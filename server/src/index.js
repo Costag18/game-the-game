@@ -179,12 +179,14 @@ io.on(EVENTS.CONNECTION, (socket) => {
         const game = createGame(tm.selectedGame, lobby.players);
         tm.activeGame = game;
         game.startGame();
+        const nicknames = lobby.nicknames || {};
         for (const playerId of lobby.players) {
           const playerSocket = io.sockets.sockets.get(playerId);
           if (playerSocket) {
             playerSocket.emit(EVENTS.GAME_STATE, {
               gameId: tm.selectedGame,
               state: game.getStateForPlayer(playerId),
+              nicknames,
             });
           }
         }
@@ -251,12 +253,14 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
 
     const lobby = lobbyManager.getLobby(lobbyId);
+    const nicknames = lobby.nicknames || {};
     for (const playerId of lobby.players) {
       const playerSocket = io.sockets.sockets.get(playerId);
       if (playerSocket) {
         playerSocket.emit(EVENTS.GAME_STATE, {
           gameId: tm.selectedGame,
           state: game.getStateForPlayer(playerId),
+          nicknames,
         });
       }
     }

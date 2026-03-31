@@ -116,6 +116,7 @@ function GameRouter() {
         return (
           <GameComponent
             gameState={tournament.gameState?.state}
+            nicknames={tournament.gameState?.nicknames || {}}
             onAction={tournament.sendAction}
           />
         );
