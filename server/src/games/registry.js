@@ -3,6 +3,11 @@ import { RockPaperScissors } from './RockPaperScissors.js';
 import { War } from './War.js';
 import { MemoryMatch } from './MemoryMatch.js';
 import { LiarsDice } from './LiarsDice.js';
+import { Uno } from './Uno.js';
+import { CrazyEights } from './CrazyEights.js';
+import { GoFish } from './GoFish.js';
+import { Roulette } from './Roulette.js';
+import { Hangman } from './Hangman.js';
 
 const gameEngines = {};
 
@@ -29,3 +34,8 @@ registerGame('rps', RockPaperScissors);
 registerGame('war', War);
 registerGame('memoryMatch', MemoryMatch);
 registerGame('liarsDice', LiarsDice);
+registerGame('uno', Uno);
+registerGame('crazyEights', CrazyEights);
+registerGame('goFish', GoFish);
+registerGame('roulette', Roulette);
+registerGame('hangman', Hangman);
