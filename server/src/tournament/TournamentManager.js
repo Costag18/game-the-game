@@ -58,12 +58,12 @@ export class TournamentManager {
     this.phase = 'playing';
   }
 
-  completeRound(placements) {
+  completeRound(placements, gameResults = null) {
     // Ensure all players have a wager entry (default 0)
     for (const p of this.players) {
       if (this.wagers[p] === undefined) this.wagers[p] = 0;
     }
-    const roundScores = Scorer.calculateRoundScores(placements, this.wagers, this.currentRound);
+    const roundScores = Scorer.calculateRoundScores(placements, this.wagers, this.currentRound, gameResults);
     for (const [playerId, scoreData] of Object.entries(roundScores)) {
       this.scores[playerId] += scoreData.total;
     }

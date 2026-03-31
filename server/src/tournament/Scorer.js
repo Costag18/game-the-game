@@ -28,13 +28,30 @@ export class Scorer {
     return amount <= Math.floor(currentPoints * SCORING.MAX_WAGER_PERCENT);
   }
 
-  static calculateRoundScores(placements, wagers, roundNumber) {
+  /**
+   * Calculate round scores. `placements` is an array of player IDs ordered by rank.
+   * `gameResults` is an optional array of { playerId, placement } from the game engine
+   * which may contain ties (same placement number for multiple players).
+   */
+  static calculateRoundScores(placements, wagers, roundNumber, gameResults = null) {
     const basePoints = Scorer.getBasePoints(roundNumber);
     const wagerPayouts = Scorer.calculateWagerPayouts(wagers, placements);
     const scores = {};
+
+    // Build a placement map — if gameResults has ties, use those placements
+    const placementMap = {};
+    if (gameResults && Array.isArray(gameResults)) {
+      for (const r of gameResults) {
+        if (r.playerId && r.placement) {
+          placementMap[r.playerId] = r.placement;
+        }
+      }
+    }
+
     for (let i = 0; i < placements.length; i++) {
       const playerId = placements[i];
-      const placement = i + 1;
+      // Use tied placement from game results if available, otherwise index-based
+      const placement = placementMap[playerId] || (i + 1);
       const base = Scorer.calculatePlacementPoints(placement, basePoints);
       const wagerCost = wagers[playerId] || 0;
       const wagerPayout = wagerPayouts[playerId] || 0;

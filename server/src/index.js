@@ -199,7 +199,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
           const results = game.getResults();
           const placements = results.map((r) => r.playerId);
           tm.activeGame = null;
-          const roundScores = tm.completeRound(placements);
+          const roundScores = tm.completeRound(placements, results);
 
           io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
           io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
@@ -317,7 +317,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       const results = game.getResults();
       const placements = results.map((r) => r.playerId);
       tm.activeGame = null;
-      const roundScores = tm.completeRound(placements);
+      const roundScores = tm.completeRound(placements, results);
 
       io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
       io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
