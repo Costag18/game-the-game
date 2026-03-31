@@ -1,21 +1,23 @@
 .table {
   min-height: 100vh;
-  background-color: #1a6b35;
-  background-image:
-    radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
+  background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   gap: 1.5rem;
+  border: 8px solid #5c3317;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 2.5rem;
-  color: #ffd700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
   letter-spacing: 0.05em;
 }
@@ -28,29 +30,33 @@
 
 .statusText {
   font-size: 1.05rem;
-  color: #fff9c4;
+  color: #f0d68a;
   margin: 0;
   text-align: center;
 }
 
 /* Scoreboard */
 .scoreboard {
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 12px;
-  padding: 1rem 1.5rem;
+  padding: 1rem;
   width: 100%;
   max-width: 640px;
   box-sizing: border-box;
 }
 
 .scoreboardTitle {
-  color: #ffd700;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0 0 0.75rem 0;
   text-align: center;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
+  padding-top: 0.5rem;
 }
 
 .scoreList {
@@ -64,18 +70,19 @@
 }
 
 .scoreItem {
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(212, 168, 67, 0.2);
   border-radius: 8px;
   padding: 0.4rem 0.9rem;
   font-size: 0.9rem;
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 .scoreItem.activePlayer {
-  border-color: #ffd700;
-  color: #ffd700;
+  border-color: #d4a843;
+  color: #d4a843;
   font-weight: bold;
+  background: rgba(212, 168, 67, 0.12);
 }
 
 /* Board */
@@ -90,7 +97,7 @@
   gap: 0.5rem;
 }
 
-/* Cards */
+/* Cards — casino-style backs */
 .card {
   aspect-ratio: 3 / 4;
   border-radius: 8px;
@@ -103,18 +110,28 @@
   user-select: none;
   border: 2px solid transparent;
   transition: transform 0.12s ease, filter 0.12s ease;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.35);
+  box-shadow: 2px 3px 7px rgba(0,0,0,0.4), inset 0 0 3px rgba(0,0,0,0.1);
 }
 
+/* Decorative casino-pattern card back */
 .cardBack {
-  background-color: #1a237e;
-  border-color: #3949ab;
-  color: #7986cb;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(212, 168, 67, 0.08) 0px,
+      rgba(212, 168, 67, 0.08) 2px,
+      transparent 2px,
+      transparent 8px
+    ),
+    linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  border-color: #d4a843;
+  color: #d4a843;
 }
 
 .cardBack.canFlip:hover {
   filter: brightness(1.2);
   transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(212, 168, 67, 0.3);
 }
 
 .cardBack.noFlip {
@@ -122,37 +139,42 @@
 }
 
 .cardFaceUp {
-  background-color: #f5f0e0;
-  border-color: #ffd700;
+  background-color: #f5f0e8;
+  border-color: #d4a843;
   color: #1a1a1a;
+  box-shadow: 2px 3px 7px rgba(0,0,0,0.4), inset 0 0 3px rgba(0,0,0,0.1);
 }
 
 .cardMatched {
-  background-color: #3a3a3a;
-  border-color: #555;
-  color: #777;
+  background-color: #2a3a2a;
+  border-color: rgba(212, 168, 67, 0.2);
+  color: #5a7a5a;
   cursor: default;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 /* Results */
 .resultsSection {
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem;
   width: 100%;
   max-width: 640px;
   box-sizing: border-box;
 }
 
 .resultsTitle {
-  color: #ffd700;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
   font-size: 1.3rem;
   text-align: center;
   margin: 0 0 1rem 0;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
+  padding-top: 0.5rem;
 }
 
 .resultsList {
@@ -168,14 +190,14 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   padding: 0.5rem 0.9rem;
   border-radius: 8px;
   font-size: 0.95rem;
 }
 
 .placement {
-  color: #ffd700;
+  color: #d4a843;
   font-weight: bold;
   font-size: 1.1rem;
   width: 1.5rem;
@@ -183,7 +205,7 @@
 
 .resultPlayerId {
   flex: 1;
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 .resultPairs {

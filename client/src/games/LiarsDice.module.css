@@ -1,21 +1,23 @@
 .table {
   min-height: 100vh;
-  background-color: #1a6b35;
-  background-image:
-    radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
+  background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   gap: 1.5rem;
+  border: 8px solid #5c3317;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 2.5rem;
-  color: #ffd700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
   letter-spacing: 0.05em;
 }
@@ -28,7 +30,7 @@
 
 .statusText {
   font-size: 1.05rem;
-  color: #fff9c4;
+  color: #f0d68a;
   margin: 0;
   text-align: center;
   min-height: 1.5em;
@@ -36,10 +38,10 @@
 
 /* Panel */
 .panel {
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem;
   width: 100%;
   max-width: 640px;
   box-sizing: border-box;
@@ -49,15 +51,19 @@
 }
 
 .panelTitle {
-  color: #ffd700;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0;
   text-align: center;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
+  padding-top: 0.5rem;
 }
 
-/* Dice */
+/* Dice — ivory with shadow */
 .diceRow {
   display: flex;
   flex-wrap: wrap;
@@ -68,7 +74,7 @@
 .die {
   width: 52px;
   height: 52px;
-  background-color: #f5f0e0;
+  background: linear-gradient(135deg, #f5f5dc 0%, #e8e8c8 100%);
   border: 2px solid #c8a000;
   border-radius: 10px;
   display: grid;
@@ -76,13 +82,13 @@
   grid-template-rows: repeat(3, 1fr);
   padding: 6px;
   box-sizing: border-box;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 3px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 .dot {
   width: 8px;
   height: 8px;
-  background-color: #1a1a1a;
+  background-color: #2c3e50;
   border-radius: 50%;
   align-self: center;
   justify-self: center;
@@ -103,7 +109,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   padding: 0.45rem 0.9rem;
   border-radius: 8px;
 }
@@ -113,13 +119,14 @@
 }
 
 .playerRow.activeTurn {
-  border: 1px solid #ffd700;
+  border: 1px solid #d4a843;
+  background: rgba(212, 168, 67, 0.08);
 }
 
 .playerName {
   flex: 1;
   font-weight: bold;
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 .diceCount {
@@ -128,7 +135,7 @@
 }
 
 .badgeEliminated {
-  background-color: #c62828;
+  background: linear-gradient(135deg, #c0392b 0%, #7b1e1e 100%);
   color: #fff;
   font-size: 0.75rem;
   padding: 2px 8px;
@@ -140,8 +147,9 @@
 .bidDisplay {
   text-align: center;
   font-size: 1.4rem;
-  color: #ffd700;
+  color: #d4a843;
   font-weight: bold;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
 }
 
 .bidNone {
@@ -158,6 +166,8 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
+  padding-top: 0.75rem;
 }
 
 .selectLabel {
@@ -166,14 +176,14 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.8rem;
-  color: #c8e6c9;
+  color: #f0d68a;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .select {
-  background-color: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 215, 0, 0.5);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 168, 67, 0.5);
   border-radius: 6px;
   color: #fff;
   font-size: 1rem;
@@ -183,21 +193,22 @@
 }
 
 .select:focus {
-  border-color: #ffd700;
+  border-color: #d4a843;
 }
 
 .btnBid {
   padding: 0.55rem 1.6rem;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 700;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  background-color: #2e7d32;
-  color: #fff;
-  box-shadow: 0 3px 0 #1b5e20;
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
+  color: #1a0a0a;
+  box-shadow: 0 3px 0 #5c4a10;
   transition: transform 0.1s ease, filter 0.1s ease;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .btnBid:hover {
@@ -220,15 +231,16 @@
 .btnChallenge {
   padding: 0.55rem 1.6rem;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 700;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  background-color: #c62828;
+  background: linear-gradient(135deg, #c0392b 0%, #7b1e1e 100%);
   color: #fff;
-  box-shadow: 0 3px 0 #7f0000;
+  box-shadow: 0 3px 0 #4a0e0e;
   transition: transform 0.1s ease, filter 0.1s ease;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .btnChallenge:hover {
@@ -250,12 +262,16 @@
 
 /* Results */
 .resultsTitle {
-  color: #ffd700;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
   font-size: 1.3rem;
   text-align: center;
   margin: 0 0 1rem 0;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
+  padding-top: 0.5rem;
 }
 
 .resultsList {
@@ -271,14 +287,14 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   padding: 0.5rem 0.9rem;
   border-radius: 8px;
   font-size: 0.95rem;
 }
 
 .placement {
-  color: #ffd700;
+  color: #d4a843;
   font-weight: bold;
   font-size: 1.1rem;
   width: 1.5rem;
@@ -286,7 +302,7 @@
 
 .resultPlayerId {
   flex: 1;
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 .challengeInfo {
@@ -309,26 +325,31 @@
   background: rgba(0, 0, 0, 0.25);
   padding: 0.6rem 1rem;
   border-radius: 8px;
+  border: 1px solid rgba(212, 168, 67, 0.15);
 }
 
 .revealName {
-  color: #ffd700;
+  color: #d4a843;
   font-weight: bold;
   min-width: 80px;
   font-size: 0.9rem;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
 }
 
 .btnContinue {
   padding: 0.65rem 2rem;
-  background: linear-gradient(135deg, #ffd700 0%, #8a7230 100%);
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
   color: #1a0a0a;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   transition: opacity 0.2s;
+  box-shadow: 0 2px 0 #5c4a10;
 }
 
 .btnContinue:hover {
@@ -336,7 +357,7 @@
 }
 
 .waitingSmall {
-  color: #b0bec5;
+  color: #b8a88a;
   font-style: italic;
   font-size: 0.9rem;
   margin-top: 0.5rem;

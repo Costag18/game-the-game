@@ -1,20 +1,23 @@
 .table {
   min-height: 100vh;
-  background-color: #0a4a2f;
-  background-image: radial-gradient(ellipse at center, #0e5c3a 0%, #083d26 60%, #052818 100%);
+  background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   gap: 1.25rem;
+  border: 8px solid #5c3317;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 2.5rem;
-  color: #7ecfff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
   letter-spacing: 0.05em;
 }
@@ -31,17 +34,18 @@
   gap: 1.5rem;
   align-items: center;
   background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(212, 168, 67, 0.2);
   border-radius: 8px;
   padding: 0.5rem 1.25rem;
   font-size: 0.95rem;
 }
 
 .deckCount {
-  color: #b0bec5;
+  color: #b8a88a;
 }
 
 .statusMyTurn {
-  color: #ffe082;
+  color: #f0d68a;
   font-weight: bold;
   font-size: 1rem;
 }
@@ -57,12 +61,12 @@
 
 /* Last action */
 .lastAction {
-  background: rgba(126, 207, 255, 0.12);
-  border: 1px solid rgba(126, 207, 255, 0.3);
+  background: rgba(212, 168, 67, 0.1);
+  border: 1px solid rgba(212, 168, 67, 0.3);
   border-radius: 8px;
   padding: 0.6rem 1.25rem;
   font-size: 0.9rem;
-  color: #e3f2fd;
+  color: #f0e6d3;
   text-align: center;
   max-width: 600px;
   width: 100%;
@@ -72,10 +76,10 @@
 .opponentsSection,
 .mySection,
 .resultsSection {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(126, 207, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem;
   width: 100%;
   max-width: 640px;
   box-sizing: border-box;
@@ -83,10 +87,15 @@
 
 .sectionTitle {
   font-size: 1rem;
-  color: #7ecfff;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin: 0 0 0.75rem 0;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
+  padding-top: 0.5rem;
+  text-align: center;
 }
 
 /* Opponents */
@@ -108,14 +117,14 @@
 }
 
 .opponentActive {
-  border-color: #ffe082;
-  background: rgba(255, 224, 130, 0.1);
+  border-color: #d4a843;
+  background: rgba(212, 168, 67, 0.1);
 }
 
 .opponentName {
   font-weight: bold;
   flex: 1;
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 .opponentCards {
@@ -139,12 +148,12 @@
 }
 
 .mySetsLabel {
-  color: #b0bec5;
+  color: #b8a88a;
   font-size: 0.9rem;
 }
 
 .mySetsCount {
-  color: #ffe082;
+  color: #d4a843;
   font-size: 1.1rem;
   font-weight: bold;
 }
@@ -166,33 +175,34 @@
 .cardMini {
   display: inline-flex;
   align-items: center;
-  background: #fff;
+  background: #f5f0e8;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 5px;
   padding: 2px 6px;
   font-size: 0.8rem;
   font-weight: bold;
   user-select: none;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.35), inset 0 0 2px rgba(0,0,0,0.08);
 }
 
 .cardRed {
-  color: #c62828;
+  color: #c0392b;
 }
 
 .cardBlack {
-  color: #212121;
+  color: #2c3e50;
 }
 
 /* Ask controls */
 .askControls {
-  border-top: 1px solid rgba(126, 207, 255, 0.2);
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
   padding-top: 1rem;
 }
 
 .askTitle {
   font-size: 0.9rem;
-  color: #7ecfff;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -206,9 +216,9 @@
 }
 
 .select {
-  background: #1e3a2f;
-  color: #e8f5e9;
-  border: 1px solid #4caf50;
+  background: rgba(0, 0, 0, 0.4);
+  color: #f0e6d3;
+  border: 1px solid rgba(212, 168, 67, 0.5);
   border-radius: 6px;
   padding: 0.4rem 0.75rem;
   font-size: 0.9rem;
@@ -217,25 +227,27 @@
 
 .select:focus {
   outline: none;
-  border-color: #7ecfff;
+  border-color: #d4a843;
 }
 
 .forText {
-  color: #90a4ae;
+  color: #b8a88a;
   font-size: 0.9rem;
 }
 
 .btnAsk {
   padding: 0.4rem 1.25rem;
-  background: #1565c0;
-  color: #fff;
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
+  color: #1a0a0a;
   border: none;
   border-radius: 6px;
   font-size: 0.95rem;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   transition: filter 0.15s, transform 0.1s;
-  box-shadow: 0 2px 0 #0d47a1;
+  box-shadow: 0 2px 0 #5c4a10;
 }
 
 .btnAsk:hover:not(:disabled) {
@@ -271,10 +283,10 @@
 
 .resultName {
   font-weight: bold;
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 .resultSets {
-  color: #ffe082;
+  color: #d4a843;
   font-weight: bold;
 }

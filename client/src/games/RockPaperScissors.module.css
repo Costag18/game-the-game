@@ -1,19 +1,23 @@
 .arena {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   gap: 1.5rem;
+  border: 8px solid #5c3317;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 2.2rem;
-  color: #e94560;
-  text-shadow: 0 2px 8px rgba(233, 69, 96, 0.4);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
   letter-spacing: 0.04em;
 }
@@ -33,7 +37,7 @@
 
 .roundLabel {
   font-size: 1rem;
-  color: #90cdf4;
+  color: #f0d68a;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -45,8 +49,8 @@
 }
 
 .scoreCard {
-  background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 12px;
   padding: 0.75rem 1.5rem;
   display: flex;
@@ -58,7 +62,7 @@
 
 .playerName {
   font-size: 0.85rem;
-  color: #a0aec0;
+  color: #b8a88a;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -66,8 +70,9 @@
 .scoreValue {
   font-size: 2rem;
   font-weight: bold;
-  color: #ffd700;
+  color: #d4a843;
   line-height: 1;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
 }
 
 /* Reveal area */
@@ -75,16 +80,16 @@
   display: flex;
   align-items: center;
   gap: 2rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  border-radius: 12px;
   padding: 1.5rem 2.5rem;
 }
 
 .vs {
   font-size: 1.4rem;
   font-weight: bold;
-  color: #e94560;
+  color: #d4a843;
 }
 
 .choiceDisplay {
@@ -118,7 +123,7 @@
 
 .choiceLabel {
   font-size: 0.9rem;
-  color: #a0aec0;
+  color: #b8a88a;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -126,7 +131,7 @@
 /* Status text */
 .statusText {
   font-size: 1.2rem;
-  color: #fff9c4;
+  color: #f0d68a;
   margin: 0;
   text-align: center;
   min-height: 1.6em;
@@ -134,9 +139,9 @@
 
 .statusFinished {
   font-size: 1.5rem;
-  color: #ffd700;
+  color: #d4a843;
   font-weight: bold;
-  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.4);
 }
 
 /* Choice buttons */
@@ -154,9 +159,9 @@
   gap: 0.5rem;
   width: 110px;
   padding: 1.25rem 0.75rem;
-  background-color: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(212, 168, 67, 0.25);
+  border-radius: 12px;
   color: #fff;
   cursor: pointer;
   transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
@@ -164,9 +169,10 @@
 }
 
 .choiceBtn:hover {
-  background-color: rgba(233, 69, 96, 0.25);
-  border-color: #e94560;
+  background: rgba(212, 168, 67, 0.2);
+  border-color: #d4a843;
   transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(212, 168, 67, 0.25);
 }
 
 .choiceBtn:active {
@@ -180,9 +186,10 @@
 
 .btnLabel {
   font-size: 0.9rem;
-  font-weight: bold;
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
+  color: #f0d68a;
 }
 
 /* Waiting area */
@@ -191,9 +198,9 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  border-radius: 12px;
   padding: 1.25rem 2rem;
 }
 
@@ -206,12 +213,12 @@
 
 .chosenLabel {
   font-size: 1rem;
-  color: #e2e8f0;
+  color: #f0e6d3;
 }
 
 .waitingText {
   font-size: 0.95rem;
-  color: #a0aec0;
+  color: #b8a88a;
   margin: 0;
   letter-spacing: 0.03em;
 }

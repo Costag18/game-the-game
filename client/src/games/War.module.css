@@ -1,19 +1,23 @@
 .table {
   min-height: 100vh;
-  background: linear-gradient(160deg, #1a0533 0%, #2d1b69 50%, #1a0533 100%);
+  background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   gap: 1.5rem;
+  border: 8px solid #5c3317;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 2.5rem;
-  color: #ffd700;
-  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -30,12 +34,13 @@
   font-size: 2rem;
   font-weight: bold;
   color: #fff;
-  background-color: #c62828;
+  background: linear-gradient(135deg, #c0392b 0%, #7b1e1e 100%);
   padding: 0.4rem 2rem;
   border-radius: 8px;
   letter-spacing: 0.12em;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   animation: pulse 0.7s ease infinite alternate;
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.5);
 }
 
 @keyframes pulse {
@@ -70,12 +75,12 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #b39ddb;
+  color: #f0d68a;
 }
 
 .deckCount {
   font-size: 0.8rem;
-  color: #9575cd;
+  color: #b8a88a;
 }
 
 /* Battle zone */
@@ -84,9 +89,9 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  border-radius: 12px;
   padding: 1.25rem 1.5rem;
   min-width: 260px;
 }
@@ -108,25 +113,25 @@
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #b39ddb;
+  color: #f0d68a;
 }
 
 .emptySlot {
   width: 72px;
   height: 100px;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border: 2px dashed rgba(212, 168, 67, 0.3);
+  border-radius: 9px;
 }
 
 .versus {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #e94560;
+  color: #d4a843;
 }
 
 .flipCounter {
   font-size: 0.82rem;
-  color: #9575cd;
+  color: #b8a88a;
   letter-spacing: 0.04em;
 }
 
@@ -134,15 +139,15 @@
 .card {
   width: 56px;
   height: 80px;
-  background-color: #fff;
+  background-color: #f5f0e8;
   border: 2px solid #ccc;
-  border-radius: 8px;
+  border-radius: 9px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 3px 7px rgba(0,0,0,0.4), inset 0 0 3px rgba(0,0,0,0.1);
   font-weight: bold;
   font-size: 0.9rem;
   user-select: none;
@@ -155,15 +160,15 @@
 }
 
 .cardRed {
-  color: #c62828;
+  color: #c0392b;
 }
 
 .cardBlack {
-  color: #212121;
+  color: #2c3e50;
 }
 
 .cardHidden {
-  background-color: #311b92;
+  background: linear-gradient(135deg, #311b92 0%, #4527a0 100%);
   border-color: #7c4dff;
   color: #b39ddb;
   font-size: 1.4rem;
@@ -176,7 +181,7 @@
 
 .cardEmpty {
   background-color: transparent;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border: 2px dashed rgba(212, 168, 67, 0.25);
   color: rgba(255, 255, 255, 0.3);
   font-size: 0.75rem;
   cursor: default;
@@ -195,7 +200,7 @@
 /* Status */
 .statusText {
   font-size: 1.1rem;
-  color: #e2d9f3;
+  color: #f0e6d3;
   margin: 0;
   text-align: center;
   min-height: 1.5em;
@@ -203,13 +208,13 @@
 
 .statusFinished {
   font-size: 1.5rem;
-  color: #ffd700;
+  color: #d4a843;
   font-weight: bold;
-  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.4);
 }
 
 .statusWar {
-  color: #ff8a80;
+  color: #ef9a9a;
   font-weight: bold;
 }
 
@@ -217,14 +222,15 @@
 .flipBtn {
   padding: 0.75rem 2.5rem;
   font-size: 1.15rem;
-  font-weight: bold;
-  background-color: #7c4dff;
-  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
+  color: #1a0a0a;
   border: none;
-  border-radius: 10px;
+  border-radius: 6px;
   cursor: pointer;
   letter-spacing: 0.05em;
-  box-shadow: 0 4px 0 #4527a0;
+  text-transform: uppercase;
+  box-shadow: 0 4px 0 #5c4a10;
   transition: transform 0.1s ease, filter 0.1s ease;
   font-family: inherit;
 }
@@ -236,12 +242,13 @@
 
 .flipBtn:active {
   transform: translateY(2px);
-  box-shadow: 0 2px 0 #4527a0;
+  box-shadow: 0 2px 0 #5c4a10;
 }
 
 .flipBtnWar {
-  background-color: #c62828;
-  box-shadow: 0 4px 0 #7f0000;
+  background: linear-gradient(135deg, #c0392b 0%, #7b1e1e 100%);
+  color: #fff;
+  box-shadow: 0 4px 0 #4a0e0e;
   animation: shake 0.5s ease;
 }
 

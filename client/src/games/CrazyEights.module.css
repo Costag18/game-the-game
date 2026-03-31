@@ -1,22 +1,24 @@
 .table {
   min-height: 100vh;
-  background-color: #1a6b35;
-  background-image:
-    radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
+  background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
   color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', serif;
+  font-family: 'Georgia', 'Times New Roman', serif;
   gap: 1.5rem;
   position: relative;
+  border: 8px solid #5c3317;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
+  box-sizing: border-box;
 }
 
 .title {
   font-size: 2.5rem;
-  color: #ffd700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
   letter-spacing: 0.05em;
 }
@@ -41,20 +43,20 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 215, 0, 0.25);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 999px;
   padding: 0.3rem 0.75rem;
 }
 
 .opponentName {
   font-size: 0.9rem;
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 .handCountBadge {
-  background-color: #ffd700;
-  color: #212121;
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
+  color: #1a0a0a;
   font-size: 0.8rem;
   font-weight: bold;
   width: 1.6rem;
@@ -70,8 +72,8 @@
   display: flex;
   align-items: flex-start;
   gap: 3rem;
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 12px;
   padding: 1.5rem 2rem;
   width: 100%;
@@ -91,13 +93,13 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #a5d6a7;
+  color: #b8a88a;
   margin: 0;
 }
 
 .suitIndicator {
   font-size: 0.85rem;
-  color: #fff9c4;
+  color: #f0d68a;
   margin: 0;
   text-align: center;
   text-transform: capitalize;
@@ -108,22 +110,22 @@
 }
 
 .suitBlack {
-  color: #e8f5e9;
+  color: #f0e6d3;
 }
 
 /* Standard playing cards */
 .card {
   width: 60px;
   height: 88px;
-  background-color: #fff;
+  background-color: #f5f0e8;
   border: 2px solid #ccc;
-  border-radius: 8px;
+  border-radius: 9px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2px;
-  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 3px 7px rgba(0,0,0,0.4), inset 0 0 3px rgba(0,0,0,0.1);
   font-weight: bold;
   font-size: 0.85rem;
   cursor: pointer;
@@ -148,16 +150,16 @@
 }
 
 .cardRed {
-  color: #c62828;
+  color: #c0392b;
 }
 
 .cardBlack {
-  color: #212121;
+  color: #2c3e50;
 }
 
 .cardWild {
-  border: 3px solid #f9a825;
-  box-shadow: 0 0 8px rgba(249, 168, 37, 0.6), 2px 4px 8px rgba(0, 0, 0, 0.3);
+  border: 3px solid #d4a843;
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.5), 2px 3px 7px rgba(0,0,0,0.4);
 }
 
 .cardStatic {
@@ -167,7 +169,7 @@
 .cardPlayable:hover {
   transform: translateY(-6px);
   box-shadow: 2px 8px 16px rgba(0, 0, 0, 0.5);
-  border-color: #ffd700;
+  border-color: #d4a843;
 }
 
 .cardPlayable:active {
@@ -177,13 +179,13 @@
 .cardEmpty {
   background-color: rgba(255, 255, 255, 0.08);
   border-style: dashed;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(212, 168, 67, 0.3);
   color: rgba(255, 255, 255, 0.4);
   font-size: 1.5rem;
 }
 
 .cardBack {
-  background-color: #1a237e;
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
   border-color: #3949ab;
   color: #7986cb;
 }
@@ -195,10 +197,10 @@
 
 /* Hand section */
 .handSection {
-  background-color: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
   border-radius: 12px;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem;
   width: 100%;
   max-width: 640px;
   box-sizing: border-box;
@@ -217,7 +219,7 @@
 
 .statusText {
   font-size: 1rem;
-  color: #fff9c4;
+  color: #f0d68a;
   margin: 0;
   text-align: center;
 }
@@ -234,21 +236,24 @@
 }
 
 .suitPicker {
-  background-color: #f5f5f5;
-  border: 2px solid #ffd700;
+  background: linear-gradient(135deg, #1a3a25 0%, #0f2318 100%);
+  border: 2px solid #d4a843;
   border-radius: 16px;
   padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
 }
 
 .suitPickerTitle {
   font-size: 1.2rem;
-  color: #212121;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #d4a843;
   margin: 0;
   font-weight: bold;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
 }
 
 .suitPickerButtons {
@@ -260,27 +265,27 @@
   width: 72px;
   height: 72px;
   border-radius: 12px;
-  border: 2px solid #ccc;
-  background-color: #fff;
+  border: 2px solid rgba(212, 168, 67, 0.4);
+  background-color: #f5f0e8;
   cursor: pointer;
   font-size: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 2px 3px 7px rgba(0,0,0,0.4), inset 0 0 3px rgba(0,0,0,0.1);
 }
 
 .suitBtn.suitRed {
-  color: #c62828;
+  color: #c0392b;
 }
 
 .suitBtn.suitBlack {
-  color: #212121;
+  color: #2c3e50;
 }
 
 .suitBtn:hover {
   transform: scale(1.12);
-  border-color: #ffd700;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  border-color: #d4a843;
+  box-shadow: 0 0 12px rgba(212, 168, 67, 0.5);
 }
