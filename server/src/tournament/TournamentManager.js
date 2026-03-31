@@ -104,6 +104,8 @@ export class TournamentManager {
       scores: this.getScores(),
       standings: this.getStandings(),
       selectedGame: this.selectedGame,
+      winCondition: this.winCondition,
+      winTarget: this.winTarget,
       votes: this.phase === 'voting' ? { ...this.votes } : null,
       wagers: this.phase === 'wagering' ? { ...this.wagers } : null,
     };

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
+import { displayName } from '../utils/displayName.js';
 import styles from './GameVote.module.css';
 
-export default function GameVote({ eligibleGames, tournamentState, onVote }) {
+export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
   const [voted, setVoted] = useState(false);
   const [voteCounts, setVoteCounts] = useState({});
@@ -30,14 +31,39 @@ export default function GameVote({ eligibleGames, tournamentState, onVote }) {
   }
 
   const round = tournamentState?.currentRound ?? '?';
-  const totalRounds = tournamentState?.totalRounds ?? '?';
+  const winCondition = tournamentState?.winCondition;
+  const winTarget = tournamentState?.winTarget;
+  const standings = tournamentState?.standings || [];
+
+  const roundLabel = winCondition === 'fixedRounds'
+    ? `Round ${round} of ${winTarget}`
+    : `Round ${round}`;
+  const targetLabel = winCondition === 'pointThreshold'
+    ? `First to ${winTarget?.toLocaleString()} points`
+    : null;
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className={styles.title}>Vote for the Next Game</h2>
-        <p className={styles.subtitle}>Round {round} of {totalRounds}</p>
+        <p className={styles.subtitle}>{roundLabel}</p>
+        {targetLabel && <p className={styles.subtitle}>{targetLabel}</p>}
       </div>
+
+      {/* Player standings */}
+      {standings.length > 0 && (
+        <div className={styles.standings}>
+          {standings.map((entry, i) => (
+            <div key={entry.playerId} className={styles.standingRow}>
+              <span className={styles.standingRank}>
+                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+              </span>
+              <span className={styles.standingName}>{displayName(entry.playerId, nicknames)}</span>
+              <span className={styles.standingScore}>{entry.score} pts</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className={styles.grid}>
         {eligibleGames.map((game) => {

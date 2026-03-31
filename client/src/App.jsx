@@ -94,6 +94,7 @@ function GameRouter() {
         <GameVote
           eligibleGames={tournament.eligibleGames}
           tournamentState={tournament.tournamentState}
+          nicknames={currentLobby?.nicknames || tournament.gameState?.nicknames || {}}
           onVote={tournament.vote}
         />
       )}
