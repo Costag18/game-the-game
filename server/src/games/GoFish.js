@@ -36,7 +36,20 @@ export class GoFish extends BaseGame {
 
     this.transition('start');
     this.setTurnPlayer(this.players[0]);
+    this._autoDrawIfEmpty(this.players[0]);
     this._checkGameEnd();
+  }
+
+  _autoDrawIfEmpty(playerId) {
+    // If player has no cards but deck has cards, auto-draw one
+    if ((this.hands[playerId] || []).length === 0 && this.deck.remaining() > 0) {
+      const card = this.deck.deal();
+      if (card) {
+        this.hands[playerId].push(card);
+        this._checkAndRemoveSets(playerId);
+        this.lastAction = { type: 'autoDraw', playerId };
+      }
+    }
   }
 
   _checkAndRemoveSets(playerId) {
@@ -101,6 +114,7 @@ export class GoFish extends BaseGame {
         this.hands[playerId] = [...myHand, ...matchingCards];
         this._checkAndRemoveSets(playerId);
         this.lastAction = { type: 'transfer', playerId, targetPlayer, rank, count: matchingCards.length };
+        this._autoDrawIfEmpty(playerId);
         this._checkGameEnd();
         // Go again (don't advance turn)
       } else {
@@ -152,6 +166,7 @@ export class GoFish extends BaseGame {
       const candidate = this.players[nextIndex];
       if (!deckEmpty || (this.hands[candidate] || []).length > 0) {
         this.setTurnPlayer(candidate);
+        this._autoDrawIfEmpty(candidate);
         return;
       }
       nextIndex = (nextIndex + 1) % this.players.length;
