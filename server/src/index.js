@@ -1,16 +1,24 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import { EVENTS } from '../../shared/events.js';
 import { LobbyManager } from './lobby/LobbyManager.js';
 import { TournamentManager } from './tournament/TournamentManager.js';
 import { createGame, isGameRegistered } from './games/registry.js';
 import { getEligibleGames } from '../../shared/gameList.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const httpServer = createServer(app);
+
+const isProduction = process.env.NODE_ENV === 'production';
+
 const io = new Server(httpServer, {
-  cors: {
+  cors: isProduction ? {} : {
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
   },
@@ -18,6 +26,12 @@ const io = new Server(httpServer, {
 
 const lobbyManager = new LobbyManager();
 const tournaments = new Map();
+
+// Serve built React app in production
+if (isProduction) {
+  const clientDist = path.join(__dirname, '../../client/dist');
+  app.use(express.static(clientDist));
+}
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
@@ -356,6 +370,14 @@ function handlePlayerLeave(socket) {
     io.to(lobbyId).emit(EVENTS.PLAYER_LEFT, { playerId: socket.id });
     io.to(lobbyId).emit(EVENTS.LOBBY_STATE, lobby);
   }
+}
+
+// Catch-all: serve React app for any non-API route in production
+if (isProduction) {
+  const clientDist = path.join(__dirname, '../../client/dist');
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
 }
 
 const PORT = process.env.PORT || 3001;

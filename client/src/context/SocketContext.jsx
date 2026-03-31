@@ -8,7 +8,9 @@ export function SocketProvider({ children }) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:3001', {
+    // Connect to same origin in production, localhost in dev
+    const url = import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin;
+    const newSocket = io(url, {
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
