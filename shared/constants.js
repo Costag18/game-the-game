@@ -1,0 +1,27 @@
+export const SCORING = {
+  BASE_START: 100,
+  BASE_INCREMENT: 50,
+  PLACEMENT_MULTIPLIERS: [1.0, 0.7, 0.5, 0.35, 0.25, 0.15],
+  MAX_WAGER_PERCENT: 0.5,
+  WAGER_POT_SPLIT: [0.5, 0.3, 0.2],
+};
+
+export const TIMERS = {
+  CARD_GAME: 30,
+  RPS: 15,
+  ROULETTE: 60,
+  VOTE: 20,
+  WAGER: 30,
+  RECONNECT_GRACE: 45,
+};
+
+export const LOBBY = {
+  MIN_PLAYERS: 2,
+  MAX_PLAYERS: 8,
+  WIN_CONDITIONS: {
+    FIXED_ROUNDS: 'fixedRounds',
+    POINT_THRESHOLD: 'pointThreshold',
+  },
+  ROUND_OPTIONS: [5, 10, 15],
+  THRESHOLD_OPTIONS: [1000, 2000, 5000],
+};

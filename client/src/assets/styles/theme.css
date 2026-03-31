@@ -1,0 +1,27 @@
+:root {
+  --felt-green: #1a5c2a;
+  --felt-dark: #0f3d1a;
+  --wood-brown: #5c3317;
+  --wood-dark: #3a1f0d;
+  --mahogany: #4a0e0e;
+  --burgundy: #6b1c1c;
+  --gold: #d4a843;
+  --gold-light: #f0d68a;
+  --gold-dim: #8a7230;
+  --card-white: #f5f0e8;
+  --card-red: #c0392b;
+  --card-black: #2c3e50;
+  --ivory: #f5f5dc;
+  --text-primary: #f0e6d3;
+  --text-secondary: #b8a88a;
+  --bg-dark: #1a0a0a;
+  --bg-panel: #2a1515;
+  --success: #27ae60;
+  --danger: #c0392b;
+  --warning: #f39c12;
+  --font-heading: 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
