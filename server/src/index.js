@@ -24,14 +24,20 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 io.on(EVENTS.CONNECTION, (socket) => {
   console.log(`Player connected: ${socket.id}`);
 
-  socket.on(EVENTS.SET_NICKNAME, (nickname) => {
-    socket.data.nickname = nickname;
+  socket.on(EVENTS.SET_NICKNAME, (data, callback) => {
+    const nickname = typeof data === 'string' ? data : data?.nickname;
+    if (!nickname || typeof nickname !== 'string' || nickname.trim().length === 0) {
+      if (typeof callback === 'function') callback({ error: 'Nickname is required' });
+      return;
+    }
+    socket.data.nickname = nickname.trim();
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (lobbyId) {
-      lobbyManager.setNickname(socket.id, nickname);
+      lobbyManager.setNickname(socket.id, nickname.trim());
       const lobby = lobbyManager.getLobby(lobbyId);
       io.to(lobbyId).emit(EVENTS.LOBBY_STATE, lobby);
     }
+    if (typeof callback === 'function') callback({ success: true });
   });
 
   socket.on(EVENTS.LIST_LOBBIES, (callback) => {
