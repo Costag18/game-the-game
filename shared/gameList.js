@@ -39,7 +39,7 @@ export const GAMES = {
   liarsDice: {
     id: 'liarsDice', name: 'Liar\'s Dice', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME, description: 'Bluff or call. Last player with dice wins.',
-    tutorial: 'https://www.youtube.com/watch?v=aVhHPm_nNGM',
+    tutorial: 'https://www.youtube.com/watch?v=bJKLJHRa8D4',
   },
   memoryMatch: {
     id: 'memoryMatch', name: 'Memory Match', minPlayers: 2, maxPlayers: 6,
