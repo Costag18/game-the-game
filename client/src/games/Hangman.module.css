@@ -1,0 +1,311 @@
+.table {
+  min-height: 100vh;
+  background-color: #1a1a2e;
+  background-image: radial-gradient(ellipse at center, #1f1f3d 0%, #131328 60%, #0a0a1a 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  font-family: 'Georgia', serif;
+  gap: 1.25rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #ce93d8;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.waiting {
+  font-size: 1.2rem;
+  color: #b39ddb;
+  margin-top: 4rem;
+}
+
+/* Status bar */
+.statusBar {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.statusMyTurn {
+  color: #ffe082;
+  font-weight: bold;
+}
+
+.statusWaiting {
+  color: #90a4ae;
+}
+
+.statusFinished {
+  color: #ef9a9a;
+  font-weight: bold;
+}
+
+.statusEliminated {
+  color: #ef5350;
+  font-weight: bold;
+}
+
+/* Game area (gallows + word) */
+.gameArea {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(206, 147, 216, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+}
+
+/* Gallows */
+.gallowsArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.hangmanSvg {
+  display: block;
+}
+
+.wrongCount {
+  font-size: 0.85rem;
+  color: #ef9a9a;
+  margin: 0;
+}
+
+/* Word display */
+.wordArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.wordDisplay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.letterSlot {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 32px;
+  height: 40px;
+  border-bottom: 3px solid #ce93d8;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #e1bee7;
+  letter-spacing: 0.02em;
+}
+
+.revealedWord {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #a5d6a7;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.letterCount {
+  font-size: 0.8rem;
+  color: #78909c;
+  margin: 0;
+}
+
+/* Keyboard */
+.keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  max-width: 520px;
+  width: 100%;
+}
+
+.keyBtn {
+  width: 38px;
+  height: 38px;
+  background: rgba(206, 147, 216, 0.15);
+  border: 1px solid rgba(206, 147, 216, 0.4);
+  border-radius: 6px;
+  color: #e1bee7;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, opacity 0.15s;
+}
+
+.keyBtn:hover:not(:disabled) {
+  background: rgba(206, 147, 216, 0.35);
+  transform: translateY(-1px);
+}
+
+.keyBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.keyBtn:disabled {
+  cursor: default;
+}
+
+.keyUsed {
+  opacity: 0.4;
+}
+
+.keyCorrect {
+  background: rgba(46, 125, 50, 0.5) !important;
+  border-color: #4caf50 !important;
+  color: #a5d6a7 !important;
+  opacity: 0.7;
+}
+
+.keyWrong {
+  background: rgba(183, 28, 28, 0.4) !important;
+  border-color: #ef5350 !important;
+  color: #ef9a9a !important;
+  opacity: 0.6;
+}
+
+/* Players section */
+.playersSection {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(206, 147, 216, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+}
+
+.sectionTitle {
+  font-size: 0.9rem;
+  color: #ce93d8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.7rem 0;
+}
+
+.playersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.playerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.playerActive {
+  border-color: #ffe082;
+  background: rgba(255, 224, 130, 0.08);
+}
+
+.playerEliminated {
+  opacity: 0.5;
+}
+
+.playerName {
+  font-weight: bold;
+  flex: 1;
+  color: #e1bee7;
+}
+
+.playerGallows {
+  transform: scale(0.4);
+  transform-origin: left center;
+  width: 48px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.playerGallows svg {
+  margin-top: -55px;
+  margin-left: -15px;
+}
+
+.playerWrong {
+  font-size: 0.85rem;
+  color: #ef9a9a;
+  min-width: 30px;
+}
+
+.eliminatedBadge {
+  font-size: 0.75rem;
+  background: #b71c1c;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+
+.turnBadge {
+  font-size: 0.75rem;
+  background: #f9a825;
+  color: #212121;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-weight: bold;
+}
+
+/* Guessed letters */
+.guessedSection {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(206, 147, 216, 0.15);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
+}
+
+.guessedLetters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.guessedLetter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.guessedCorrect {
+  background: rgba(46, 125, 50, 0.5);
+  border: 1px solid #4caf50;
+  color: #a5d6a7;
+}
+
+.guessedWrong {
+  background: rgba(183, 28, 28, 0.4);
+  border: 1px solid #ef5350;
+  color: #ef9a9a;
+}

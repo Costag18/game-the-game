@@ -1,0 +1,185 @@
+import styles from './Hangman.module.css';
+
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+// SVG hangman stages (0–6 wrong guesses)
+function HangmanFigure({ wrongCount }) {
+  return (
+    <svg
+      className={styles.hangmanSvg}
+      viewBox="0 0 120 150"
+      width="120"
+      height="150"
+      aria-label={`Hangman: ${wrongCount} wrong guesses`}
+    >
+      {/* Gallows */}
+      <line x1="10" y1="145" x2="110" y2="145" stroke="#a5d6a7" strokeWidth="3" strokeLinecap="round" />
+      <line x1="30" y1="145" x2="30" y2="10" stroke="#a5d6a7" strokeWidth="3" strokeLinecap="round" />
+      <line x1="30" y1="10" x2="75" y2="10" stroke="#a5d6a7" strokeWidth="3" strokeLinecap="round" />
+      <line x1="75" y1="10" x2="75" y2="28" stroke="#a5d6a7" strokeWidth="2" strokeLinecap="round" />
+
+      {/* Head */}
+      {wrongCount >= 1 && (
+        <circle cx="75" cy="38" r="10" stroke="#ef9a9a" strokeWidth="2.5" fill="none" />
+      )}
+      {/* Body */}
+      {wrongCount >= 2 && (
+        <line x1="75" y1="48" x2="75" y2="90" stroke="#ef9a9a" strokeWidth="2.5" strokeLinecap="round" />
+      )}
+      {/* Left arm */}
+      {wrongCount >= 3 && (
+        <line x1="75" y1="58" x2="55" y2="75" stroke="#ef9a9a" strokeWidth="2.5" strokeLinecap="round" />
+      )}
+      {/* Right arm */}
+      {wrongCount >= 4 && (
+        <line x1="75" y1="58" x2="95" y2="75" stroke="#ef9a9a" strokeWidth="2.5" strokeLinecap="round" />
+      )}
+      {/* Left leg */}
+      {wrongCount >= 5 && (
+        <line x1="75" y1="90" x2="55" y2="115" stroke="#ef9a9a" strokeWidth="2.5" strokeLinecap="round" />
+      )}
+      {/* Right leg */}
+      {wrongCount >= 6 && (
+        <line x1="75" y1="90" x2="95" y2="115" stroke="#ef9a9a" strokeWidth="2.5" strokeLinecap="round" />
+      )}
+    </svg>
+  );
+}
+
+export default function Hangman({ gameState, onAction, currentPlayerId }) {
+  if (!gameState) {
+    return (
+      <div className={styles.table}>
+        <p className={styles.waiting}>Waiting for game to start...</p>
+      </div>
+    );
+  }
+
+  const {
+    displayWord,
+    word,
+    guessedLetters,
+    playerStates,
+    currentTurnPlayer,
+    isMyTurn,
+    myWrongCount,
+    isEliminated,
+    phase,
+  } = gameState;
+
+  const isFinished = phase === 'finished';
+  const guessedSet = new Set(guessedLetters || []);
+
+  function handleGuess(letter) {
+    if (!isMyTurn || isEliminated) return;
+    if (guessedSet.has(letter)) return;
+    onAction({ type: 'guess', letter });
+  }
+
+  return (
+    <div className={styles.table}>
+      <h1 className={styles.title}>Hangman</h1>
+
+      {/* Status */}
+      <div className={styles.statusBar}>
+        {isFinished ? (
+          <span className={styles.statusFinished}>Game Over</span>
+        ) : isEliminated ? (
+          <span className={styles.statusEliminated}>You have been eliminated!</span>
+        ) : isMyTurn ? (
+          <span className={styles.statusMyTurn}>Your turn — guess a letter!</span>
+        ) : (
+          <span className={styles.statusWaiting}>Waiting for {currentTurnPlayer}...</span>
+        )}
+      </div>
+
+      <div className={styles.gameArea}>
+        {/* Left: Gallows */}
+        <div className={styles.gallowsArea}>
+          <HangmanFigure wrongCount={myWrongCount} />
+          <p className={styles.wrongCount}>{myWrongCount} / 6 wrong</p>
+        </div>
+
+        {/* Center: Word display */}
+        <div className={styles.wordArea}>
+          {isFinished && word ? (
+            <p className={styles.revealedWord}>{word.toUpperCase()}</p>
+          ) : (
+            <div className={styles.wordDisplay}>
+              {(displayWord || []).map((char, i) => (
+                <span key={i} className={styles.letterSlot}>
+                  {char !== '_' ? char.toUpperCase() : ''}
+                </span>
+              ))}
+            </div>
+          )}
+          <p className={styles.letterCount}>
+            {(displayWord || []).filter((c) => c !== '_').length} /{' '}
+            {(displayWord || []).length} letters revealed
+          </p>
+        </div>
+      </div>
+
+      {/* Keyboard */}
+      {!isFinished && (
+        <div className={styles.keyboard}>
+          {ALPHABET.map((letter) => {
+            const used = guessedSet.has(letter);
+            const isCorrect = used && (displayWord || []).some((c) => c === letter);
+            const isWrong = used && !(displayWord || []).some((c) => c === letter);
+            return (
+              <button
+                key={letter}
+                className={`${styles.keyBtn} ${isCorrect ? styles.keyCorrect : ''} ${isWrong ? styles.keyWrong : ''} ${used ? styles.keyUsed : ''}`}
+                onClick={() => handleGuess(letter)}
+                disabled={used || !isMyTurn || isEliminated}
+              >
+                {letter.toUpperCase()}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Players */}
+      <section className={styles.playersSection}>
+        <h2 className={styles.sectionTitle}>Players</h2>
+        <div className={styles.playersList}>
+          {(playerStates || []).map((ps) => (
+            <div
+              key={ps.playerId}
+              className={`${styles.playerRow} ${currentTurnPlayer === ps.playerId ? styles.playerActive : ''} ${ps.eliminated ? styles.playerEliminated : ''}`}
+            >
+              <span className={styles.playerName}>{ps.playerId}</span>
+              <div className={styles.playerGallows}>
+                <HangmanFigure wrongCount={ps.wrongCount} />
+              </div>
+              <span className={styles.playerWrong}>{ps.wrongCount}/6</span>
+              {ps.eliminated && <span className={styles.eliminatedBadge}>Eliminated</span>}
+              {currentTurnPlayer === ps.playerId && !ps.eliminated && (
+                <span className={styles.turnBadge}>Their turn</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Guessed letters */}
+      {guessedLetters && guessedLetters.length > 0 && (
+        <section className={styles.guessedSection}>
+          <h2 className={styles.sectionTitle}>Guessed letters</h2>
+          <div className={styles.guessedLetters}>
+            {guessedLetters.sort().map((letter) => {
+              const correct = (displayWord || []).some((c) => c === letter);
+              return (
+                <span key={letter} className={`${styles.guessedLetter} ${correct ? styles.guessedCorrect : styles.guessedWrong}`}>
+                  {letter.toUpperCase()}
+                </span>
+              );
+            })}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
