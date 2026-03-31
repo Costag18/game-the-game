@@ -4,17 +4,17 @@ export const GAMES = {
   blackjack: {
     id: 'blackjack', name: 'Blackjack', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME, description: 'Beat the dealer. Closest to 21 wins.',
-    tutorial: 'https://www.youtube.com/watch?v=eyoh-Ku9TCI',
+    tutorial: 'https://www.youtube.com/watch?v=PljDuynF-j0',
   },
   poker: {
     id: 'poker', name: 'Texas Hold\'em', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME, description: 'Best hand wins the pot.',
-    tutorial: 'https://www.youtube.com/watch?v=GAoR9ji8D6A',
+    tutorial: 'https://www.youtube.com/watch?v=q4tVldt4MuI',
   },
   uno: {
     id: 'uno', name: 'Uno', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME, description: 'First to empty your hand wins.',
-    tutorial: 'https://www.youtube.com/watch?v=p9n408gtqJQ',
+    tutorial: 'https://www.youtube.com/watch?v=oHgN-SUDjKI',
   },
   war: {
     id: 'war', name: 'War', minPlayers: 2, maxPlayers: 2,
@@ -24,7 +24,7 @@ export const GAMES = {
   goFish: {
     id: 'goFish', name: 'Go Fish', minPlayers: 2, maxPlayers: 6,
     turnTimer: TIMERS.CARD_GAME, description: 'Collect the most sets of four.',
-    tutorial: 'https://www.youtube.com/watch?v=hDMzuvoGfOE',
+    tutorial: 'https://www.youtube.com/watch?v=Jga7JjSPSbs',
   },
   crazyEights: {
     id: 'crazyEights', name: 'Crazy Eights', minPlayers: 2, maxPlayers: 6,
@@ -39,7 +39,7 @@ export const GAMES = {
   liarsDice: {
     id: 'liarsDice', name: 'Liar\'s Dice', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME, description: 'Bluff or call. Last player with dice wins.',
-    tutorial: 'https://www.youtube.com/watch?v=bJKLJHRa8D4',
+    tutorial: 'https://www.youtube.com/watch?v=jJx4LgRX-4A',
   },
   memoryMatch: {
     id: 'memoryMatch', name: 'Memory Match', minPlayers: 2, maxPlayers: 6,
@@ -49,7 +49,7 @@ export const GAMES = {
   roulette: {
     id: 'roulette', name: 'Roulette', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.ROULETTE, description: 'Place your bets. Highest winnings ranks first.',
-    tutorial: 'https://www.youtube.com/watch?v=WLsgBaAszVQ',
+    tutorial: 'https://www.youtube.com/watch?v=bCMmFaJGMnA',
   },
   hangman: {
     id: 'hangman', name: 'Hangman', minPlayers: 2, maxPlayers: 8,

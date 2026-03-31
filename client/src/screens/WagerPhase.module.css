@@ -83,6 +83,18 @@
   border-radius: var(--radius-sm);
 }
 
+.tutorialLink {
+  color: var(--gold);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.tutorialLink:hover {
+  color: var(--gold-light);
+}
+
 .scoreRow {
   display: flex;
   justify-content: space-between;
