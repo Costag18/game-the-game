@@ -1,0 +1,393 @@
+/* ============================================================
+   Poker table layout
+   ============================================================ */
+
+.table {
+  min-height: 100vh;
+  background-color: #1a5c38;
+  background-image:
+    radial-gradient(ellipse at center, #1e6b40 0%, #134d2c 60%, #0b3320 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 1rem 3rem;
+  font-family: 'Georgia', serif;
+  gap: 1.25rem;
+}
+
+.title {
+  font-size: 2.2rem;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.waiting {
+  font-size: 1.2rem;
+  color: #b2dfdb;
+  margin-top: 5rem;
+}
+
+/* ============================================================
+   Info bar (phase + pot)
+   ============================================================ */
+
+.infoBar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  padding: 0.4rem 1.25rem;
+}
+
+.phaseBadge {
+  font-size: 0.95rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #ffd700;
+}
+
+.potDisplay {
+  font-size: 1rem;
+  color: #e0f2f1;
+}
+
+/* ============================================================
+   Sections
+   ============================================================ */
+
+.communitySection,
+.othersSection,
+.playerSection {
+  background-color: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  border-radius: 14px;
+  padding: 1.1rem 1.4rem;
+  width: 100%;
+  max-width: 680px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.playerSectionFolded {
+  opacity: 0.55;
+}
+
+.sectionHeading {
+  color: #ffd700;
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   Cards
+   ============================================================ */
+
+.cardRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.card {
+  width: 58px;
+  height: 84px;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 2px 3px 7px rgba(0, 0, 0, 0.35);
+  font-weight: bold;
+  font-size: 0.95rem;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.cardSmall {
+  width: 38px;
+  height: 54px;
+  font-size: 0.72rem;
+}
+
+.cardRed {
+  color: #c62828;
+}
+
+.cardBlack {
+  color: #1a1a1a;
+}
+
+.cardHidden {
+  background-color: #1a237e;
+  border-color: #3949ab;
+  color: #5c6bc0;
+  font-size: 1.4rem;
+}
+
+.cardSmall.cardHidden {
+  font-size: 1rem;
+}
+
+.cardRank {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.cardSmall .cardRank {
+  font-size: 0.75rem;
+}
+
+.cardSuit {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.cardSmall .cardSuit {
+  font-size: 0.85rem;
+}
+
+/* ============================================================
+   Other players
+   ============================================================ */
+
+.otherPlayersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.otherPlayer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  transition: opacity 0.2s;
+}
+
+.otherPlayerFolded {
+  opacity: 0.4;
+}
+
+.otherPlayerId {
+  font-weight: bold;
+  min-width: 60px;
+  color: #e0f7fa;
+}
+
+.otherCardRow {
+  display: flex;
+  gap: 4px;
+}
+
+.otherChips {
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: #a5d6a7;
+}
+
+.otherBet {
+  font-size: 0.8rem;
+  color: #fff176;
+}
+
+.badgeFolded {
+  background-color: #424242;
+  color: #bdbdbd;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: bold;
+}
+
+/* ============================================================
+   Player own section
+   ============================================================ */
+
+.chipsRow {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.chipsLabel {
+  color: #e0f2f1;
+}
+
+.myBetLabel {
+  color: #fff176;
+  font-size: 0.9rem;
+}
+
+.statusText {
+  font-size: 1rem;
+  color: #fff9c4;
+  margin: 0;
+  text-align: center;
+  min-height: 1.4em;
+}
+
+/* ============================================================
+   Action controls
+   ============================================================ */
+
+.actionsArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btnFold,
+.btnCheck,
+.btnCall,
+.btnRaise {
+  padding: 0.55rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.btnFold:hover,
+.btnCheck:hover,
+.btnCall:hover,
+.btnRaise:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btnFold:active,
+.btnCheck:active,
+.btnCall:active,
+.btnRaise:active {
+  transform: translateY(0);
+  filter: brightness(0.92);
+}
+
+.btnFold {
+  background-color: #b71c1c;
+  color: #fff;
+  box-shadow: 0 3px 0 #7f0000;
+}
+
+.btnCheck {
+  background-color: #37474f;
+  color: #eceff1;
+  box-shadow: 0 3px 0 #1c313a;
+}
+
+.btnCall {
+  background-color: #1565c0;
+  color: #fff;
+  box-shadow: 0 3px 0 #0d3c77;
+}
+
+.btnRaise {
+  background-color: #e65100;
+  color: #fff;
+  box-shadow: 0 3px 0 #b23c00;
+}
+
+.btnRaise:disabled {
+  background-color: #6d4c41;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+.raiseRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.raiseInput {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  width: 110px;
+  outline: none;
+}
+
+.raiseInput::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.raiseInput:focus {
+  border-color: #ffd700;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================
+   Revealed hands (showdown / finished)
+   ============================================================ */
+
+.revealSection {
+  width: 100%;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.revealHeading {
+  color: #ffd700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.3rem;
+  text-align: center;
+}
+
+.revealRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.revealPlayerId {
+  min-width: 60px;
+  font-weight: bold;
+  color: #e0f7fa;
+  font-size: 0.9rem;
+}

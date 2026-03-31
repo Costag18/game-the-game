@@ -1,4 +1,5 @@
 import { Blackjack } from './Blackjack.js';
+import { Poker } from './Poker.js';
 import { RockPaperScissors } from './RockPaperScissors.js';
 import { War } from './War.js';
 import { MemoryMatch } from './MemoryMatch.js';
@@ -39,3 +40,4 @@ registerGame('crazyEights', CrazyEights);
 registerGame('goFish', GoFish);
 registerGame('roulette', Roulette);
 registerGame('hangman', Hangman);
+registerGame('poker', Poker);
