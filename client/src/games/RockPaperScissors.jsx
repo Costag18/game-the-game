@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './RockPaperScissors.module.css';
 import { displayName } from '../utils/displayName.js';
 
@@ -25,6 +26,9 @@ function ChoiceDisplay({ choice, label, hidden = false }) {
 }
 
 export default function RockPaperScissors({ gameState, onAction, nicknames }) {
+  const [acked, setAcked] = useState(false);
+  const [lastAckedRound, setLastAckedRound] = useState(0);
+
   if (!gameState) {
     return (
       <div className={styles.arena}>
@@ -47,6 +51,12 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
 
   const isReveal = phase === 'reveal' || phase === 'finished';
   const isFinished = phase === 'finished';
+
+  // Reset ack when round advances
+  if (roundNumber !== lastAckedRound && phase === 'round') {
+    setAcked(false);
+    setLastAckedRound(roundNumber);
+  }
 
   const myName = displayName(myId, nicknames);
   const oppName = displayName(opponentId, nicknames);
@@ -106,13 +116,16 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
       </p>
 
       {/* Continue button after reveal (not finished) */}
-      {phase === 'reveal' && (
+      {phase === 'reveal' && !acked && (
         <button
           className={styles.btnContinue}
-          onClick={() => onAction({ type: 'acknowledge' })}
+          onClick={() => { setAcked(true); onAction({ type: 'acknowledge' }); }}
         >
           Continue
         </button>
+      )}
+      {phase === 'reveal' && acked && (
+        <p className={styles.waitingText}>Waiting for other player...</p>
       )}
 
       {/* Action buttons — only shown when in round phase and not yet chosen */}
