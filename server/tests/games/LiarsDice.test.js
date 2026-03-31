@@ -1,6 +1,14 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { LiarsDice } from '../../src/games/LiarsDice.js';
 
+// Helper: send acknowledge from all active (non-eliminated) players
+function _acknowledgeAll(game) {
+  const active = game.players.filter((p) => !game.eliminated.includes(p));
+  for (const p of active) {
+    game.handleAction(p, { type: 'acknowledge' });
+  }
+}
+
 describe('LiarsDice', () => {
   let game;
 
@@ -82,6 +90,27 @@ describe('LiarsDice', () => {
   });
 
   describe('challenge resolution', () => {
+    test('after challenge, state goes to challenging', () => {
+      game.dice['p1'] = [3, 3, 3, 4, 5];
+      game.dice['p2'] = [2, 2, 4, 5, 6];
+      game.dice['p3'] = [2, 2, 4, 5, 6];
+      game.handleAction('p1', { type: 'bid', quantity: 2, faceValue: 3 });
+      game.handleAction('p2', { type: 'challenge' });
+      expect(game.state).toBe('challenging');
+    });
+
+    test('challengeResult is populated after challenge', () => {
+      game.dice['p1'] = [3, 3, 3, 4, 5];
+      game.dice['p2'] = [2, 2, 4, 5, 6];
+      game.dice['p3'] = [2, 2, 4, 5, 6];
+      game.handleAction('p1', { type: 'bid', quantity: 2, faceValue: 3 });
+      game.handleAction('p2', { type: 'challenge' });
+      expect(game.challengeResult).not.toBeNull();
+      expect(game.challengeResult.challenger).toBe('p2');
+      expect(game.challengeResult.bidder).toBe('p1');
+      expect(game.challengeResult.allDice).toBeDefined();
+    });
+
     test('challenger loses a die when bid is correct (actual >= bid)', () => {
       // Force known dice values: p1 has three 3s, p2 bids 2 threes
       game.dice['p1'] = [3, 3, 3, 4, 5];
@@ -92,6 +121,9 @@ describe('LiarsDice', () => {
       // p2 challenges
       const p2DiceBefore = game.dice['p2'].length;
       game.handleAction('p2', { type: 'challenge' });
+      // Still in challenging state — acknowledge to resolve
+      expect(game.state).toBe('challenging');
+      _acknowledgeAll(game);
       expect(game.dice['p2'].length).toBe(p2DiceBefore - 1);
     });
 
@@ -104,6 +136,8 @@ describe('LiarsDice', () => {
       // p2 challenges
       const p1DiceBefore = game.dice['p1'].length;
       game.handleAction('p2', { type: 'challenge' });
+      expect(game.state).toBe('challenging');
+      _acknowledgeAll(game);
       expect(game.dice['p1'].length).toBe(p1DiceBefore - 1);
     });
 
@@ -117,6 +151,8 @@ describe('LiarsDice', () => {
       // p2 challenges -> actual >= 3, challenger loses
       const p2DiceBefore = game.dice['p2'].length;
       game.handleAction('p2', { type: 'challenge' });
+      expect(game.state).toBe('challenging');
+      _acknowledgeAll(game);
       expect(game.dice['p2'].length).toBe(p2DiceBefore - 1);
     });
 
@@ -140,6 +176,10 @@ describe('LiarsDice', () => {
       game.handleAction('p1', { type: 'bid', quantity: 3, faceValue: 3 });
       // p2 challenges and loses (bid correct, challenger loses die)
       game.handleAction('p2', { type: 'challenge' });
+      expect(game.state).toBe('challenging');
+      // Only p1 and p3 need to acknowledge (p2 has no dice yet but is still active)
+      // Use full _acknowledgeAll which handles all non-eliminated at time of ack
+      _acknowledgeAll(game);
       expect(game.eliminated).toContain('p2');
       expect(game.activePlayers).not.toContain('p2');
     });
@@ -150,15 +190,19 @@ describe('LiarsDice', () => {
       game.dice['p3'] = [2, 2, 4, 5, 6];
       game.handleAction('p1', { type: 'bid', quantity: 2, faceValue: 3 });
       game.handleAction('p2', { type: 'challenge' });
+      expect(game.state).toBe('challenging');
+      _acknowledgeAll(game);
       expect(game.state).toBe('bidding');
     });
 
-    test('bid is reset to null after challenge', () => {
+    test('bid is reset to null after challenge acknowledge', () => {
       game.dice['p1'] = [3, 3, 3, 4, 5];
       game.dice['p2'] = [2, 2, 4, 5, 6];
       game.dice['p3'] = [2, 2, 4, 5, 6];
       game.handleAction('p1', { type: 'bid', quantity: 2, faceValue: 3 });
       game.handleAction('p2', { type: 'challenge' });
+      expect(game.state).toBe('challenging');
+      _acknowledgeAll(game);
       expect(game.currentBid).toBeNull();
     });
   });
@@ -177,6 +221,10 @@ describe('LiarsDice', () => {
       g.handleAction('a', { type: 'bid', quantity: 5, faceValue: 4 });
       // 'b' challenges — bid is correct (actual >= bid), challenger loses die
       g.handleAction('b', { type: 'challenge' });
+      expect(g.state).toBe('challenging');
+      // Both players acknowledge
+      g.handleAction('a', { type: 'acknowledge' });
+      g.handleAction('b', { type: 'acknowledge' });
 
       expect(g.state).toBe('finished');
       expect(g.isComplete()).toBe(true);
@@ -213,12 +261,13 @@ describe('LiarsDice', () => {
       expect(state.myDice).toEqual([1, 2, 3, 4, 5]);
     });
 
-    test('shows other players dice COUNT not values', () => {
+    test('shows other players dice COUNT not values during bidding', () => {
       game.dice['p2'] = [1, 2, 3, 4, 5];
       const state = game.getStateForPlayer('p1');
       const p2Info = state.otherPlayers.find((p) => p.playerId === 'p2');
       expect(p2Info.diceCount).toBe(5);
-      expect(p2Info).not.toHaveProperty('dice');
+      // During bidding, dice values are null (not revealed)
+      expect(p2Info.dice).toBeNull();
     });
 
     test('shows current bid', () => {
@@ -240,6 +289,19 @@ describe('LiarsDice', () => {
       const state = game.getStateForPlayer('p1');
       const p3Info = state.otherPlayers.find((p) => p.playerId === 'p3');
       expect(p3Info.eliminated).toBe(true);
+    });
+
+    test('reveals all dice during challenging state', () => {
+      game.dice['p1'] = [3, 3, 3, 4, 5];
+      game.dice['p2'] = [2, 2, 4, 5, 6];
+      game.dice['p3'] = [2, 2, 4, 5, 6];
+      game.handleAction('p1', { type: 'bid', quantity: 2, faceValue: 3 });
+      game.handleAction('p2', { type: 'challenge' });
+      expect(game.state).toBe('challenging');
+      const state = game.getStateForPlayer('p1');
+      // Other players' dice should be revealed during challenge
+      const p2Info = state.otherPlayers.find((p) => p.playerId === 'p2');
+      expect(p2Info.dice).not.toBeNull();
     });
   });
 });

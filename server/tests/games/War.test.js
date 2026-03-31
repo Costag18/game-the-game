@@ -1,6 +1,13 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { War } from '../../src/games/War.js';
 
+// Helper: send acknowledge from all players (used after pendingReveal = true)
+function _acknowledgeAll(game) {
+  for (const p of game.players) {
+    game.handleAction(p, { type: 'acknowledge' });
+  }
+}
+
 describe('War', () => {
   let game;
 
@@ -43,7 +50,7 @@ describe('War', () => {
     expect(game.flipCount).toBe(1);
   });
 
-  test('higher rank card wins both cards', () => {
+  test('higher rank card wins both cards after acknowledge', () => {
     game.startGame();
     // Replace decks with known cards — p1 has high card
     game.playerDecks['p1'] = [{ rank: 10, suit: 'hearts' }, { rank: 2, suit: 'hearts' }];
@@ -51,6 +58,12 @@ describe('War', () => {
 
     game.handleAction('p1', { type: 'flip' });
     game.handleAction('p2', { type: 'flip' });
+
+    // After flip, pendingReveal = true — cards not yet awarded
+    expect(game.pendingReveal).toBe(true);
+
+    // Acknowledge to award cards
+    _acknowledgeAll(game);
 
     // p1 flipped rank-10, p2 flipped rank-5 — p1 wins both flipped cards
     // p1: started with 2, lost 1 (flip), gained 2 (both flipped) = 3
@@ -70,7 +83,7 @@ describe('War', () => {
     expect(game.state).toBe('war');
   });
 
-  test('war: each player flips resolves the war', () => {
+  test('war: each player flipping resolves the war', () => {
     game.startGame();
     // Set up a tie
     game.playerDecks['p1'].unshift({ rank: 7, suit: 'hearts' });
@@ -133,11 +146,17 @@ describe('War', () => {
   test('game ends after 26 flips', () => {
     game.startGame();
     game.flipCount = 25;
-    // Do one more flip
+    // Do one more flip — ensure cards won't tie (use different ranks)
     game.playerDecks['p1'].unshift({ rank: 10, suit: 'hearts' });
     game.playerDecks['p2'].unshift({ rank: 5, suit: 'spades' });
     game.handleAction('p1', { type: 'flip' });
     game.handleAction('p2', { type: 'flip' });
+
+    // After flip 26, pendingReveal=true; acknowledge to trigger end check
+    if (game.pendingReveal) {
+      _acknowledgeAll(game);
+    }
+
     expect(game.state).toBe('finished');
     expect(game.isComplete()).toBe(true);
   });
@@ -174,9 +193,7 @@ describe('War', () => {
     game.handleAction('p1', { type: 'flip' });
     game.handleAction('p2', { type: 'flip' });
 
-    // After comparison, state goes back to flipping and cards are cleared for next round
-    // But during the flip (before p2 flips), p1's card should be accessible
-    // The test here checks final state after round completes
+    // After comparison, flipCount incremented
     expect(game.flipCount).toBe(1);
   });
 
@@ -191,5 +208,31 @@ describe('War', () => {
   test('isComplete returns false at game start', () => {
     game.startGame();
     expect(game.isComplete()).toBe(false);
+  });
+
+  test('pendingReveal is true after both players flip and one wins', () => {
+    game.startGame();
+    // Set up different ranks so there's a winner
+    game.playerDecks['p1'].unshift({ rank: 10, suit: 'hearts' });
+    game.playerDecks['p2'].unshift({ rank: 3, suit: 'spades' });
+
+    game.handleAction('p1', { type: 'flip' });
+    game.handleAction('p2', { type: 'flip' });
+
+    expect(game.pendingReveal).toBe(true);
+    expect(game.state).toBe('flipping');
+  });
+
+  test('acknowledging pendingReveal advances the round', () => {
+    game.startGame();
+    game.playerDecks['p1'].unshift({ rank: 10, suit: 'hearts' });
+    game.playerDecks['p2'].unshift({ rank: 3, suit: 'spades' });
+
+    game.handleAction('p1', { type: 'flip' });
+    game.handleAction('p2', { type: 'flip' });
+
+    expect(game.pendingReveal).toBe(true);
+    _acknowledgeAll(game);
+    expect(game.pendingReveal).toBe(false);
   });
 });

@@ -74,7 +74,7 @@ describe('MemoryMatch', () => {
     expect(game.currentTurnPlayer).toBe('p1');
   });
 
-  test('non-matching pair flips both cards back face-down', () => {
+  test('non-matching pair sets pendingFlipBack = true', () => {
     // Find two positions with different values
     const v1 = game.board[0].value;
     const pos2 = game.board.findIndex((c, i) => i !== 0 && c.value !== v1);
@@ -82,22 +82,45 @@ describe('MemoryMatch', () => {
     game.handleAction('p1', { type: 'flip', position: 0 });
     game.handleAction('p1', { type: 'flip', position: pos2 });
 
-    expect(game.board[0].faceUp).toBe(false);
-    expect(game.board[pos2].faceUp).toBe(false);
+    expect(game.pendingFlipBack).toBe(true);
   });
 
-  test('non-matching pair advances turn to next player', () => {
+  test('non-matching pair flips both cards back face-down after acknowledge', () => {
+    // Find two positions with different values
     const v1 = game.board[0].value;
     const pos2 = game.board.findIndex((c, i) => i !== 0 && c.value !== v1);
 
     game.handleAction('p1', { type: 'flip', position: 0 });
     game.handleAction('p1', { type: 'flip', position: pos2 });
 
+    // Cards are still face-up, pendingFlipBack = true
+    expect(game.board[0].faceUp).toBe(true);
+    expect(game.board[pos2].faceUp).toBe(true);
+
+    // Acknowledge to flip back
+    game.handleAction('p1', { type: 'acknowledge' });
+
+    expect(game.board[0].faceUp).toBe(false);
+    expect(game.board[pos2].faceUp).toBe(false);
+  });
+
+  test('non-matching pair advances turn to next player after acknowledge', () => {
+    const v1 = game.board[0].value;
+    const pos2 = game.board.findIndex((c, i) => i !== 0 && c.value !== v1);
+
+    game.handleAction('p1', { type: 'flip', position: 0 });
+    game.handleAction('p1', { type: 'flip', position: pos2 });
+
+    // Turn still belongs to p1 (pending acknowledge)
+    expect(game.currentTurnPlayer).toBe('p1');
+
+    // Acknowledge — flips cards back and advances to p2
+    game.handleAction('p1', { type: 'acknowledge' });
+
     expect(game.currentTurnPlayer).toBe('p2');
   });
 
   test('non-turn player action is ignored', () => {
-    const initialBoard = game.board.map((c) => ({ ...c }));
     game.handleAction('p2', { type: 'flip', position: 0 }); // p1's turn
     expect(game.board[0].faceUp).toBe(false);
   });
@@ -171,5 +194,22 @@ describe('MemoryMatch', () => {
   test('pairs is 0 for all players at start', () => {
     expect(game.pairs['p1']).toBe(0);
     expect(game.pairs['p2']).toBe(0);
+  });
+
+  test('cannot flip while pendingFlipBack (must acknowledge first)', () => {
+    const v1 = game.board[0].value;
+    const pos2 = game.board.findIndex((c, i) => i !== 0 && c.value !== v1);
+    const pos3 = game.board.findIndex((c, i) => i !== 0 && i !== pos2 && !game.board[i].faceUp);
+
+    game.handleAction('p1', { type: 'flip', position: 0 });
+    game.handleAction('p1', { type: 'flip', position: pos2 });
+    // pendingFlipBack = true now
+
+    // Attempt to flip a third card — should be ignored
+    const boardBefore = game.board.map((c) => ({ ...c }));
+    if (pos3 >= 0) {
+      game.handleAction('p1', { type: 'flip', position: pos3 });
+      expect(game.board[pos3].faceUp).toBe(false);
+    }
   });
 });

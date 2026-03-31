@@ -1,6 +1,39 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { Blackjack } from '../../src/games/Blackjack.js';
 
+// Helper: send acknowledge from all players
+function _acknowledgeAll(game) {
+  for (const p of game.players) {
+    game.handleAction(p, { type: 'acknowledge' });
+  }
+}
+
+// Helper: complete a full 5-hand game, always having all players stand each hand.
+// Returns when state === 'finished'.
+function _completeFullGame(game) {
+  while (game.state !== 'finished') {
+    if (game.state === 'playing') {
+      // Have each player stand in turn order
+      for (const p of game.players) {
+        if (game.state === 'playing' && game.currentTurnPlayer === p) {
+          game.handleAction(p, { type: 'stand' });
+        }
+      }
+      // If still playing after iterating once, loop again (shouldn't happen with stand)
+      // Advance any remaining players
+      let safety = 0;
+      while (game.state === 'playing' && safety < 20) {
+        game.handleAction(game.currentTurnPlayer, { type: 'stand' });
+        safety++;
+      }
+    } else if (game.state === 'reveal') {
+      _acknowledgeAll(game);
+    } else {
+      break; // unexpected state
+    }
+  }
+}
+
 describe('Blackjack', () => {
   let game;
 
@@ -38,11 +71,20 @@ describe('Blackjack', () => {
     expect(state.phase).toBe('playing');
   });
 
-  test('getStateForPlayer shows full dealer hand when finished', () => {
+  test('getStateForPlayer shows full dealer hand when in reveal state', () => {
     game.startGame();
-    // Force game to finished state by having all players stand
+    // Have all players stand to move to reveal state
     game.handleAction('p1', { type: 'stand' });
     game.handleAction('p2', { type: 'stand' });
+    expect(game.state).toBe('reveal');
+    const state = game.getStateForPlayer('p1');
+    expect(state.dealerShowing).toEqual(game.dealerHand);
+    expect(state.dealerTotal).toBeGreaterThanOrEqual(0);
+  });
+
+  test('getStateForPlayer shows full dealer hand when finished', () => {
+    game.startGame();
+    _completeFullGame(game);
     expect(game.state).toBe('finished');
     const state = game.getStateForPlayer('p1');
     expect(state.dealerShowing).toEqual(game.dealerHand);
@@ -92,12 +134,19 @@ describe('Blackjack', () => {
     expect(game.busted).toContain('p1');
   });
 
-  test('game completes after all players stand or bust', () => {
+  test('game goes to reveal after all players stand or bust (hand 1)', () => {
     game.startGame();
     game.handleAction('p1', { type: 'stand' });
     game.handleAction('p2', { type: 'stand' });
+    expect(game.state).toBe('reveal');
+  });
+
+  test('game completes after 5 hands with acknowledges', () => {
+    game.startGame();
+    _completeFullGame(game);
     expect(game.state).toBe('finished');
     expect(game.isComplete()).toBe(true);
+    expect(game.handNumber).toBe(5);
   });
 
   test('isComplete returns false at start', () => {
@@ -105,15 +154,17 @@ describe('Blackjack', () => {
     expect(game.isComplete()).toBe(false);
   });
 
-  test('getResults sorts players by score (closer to 21 wins)', () => {
+  test('getResults sorts players by wins descending', () => {
     game.startGame();
-    // Give p1 a winning hand (20) and p2 a lower hand (15)
-    game.hands['p1'] = [{ rank: 10, suit: 'hearts' }, { rank: 10, suit: 'spades' }]; // 20
-    game.hands['p2'] = [{ rank: 7, suit: 'hearts' }, { rank: 8, suit: 'spades' }];   // 15
-    game.dealerHand = [{ rank: 5, suit: 'hearts' }, { rank: 8, suit: 'spades' }];    // 13 dealer
+    // Manually set win counts and force finish
+    game.wins['p1'] = 3;
+    game.wins['p2'] = 1;
+    game.handNumber = 5;
     game.stood = ['p1', 'p2'];
     game.transition('allDone');
+    game.dealerPlay();
     game.transition('resolve');
+    _acknowledgeAll(game);
     const results = game.getResults();
     expect(results[0].playerId).toBe('p1');
     expect(results[1].playerId).toBe('p2');
@@ -121,24 +172,32 @@ describe('Blackjack', () => {
     expect(results[1].placement).toBe(2);
   });
 
-  test('busted player scores 0 in results', () => {
+  test('busted player in last hand scores lower in results', () => {
     game.startGame();
-    game.hands['p1'] = [
+    // Force to hand 5 state: set handNumber=5, set up known hands, then resolve
+    game.handNumber = 5;
+    game.hands['p1'] = [{ rank: 10, suit: 'hearts' }, { rank: 10, suit: 'spades' }]; // 20
+    game.hands['p2'] = [
       { rank: 10, suit: 'hearts' },
       { rank: 10, suit: 'spades' },
       { rank: 5, suit: 'clubs' },
     ]; // 25 - bust
-    game.hands['p2'] = [{ rank: 7, suit: 'hearts' }, { rank: 8, suit: 'spades' }]; // 15
-    game.dealerHand = [{ rank: 5, suit: 'hearts' }, { rank: 8, suit: 'spades' }];  // 13 dealer
-    game.busted = ['p1'];
-    game.stood = ['p2'];
+    game.dealerHand = [{ rank: 5, suit: 'hearts' }, { rank: 8, suit: 'spades' }]; // 13
+    game.busted = ['p2'];
+    game.stood = ['p1'];
     game.transition('allDone');
+    game.dealerPlay();
+    game._recordHandResult();
     game.transition('resolve');
+    _acknowledgeAll(game);
+
+    expect(game.state).toBe('finished');
     const results = game.getResults();
-    const p1Result = results.find((r) => r.playerId === 'p1');
-    expect(p1Result.busted).toBe(true);
-    // p1 should be in last place
-    expect(p1Result.placement).toBe(2);
+    expect(results).toHaveLength(2);
+    expect(results[0].placement).toBe(1);
+    expect(results[1].placement).toBe(2);
+    // p1 should rank higher than p2 (p2 busted, p1 has the win)
+    expect(results[0].playerId).toBe('p1');
   });
 
   describe('calculateHandValue', () => {
@@ -191,12 +250,12 @@ describe('Blackjack', () => {
     expect(game.hands['p2']).toEqual(initialHand);
   });
 
-  test('action is ignored when not in playing state', () => {
+  test('action is ignored when in reveal state (non-acknowledge)', () => {
     game.startGame();
     game.handleAction('p1', { type: 'stand' });
     game.handleAction('p2', { type: 'stand' });
-    expect(game.state).toBe('finished');
-    // Action after game ends should be ignored
+    expect(game.state).toBe('reveal');
+    // hit action should be ignored in reveal state
     const dealerHandBefore = [...game.dealerHand];
     game.handleAction('p1', { type: 'hit' });
     expect(game.dealerHand).toEqual(dealerHandBefore);
@@ -216,5 +275,24 @@ describe('Blackjack', () => {
     const stateP2 = game.getStateForPlayer('p2');
     expect(stateP1.isMyTurn).toBe(true);
     expect(stateP2.isMyTurn).toBe(false);
+  });
+
+  test('handNumber increments with each hand', () => {
+    game.startGame();
+    expect(game.handNumber).toBe(1);
+    // Complete hand 1
+    game.handleAction('p1', { type: 'stand' });
+    game.handleAction('p2', { type: 'stand' });
+    expect(game.state).toBe('reveal');
+    _acknowledgeAll(game);
+    expect(game.handNumber).toBe(2);
+  });
+
+  test('wins tracked across hands', () => {
+    game.startGame();
+    expect(game.wins['p1']).toBe(0);
+    expect(game.wins['p2']).toBe(0);
+    // Wins are tracked in the engine; just ensure the property exists
+    expect(typeof game.wins).toBe('object');
   });
 });

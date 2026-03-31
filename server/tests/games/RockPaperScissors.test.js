@@ -1,6 +1,13 @@
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { RockPaperScissors } from '../../src/games/RockPaperScissors.js';
 
+// Helper: send acknowledge from all players
+function _acknowledgeAll(game) {
+  for (const p of game.players) {
+    game.handleAction(p, { type: 'acknowledge' });
+  }
+}
+
 describe('RockPaperScissors', () => {
   let game;
 
@@ -72,14 +79,21 @@ describe('RockPaperScissors', () => {
     expect(game.lastRoundResult.winner).toBeNull();
   });
 
-  test('first player to reach 3 wins ends the game', () => {
+  test('first player to reach 3 wins ends the game after acknowledge', () => {
     game.startGame();
-    // p1 wins 3 rounds
+    // p1 wins 3 rounds, each followed by acknowledge
     for (let i = 0; i < 3; i++) {
-      if (game.state === 'reveal') game.advanceToNextRound();
       game.handleAction('p1', { type: 'choose', choice: 'rock' });
       game.handleAction('p2', { type: 'choose', choice: 'scissors' });
+      expect(game.state).toBe('reveal');
+      if (i < 2) {
+        // Not the final round yet — acknowledge advances to next round
+        _acknowledgeAll(game);
+        expect(game.state).toBe('round');
+      }
     }
+    // After 3rd win, acknowledge should finish the game
+    _acknowledgeAll(game);
     expect(game.state).toBe('finished');
     expect(game.isComplete()).toBe(true);
     expect(game.scores['p1']).toBe(3);
@@ -88,10 +102,14 @@ describe('RockPaperScissors', () => {
   test('getResults returns winner first', () => {
     game.startGame();
     for (let i = 0; i < 3; i++) {
-      if (game.state === 'reveal') game.advanceToNextRound();
       game.handleAction('p1', { type: 'choose', choice: 'rock' });
       game.handleAction('p2', { type: 'choose', choice: 'scissors' });
+      if (i < 2) {
+        _acknowledgeAll(game);
+      }
     }
+    _acknowledgeAll(game);
+    expect(game.state).toBe('finished');
     const results = game.getResults();
     expect(results[0].playerId).toBe('p1');
     expect(results[0].placement).toBe(1);
@@ -141,8 +159,19 @@ describe('RockPaperScissors', () => {
     game.handleAction('p1', { type: 'choose', choice: 'rock' });
     game.handleAction('p2', { type: 'choose', choice: 'rock' }); // tie
     expect(game.roundNumber).toBe(1);
+    expect(game.state).toBe('reveal');
     game.advanceToNextRound();
     expect(game.roundNumber).toBe(2);
     expect(game.state).toBe('round');
+  });
+
+  test('acknowledge advances round after reveal', () => {
+    game.startGame();
+    game.handleAction('p1', { type: 'choose', choice: 'rock' });
+    game.handleAction('p2', { type: 'choose', choice: 'rock' }); // tie, goes to reveal
+    expect(game.state).toBe('reveal');
+    _acknowledgeAll(game);
+    expect(game.state).toBe('round');
+    expect(game.roundNumber).toBe(2);
   });
 });

@@ -1,6 +1,13 @@
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
 import { Roulette } from '../../src/games/Roulette.js';
 
+// Helper: send acknowledge from all players (advances from spinning state)
+function _acknowledgeAll(game) {
+  for (const p of game.players) {
+    game.handleAction(p, { type: 'acknowledge' });
+  }
+}
+
 describe('Roulette', () => {
   let game;
 
@@ -63,16 +70,8 @@ describe('Roulette', () => {
         payouts[p] = netChange;
       }
       this.history.push({ round: this.round, result, payouts });
-      if (this.round >= 3) {
-        this.transition('finish');
-      } else {
-        this.round++;
-        for (const p of this.players) {
-          this.bets[p] = [];
-          this.betSubmitted[p] = false;
-        }
-        this.transition('nextRound');
-      }
+      this.acknowledged = new Set();
+      // Stay in spinning state (like the real engine)
     };
 
     game.bets['p1'] = [{ type: 'straight', value: 7, amount: 100 }];
@@ -137,16 +136,18 @@ describe('Roulette', () => {
     expect(game.chips['p1']).toBe(900); // lost straight bet
   });
 
-  test('3 rounds then game finishes', () => {
+  test('3 rounds then game finishes after all acknowledges', () => {
     game.startGame();
 
-    // Force all spins to happen
     const originalRandom = Math.random;
     Math.random = () => 0.5;
 
     for (let round = 0; round < 3; round++) {
       game.handleAction('p1', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
       game.handleAction('p2', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
+      // After both bets submitted, spin fires — state moves to 'spinning'
+      expect(game.state).toBe('spinning');
+      _acknowledgeAll(game);
     }
 
     Math.random = originalRandom;
@@ -155,7 +156,7 @@ describe('Roulette', () => {
     expect(game.isComplete()).toBe(true);
   });
 
-  test('only 1 round completes when bets submitted each time', () => {
+  test('1 round completes when bets submitted and acknowledged', () => {
     game.startGame();
     expect(game.round).toBe(1);
 
@@ -164,6 +165,9 @@ describe('Roulette', () => {
 
     game.handleAction('p1', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
     game.handleAction('p2', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
+    // State is now 'spinning' — round not yet incremented
+    expect(game.state).toBe('spinning');
+    _acknowledgeAll(game);
 
     Math.random = originalRandom;
 
@@ -181,6 +185,8 @@ describe('Roulette', () => {
     // p1 bets straight on 0, p2 bets red
     game.handleAction('p1', { type: 'bet', bets: [{ type: 'straight', value: 0, amount: 500 }] });
     game.handleAction('p2', { type: 'bet', bets: [{ type: 'red', amount: 100 }] });
+    // spinning state — acknowledge
+    _acknowledgeAll(game);
 
     Math.random = originalRandom;
 
@@ -188,8 +194,12 @@ describe('Roulette', () => {
     Math.random = () => 0.5;
     game.handleAction('p1', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
     game.handleAction('p2', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
+    _acknowledgeAll(game);
+
     game.handleAction('p1', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
     game.handleAction('p2', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
+    _acknowledgeAll(game);
+
     Math.random = originalRandom;
 
     const results = game.getResults();
@@ -210,7 +220,6 @@ describe('Roulette', () => {
   test('duplicate bet submission is ignored', () => {
     game.startGame();
     game.handleAction('p1', { type: 'bet', bets: [{ type: 'red', amount: 100 }] });
-    const chipsBefore = game.chips['p1'];
 
     // Try to submit again
     game.handleAction('p1', { type: 'bet', bets: [{ type: 'black', amount: 200 }] });
@@ -223,5 +232,22 @@ describe('Roulette', () => {
   test('isComplete returns false at start', () => {
     game.startGame();
     expect(game.isComplete()).toBe(false);
+  });
+
+  test('spin result visible in spinning state', () => {
+    game.startGame();
+
+    const originalRandom = Math.random;
+    Math.random = () => 0; // result = 0
+
+    game.handleAction('p1', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
+    game.handleAction('p2', { type: 'bet', bets: [{ type: 'red', amount: 10 }] });
+
+    Math.random = originalRandom;
+
+    expect(game.state).toBe('spinning');
+    const state = game.getStateForPlayer('p1');
+    expect(state.spinResult).toBe(0);
+    expect(state.phase).toBe('spinning');
   });
 });
