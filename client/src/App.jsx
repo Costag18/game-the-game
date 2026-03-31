@@ -49,7 +49,15 @@ function GameRouter() {
     socket.on(EVENTS.ROUND_START, () => setScreen('gameVote'));
     socket.on(EVENTS.VOTE_RESULT, () => setScreen('wagerPhase'));
     socket.on(EVENTS.WAGER_LOCKED, () => setScreen('playing'));
-    socket.on(EVENTS.ROUND_RESULTS, () => setScreen('roundResults'));
+    socket.on(EVENTS.ROUND_RESULTS, () => {
+      // Delay transition for roulette so the wheel spin animation plays out
+      const currentGame = tournament.voteResult?.selectedGame;
+      if (currentGame === 'roulette') {
+        setTimeout(() => setScreen('roundResults'), 5000);
+      } else {
+        setScreen('roundResults');
+      }
+    });
     socket.on(EVENTS.TOURNAMENT_END, () => setScreen('tournamentEnd'));
     return () => {
       socket.off(EVENTS.ROUND_START);
@@ -58,7 +66,7 @@ function GameRouter() {
       socket.off(EVENTS.ROUND_RESULTS);
       socket.off(EVENTS.TOURNAMENT_END);
     };
-  }, [socket]);
+  }, [socket, tournament.voteResult]);
 
   function handleJoinLobby(lobby) {
     setCurrentLobby(lobby);

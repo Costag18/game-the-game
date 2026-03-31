@@ -197,6 +197,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
         io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
           placements: shuffled,
           scores: roundScores,
+          gameId: tm.selectedGame,
           standings: tm.getStandings().map((s) => ({
             ...s,
             nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
@@ -275,6 +276,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
         placements,
         scores: roundScores,
+        gameId: tm.selectedGame,
         standings: tm.getStandings().map((s) => ({
           ...s,
           nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
