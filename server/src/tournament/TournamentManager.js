@@ -6,7 +6,7 @@ export class TournamentManager {
     this.winCondition = winCondition;
     this.winTarget = winTarget;
     this.scores = {};
-    this.players.forEach((p) => (this.scores[p] = 0));
+    this.players.forEach((p) => (this.scores[p] = 100));
     this.currentRound = 0;
     this.phase = 'idle'; // idle | voting | wagering | playing | results
     this.votes = {};

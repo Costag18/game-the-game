@@ -48,13 +48,15 @@ function GameRouter() {
     if (!socket) return;
     socket.on(EVENTS.ROUND_START, () => setScreen('gameVote'));
     socket.on(EVENTS.VOTE_RESULT, () => setScreen('wagerPhase'));
-    socket.on(EVENTS.WAGER_LOCKED, () => setScreen('playing'));
+    socket.on(EVENTS.WAGER_LOCKED, () => setScreen('loadingGame'));
+    socket.on(EVENTS.GAME_STATE, () => setScreen((prev) => prev === 'loadingGame' ? 'playing' : prev));
     socket.on(EVENTS.ROUND_RESULTS, () => setScreen('roundResults'));
     socket.on(EVENTS.TOURNAMENT_END, () => setScreen('tournamentEnd'));
     return () => {
       socket.off(EVENTS.ROUND_START);
       socket.off(EVENTS.VOTE_RESULT);
       socket.off(EVENTS.WAGER_LOCKED);
+      socket.off(EVENTS.GAME_STATE);
       socket.off(EVENTS.ROUND_RESULTS);
       socket.off(EVENTS.TOURNAMENT_END);
     };
@@ -124,6 +126,11 @@ function GameRouter() {
           />
         );
       })()}
+      {screen === 'loadingGame' && (
+        <div style={{ minHeight: '100vh', background: 'var(--felt-dark, #0f3d1a)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: 'var(--gold, #d4a843)', fontFamily: 'Georgia', fontSize: '1.3rem' }}>Starting game...</p>
+        </div>
+      )}
       {screen === 'waiting' && (
         <div style={{ minHeight: '100vh', background: 'var(--felt-dark, #0f3d1a)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <p style={{ color: 'var(--gold, #d4a843)', fontFamily: 'Georgia', fontSize: '1.3rem' }}>Loading next round...</p>
