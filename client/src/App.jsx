@@ -74,6 +74,8 @@ function GameRouter() {
   }
 
   function handleContinueAfterResults() {
+    // Show a loading state while waiting for server to start next round
+    setScreen('waiting');
     tournament.clearRoundResults();
     socket?.emit(EVENTS.NEXT_ROUND);
   }
@@ -129,6 +131,11 @@ function GameRouter() {
           />
         );
       })()}
+      {screen === 'waiting' && (
+        <div style={{ minHeight: '100vh', background: 'var(--felt-dark, #0f3d1a)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: 'var(--gold, #d4a843)', fontFamily: 'Georgia', fontSize: '1.3rem' }}>Loading next round...</p>
+        </div>
+      )}
       {screen === 'roundResults' && (
         <RoundResults
           roundResults={tournament.roundResults}

@@ -179,15 +179,43 @@ io.on(EVENTS.CONNECTION, (socket) => {
         const game = createGame(tm.selectedGame, lobby.players);
         tm.activeGame = game;
         game.startGame();
-        const nicknames = lobby.nicknames || {};
-        for (const playerId of lobby.players) {
-          const playerSocket = io.sockets.sockets.get(playerId);
-          if (playerSocket) {
-            playerSocket.emit(EVENTS.GAME_STATE, {
-              gameId: tm.selectedGame,
-              state: game.getStateForPlayer(playerId),
-              nicknames,
-            });
+
+        // Check if game completed immediately (e.g., roulette all players broke)
+        if (game.isComplete()) {
+          const results = game.getResults();
+          const placements = results.map((r) => r.playerId);
+          tm.activeGame = null;
+          const roundScores = tm.completeRound(placements);
+
+          io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
+          io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
+            placements,
+            scores: roundScores,
+            gameId: tm.selectedGame,
+            standings: tm.getStandings().map((s) => ({
+              ...s,
+              nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+            })),
+            gameResults: results,
+          });
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+
+          if (tm.isTournamentOver()) {
+            io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+            tournaments.delete(lobbyId);
+            lobbyManager.setStatus(lobbyId, 'waiting');
+          }
+        } else {
+          const nicknames = lobby.nicknames || {};
+          for (const playerId of lobby.players) {
+            const playerSocket = io.sockets.sockets.get(playerId);
+            if (playerSocket) {
+              playerSocket.emit(EVENTS.GAME_STATE, {
+                gameId: tm.selectedGame,
+                state: game.getStateForPlayer(playerId),
+                nicknames,
+              });
+            }
           }
         }
       } else {

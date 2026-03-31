@@ -1,7 +1,15 @@
 import styles from './RoundResults.module.css';
 
 export default function RoundResults({ roundResults, onContinue }) {
-  if (!roundResults) return null;
+  if (!roundResults) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.panel}>
+          <h2 className={styles.title}>Calculating Results...</h2>
+        </div>
+      </div>
+    );
+  }
 
   const { standings = [], scores = {}, gameResults = null, gameId = null } = roundResults;
 
