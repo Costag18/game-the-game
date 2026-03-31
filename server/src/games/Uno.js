@@ -143,15 +143,13 @@ export class Uno extends BaseGame {
       this._handleDraw(playerId);
     } else if (action.type === 'pass') {
       this.drawnCard = null;
-      // If passing during a draw stack, apply accumulated draw to next player
+      this.lastPlayedRank = null;
+      // If passing during a draw stack, next player draws then plays
       if (this.pendingDrawCount > 0) {
-        this.lastPlayedRank = null;
         this._advanceTurn();
         this._dealCards(this.currentTurnPlayer, this.pendingDrawCount);
         this.pendingDrawCount = 0;
-        this._advanceTurn();
       } else {
-        this.lastPlayedRank = null;
         this._advanceTurn();
       }
     } else if (action.type === 'forceAdvance') {
@@ -161,7 +159,6 @@ export class Uno extends BaseGame {
         this._advanceTurn();
         this._dealCards(this.currentTurnPlayer, this.pendingDrawCount);
         this.pendingDrawCount = 0;
-        this._advanceTurn();
       } else {
         this._advanceTurn();
       }
@@ -215,13 +212,11 @@ export class Uno extends BaseGame {
         this.lastPlayedRank = card.rank;
         return; // stay on same player — they can stack more or pass
       }
-      // No more to stack — apply accumulated draw to next player and skip them
+      // No more to stack — next player draws then gets to play
       this.lastPlayedRank = null;
       this._advanceTurn();
-      const nextPlayer = this.currentTurnPlayer;
-      this._dealCards(nextPlayer, this.pendingDrawCount);
+      this._dealCards(this.currentTurnPlayer, this.pendingDrawCount);
       this.pendingDrawCount = 0;
-      this._advanceTurn();
       return;
     }
 
