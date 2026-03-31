@@ -142,7 +142,12 @@ export class Uno extends BaseGame {
     } else if (action.type === 'draw') {
       this._handleDraw(playerId);
     } else if (action.type === 'pass') {
-      // Pass after drawing (chose not to play the drawn card)
+      // Pass after drawing or after consecutive play option
+      this.drawnCard = null;
+      this.lastPlayedRank = null;
+      this._advanceTurn();
+    } else if (action.type === 'forceAdvance') {
+      // Deadlock recovery — force advance if stuck
       this.drawnCard = null;
       this.lastPlayedRank = null;
       this._advanceTurn();
@@ -271,16 +276,25 @@ export class Uno extends BaseGame {
   _advanceTurn() {
     const n = this.players.length;
     let idx = this.players.indexOf(this.currentTurnPlayer);
+    if (idx === -1) idx = 0; // safety: recover if currentTurnPlayer is invalid
     idx = ((idx + this.direction) % n + n) % n;
     this.currentTurnPlayer = this.players[idx];
     this.turnIndex = idx;
+    this.drawnCard = null; // clear draw state for new turn
+    this.lastPlayedRank = null;
   }
 
   getStateForPlayer(playerId) {
     const topCard = this.discardPile[this.discardPile.length - 1] || null;
     const isMyTurn = this.currentTurnPlayer === playerId && this.state === 'playing';
+
+    // Check if player has any playable cards
+    const hand = this.hands[playerId] || [];
+    const hasPlayableCard = isMyTurn && hand.some((c) => canPlay(c, topCard, this.currentColor));
+    const canDraw = isMyTurn && !this.drawnCard;
+
     return {
-      myHand: this.hands[playerId] || [],
+      myHand: hand,
       topDiscard: topCard,
       currentColor: this.currentColor,
       direction: this.direction,
@@ -289,6 +303,7 @@ export class Uno extends BaseGame {
       phase: this.state,
       drawnCard: isMyTurn && this.drawnCard ? true : false, // has drawn, can play or pass
       lastPlayedRank: isMyTurn ? this.lastPlayedRank : null, // can play consecutive
+      canAct: isMyTurn && (hasPlayableCard || canDraw || !!this.drawnCard || this.lastPlayedRank != null),
       otherPlayers: this.players
         .filter((p) => p !== playerId)
         .map((p) => ({

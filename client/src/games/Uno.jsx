@@ -139,6 +139,7 @@ export default function Uno({ gameState, onAction, nicknames }) {
     otherPlayers,
     drawnCard,
     lastPlayedRank,
+    canAct,
   } = gameState;
 
   const isFinished = phase === 'finished';
@@ -176,9 +177,16 @@ export default function Uno({ gameState, onAction, nicknames }) {
     setSelectedIndex(null);
   }
 
+  function handleForceAdvance() {
+    if (!isMyTurn) return;
+    onAction({ type: 'forceAdvance' });
+    setSelectedIndex(null);
+  }
+
   function getStatusText() {
     if (isFinished) return 'Game Over';
     if (!isMyTurn) return 'Waiting for your turn...';
+    if (isMyTurn && canAct === false) return 'No moves available — pass your turn';
     if (drawnCard) return 'You drew a playable card — play it or pass';
     if (lastPlayedRank !== null && lastPlayedRank !== undefined) return `Play another ${lastPlayedRank} or pass`;
     return 'Your turn — play a card or draw';
@@ -218,6 +226,11 @@ export default function Uno({ gameState, onAction, nicknames }) {
           {isMyTurn && (drawnCard || (lastPlayedRank !== null && lastPlayedRank !== undefined)) && (
             <button className={styles.passButton} onClick={handlePass}>
               Pass
+            </button>
+          )}
+          {isMyTurn && canAct === false && (
+            <button className={styles.passButton} onClick={handleForceAdvance}>
+              Pass Turn
             </button>
           )}
         </div>
