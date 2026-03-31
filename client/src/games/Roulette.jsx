@@ -143,6 +143,8 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
   const [pendingBets, setPendingBets] = useState([]);
   const [straightNumber, setStraightNumber] = useState('');
   const [betAmount, setBetAmount] = useState(10);
+  const [acknowledged, setAcknowledged] = useState(false);
+  const [lastAckedRound, setLastAckedRound] = useState(0);
 
   if (!gameState) {
     return (
@@ -168,8 +170,19 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
   const isBetting = phase === 'betting';
   const isSpinning = phase === 'spinning';
 
+  // Reset acknowledged state when round advances
+  if (round !== lastAckedRound && isBetting) {
+    setAcknowledged(false);
+    setLastAckedRound(round);
+  }
+
   const totalPending = pendingBets.reduce((s, b) => s + b.amount, 0);
   const canAfford = totalPending < myChips;
+
+  function handleAcknowledge() {
+    setAcknowledged(true);
+    onAction({ type: 'acknowledge' });
+  }
 
   function addBet(type, value) {
     if (myBetSubmitted) return;
@@ -207,11 +220,30 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
 
       {/* Spinning wheel — shown during spinning phase or when there's a result */}
       {(isSpinning || (spinResult !== null && spinResult !== undefined)) && (
-        <SpinningWheel isSpinning={isSpinning} spinResult={isSpinning ? null : spinResult} />
+        <SpinningWheel isSpinning={false} spinResult={spinResult} />
       )}
 
-      {/* Spin result text (only after spin) */}
-      {!isSpinning && spinResult !== null && spinResult !== undefined && (
+      {/* Spin result + continue button */}
+      {isSpinning && spinResult !== null && spinResult !== undefined && (
+        <>
+          <div className={`${styles.spinResult} ${styles[`spin_${getNumberColor(spinResult)}`]}`}>
+            <span className={styles.spinLabel}>Result:</span>
+            <span className={styles.spinNumber}>{spinResult}</span>
+            <span className={styles.spinColor}>{getNumberColor(spinResult).toUpperCase()}</span>
+          </div>
+          {!acknowledged && (
+            <button className={styles.btnContinue} onClick={handleAcknowledge}>
+              Continue
+            </button>
+          )}
+          {acknowledged && (
+            <div className={styles.waitingMsg}>Waiting for other players...</div>
+          )}
+        </>
+      )}
+
+      {/* Last spin result (during betting) */}
+      {!isSpinning && !isFinished && spinResult !== null && spinResult !== undefined && (
         <div className={`${styles.spinResult} ${styles[`spin_${getNumberColor(spinResult)}`]}`}>
           <span className={styles.spinLabel}>Last spin:</span>
           <span className={styles.spinNumber}>{spinResult}</span>

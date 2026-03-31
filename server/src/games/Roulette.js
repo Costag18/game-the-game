@@ -20,6 +20,7 @@ export class Roulette extends BaseGame {
     this.spinResult = null;
     this.round = 0;
     this.history = [];     // array of { round, result, payouts }
+    this.acknowledged = new Set();
   }
 
   startGame() {
@@ -81,21 +82,30 @@ export class Roulette extends BaseGame {
   }
 
   handleAction(playerId, action) {
-    if (this.state !== 'betting') return;
     if (!this.players.includes(playerId)) return;
-    if (this.betSubmitted[playerId]) return;
-    if (this.chips[playerId] <= 0) return; // broke players auto-skipped
 
-    if (action.type === 'bet') {
-      const { bets } = action;
-      if (!this._validateBets(playerId, bets)) return;
-      this.bets[playerId] = bets;
-      this.betSubmitted[playerId] = true;
+    if (this.state === 'betting') {
+      if (this.betSubmitted[playerId]) return;
+      if (this.chips[playerId] <= 0) return;
 
-      // Check if all players have submitted bets
-      const allSubmitted = this.players.every((p) => this.betSubmitted[p]);
-      if (allSubmitted) {
-        this._spin();
+      if (action.type === 'bet') {
+        const { bets } = action;
+        if (!this._validateBets(playerId, bets)) return;
+        this.bets[playerId] = bets;
+        this.betSubmitted[playerId] = true;
+
+        const allSubmitted = this.players.every((p) => this.betSubmitted[p]);
+        if (allSubmitted) {
+          this._spin();
+        }
+      }
+    } else if (this.state === 'spinning') {
+      if (action.type === 'acknowledge') {
+        this.acknowledged.add(playerId);
+        const allAcked = this.players.every((p) => this.acknowledged.has(p));
+        if (allAcked) {
+          this._advanceAfterSpin();
+        }
       }
     }
   }
@@ -118,12 +128,15 @@ export class Roulette extends BaseGame {
     }
 
     this.history.push({ round: this.round, result, payouts });
+    this.acknowledged = new Set();
+    // Stay in 'spinning' state — wait for players to acknowledge the result
+  }
 
+  _advanceAfterSpin() {
     if (this.round >= TOTAL_ROUNDS) {
       this.transition('finish');
     } else {
       this.round++;
-      // Reset bets for next round
       for (const p of this.players) {
         this.bets[p] = [];
         this.betSubmitted[p] = false;

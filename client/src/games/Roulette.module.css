@@ -352,6 +352,24 @@
   text-align: center;
 }
 
+.btnContinue {
+  padding: 0.75rem 2.5rem;
+  background: linear-gradient(135deg, var(--gold, #d4a843) 0%, var(--gold-dim, #8a7230) 100%);
+  color: var(--bg-dark, #1a0a0a);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-heading, Georgia);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: opacity 0.2s;
+}
+
+.btnContinue:hover {
+  opacity: 0.88;
+}
+
 /* Roulette number display */
 .rouletteNum {
   display: inline-flex;
