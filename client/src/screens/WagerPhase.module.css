@@ -107,12 +107,50 @@
   color: var(--text-secondary);
   font-size: 0.85rem;
   line-height: 1.5;
-  margin: 0;
-  padding-left: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.wagerInfo li {
-  margin-bottom: 0.3rem;
+.wagerInfo p {
+  margin: 0;
+}
+
+.wagerTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.wagerTable th {
+  color: var(--gold);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--gold-dim);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wagerTable td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid rgba(212, 168, 67, 0.1);
+}
+
+.wagerProfit {
+  color: #5cb85c;
+  font-weight: 600;
+}
+
+.wagerEven {
+  color: var(--gold);
+}
+
+.wagerLoss {
+  color: #d9534f;
+  font-weight: 600;
 }
 
 .tutorialVideo {

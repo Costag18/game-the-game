@@ -92,16 +92,25 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
         )}
 
         <Popdown title="How Wagering Works">
-          <ul className={styles.wagerInfo}>
-            <li>Wager up to 50% of your current points each round.</li>
-            <li>Your wager multiplies based on how you place:</li>
-            <li><strong style={{color: 'var(--gold)'}}>1st place</strong> — 2x wager back (double your bet)</li>
-            <li><strong style={{color: 'var(--gold)'}}>2nd place</strong> — 1.5x wager back</li>
-            <li><strong style={{color: 'var(--gold)'}}>3rd place</strong> — 1x wager back (break even)</li>
-            <li><strong style={{color: 'var(--text-secondary)'}}>4th+</strong> — lose your wager</li>
-            <li>You also earn base points for your placement regardless of wager.</li>
-            <li>High risk, high reward — wager big if you're confident!</li>
-          </ul>
+          <div className={styles.wagerInfo}>
+            <p>Wager up to 50% of your current points each round. Your wager multiplies based on how you place — high risk, high reward!</p>
+            <table className={styles.wagerTable}>
+              <thead>
+                <tr>
+                  <th>Placement</th>
+                  <th>Wager Return</th>
+                  <th>Example (wager 100)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1st</td><td>2x back</td><td className={styles.wagerProfit}>+100 profit</td></tr>
+                <tr><td>2nd</td><td>1.5x back</td><td className={styles.wagerProfit}>+50 profit</td></tr>
+                <tr><td>3rd</td><td>1x back</td><td className={styles.wagerEven}>break even</td></tr>
+                <tr><td>4th+</td><td>0x back</td><td className={styles.wagerLoss}>-100 loss</td></tr>
+              </tbody>
+            </table>
+            <p>You also earn base points for your placement regardless of wager.</p>
+          </div>
         </Popdown>
 
         <div className={styles.scoreRow}>
