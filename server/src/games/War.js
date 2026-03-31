@@ -21,6 +21,9 @@ export class War extends BaseGame {
     this.flipCount = 0;
     this.pendingFlips = {};  // tracks who has flipped this round
     this.warFlips = {};      // tracks who has flipped their face-up war card
+    this.pendingReveal = false; // true when both cards shown, waiting to continue
+    this.lastWinner = null;
+    this.revealAcknowledged = new Set();
   }
 
   startGame() {
@@ -54,7 +57,15 @@ export class War extends BaseGame {
   handleAction(playerId, action) {
     if (!this.players.includes(playerId)) return;
 
-    if (this.state === 'flipping' && action.type === 'flip') {
+    if (this.state === 'flipping' && this.pendingReveal && action.type === 'acknowledge') {
+      this.revealAcknowledged.add(playerId);
+      if (this.players.every((p) => this.revealAcknowledged.has(p))) {
+        this._advanceAfterReveal();
+      }
+      return;
+    }
+
+    if (this.state === 'flipping' && !this.pendingReveal && action.type === 'flip') {
       this._handleFlip(playerId);
     } else if (this.state === 'war' && action.type === 'flip') {
       this._handleWarFlip(playerId);
@@ -101,14 +112,30 @@ export class War extends BaseGame {
       this._setupWarFlips();
     } else {
       const winner = c1.rank > c2.rank ? p1 : p2;
-      const loser = winner === p1 ? p2 : p1;
-      this.playerDecks[winner].push(c1, c2);
-
-      if (this._checkEndCondition()) return;
-
-      this.transition('continue');
-      this._resetRound();
+      // Don't move cards yet — show both cards and wait for acknowledge
+      this.lastWinner = winner;
+      this.pendingReveal = true;
+      this.revealAcknowledged = new Set();
     }
+  }
+
+  _advanceAfterReveal() {
+    const [p1, p2] = this.players;
+    const c1 = this.flippedCards[p1];
+    const c2 = this.flippedCards[p2];
+    const winner = this.lastWinner;
+
+    if (winner && c1 && c2) {
+      this.playerDecks[winner].push(c1, c2);
+    }
+
+    this.pendingReveal = false;
+    this.lastWinner = null;
+
+    if (this._checkEndCondition()) return;
+
+    this.transition('continue');
+    this._resetRound();
   }
 
   _setupWarFlips() {
@@ -210,6 +237,8 @@ export class War extends BaseGame {
     const opponentId = this.players.find((p) => p !== playerId);
     return {
       phase: this.state,
+      myId: playerId,
+      opponentId,
       myDeckSize: (this.playerDecks[playerId] || []).length,
       opponentDeckSize: (this.playerDecks[opponentId] || []).length,
       myFlippedCard: this.flippedCards[playerId] ?? null,
@@ -218,6 +247,8 @@ export class War extends BaseGame {
       hasFlipped: this.state === 'flipping'
         ? !!(this.pendingFlips[playerId])
         : !!(this.warFlips[playerId]),
+      pendingReveal: this.pendingReveal,
+      lastWinner: this.lastWinner,
     };
   }
 

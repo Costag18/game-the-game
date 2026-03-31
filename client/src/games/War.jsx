@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import styles from './War.module.css';
+import { displayName } from '../utils/displayName.js';
 
 const RANK_NAMES = {
   1: 'A',
@@ -66,30 +68,54 @@ export default function War({ gameState, onAction, nicknames }) {
 
   const {
     phase,
+    myId,
+    opponentId,
     myDeckSize,
     opponentDeckSize,
     myFlippedCard,
     opponentFlippedCard,
     flipCount,
     hasFlipped,
+    pendingReveal,
+    lastWinner,
   } = gameState;
 
+  const [acked, setAcked] = useState(false);
+  const [lastAckedFlip, setLastAckedFlip] = useState(0);
+
+  // Reset ack when flip count changes (new round started)
+  if (flipCount !== lastAckedFlip && !pendingReveal) {
+    if (acked) setAcked(false);
+    if (lastAckedFlip !== flipCount) setLastAckedFlip(flipCount);
+  }
+
+  const myName = displayName(myId, nicknames);
+  const oppName = displayName(opponentId, nicknames);
   const isFinished = phase === 'finished';
   const isWar = phase === 'war';
-  const canFlip = !hasFlipped && !isFinished;
+  const canFlip = !hasFlipped && !isFinished && !pendingReveal;
 
   function getStatusText() {
     if (isFinished) {
-      if (myDeckSize > opponentDeckSize) return 'You win!';
-      if (opponentDeckSize > myDeckSize) return 'Opponent wins!';
+      if (myDeckSize > opponentDeckSize) return `${myName} wins!`;
+      if (opponentDeckSize > myDeckSize) return `${oppName} wins!`;
       return "It's a draw!";
     }
+    if (pendingReveal && lastWinner) {
+      const winnerName = displayName(lastWinner, nicknames);
+      return `${winnerName} wins this flip!`;
+    }
     if (isWar) {
-      if (hasFlipped) return 'War! Waiting for opponent...';
+      if (hasFlipped) return `War! Waiting for ${oppName}...`;
       return 'War! Flip your battle card!';
     }
-    if (hasFlipped) return 'Card flipped! Waiting for opponent...';
+    if (hasFlipped) return `Waiting for ${oppName}...`;
     return 'Flip your card!';
+  }
+
+  function handleAcknowledge() {
+    setAcked(true);
+    onAction({ type: 'acknowledge' });
   }
 
   return (
@@ -103,13 +129,13 @@ export default function War({ gameState, onAction, nicknames }) {
       {/* Game area */}
       <div className={styles.gameArea}>
         {/* Opponent side */}
-        <DeckPile count={opponentDeckSize} label="Opponent" />
+        <DeckPile count={opponentDeckSize} label={oppName} />
 
         {/* Center battle zone */}
         <div className={styles.battleZone}>
           <div className={styles.flippedPair}>
             <div className={styles.flippedSlot}>
-              <span className={styles.slotLabel}>Opponent</span>
+              <span className={styles.slotLabel}>{oppName}</span>
               {opponentFlippedCard ? (
                 <Card card={opponentFlippedCard} size="large" />
               ) : (
@@ -118,7 +144,7 @@ export default function War({ gameState, onAction, nicknames }) {
             </div>
             <div className={styles.versus}>VS</div>
             <div className={styles.flippedSlot}>
-              <span className={styles.slotLabel}>You</span>
+              <span className={styles.slotLabel}>{myName}</span>
               {myFlippedCard ? (
                 <Card card={myFlippedCard} size="large" />
               ) : (
@@ -133,7 +159,7 @@ export default function War({ gameState, onAction, nicknames }) {
         </div>
 
         {/* My side */}
-        <DeckPile count={myDeckSize} label="You" />
+        <DeckPile count={myDeckSize} label={myName} />
       </div>
 
       {/* Status */}
@@ -149,6 +175,16 @@ export default function War({ gameState, onAction, nicknames }) {
         >
           {isWar ? 'Battle!' : 'Flip Card'}
         </button>
+      )}
+
+      {/* Continue after reveal */}
+      {pendingReveal && !acked && (
+        <button className={styles.continueBtn} onClick={handleAcknowledge}>
+          Continue
+        </button>
+      )}
+      {pendingReveal && acked && (
+        <p className={styles.waitingSmall}>Waiting for other player...</p>
       )}
     </div>
   );

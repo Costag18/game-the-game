@@ -259,3 +259,36 @@
   60%       { transform: translateX(-3px); }
   80%       { transform: translateX(3px); }
 }
+
+.continueBtn {
+  padding: 0.7rem 2.5rem;
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
+  color: #1a0a0a;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 3px 0 #5c4a10;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.continueBtn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.waitingSmall {
+  color: #b8a88a;
+  font-style: italic;
+  font-size: 0.95rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
