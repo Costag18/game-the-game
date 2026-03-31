@@ -83,10 +83,13 @@ export default function WaitingRoom({ lobby: initialLobby, onNavigate }) {
             </h3>
             <ul className={styles.playerList}>
               {players.map((p) => {
-                const pid = p.id ?? p.socketId;
+                const pid = typeof p === 'string' ? p : (p.id ?? p.socketId);
+                const name = typeof p === 'string'
+                  ? (lobby.nicknames?.[p] || pid.slice(0, 8))
+                  : (p.nickname || pid.slice(0, 8));
                 return (
                   <li key={pid} className={styles.playerRow}>
-                    <span className={styles.playerName}>{p.nickname}</span>
+                    <span className={styles.playerName}>{name}</span>
                     {pid === hostId && (
                       <span className={styles.hostBadge}>HOST</span>
                     )}
