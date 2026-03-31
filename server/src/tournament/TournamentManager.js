@@ -1,0 +1,101 @@
+import { Scorer } from './Scorer.js';
+
+export class TournamentManager {
+  constructor({ players, winCondition, winTarget }) {
+    this.players = [...players];
+    this.winCondition = winCondition;
+    this.winTarget = winTarget;
+    this.scores = {};
+    this.players.forEach((p) => (this.scores[p] = 0));
+    this.currentRound = 0;
+    this.phase = 'idle'; // idle | voting | wagering | playing | results
+    this.votes = {};
+    this.wagers = {};
+    this.selectedGame = null;
+    this.roundHistory = [];
+  }
+
+  startNextRound() {
+    this.currentRound++;
+    this.phase = 'voting';
+    this.votes = {};
+    this.wagers = {};
+    this.selectedGame = null;
+  }
+
+  submitVote(playerId, gameId) {
+    this.votes[playerId] = gameId;
+  }
+
+  tallyVotes() {
+    const counts = {};
+    for (const gameId of Object.values(this.votes)) counts[gameId] = (counts[gameId] || 0) + 1;
+    const maxCount = Math.max(...Object.values(counts));
+    const tied = Object.entries(counts).filter(([, c]) => c === maxCount).map(([g]) => g);
+    this.selectedGame = tied[Math.floor(Math.random() * tied.length)];
+    return this.selectedGame;
+  }
+
+  startWagerPhase() {
+    this.phase = 'wagering';
+    this.players.forEach((p) => (this.wagers[p] = 0));
+  }
+
+  submitWager(playerId, amount) {
+    if (!Scorer.validateWager(amount, this.scores[playerId])) {
+      throw new Error(`Invalid wager: ${amount} (current points: ${this.scores[playerId]})`);
+    }
+    this.wagers[playerId] = amount;
+  }
+
+  startPlaying() {
+    this.phase = 'playing';
+  }
+
+  completeRound(placements) {
+    const roundScores = Scorer.calculateRoundScores(placements, this.wagers, this.currentRound);
+    for (const [playerId, scoreData] of Object.entries(roundScores)) {
+      this.scores[playerId] += scoreData.total;
+    }
+    this.roundHistory.push({
+      round: this.currentRound,
+      game: this.selectedGame,
+      placements,
+      scores: roundScores,
+    });
+    this.phase = 'results';
+    return roundScores;
+  }
+
+  isTournamentOver() {
+    if (this.winCondition === 'fixedRounds') return this.currentRound >= this.winTarget;
+    if (this.winCondition === 'pointThreshold') return Object.values(this.scores).some((s) => s >= this.winTarget);
+    return false;
+  }
+
+  getStandings() {
+    return this.players
+      .map((p) => ({ playerId: p, score: this.scores[p] }))
+      .sort((a, b) => b.score - a.score);
+  }
+
+  getScores() {
+    return { ...this.scores };
+  }
+
+  getWinner() {
+    return this.getStandings()[0].playerId;
+  }
+
+  getState() {
+    return {
+      currentRound: this.currentRound,
+      phase: this.phase,
+      scores: this.getScores(),
+      standings: this.getStandings(),
+      selectedGame: this.selectedGame,
+      votes: this.phase === 'voting' ? { ...this.votes } : null,
+      wagers: this.phase === 'wagering' ? { ...this.wagers } : null,
+    };
+  }
+}
