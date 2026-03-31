@@ -236,8 +236,15 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
         </div>
       </section>
 
+      {/* Broke message */}
+      {isBetting && myChips <= 0 && (
+        <div className={styles.waitingMsg}>
+          You're out of chips! Waiting for other players...
+        </div>
+      )}
+
       {/* Betting area */}
-      {isBetting && !myBetSubmitted && (
+      {isBetting && !myBetSubmitted && myChips > 0 && (
         <section className={styles.bettingSection}>
           <h2 className={styles.sectionTitle}>Place Your Bets</h2>
 

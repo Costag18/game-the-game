@@ -38,6 +38,28 @@ export class Roulette extends BaseGame {
 
     this.transition('start');
     this.round = 1;
+    this._autoSkipBrokePlayers();
+  }
+
+  _autoSkipBrokePlayers() {
+    // Auto-submit empty bets for players with 0 chips
+    for (const p of this.players) {
+      if (this.chips[p] <= 0 && !this.betSubmitted[p]) {
+        this.bets[p] = [];
+        this.betSubmitted[p] = true;
+      }
+    }
+    // If all players are broke, end the game
+    const allBroke = this.players.every((p) => this.chips[p] <= 0);
+    if (allBroke) {
+      this.state = 'finished';
+      return;
+    }
+    // If all submitted (everyone broke or mix), trigger spin
+    const allSubmitted = this.players.every((p) => this.betSubmitted[p]);
+    if (allSubmitted) {
+      this._spin();
+    }
   }
 
   _totalBetAmount(bets) {
@@ -62,6 +84,7 @@ export class Roulette extends BaseGame {
     if (this.state !== 'betting') return;
     if (!this.players.includes(playerId)) return;
     if (this.betSubmitted[playerId]) return;
+    if (this.chips[playerId] <= 0) return; // broke players auto-skipped
 
     if (action.type === 'bet') {
       const { bets } = action;
@@ -106,6 +129,7 @@ export class Roulette extends BaseGame {
         this.betSubmitted[p] = false;
       }
       this.transition('nextRound');
+      this._autoSkipBrokePlayers();
     }
   }
 
@@ -166,10 +190,18 @@ export class Roulette extends BaseGame {
       chips: this.chips[p] || 0,
     }));
     scores.sort((a, b) => b.chips - a.chips);
-    return scores.map((s, i) => ({
-      playerId: s.playerId,
-      placement: i + 1,
-      chips: s.chips,
-    }));
+
+    // Handle ties — players with equal chips get the same placement
+    let placement = 1;
+    return scores.map((s, i) => {
+      if (i > 0 && s.chips < scores[i - 1].chips) {
+        placement = i + 1;
+      }
+      return {
+        playerId: s.playerId,
+        placement,
+        chips: s.chips,
+      };
+    });
   }
 }
