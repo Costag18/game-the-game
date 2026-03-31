@@ -23,11 +23,10 @@
 }
 
 .logo {
-  max-width: 420px;
+  max-width: 525px;
   width: 100%;
   height: auto;
   margin-bottom: 0.25rem;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
 }
 
 .subtitle {
