@@ -1,0 +1,121 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-dark);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  font-family: var(--font-body);
+}
+
+.header {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--gold-dim);
+  padding: 0.6rem 1rem;
+}
+
+.headerTitle {
+  color: var(--gold);
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.messageList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold-dim) transparent;
+}
+
+.messageList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.messageList::-webkit-scrollbar-thumb {
+  background: var(--gold-dim);
+  border-radius: 2px;
+}
+
+.empty {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-align: center;
+  margin: auto;
+  opacity: 0.6;
+}
+
+.message {
+  font-size: 0.88rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.nick {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.text {
+  color: var(--text-primary);
+}
+
+.inputRow {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-top: 1px solid var(--gold-dim);
+  background: var(--bg-panel);
+}
+
+.input {
+  flex: 1;
+  background: var(--bg-dark);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.45rem 0.7rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--gold);
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.btnSend {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.btnSend:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btnSend:hover:not(:disabled) {
+  opacity: 0.88;
+}
