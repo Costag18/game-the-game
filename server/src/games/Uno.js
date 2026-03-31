@@ -179,20 +179,23 @@ export class Uno extends BaseGame {
       return;
     }
 
-    // Check if player has another card of the same rank (for consecutive plays)
-    // Only for number cards — action/wild cards apply effects immediately
-    if (typeof card.rank === 'number') {
-      const hasAnother = hand.some((c) => c.rank === card.rank);
-      if (hasAnother) {
-        this.lastPlayedRank = card.rank;
-        // Don't advance turn — player can play another of the same rank or pass
-        return;
-      }
+    // Wild, WildDrawFour, DrawTwo, Skip, Reverse — always end turn immediately
+    if (typeof card.rank !== 'number') {
+      this.lastPlayedRank = null;
+      this._applyCardEffect(card);
+      return;
+    }
+
+    // Number cards: allow consecutive plays of the same rank
+    const hasAnother = hand.some((c) => c.rank === card.rank);
+    if (hasAnother) {
+      this.lastPlayedRank = card.rank;
+      // Don't advance turn — player can play another of the same rank or pass
+      return;
     }
 
     this.lastPlayedRank = null;
-    // Apply card effects then advance turn
-    this._applyCardEffect(card);
+    this._advanceTurn();
   }
 
   _applyCardEffect(card) {
