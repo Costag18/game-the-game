@@ -1,0 +1,254 @@
+.table {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #1a0533 0%, #2d1b69 50%, #1a0533 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  font-family: 'Georgia', serif;
+  gap: 1.5rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #ffd700;
+  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.waiting {
+  font-size: 1.2rem;
+  color: #b39ddb;
+  margin-top: 4rem;
+}
+
+/* War banner */
+.warBanner {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #c62828;
+  padding: 0.4rem 2rem;
+  border-radius: 8px;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  animation: pulse 0.7s ease infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.04); }
+}
+
+/* Game area layout */
+.gameArea {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 700px;
+}
+
+/* Deck pile */
+.deckPile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deckStack {
+  position: relative;
+}
+
+.deckLabel {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #b39ddb;
+}
+
+.deckCount {
+  font-size: 0.8rem;
+  color: #9575cd;
+}
+
+/* Battle zone */
+.battleZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  min-width: 260px;
+}
+
+.flippedPair {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.flippedSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.slotLabel {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #b39ddb;
+}
+
+.emptySlot {
+  width: 72px;
+  height: 100px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+}
+
+.versus {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #e94560;
+}
+
+.flipCounter {
+  font-size: 0.82rem;
+  color: #9575cd;
+  letter-spacing: 0.04em;
+}
+
+/* Cards */
+.card {
+  width: 56px;
+  height: 80px;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+  font-weight: bold;
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.cardLarge {
+  width: 72px;
+  height: 100px;
+  font-size: 1rem;
+}
+
+.cardRed {
+  color: #c62828;
+}
+
+.cardBlack {
+  color: #212121;
+}
+
+.cardHidden {
+  background-color: #311b92;
+  border-color: #7c4dff;
+  color: #b39ddb;
+  font-size: 1.4rem;
+  cursor: default;
+}
+
+.cardLarge.cardHidden {
+  font-size: 1.6rem;
+}
+
+.cardEmpty {
+  background-color: transparent;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.75rem;
+  cursor: default;
+}
+
+.cardRank {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.cardSuit {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Status */
+.statusText {
+  font-size: 1.1rem;
+  color: #e2d9f3;
+  margin: 0;
+  text-align: center;
+  min-height: 1.5em;
+}
+
+.statusFinished {
+  font-size: 1.5rem;
+  color: #ffd700;
+  font-weight: bold;
+  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.statusWar {
+  color: #ff8a80;
+  font-weight: bold;
+}
+
+/* Flip button */
+.flipBtn {
+  padding: 0.75rem 2.5rem;
+  font-size: 1.15rem;
+  font-weight: bold;
+  background-color: #7c4dff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 0 #4527a0;
+  transition: transform 0.1s ease, filter 0.1s ease;
+  font-family: inherit;
+}
+
+.flipBtn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-2px);
+}
+
+.flipBtn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #4527a0;
+}
+
+.flipBtnWar {
+  background-color: #c62828;
+  box-shadow: 0 4px 0 #7f0000;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  40%       { transform: translateX(4px); }
+  60%       { transform: translateX(-3px); }
+  80%       { transform: translateX(3px); }
+}
