@@ -10,8 +10,33 @@ import GameVote from './screens/GameVote.jsx';
 import WagerPhase from './screens/WagerPhase.jsx';
 import RoundResults from './screens/RoundResults.jsx';
 import TournamentEnd from './screens/TournamentEnd.jsx';
+import BlackjackGame from './games/Blackjack.jsx';
+import PokerGame from './games/Poker.jsx';
+import UnoGame from './games/Uno.jsx';
+import WarGame from './games/War.jsx';
+import GoFishGame from './games/GoFish.jsx';
+import CrazyEightsGame from './games/CrazyEights.jsx';
+import RpsGame from './games/RockPaperScissors.jsx';
+import LiarsDiceGame from './games/LiarsDice.jsx';
+import MemoryMatchGame from './games/MemoryMatch.jsx';
+import RouletteGame from './games/Roulette.jsx';
+import HangmanGame from './games/Hangman.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
+
+const GAME_COMPONENTS = {
+  blackjack: BlackjackGame,
+  poker: PokerGame,
+  uno: UnoGame,
+  war: WarGame,
+  goFish: GoFishGame,
+  crazyEights: CrazyEightsGame,
+  rps: RpsGame,
+  liarsDice: LiarsDiceGame,
+  memoryMatch: MemoryMatchGame,
+  roulette: RouletteGame,
+  hangman: HangmanGame,
+};
 
 function GameRouter() {
   const { socket } = useSocketContext();
@@ -77,13 +102,24 @@ function GameRouter() {
           onSubmitWager={tournament.submitWager}
         />
       )}
-      {screen === 'playing' && (
-        <div style={{ color: 'white', textAlign: 'center', paddingTop: '4rem', background: '#0f3d1a', minHeight: '100vh' }}>
-          <h2 style={{ fontFamily: 'Georgia', color: '#d4a843' }}>Playing: {tournament.voteResult?.selectedGame}</h2>
-          <p style={{ marginTop: '1rem', color: '#b8a88a' }}>Game UI will render here once game engines are implemented.</p>
-          <p style={{ marginTop: '0.5rem', color: '#b8a88a' }}>Unimplemented games resolve with random placements.</p>
-        </div>
-      )}
+      {screen === 'playing' && (() => {
+        const gameId = tournament.voteResult?.selectedGame;
+        const GameComponent = GAME_COMPONENTS[gameId];
+        if (!GameComponent) {
+          return (
+            <div style={{ color: 'white', textAlign: 'center', paddingTop: '4rem', background: '#0f3d1a', minHeight: '100vh' }}>
+              <h2 style={{ fontFamily: 'Georgia', color: '#d4a843' }}>Playing: {gameId}</h2>
+              <p style={{ marginTop: '1rem', color: '#b8a88a' }}>Game not yet implemented.</p>
+            </div>
+          );
+        }
+        return (
+          <GameComponent
+            gameState={tournament.gameState?.state}
+            onAction={tournament.sendAction}
+          />
+        );
+      })()}
       {screen === 'roundResults' && (
         <RoundResults
           roundResults={tournament.roundResults}
