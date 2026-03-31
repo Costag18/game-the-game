@@ -82,6 +82,66 @@
   text-align: center;
 }
 
+.codeSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.codeLabel {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.codeRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.codeInput {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-sm);
+  color: var(--gold-light);
+  font-family: monospace;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.codeInput:focus {
+  outline: none;
+  border-color: var(--gold);
+}
+
+.codeInput::placeholder {
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  letter-spacing: normal;
+}
+
+.btnJoinCode {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnJoinCode:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .list {
   display: flex;
   flex-direction: column;

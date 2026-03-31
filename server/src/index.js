@@ -70,20 +70,38 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
+  socket.on(EVENTS.JOIN_BY_CODE, (code, callback) => {
+    try {
+      const lobby = lobbyManager.findLobbyByCode(code);
+      if (!lobby) throw new Error('No lobby found with that code');
+      const updated = lobbyManager.joinLobby(lobby.id, socket.id, lobby.code);
+      socket.join(lobby.id);
+      io.to(lobby.id).emit(EVENTS.PLAYER_JOINED, {
+        playerId: socket.id,
+        nickname: socket.data.nickname || socket.id,
+      });
+      io.to(lobby.id).emit(EVENTS.LOBBY_STATE, updated);
+      if (typeof callback === 'function') callback({ success: true, lobby: updated });
+    } catch (err) {
+      if (typeof callback === 'function') callback({ success: false, error: err.message });
+    }
+  });
+
   socket.on(EVENTS.LEAVE_LOBBY, () => {
     handlePlayerLeave(socket);
   });
 
-  socket.on(EVENTS.CHAT_SEND, (message) => {
+  socket.on(EVENTS.CHAT_SEND, (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
-    if (lobbyId) {
-      io.to(lobbyId).emit(EVENTS.CHAT_MESSAGE, {
-        playerId: socket.id,
-        nickname: socket.data.nickname || socket.id,
-        message,
-        timestamp: Date.now(),
-      });
-    }
+    if (!lobbyId) return;
+    const text = typeof data === 'string' ? data : data?.message;
+    if (!text || !text.trim()) return;
+    io.to(lobbyId).emit(EVENTS.CHAT_MESSAGE, {
+      playerId: socket.id,
+      nickname: socket.data.nickname || socket.id,
+      message: text.trim(),
+      timestamp: Date.now(),
+    });
   });
 
   // --- Tournament Events ---

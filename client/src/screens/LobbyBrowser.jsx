@@ -9,6 +9,7 @@ export default function LobbyBrowser({ onNavigate, onJoinLobby }) {
   const [loading, setLoading] = useState(false);
   const [joiningId, setJoiningId] = useState(null);
   const [error, setError] = useState('');
+  const [roomCode, setRoomCode] = useState('');
 
   const fetchLobbies = useCallback(() => {
     if (!socket || !connected) return;
@@ -28,6 +29,18 @@ export default function LobbyBrowser({ onNavigate, onJoinLobby }) {
     const interval = setInterval(fetchLobbies, 3000);
     return () => clearInterval(interval);
   }, [fetchLobbies]);
+
+  function handleJoinByCode() {
+    if (!roomCode.trim()) return;
+    setError('');
+    socket.emit(EVENTS.JOIN_BY_CODE, roomCode.trim().toUpperCase(), (res) => {
+      if (res?.success) {
+        onJoinLobby(res.lobby);
+      } else {
+        setError(res?.error || 'Failed to join');
+      }
+    });
+  }
 
   function handleJoin(lobby) {
     setError('');
@@ -56,6 +69,28 @@ export default function LobbyBrowser({ onNavigate, onJoinLobby }) {
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
+
+        <div className={styles.codeSection}>
+          <span className={styles.codeLabel}>Join Private Room</span>
+          <div className={styles.codeRow}>
+            <input
+              type="text"
+              className={styles.codeInput}
+              placeholder="Enter room code"
+              value={roomCode}
+              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+              maxLength={6}
+              onKeyDown={(e) => e.key === 'Enter' && handleJoinByCode()}
+            />
+            <button
+              className={styles.btnJoinCode}
+              onClick={handleJoinByCode}
+              disabled={!roomCode.trim()}
+            >
+              Join
+            </button>
+          </div>
+        </div>
 
         <div className={styles.list}>
           {lobbies.length === 0 ? (

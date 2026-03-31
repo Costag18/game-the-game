@@ -59,6 +59,15 @@ export class LobbyManager {
     return list;
   }
 
+  findLobbyByCode(code) {
+    for (const lobby of this.lobbies.values()) {
+      if (lobby.isPrivate && lobby.code === code.toUpperCase()) {
+        return lobby;
+      }
+    }
+    return null;
+  }
+
   setNickname(playerId, nickname) {
     const lobbyId = this.playerToLobby.get(playerId);
     if (!lobbyId) return;

@@ -4,6 +4,7 @@ export const EVENTS = {
   RECONNECT: 'reconnect',
   CREATE_LOBBY: 'lobby:create',
   JOIN_LOBBY: 'lobby:join',
+  JOIN_BY_CODE: 'lobby:joinByCode',
   LEAVE_LOBBY: 'lobby:leave',
   LIST_LOBBIES: 'lobby:list',
   LOBBIES_UPDATE: 'lobby:update',
