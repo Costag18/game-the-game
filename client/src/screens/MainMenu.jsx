@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import styles from './MainMenu.module.css';
+import logoImg from '../assets/images/logo.png';
 
 export default function MainMenu({ onNavigate }) {
   const { socket, connected } = useSocketContext();
@@ -32,7 +33,7 @@ export default function MainMenu({ onNavigate }) {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Game The Game</h1>
+        <img src={logoImg} alt="Game The Game" className={styles.logo} />
         <p className={styles.subtitle}>The ultimate card &amp; casino tournament</p>
 
         <div className={styles.statusRow}>

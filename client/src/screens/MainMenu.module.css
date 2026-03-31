@@ -22,15 +22,12 @@
   gap: 1.25rem;
 }
 
-.title {
-  font-family: var(--font-heading);
-  color: var(--gold);
-  font-size: 2.6rem;
-  font-weight: 700;
-  text-align: center;
-  margin: 0;
-  letter-spacing: 0.04em;
-  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.4);
+.logo {
+  max-width: 420px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
 }
 
 .subtitle {
