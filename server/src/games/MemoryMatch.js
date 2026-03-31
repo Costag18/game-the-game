@@ -13,6 +13,7 @@ export class MemoryMatch extends BaseGame {
     this.board = [];
     this.pairs = {}; // playerId -> count
     this.flippedThisTurn = []; // indices of cards flipped this turn (max 2)
+    this.pendingFlipBack = false; // true when 2 non-matching cards are shown
   }
 
   startGame() {
@@ -38,16 +39,27 @@ export class MemoryMatch extends BaseGame {
   handleAction(playerId, action) {
     if (this.state !== 'playing') return;
     if (playerId !== this.currentTurnPlayer) return;
+
+    // Acknowledge: flip back mismatched cards and advance turn
+    if (action.type === 'acknowledge' && this.pendingFlipBack) {
+      const [i1, i2] = this.flippedThisTurn;
+      this.board[i1].faceUp = false;
+      this.board[i2].faceUp = false;
+      this.flippedThisTurn = [];
+      this.pendingFlipBack = false;
+      this.nextTurn();
+      return;
+    }
+
     if (action.type !== 'flip') return;
+    if (this.pendingFlipBack) return; // must acknowledge first
 
     const position = action.position;
     if (position < 0 || position >= this.board.length) return;
 
     const card = this.board[position];
-    // Can't flip already-matched or already face-up card, or same position twice
     if (card.matched || card.faceUp) return;
     if (this.flippedThisTurn.includes(position)) return;
-    // Only allow 2 flips per turn
     if (this.flippedThisTurn.length >= 2) return;
 
     card.faceUp = true;
@@ -64,16 +76,13 @@ export class MemoryMatch extends BaseGame {
         c2.matched = true;
         this.pairs[playerId] = (this.pairs[playerId] || 0) + 1;
         this.flippedThisTurn = [];
-        // Same player goes again (don't advance turn)
+        this.pendingFlipBack = false;
         if (this.isComplete()) {
           this.transition('finish');
         }
       } else {
-        // No match — flip back and move to next player
-        c1.faceUp = false;
-        c2.faceUp = false;
-        this.flippedThisTurn = [];
-        this.nextTurn();
+        // No match — keep cards face-up, wait for acknowledge
+        this.pendingFlipBack = true;
       }
     }
   }
@@ -91,6 +100,7 @@ export class MemoryMatch extends BaseGame {
       isMyTurn: this.currentTurnPlayer === playerId && this.state === 'playing',
       phase: this.state,
       flippedThisTurn: [...this.flippedThisTurn],
+      pendingFlipBack: this.pendingFlipBack,
     };
   }
 

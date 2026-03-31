@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import styles from './MemoryMatch.module.css';
 import { displayName } from '../utils/displayName.js';
 
@@ -37,15 +38,29 @@ export default function MemoryMatch({ gameState, onAction, playerId, nicknames }
     );
   }
 
-  const { board, pairs, currentTurnPlayer, isMyTurn, phase } = gameState;
+  const { board, pairs, currentTurnPlayer, isMyTurn, phase, pendingFlipBack } = gameState;
   const isFinished = phase === 'finished';
+  const timerRef = useRef(null);
+
+  // Auto-acknowledge after 2 seconds when cards are shown and it's my turn
+  useEffect(() => {
+    if (pendingFlipBack && isMyTurn) {
+      timerRef.current = setTimeout(() => {
+        onAction({ type: 'acknowledge' });
+      }, 2000);
+      return () => clearTimeout(timerRef.current);
+    }
+  }, [pendingFlipBack, isMyTurn, onAction]);
 
   function handleFlip(position) {
+    if (pendingFlipBack) return; // wait for auto-flip
     onAction({ type: 'flip', position });
   }
 
   function getStatusText() {
     if (isFinished) return 'Game Over!';
+    if (pendingFlipBack && isMyTurn) return 'No match! Cards flipping back...';
+    if (pendingFlipBack) return `No match! ${displayName(currentTurnPlayer, nicknames)}'s cards flipping back...`;
     if (isMyTurn) return 'Your turn — flip a card!';
     return `Waiting for ${displayName(currentTurnPlayer, nicknames)}'s turn...`;
   }
@@ -84,7 +99,7 @@ export default function MemoryMatch({ gameState, onAction, playerId, nicknames }
                 key={i}
                 card={card}
                 position={i}
-                isMyTurn={isMyTurn}
+                isMyTurn={isMyTurn && !pendingFlipBack}
                 onFlip={handleFlip}
               />
             ))}
