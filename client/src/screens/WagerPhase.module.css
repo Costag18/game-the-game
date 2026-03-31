@@ -1,0 +1,166 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--mahogany);
+  background-image:
+    radial-gradient(ellipse at top, #6b1c1c 0%, var(--mahogany) 50%, var(--bg-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  padding: 2rem 1.5rem;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold-dim);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--gold);
+  font-size: 1.8rem;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+}
+
+.gameInfo {
+  background: var(--bg-dark);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.gameLabel {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.gameName {
+  font-family: var(--font-heading);
+  color: var(--gold);
+  font-size: 1.1rem;
+}
+
+.gameDesc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.scoreRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--gold-dim);
+  padding-bottom: 1rem;
+}
+
+.scoreLabel {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.scoreValue {
+  color: var(--gold-light);
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}
+
+.sliderSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sliderLabel {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.wagerAmount {
+  color: var(--gold);
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-dark);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--gold);
+}
+
+.slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sliderBounds {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.btnLockIn {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: opacity 0.2s, transform 0.1s;
+  width: 100%;
+}
+
+.btnLockIn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.locked {
+  text-align: center;
+  color: var(--gold-light);
+  font-size: 1rem;
+  font-style: italic;
+  margin: 0;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

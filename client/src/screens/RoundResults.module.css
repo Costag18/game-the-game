@@ -1,0 +1,125 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--felt-dark);
+  background-image:
+    radial-gradient(ellipse at top, var(--felt-green) 0%, var(--felt-dark) 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  padding: 2rem 1.5rem;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold-dim);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--gold);
+  font-size: 1.8rem;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--gold-dim);
+  font-weight: 600;
+}
+
+.th:first-child {
+  width: 3rem;
+  text-align: center;
+}
+
+.th:last-child {
+  text-align: right;
+}
+
+.row {
+  background: var(--bg-dark);
+  border-bottom: 1px solid rgba(138, 114, 48, 0.2);
+  transition: background 0.15s;
+}
+
+.row:hover {
+  background: rgba(42, 21, 21, 0.8);
+}
+
+.rank {
+  text-align: center;
+  padding: 0.65rem 0.75rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.playerName {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  padding: 0.65rem 0.75rem;
+  font-family: monospace;
+}
+
+.score {
+  color: var(--gold-light);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.65rem 0.75rem;
+}
+
+.delta {
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.65rem 0.75rem;
+}
+
+.positive {
+  color: var(--success);
+}
+
+.negative {
+  color: var(--danger);
+}
+
+.btnContinue {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: opacity 0.2s, transform 0.1s;
+  width: 100%;
+}
+
+.btnContinue:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}

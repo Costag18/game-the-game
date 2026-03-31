@@ -1,0 +1,112 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--felt-dark);
+  background-image:
+    radial-gradient(ellipse at top, var(--felt-green) 0%, var(--felt-dark) 60%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  font-family: var(--font-body);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--gold);
+  font-size: 2rem;
+  margin: 0 0 0.4rem;
+  text-shadow: 0 2px 10px rgba(212, 168, 67, 0.4);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.card {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold-dim);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.card:hover:not(:disabled) {
+  border-color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(212, 168, 67, 0.25);
+}
+
+.cardDisabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.gameName {
+  font-family: var(--font-heading);
+  color: var(--gold);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.gameDesc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.playerRange {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.voteCount {
+  background: var(--gold-dim);
+  color: var(--bg-dark);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+}
+
+.waiting {
+  margin-top: 2rem;
+  color: var(--gold-light);
+  font-size: 1rem;
+  font-style: italic;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
