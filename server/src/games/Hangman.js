@@ -180,9 +180,17 @@ export class Hangman extends BaseGame {
     }));
 
     const all = [...survivors, ...eliminatedOrdered];
-    return all.map((entry, i) => ({
-      ...entry,
-      placement: i + 1,
-    }));
+    let placement = 1;
+    return all.map((entry, i) => {
+      if (i > 0) {
+        const prev = all[i - 1];
+        // Tied if both non-eliminated with same wrongCount (and neither is the word guesser)
+        const tied = !entry.eliminated && !prev.eliminated
+          && entry.wrongCount === prev.wrongCount
+          && entry.playerId !== this.wordGuessWinner && prev.playerId !== this.wordGuessWinner;
+        if (!tied) placement = i + 1;
+      }
+      return { ...entry, placement };
+    });
   }
 }

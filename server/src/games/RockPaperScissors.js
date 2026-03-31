@@ -130,10 +130,12 @@ export class RockPaperScissors extends BaseGame {
     const sorted = [...this.players].sort(
       (a, b) => this.scores[b] - this.scores[a]
     );
-    return sorted.map((playerId, i) => ({
-      playerId,
-      placement: i + 1,
-      score: this.scores[playerId],
-    }));
+    let placement = 1;
+    return sorted.map((playerId, i) => {
+      if (i > 0 && this.scores[playerId] < this.scores[sorted[i - 1]]) {
+        placement = i + 1;
+      }
+      return { playerId, placement, score: this.scores[playerId] };
+    });
   }
 }

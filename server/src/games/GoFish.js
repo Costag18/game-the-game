@@ -207,10 +207,12 @@ export class GoFish extends BaseGame {
       completedSets: this.completedSets[p] || 0,
     }));
     scores.sort((a, b) => b.completedSets - a.completedSets);
-    return scores.map((s, i) => ({
-      playerId: s.playerId,
-      placement: i + 1,
-      completedSets: s.completedSets,
-    }));
+    let placement = 1;
+    return scores.map((s, i) => {
+      if (i > 0 && s.completedSets < scores[i - 1].completedSets) {
+        placement = i + 1;
+      }
+      return { playerId: s.playerId, placement, completedSets: s.completedSets };
+    });
   }
 }

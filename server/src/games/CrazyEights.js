@@ -193,11 +193,14 @@ export class CrazyEights extends BaseGame {
       return a.points - b.points;
     });
 
-    return scored.map((s, i) => ({
-      playerId: s.playerId,
-      placement: i + 1,
-      remainingCards: s.remainingCards,
-      points: s.points,
-    }));
+    let placement = 1;
+    return scored.map((s, i) => {
+      if (i > 0) {
+        const prev = scored[i - 1];
+        const tied = s.remainingCards === prev.remainingCards && s.points === prev.points;
+        if (!tied) placement = i + 1;
+      }
+      return { playerId: s.playerId, placement, remainingCards: s.remainingCards, points: s.points };
+    });
   }
 }

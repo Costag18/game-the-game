@@ -533,13 +533,24 @@ export class Poker extends BaseGame {
       return 0;
     });
 
-    return evaluated.map((e, i) => ({
-      playerId: e.playerId,
-      placement: i + 1,
-      handDescription: e.handResult.description,
-      handRank: e.handResult.rank,
-      chips: e.chips,
-      folded: e.folded,
-    }));
+    let placement = 1;
+    return evaluated.map((e, i) => {
+      if (i > 0) {
+        const prev = evaluated[i - 1];
+        // Tied only if both non-folded (or both folded) with identical hand comparison
+        const sameCategory = e.folded === prev.folded;
+        const sameHand = !e.folded && !prev.folded && compareHands(e.handResult, prev.handResult) === 0;
+        const bothFolded = e.folded && prev.folded;
+        if (!(sameCategory && (sameHand || bothFolded))) placement = i + 1;
+      }
+      return {
+        playerId: e.playerId,
+        placement,
+        handDescription: e.handResult.description,
+        handRank: e.handResult.rank,
+        chips: e.chips,
+        folded: e.folded,
+      };
+    });
   }
 }

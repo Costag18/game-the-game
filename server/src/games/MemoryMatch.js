@@ -114,6 +114,12 @@ export class MemoryMatch extends BaseGame {
       pairsCollected: this.pairs[p] || 0,
     }));
     entries.sort((a, b) => b.pairsCollected - a.pairsCollected);
-    return entries.map((e, i) => ({ ...e, placement: i + 1 }));
+    let placement = 1;
+    return entries.map((e, i) => {
+      if (i > 0 && e.pairsCollected < entries[i - 1].pairsCollected) {
+        placement = i + 1;
+      }
+      return { ...e, placement };
+    });
   }
 }

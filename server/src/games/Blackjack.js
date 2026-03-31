@@ -183,12 +183,18 @@ export class Blackjack extends BaseGame {
       handTotal: this.calculateHandValue(this.hands[p] || []),
     }));
     scored.sort((a, b) => b.wins - a.wins || b.handTotal - a.handTotal);
-    return scored.map((s, i) => ({
-      playerId: s.playerId,
-      placement: i + 1,
-      handTotal: s.handTotal,
-      wins: s.wins,
-      handDescription: `${s.wins} win${s.wins !== 1 ? 's' : ''}`,
-    }));
+    let placement = 1;
+    return scored.map((s, i) => {
+      if (i > 0 && (s.wins < scored[i - 1].wins || (s.wins === scored[i - 1].wins && s.handTotal < scored[i - 1].handTotal))) {
+        placement = i + 1;
+      }
+      return {
+        playerId: s.playerId,
+        placement,
+        handTotal: s.handTotal,
+        wins: s.wins,
+        handDescription: `${s.wins} win${s.wins !== 1 ? 's' : ''}`,
+      };
+    });
   }
 }

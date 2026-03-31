@@ -262,10 +262,14 @@ export class War extends BaseGame {
         (this.playerDecks[b] || []).length -
         (this.playerDecks[a] || []).length
     );
-    return sorted.map((playerId, i) => ({
-      playerId,
-      placement: i + 1,
-      cardCount: (this.playerDecks[playerId] || []).length,
-    }));
+    let placement = 1;
+    return sorted.map((playerId, i) => {
+      if (i > 0) {
+        const prevCount = (this.playerDecks[sorted[i - 1]] || []).length;
+        const curCount = (this.playerDecks[playerId] || []).length;
+        if (curCount < prevCount) placement = i + 1;
+      }
+      return { playerId, placement, cardCount: (this.playerDecks[playerId] || []).length };
+    });
   }
 }
