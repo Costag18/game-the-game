@@ -137,6 +137,7 @@ export class Roulette extends BaseGame {
       this.transition('finish');
     } else {
       this.round++;
+      this.spinResult = null; // clear so next betting round doesn't show old result
       for (const p of this.players) {
         this.bets[p] = [];
         this.betSubmitted[p] = false;
@@ -182,7 +183,7 @@ export class Roulette extends BaseGame {
       myChips: this.chips[playerId] || 0,
       myBets: this.bets[playerId] || [],
       myBetSubmitted: this.betSubmitted[playerId] || false,
-      spinResult: this.state === 'spinning' || this.state === 'finished' || this.state === 'betting'
+      spinResult: this.state === 'spinning' || this.state === 'finished'
         ? this.spinResult
         : null,
       round: this.round,
