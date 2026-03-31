@@ -3,6 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { displayName } from '../utils/displayName.js';
 import styles from './GameVote.module.css';
+import voteImg from '../assets/images/votefornext.png';
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
@@ -45,7 +46,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Vote for the Next Game</h2>
+        <img src={voteImg} alt="Vote for the Next Game" className={styles.titleImage} />
         <p className={styles.subtitle}>{roundLabel}</p>
         {targetLabel && <p className={styles.subtitle}>{targetLabel}</p>}
       </div>
