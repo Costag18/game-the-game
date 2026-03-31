@@ -13,7 +13,7 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
 
   const [wager, setWager] = useState(0);
 
-  const gameId = voteResult?.gameId;
+  const gameId = voteResult?.selectedGame ?? voteResult?.gameId;
   const game = gameId ? GAMES[gameId] : null;
 
   function handleLockIn() {

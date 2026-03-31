@@ -38,7 +38,8 @@ export class TournamentManager {
 
   startWagerPhase() {
     this.phase = 'wagering';
-    this.players.forEach((p) => (this.wagers[p] = 0));
+    this.wagers = {};
+    this.wagerSubmitted = new Set();
   }
 
   submitWager(playerId, amount) {
@@ -46,6 +47,11 @@ export class TournamentManager {
       throw new Error(`Invalid wager: ${amount} (current points: ${this.scores[playerId]})`);
     }
     this.wagers[playerId] = amount;
+    this.wagerSubmitted.add(playerId);
+  }
+
+  allWagersIn() {
+    return this.players.every((p) => this.wagerSubmitted.has(p));
   }
 
   startPlaying() {
@@ -53,6 +59,10 @@ export class TournamentManager {
   }
 
   completeRound(placements) {
+    // Ensure all players have a wager entry (default 0)
+    for (const p of this.players) {
+      if (this.wagers[p] === undefined) this.wagers[p] = 0;
+    }
     const roundScores = Scorer.calculateRoundScores(placements, this.wagers, this.currentRound);
     for (const [playerId, scoreData] of Object.entries(roundScores)) {
       this.scores[playerId] += scoreData.total;

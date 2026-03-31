@@ -171,8 +171,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
 
     const lobby = lobbyManager.getLobby(lobbyId);
-    const allWagered = lobby.players.every((p) => tm.wagers[p] !== undefined);
-    if (allWagered) {
+    if (tm.allWagersIn()) {
       tm.startPlaying();
       io.to(lobbyId).emit(EVENTS.WAGER_LOCKED, { wagers: { ...tm.wagers } });
 
