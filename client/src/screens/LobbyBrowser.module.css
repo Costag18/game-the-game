@@ -1,0 +1,167 @@
+.container {
+  min-height: 100vh;
+  background-color: var(--mahogany);
+  background-image:
+    radial-gradient(ellipse at top, #6b1c1c 0%, var(--mahogany) 50%, var(--bg-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  padding: 1.5rem;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 2px solid var(--gold-dim);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  font-family: var(--font-heading);
+  color: var(--gold);
+  font-size: 1.6rem;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(212, 168, 67, 0.3);
+}
+
+.btnBack {
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnBack:hover {
+  background: rgba(212, 168, 67, 0.08);
+}
+
+.btnRefresh {
+  background: transparent;
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnRefresh:hover:not(:disabled) {
+  background: rgba(212, 168, 67, 0.08);
+}
+
+.btnRefresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-height: 120px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  color: var(--text-secondary);
+  gap: 0.25rem;
+}
+
+.empty p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.emptyHint {
+  font-size: 0.85rem !important;
+  opacity: 0.7;
+}
+
+.lobbyRow {
+  background: var(--bg-dark);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: border-color 0.2s;
+}
+
+.lobbyRow:hover {
+  border-color: var(--gold);
+}
+
+.lobbyInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.lobbyName {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.lobbyMeta {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.btnJoin {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+  color: var(--bg-dark);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+  letter-spacing: 0.03em;
+}
+
+.btnJoin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnJoin:hover:not(:disabled) {
+  opacity: 0.88;
+}
