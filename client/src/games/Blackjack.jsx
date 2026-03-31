@@ -145,7 +145,7 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
             {otherPlayers.map((p) => (
               <div key={p.playerId} className={styles.otherPlayer}>
                 <span className={styles.otherPlayerId}>{displayName(p.playerId, nicknames)}</span>
-                <span className={styles.otherCardCount}>{p.cardCount} cards</span>
+                <span className={styles.otherCardCount}>{p.cardCount} cards — {p.total}</span>
                 {p.busted && <span className={styles.badgeBusted}>Busted</span>}
                 {p.stood && !p.busted && <span className={styles.badgeStood}>Stood</span>}
               </div>

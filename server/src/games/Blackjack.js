@@ -158,6 +158,7 @@ export class Blackjack extends BaseGame {
       otherPlayers: this.players.filter((p) => p !== playerId).map((p) => ({
         playerId: p,
         cardCount: (this.hands[p] || []).length,
+        total: this.calculateHandValue(this.hands[p] || []),
         busted: this.busted.includes(p),
         stood: this.stood.includes(p),
       })),
