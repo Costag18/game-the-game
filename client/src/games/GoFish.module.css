@@ -1,0 +1,280 @@
+.table {
+  min-height: 100vh;
+  background-color: #0a4a2f;
+  background-image: radial-gradient(ellipse at center, #0e5c3a 0%, #083d26 60%, #052818 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  font-family: 'Georgia', serif;
+  gap: 1.25rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #7ecfff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.waiting {
+  font-size: 1.2rem;
+  color: #a5d6a7;
+  margin-top: 4rem;
+}
+
+/* Status bar */
+.statusBar {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.95rem;
+}
+
+.deckCount {
+  color: #b0bec5;
+}
+
+.statusMyTurn {
+  color: #ffe082;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.statusWaiting {
+  color: #90a4ae;
+}
+
+.statusFinished {
+  color: #ef9a9a;
+  font-weight: bold;
+}
+
+/* Last action */
+.lastAction {
+  background: rgba(126, 207, 255, 0.12);
+  border: 1px solid rgba(126, 207, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  color: #e3f2fd;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Sections */
+.opponentsSection,
+.mySection,
+.resultsSection {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(126, 207, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  max-width: 640px;
+  box-sizing: border-box;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  color: #7ecfff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.75rem 0;
+}
+
+/* Opponents */
+.opponentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.opponent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.opponentActive {
+  border-color: #ffe082;
+  background: rgba(255, 224, 130, 0.1);
+}
+
+.opponentName {
+  font-weight: bold;
+  flex: 1;
+  color: #e8f5e9;
+}
+
+.opponentCards {
+  font-size: 0.85rem;
+  color: #90caf9;
+}
+
+.opponentSets {
+  font-size: 0.85rem;
+  color: #a5d6a7;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* My section */
+.mySetsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.mySetsLabel {
+  color: #b0bec5;
+  font-size: 0.9rem;
+}
+
+.mySetsCount {
+  color: #ffe082;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.handRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.emptyHand {
+  color: #78909c;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Card mini */
+.cardMini {
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  user-select: none;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.cardRed {
+  color: #c62828;
+}
+
+.cardBlack {
+  color: #212121;
+}
+
+/* Ask controls */
+.askControls {
+  border-top: 1px solid rgba(126, 207, 255, 0.2);
+  padding-top: 1rem;
+}
+
+.askTitle {
+  font-size: 0.9rem;
+  color: #7ecfff;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.askRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.select {
+  background: #1e3a2f;
+  color: #e8f5e9;
+  border: 1px solid #4caf50;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #7ecfff;
+}
+
+.forText {
+  color: #90a4ae;
+  font-size: 0.9rem;
+}
+
+.btnAsk {
+  padding: 0.4rem 1.25rem;
+  background: #1565c0;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  box-shadow: 0 2px 0 #0d47a1;
+}
+
+.btnAsk:hover:not(:disabled) {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btnAsk:active:not(:disabled) {
+  transform: translateY(0);
+  filter: brightness(0.9);
+}
+
+.btnAsk:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Results */
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.07);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+}
+
+.resultName {
+  font-weight: bold;
+  color: #e8f5e9;
+}
+
+.resultSets {
+  color: #ffe082;
+  font-weight: bold;
+}
