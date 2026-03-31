@@ -1,0 +1,217 @@
+.arena {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  font-family: 'Georgia', serif;
+  gap: 1.5rem;
+}
+
+.title {
+  font-size: 2.2rem;
+  color: #e94560;
+  text-shadow: 0 2px 8px rgba(233, 69, 96, 0.4);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.waiting {
+  font-size: 1.2rem;
+  color: #a0aec0;
+  margin-top: 4rem;
+}
+
+/* Round info */
+.roundInfo {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.roundLabel {
+  font-size: 1rem;
+  color: #90cdf4;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Scoreboard */
+.scoreboard {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.scoreCard {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 80px;
+}
+
+.playerName {
+  font-size: 0.85rem;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.scoreValue {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffd700;
+  line-height: 1;
+}
+
+/* Reveal area */
+.revealArea {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem 2.5rem;
+}
+
+.vs {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #e94560;
+}
+
+.choiceDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.choiceIcon {
+  font-size: 3.5rem;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.choiceIcon:not(.choiceHidden) {
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.choiceHidden {
+  filter: grayscale(1);
+  opacity: 0.4;
+  font-size: 2.5rem;
+}
+
+.choiceLabel {
+  font-size: 0.9rem;
+  color: #a0aec0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Status text */
+.statusText {
+  font-size: 1.2rem;
+  color: #fff9c4;
+  margin: 0;
+  text-align: center;
+  min-height: 1.6em;
+}
+
+.statusFinished {
+  font-size: 1.5rem;
+  color: #ffd700;
+  font-weight: bold;
+  text-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+/* Choice buttons */
+.choiceButtons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.choiceBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 110px;
+  padding: 1.25rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+  font-family: inherit;
+}
+
+.choiceBtn:hover {
+  background-color: rgba(233, 69, 96, 0.25);
+  border-color: #e94560;
+  transform: translateY(-3px);
+}
+
+.choiceBtn:active {
+  transform: translateY(0);
+}
+
+.btnEmoji {
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.btnLabel {
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Waiting area */
+.waitingArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 1.25rem 2rem;
+}
+
+.myChoicePreview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 2rem;
+}
+
+.chosenLabel {
+  font-size: 1rem;
+  color: #e2e8f0;
+}
+
+.waitingText {
+  font-size: 0.95rem;
+  color: #a0aec0;
+  margin: 0;
+  letter-spacing: 0.03em;
+}
