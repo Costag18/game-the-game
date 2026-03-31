@@ -16,7 +16,7 @@
   border-radius: var(--radius-lg);
   padding: 2rem;
   width: 100%;
-  max-width: 480px;
+  max-width: 560px;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
@@ -60,6 +60,27 @@
   font-size: 0.85rem;
   margin: 0;
   line-height: 1.4;
+}
+
+.tutorialWrapper {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.tutorialLabel {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.tutorialVideo {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-sm);
 }
 
 .scoreRow {
