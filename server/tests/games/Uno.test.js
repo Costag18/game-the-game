@@ -101,10 +101,16 @@ describe('Uno', () => {
     expect(game.hands[currentPlayer].length).toBe(beforeCount + 1);
   });
 
-  test('draw advances turn to next player', () => {
+  test('draw either advances turn or lets player play/pass', () => {
     game.startGame();
     const firstPlayer = game.currentTurnPlayer;
+    const handBefore = game.hands[firstPlayer].length;
     game.handleAction(firstPlayer, { type: 'draw' });
+    expect(game.hands[firstPlayer].length).toBe(handBefore + 1);
+    // If drawn card was playable, player stays on turn — pass to advance
+    if (game.currentTurnPlayer === firstPlayer) {
+      game.handleAction(firstPlayer, { type: 'pass' });
+    }
     expect(game.currentTurnPlayer).not.toBe(firstPlayer);
   });
 

@@ -151,9 +151,10 @@ describe('TournamentManager', () => {
       expect(manager.phase).toBe('wagering');
     });
 
-    test('initializes all player wagers to 0', () => {
+    test('initializes with no wagers submitted', () => {
       manager.startWagerPhase();
-      expect(manager.wagers).toEqual({ alice: 0, bob: 0, carol: 0 });
+      expect(manager.wagers).toEqual({});
+      expect(manager.allWagersIn()).toBe(false);
     });
   });
 
@@ -377,9 +378,9 @@ describe('TournamentManager', () => {
 
     test('exposes wagers only during wagering phase', () => {
       manager.startNextRound();
-      manager.startWagerPhase(); // sets phase to 'wagering'
+      manager.startWagerPhase();
       const state = manager.getState();
-      expect(state.wagers).toMatchObject({ alice: 0, bob: 0, carol: 0 });
+      expect(state.wagers).toEqual({});
       expect(state.votes).toBeNull();
     });
 

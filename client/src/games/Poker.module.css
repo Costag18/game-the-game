@@ -43,6 +43,21 @@
   padding: 0.4rem 1.25rem;
 }
 
+.handHistory {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.handHistoryItem {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #b8a88a);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
 .phaseBadge {
   font-size: 0.95rem;
   font-weight: bold;

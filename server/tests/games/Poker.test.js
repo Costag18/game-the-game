@@ -301,26 +301,17 @@ describe('Poker game engine', () => {
     expect(game.communityCards).toHaveLength(5);
   });
 
-  test('showdown evaluates hands and game finishes', () => {
+  test('showdown evaluates hands and game finishes after 3 hands', () => {
     game.startGame();
-    _completePreflop(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
+    _completeFullGame(game);
     expect(game.state).toBe('finished');
     expect(game.isComplete()).toBe(true);
+    expect(game.handNumber).toBe(3);
   });
 
-  test('pot is awarded to a player in showdown', () => {
+  test('chips are conserved across all hands', () => {
     game.startGame();
-    const potBefore = game.pot;
-    expect(potBefore).toBeGreaterThan(0);
-    _completePreflop(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
-    // Pot should have been distributed
-    expect(game.pot).toBe(0);
+    _completeFullGame(game);
     const total = game.chips['p1'] + game.chips['p2'] + game.chips['p3'];
     expect(total).toBe(3000);
   });
@@ -339,10 +330,7 @@ describe('Poker game engine', () => {
 
   test('getResults returns placement for all players', () => {
     game.startGame();
-    _completePreflop(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
+    _completeFullGame(game);
     const results = game.getResults();
     expect(results).toHaveLength(3);
     expect(results[0].placement).toBe(1);
@@ -377,16 +365,12 @@ describe('Poker game engine', () => {
     expect(game.isComplete()).toBe(false);
   });
 
-  test('revealed hands shown at showdown', () => {
+  test('revealed hands shown when game is finished', () => {
     game.startGame();
-    _completePreflop(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
-    _completeBettingRound(game);
+    _completeFullGame(game);
     const state = game.getStateForPlayer('p1');
-    // In finished state, hands of non-folded players should be revealed
-    // At least the winner's hand should be visible
     expect(state.phase).toBe('finished');
+    expect(Object.keys(state.revealedHands).length).toBeGreaterThan(0);
   });
 
   test('check is valid when no bet to match', () => {
@@ -426,23 +410,24 @@ describe('Poker showdown with known hands', () => {
     const game = new Poker(['alice', 'bob']);
     game.startGame();
 
+    // Force to last hand so showdown finishes the game
+    game.handNumber = 3;
+
     // Inject known hole cards
-    // alice: A-K suited (strong)
-    // bob: 2-7 offsuit (weak)
     game.holeCards['alice'] = [c(1, 'spades'), c(13, 'spades')]; // A, K of spades
     game.holeCards['bob'] = [c(2, 'hearts'), c(7, 'clubs')];
 
-    // Inject community cards: Q-J-10 spades + 2, 3 (alice gets Royal Flush)
+    // Inject community cards: Q-J-10 spades + junk (alice gets Royal Flush)
     game.communityCards = [
       c(12, 'spades'), c(11, 'spades'), c(10, 'spades'), c(4, 'hearts'), c(5, 'diamonds'),
     ];
 
     // Force to showdown state
     game.state = 'river';
-    // Manually collect bets and go to showdown
     game._collectBets();
     game._resolveShowdown();
 
+    expect(game.isComplete()).toBe(true);
     const results = game.getResults();
     expect(results[0].playerId).toBe('alice');
     expect(results[0].placement).toBe(1);
@@ -489,5 +474,21 @@ function _completeBettingRound(game) {
     } else {
       game.handleAction(tp, { type: 'check' });
     }
+  }
+}
+
+/** Play one full hand (preflop through showdown). */
+function _completeOneHand(game) {
+  if (game.state === 'preflop') _completePreflop(game);
+  if (!game.isComplete() && game.state === 'flop') _completeBettingRound(game);
+  if (!game.isComplete() && game.state === 'turn') _completeBettingRound(game);
+  if (!game.isComplete() && game.state === 'river') _completeBettingRound(game);
+}
+
+/** Play all 3 hands to finish the game. */
+function _completeFullGame(game) {
+  let guard = 0;
+  while (!game.isComplete() && guard++ < 60) {
+    _completeOneHand(game);
   }
 }

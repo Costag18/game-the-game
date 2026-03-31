@@ -158,16 +158,17 @@ function compareHands(a, b) {
 const STARTING_CHIPS = 1000;
 const SMALL_BLIND = 10;
 const BIG_BLIND = 20;
+const HANDS_PER_GAME = 3;
 
 const FSM = {
   initialState: 'waiting',
   transitions: {
     waiting: { start: 'preflop' },
-    preflop: { deal: 'flop', finish: 'finished' },
+    preflop: { deal: 'flop', finish: 'finished', newhand: 'preflop' },
     flop: { deal: 'turn', finish: 'finished' },
     turn: { deal: 'river', finish: 'finished' },
     river: { showdown: 'showdown', finish: 'finished' },
-    showdown: { finish: 'finished' },
+    showdown: { finish: 'finished', newhand: 'preflop' },
   },
 };
 
@@ -186,6 +187,8 @@ export class Poker extends BaseGame {
     this.lastRaiser = null;   // playerId of last raiser (to detect full orbit)
     this.actedThisRound = new Set(); // players who have acted this betting round
     this._roundComplete = false;
+    this.handNumber = 0;           // current hand (1-based once started)
+    this.handResults = [];         // store result of each hand for display
   }
 
   // -------------------------------------------------------------------------
@@ -193,6 +196,20 @@ export class Poker extends BaseGame {
   // -------------------------------------------------------------------------
 
   startGame() {
+    // Initialise chips
+    for (const p of this.players) {
+      this.chips[p] = STARTING_CHIPS;
+    }
+    this.handNumber = 0;
+    this.handResults = [];
+    this.dealerIndex = 0;
+
+    this.transition('start');
+    this._startHand();
+  }
+
+  _startHand() {
+    this.handNumber++;
     this.deck.reset();
     this.holeCards = {};
     this.communityCards = [];
@@ -203,9 +220,7 @@ export class Poker extends BaseGame {
     this.lastRaiser = null;
     this._roundComplete = false;
 
-    // Initialise chips if not already set
     for (const p of this.players) {
-      if (this.chips[p] === undefined) this.chips[p] = STARTING_CHIPS;
       this.bets[p] = 0;
     }
 
@@ -214,9 +229,7 @@ export class Poker extends BaseGame {
       this.holeCards[p] = this.deck.dealMultiple(2);
     }
 
-    this.transition('start');
-
-    // Post blinds. Dealer = dealerIndex, small blind = next, big blind = next+1.
+    // Post blinds
     const activePlayers = this._activePlayers();
     const n = activePlayers.length;
     if (n < 2) return;
@@ -390,40 +403,69 @@ export class Poker extends BaseGame {
   _resolveShowdown() {
     // Award pot to best hand
     const contenders = this._nonFoldedPlayers();
-    if (contenders.length === 0) {
-      this.transition('finish');
-      return;
-    }
-    let best = null;
-    let winner = null;
-    for (const p of contenders) {
-      const allCards = [...(this.holeCards[p] || []), ...this.communityCards];
-      const result = evaluateHand(allCards);
-      if (!best || compareHands(result, best) < 0) {
-        best = result;
-        winner = p;
+    let winnerName = null;
+    let bestDesc = null;
+
+    if (contenders.length > 0) {
+      let best = null;
+      let winner = null;
+      for (const p of contenders) {
+        const allCards = [...(this.holeCards[p] || []), ...this.communityCards];
+        const result = evaluateHand(allCards);
+        if (!best || compareHands(result, best) < 0) {
+          best = result;
+          winner = p;
+        }
+      }
+      if (winner) {
+        this.chips[winner] += this.pot;
+        this.pot = 0;
+        winnerName = winner;
+        bestDesc = best?.description;
       }
     }
-    if (winner) {
-      this.chips[winner] += this.pot;
-      this.pot = 0;
-    }
-    this.transition('finish');
+
+    // Record hand result
+    this.handResults.push({
+      hand: this.handNumber,
+      winner: winnerName,
+      handDescription: bestDesc,
+      holeCards: Object.fromEntries(
+        this.players.map((p) => [p, this.holeCards[p] || []])
+      ),
+      communityCards: [...this.communityCards],
+    });
+
+    this._finishHandOrGame();
   }
 
   _forceFinish() {
-    // Skip straight to finished state regardless of current state
-    while (this.state !== 'finished') {
-      const transitions = FSM.transitions[this.state];
-      if (!transitions) break;
-      if (transitions.finish) {
-        this.transition('finish');
-      } else {
-        // use whatever first transition is available to get closer
-        const key = Object.keys(transitions)[0];
-        if (key) this.state = transitions[key]; // direct assign to avoid hooks
-        else break;
-      }
+    // Someone won by everyone else folding
+    const remaining = this._activePlayers().filter((p) => !this.folded.has(p));
+    const winner = remaining[0] || null;
+
+    this.handResults.push({
+      hand: this.handNumber,
+      winner,
+      handDescription: 'All others folded',
+      holeCards: Object.fromEntries(
+        this.players.map((p) => [p, this.holeCards[p] || []])
+      ),
+      communityCards: [...this.communityCards],
+    });
+
+    this._finishHandOrGame();
+  }
+
+  _finishHandOrGame() {
+    if (this.handNumber >= HANDS_PER_GAME) {
+      // All hands played — finish the game
+      this.state = 'finished';
+    } else {
+      // Move dealer button and start next hand
+      this.dealerIndex = (this.dealerIndex + 1) % this.players.length;
+      this.state = 'preflop'; // reset state for next hand
+      this._startHand();
     }
   }
 
@@ -444,6 +486,9 @@ export class Poker extends BaseGame {
       isMyTurn: this.currentTurnPlayer === playerId && ['preflop', 'flop', 'turn', 'river'].includes(this.state),
       currentTurnPlayer: this.currentTurnPlayer,
       folded: [...this.folded],
+      handNumber: this.handNumber,
+      totalHands: HANDS_PER_GAME,
+      handResults: this.handResults,
       otherPlayers: this.players
         .filter((p) => p !== playerId)
         .map((p) => ({

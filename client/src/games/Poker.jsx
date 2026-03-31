@@ -86,6 +86,9 @@ export default function Poker({ gameState, onAction, playerId }) {
     folded,
     otherPlayers,
     revealedHands,
+    handNumber = 1,
+    totalHands = 3,
+    handResults = [],
   } = gameState;
 
   const iAmFolded = folded && folded.includes(playerId);
@@ -128,9 +131,21 @@ export default function Poker({ gameState, onAction, playerId }) {
 
       {/* Phase badge + pot */}
       <div className={styles.infoBar}>
+        <span className={styles.phaseBadge}>Hand {handNumber}/{totalHands}</span>
         <span className={styles.phaseBadge}>{PHASE_LABELS[phase] ?? phase}</span>
         <span className={styles.potDisplay}>Pot: {pot}</span>
       </div>
+
+      {/* Previous hand results */}
+      {handResults.length > 0 && (
+        <div className={styles.handHistory}>
+          {handResults.map((hr, i) => (
+            <span key={i} className={styles.handHistoryItem}>
+              Hand {hr.hand}: {hr.winner?.slice(0, 8) ?? '?'} — {hr.handDescription}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Community cards */}
       <section className={styles.communitySection}>
