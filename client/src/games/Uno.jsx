@@ -8,7 +8,12 @@ const COLOR_MAP = {
   blue: styles.colorBlue,
 };
 
-const RANK_DISPLAY = {
+const RANK_SYMBOL = {
+  Skip: '⊘',
+  Reverse: '↻',
+};
+
+const RANK_LETTER = {
   Skip: 'S',
   Reverse: 'R',
   DrawTwo: '+2',
@@ -17,7 +22,11 @@ const RANK_DISPLAY = {
 };
 
 function getRankDisplay(rank) {
-  return RANK_DISPLAY[rank] ?? String(rank);
+  return RANK_LETTER[rank] ?? String(rank);
+}
+
+function getRankSymbol(rank) {
+  return RANK_SYMBOL[rank] ?? null;
 }
 
 function UnoCard({ card, onClick, selected, playable }) {
@@ -36,6 +45,9 @@ function UnoCard({ card, onClick, selected, playable }) {
       onClick={onClick}
       disabled={!onClick}
     >
+      {getRankSymbol(card.rank) && (
+        <span className={styles.cardSymbol}>{getRankSymbol(card.rank)}</span>
+      )}
       <span className={styles.cardRank}>{getRankDisplay(card.rank)}</span>
     </button>
   );
@@ -48,6 +60,9 @@ function DiscardPile({ topCard, currentColor }) {
       <p className={styles.pileLabel}>Discard</p>
       {topCard ? (
         <div className={[styles.card, styles.cardStatic, colorClass].join(' ')}>
+          {getRankSymbol(topCard.rank) && (
+            <span className={styles.cardSymbol}>{getRankSymbol(topCard.rank)}</span>
+          )}
           <span className={styles.cardRank}>{getRankDisplay(topCard.rank)}</span>
         </div>
       ) : (
