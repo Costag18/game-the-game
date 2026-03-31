@@ -55,7 +55,7 @@ function DeckPile({ count, label }) {
   );
 }
 
-export default function War({ gameState, onAction }) {
+export default function War({ gameState, onAction, nicknames }) {
   if (!gameState) {
     return (
       <div className={styles.table}>

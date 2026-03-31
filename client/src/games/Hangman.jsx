@@ -1,4 +1,5 @@
 import styles from './Hangman.module.css';
+import { displayName } from '../utils/displayName.js';
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -46,7 +47,7 @@ function HangmanFigure({ wrongCount }) {
   );
 }
 
-export default function Hangman({ gameState, onAction, currentPlayerId }) {
+export default function Hangman({ gameState, onAction, currentPlayerId, nicknames }) {
   if (!gameState) {
     return (
       <div className={styles.table}>
@@ -89,7 +90,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId }) {
         ) : isMyTurn ? (
           <span className={styles.statusMyTurn}>Your turn — guess a letter!</span>
         ) : (
-          <span className={styles.statusWaiting}>Waiting for {currentTurnPlayer}...</span>
+          <span className={styles.statusWaiting}>Waiting for {displayName(currentTurnPlayer, nicknames)}...</span>
         )}
       </div>
 
@@ -150,7 +151,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId }) {
               key={ps.playerId}
               className={`${styles.playerRow} ${currentTurnPlayer === ps.playerId ? styles.playerActive : ''} ${ps.eliminated ? styles.playerEliminated : ''}`}
             >
-              <span className={styles.playerName}>{ps.playerId}</span>
+              <span className={styles.playerName}>{displayName(ps.playerId, nicknames)}</span>
               <div className={styles.playerGallows}>
                 <HangmanFigure wrongCount={ps.wrongCount} />
               </div>

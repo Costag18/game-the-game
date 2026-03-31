@@ -1,4 +1,5 @@
 import styles from './RockPaperScissors.module.css';
+import { displayName } from '../utils/displayName.js';
 
 const CHOICE_EMOJI = {
   rock: '✊',
@@ -23,7 +24,7 @@ function ChoiceDisplay({ choice, label, hidden = false }) {
   );
 }
 
-export default function RockPaperScissors({ gameState, onAction }) {
+export default function RockPaperScissors({ gameState, onAction, nicknames }) {
   if (!gameState) {
     return (
       <div className={styles.arena}>
@@ -83,7 +84,7 @@ export default function RockPaperScissors({ gameState, onAction }) {
       <div className={styles.scoreboard}>
         {playerIds.map((pid) => (
           <div key={pid} className={styles.scoreCard}>
-            <span className={styles.playerName}>{pid}</span>
+            <span className={styles.playerName}>{displayName(pid, nicknames)}</span>
             <span className={styles.scoreValue}>{scores[pid] ?? 0}</span>
           </div>
         ))}

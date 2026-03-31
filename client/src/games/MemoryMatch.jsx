@@ -1,4 +1,5 @@
 import styles from './MemoryMatch.module.css';
+import { displayName } from '../utils/displayName.js';
 
 function MemoryCard({ card, position, isMyTurn, onFlip }) {
   if (card.matched) {
@@ -27,7 +28,7 @@ function MemoryCard({ card, position, isMyTurn, onFlip }) {
   );
 }
 
-export default function MemoryMatch({ gameState, onAction, playerId }) {
+export default function MemoryMatch({ gameState, onAction, playerId, nicknames }) {
   if (!gameState) {
     return (
       <div className={styles.table}>
@@ -46,7 +47,7 @@ export default function MemoryMatch({ gameState, onAction, playerId }) {
   function getStatusText() {
     if (isFinished) return 'Game Over!';
     if (isMyTurn) return 'Your turn — flip a card!';
-    return `Waiting for ${currentTurnPlayer}'s turn...`;
+    return `Waiting for ${displayName(currentTurnPlayer, nicknames)}'s turn...`;
   }
 
   const matchedCount = board ? board.filter((c) => c.matched).length / 2 : 0;
@@ -67,7 +68,7 @@ export default function MemoryMatch({ gameState, onAction, playerId }) {
                 key={pid}
                 className={`${styles.scoreItem} ${pid === currentTurnPlayer ? styles.activePlayer : ''}`}
               >
-                {pid}: {count} pair{count !== 1 ? 's' : ''}
+                {displayName(pid, nicknames)}: {count} pair{count !== 1 ? 's' : ''}
               </li>
             ))}
           </ul>
@@ -101,7 +102,7 @@ export default function MemoryMatch({ gameState, onAction, playerId }) {
               .map(([pid, count], i) => (
                 <li key={pid} className={styles.resultItem}>
                   <span className={styles.placement}>#{i + 1}</span>
-                  <span className={styles.resultPlayerId}>{pid}</span>
+                  <span className={styles.resultPlayerId}>{displayName(pid, nicknames)}</span>
                   <span className={styles.resultPairs}>{count} pairs</span>
                 </li>
               ))}

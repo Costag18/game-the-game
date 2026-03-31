@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './GoFish.module.css';
+import { displayName } from '../utils/displayName.js';
 
 const RANK_NAMES = {
   1: 'A', 11: 'J', 12: 'Q', 13: 'K',
@@ -23,7 +24,7 @@ function CardMini({ rank, suit }) {
   );
 }
 
-export default function GoFish({ gameState, onAction, currentPlayerId }) {
+export default function GoFish({ gameState, onAction, currentPlayerId, nicknames }) {
   const [selectedTarget, setSelectedTarget] = useState('');
   const [selectedRank, setSelectedRank] = useState('');
 
@@ -59,16 +60,18 @@ export default function GoFish({ gameState, onAction, currentPlayerId }) {
 
   function getLastActionText() {
     if (!lastAction) return null;
-    const { type, playerId, targetPlayer, rank, count } = lastAction;
+    const { type, playerId: actionPlayerId, targetPlayer, rank, count } = lastAction;
     const rankName = getRankLabel(rank);
+    const actorName = displayName(actionPlayerId, nicknames);
+    const targetName = displayName(targetPlayer, nicknames);
     if (type === 'transfer') {
-      return `${playerId} asked ${targetPlayer} for ${rankName}s and got ${count} card${count !== 1 ? 's' : ''}!`;
+      return `${actorName} asked ${targetName} for ${rankName}s and got ${count} card${count !== 1 ? 's' : ''}!`;
     }
     if (type === 'goFish') {
-      return `${playerId} asked for ${rankName}s — Go Fish!`;
+      return `${actorName} asked for ${rankName}s — Go Fish!`;
     }
     if (type === 'luckyFish') {
-      return `${playerId} asked for ${rankName}s — Go Fish! Drew the right card — go again!`;
+      return `${actorName} asked for ${rankName}s — Go Fish! Drew the right card — go again!`;
     }
     return null;
   }
@@ -86,7 +89,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId }) {
           <span className={styles.statusMyTurn}>Your turn!</span>
         ) : (
           <span className={styles.statusWaiting}>
-            Waiting for {currentTurnPlayer}...
+            Waiting for {displayName(currentTurnPlayer, nicknames)}...
           </span>
         )}
       </div>
@@ -105,7 +108,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId }) {
               key={p.playerId}
               className={`${styles.opponent} ${currentTurnPlayer === p.playerId ? styles.opponentActive : ''}`}
             >
-              <span className={styles.opponentName}>{p.playerId}</span>
+              <span className={styles.opponentName}>{displayName(p.playerId, nicknames)}</span>
               <span className={styles.opponentCards}>{p.cardCount} cards</span>
               <span className={styles.opponentSets}>
                 {p.completedSets} {p.completedSets === 1 ? 'set' : 'sets'}
@@ -146,7 +149,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId }) {
               >
                 <option value="">Select player</option>
                 {(otherPlayers || []).map((p) => (
-                  <option key={p.playerId} value={p.playerId}>{p.playerId}</option>
+                  <option key={p.playerId} value={p.playerId}>{displayName(p.playerId, nicknames)}</option>
                 ))}
               </select>
               <span className={styles.forText}>for</span>
@@ -183,7 +186,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId }) {
             </div>
             {(otherPlayers || []).map((p) => (
               <div key={p.playerId} className={styles.resultRow}>
-                <span className={styles.resultName}>{p.playerId}</span>
+                <span className={styles.resultName}>{displayName(p.playerId, nicknames)}</span>
                 <span className={styles.resultSets}>{p.completedSets} sets</span>
               </div>
             ))}

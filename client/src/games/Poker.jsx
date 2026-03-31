@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './Poker.module.css';
+import { displayName } from '../utils/displayName.js';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -63,7 +64,7 @@ function Card({ card, hidden = false, small = false }) {
 // Main component
 // ---------------------------------------------------------------------------
 
-export default function Poker({ gameState, onAction, playerId }) {
+export default function Poker({ gameState, onAction, playerId, nicknames }) {
   const [raiseAmount, setRaiseAmount] = useState('');
 
   if (!gameState) {
@@ -141,7 +142,7 @@ export default function Poker({ gameState, onAction, playerId }) {
         <div className={styles.handHistory}>
           {handResults.map((hr, i) => (
             <span key={i} className={styles.handHistoryItem}>
-              Hand {hr.hand}: {hr.winner?.slice(0, 8) ?? '?'} — {hr.handDescription}
+              Hand {hr.hand}: {hr.winner ? displayName(hr.winner, nicknames) : '?'} — {hr.handDescription}
             </span>
           ))}
         </div>
@@ -167,7 +168,7 @@ export default function Poker({ gameState, onAction, playerId }) {
                 key={p.playerId}
                 className={`${styles.otherPlayer} ${p.folded ? styles.otherPlayerFolded : ''}`}
               >
-                <span className={styles.otherPlayerId}>{p.playerId}</span>
+                <span className={styles.otherPlayerId}>{displayName(p.playerId, nicknames)}</span>
 
                 {/* Card backs (or revealed cards in showdown) */}
                 <div className={styles.otherCardRow}>
@@ -256,7 +257,7 @@ export default function Poker({ gameState, onAction, playerId }) {
               return (
                 <div key={pid} className={styles.revealRow}>
                   <div className={styles.revealPlayerInfo}>
-                    <span className={styles.revealPlayerId}>{pid.slice(0, 8)}</span>
+                    <span className={styles.revealPlayerId}>{displayName(pid, nicknames)}</span>
                     {desc && <span className={styles.handLabel}>{desc}</span>}
                   </div>
                   <div className={styles.cardRow}>

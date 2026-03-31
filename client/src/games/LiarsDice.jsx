@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './LiarsDice.module.css';
+import { displayName } from '../utils/displayName.js';
 
 // Dot positions for each die face value (3x3 grid, cells 0-8 top-left to bottom-right)
 const DOT_POSITIONS = {
@@ -25,7 +26,7 @@ function Die({ value }) {
   );
 }
 
-export default function LiarsDice({ gameState, onAction, playerId }) {
+export default function LiarsDice({ gameState, onAction, playerId, nicknames }) {
   const [bidQuantity, setBidQuantity] = useState(1);
   const [bidFaceValue, setBidFaceValue] = useState(2);
 
@@ -53,7 +54,7 @@ export default function LiarsDice({ gameState, onAction, playerId }) {
     if (isFinished) return 'Game Over!';
     if (eliminated) return 'You have been eliminated.';
     if (isMyTurn) return 'Your turn — bid or challenge!';
-    return `Waiting for ${currentTurnPlayer}'s turn...`;
+    return `Waiting for ${displayName(currentTurnPlayer, nicknames)}'s turn...`;
   }
 
   function handleBid() {
@@ -102,7 +103,7 @@ export default function LiarsDice({ gameState, onAction, playerId }) {
                 key={p.playerId}
                 className={`${styles.playerRow} ${p.eliminated ? styles.eliminated : ''} ${p.playerId === currentTurnPlayer ? styles.activeTurn : ''}`}
               >
-                <span className={styles.playerName}>{p.playerId}</span>
+                <span className={styles.playerName}>{displayName(p.playerId, nicknames)}</span>
                 <span className={styles.diceCount}>
                   {p.eliminated ? '0' : p.diceCount} dice
                 </span>
@@ -180,7 +181,7 @@ export default function LiarsDice({ gameState, onAction, playerId }) {
             ].map((r, i) => (
               <li key={r.playerId} className={styles.resultItem}>
                 <span className={styles.placement}>#{r.placement}</span>
-                <span className={styles.resultPlayerId}>{r.playerId}</span>
+                <span className={styles.resultPlayerId}>{displayName(r.playerId, nicknames)}</span>
               </li>
             ))}
           </ul>

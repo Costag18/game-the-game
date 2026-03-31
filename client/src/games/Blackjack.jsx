@@ -1,4 +1,5 @@
 import styles from './Blackjack.module.css';
+import { displayName } from '../utils/displayName.js';
 
 const RANK_NAMES = {
   1: 'A',
@@ -47,7 +48,7 @@ function Hand({ cards, label, total, showHoleCard = true }) {
   );
 }
 
-export default function Blackjack({ gameState, onAction }) {
+export default function Blackjack({ gameState, onAction, nicknames }) {
   if (!gameState) {
     return <div className={styles.table}><p className={styles.waiting}>Waiting for game to start...</p></div>;
   }
@@ -99,7 +100,7 @@ export default function Blackjack({ gameState, onAction }) {
           <div className={styles.otherPlayersList}>
             {otherPlayers.map((p) => (
               <div key={p.playerId} className={styles.otherPlayer}>
-                <span className={styles.otherPlayerId}>{p.playerId}</span>
+                <span className={styles.otherPlayerId}>{displayName(p.playerId, nicknames)}</span>
                 <span className={styles.otherCardCount}>{p.cardCount} cards</span>
                 {p.busted && <span className={styles.badgeBusted}>Busted</span>}
                 {p.stood && !p.busted && <span className={styles.badgeStood}>Stood</span>}

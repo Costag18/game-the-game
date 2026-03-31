@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './Uno.module.css';
+import { displayName } from '../utils/displayName.js';
 
 const COLOR_MAP = {
   red: styles.colorRed,
@@ -73,10 +74,10 @@ function DiscardPile({ topCard, currentColor }) {
   );
 }
 
-function OpponentBadge({ playerId, handCount }) {
+function OpponentBadge({ label, handCount }) {
   return (
     <div className={styles.opponentBadge}>
-      <span className={styles.opponentName}>{playerId}</span>
+      <span className={styles.opponentName}>{label}</span>
       <span className={styles.handCountBadge}>{handCount}</span>
     </div>
   );
@@ -115,7 +116,7 @@ function canPlay(card, topCard, currentColor) {
   return false;
 }
 
-export default function Uno({ gameState, onAction }) {
+export default function Uno({ gameState, onAction, nicknames }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [pickingColor, setPickingColor] = useState(false);
   const [pendingCardIndex, setPendingCardIndex] = useState(null);
@@ -195,7 +196,7 @@ export default function Uno({ gameState, onAction }) {
           {otherPlayers.map((op) => (
             <OpponentBadge
               key={op.playerId}
-              playerId={op.playerId}
+              label={displayName(op.playerId, nicknames)}
               handCount={op.handCount}
             />
           ))}
