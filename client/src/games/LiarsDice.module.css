@@ -1,0 +1,290 @@
+.table {
+  min-height: 100vh;
+  background-color: #1a6b35;
+  background-image:
+    radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  font-family: 'Georgia', serif;
+  gap: 1.5rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.waiting {
+  font-size: 1.2rem;
+  color: #c8e6c9;
+  margin-top: 4rem;
+}
+
+.statusText {
+  font-size: 1.05rem;
+  color: #fff9c4;
+  margin: 0;
+  text-align: center;
+  min-height: 1.5em;
+}
+
+/* Panel */
+.panel {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  max-width: 640px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panelTitle {
+  color: #ffd700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-align: center;
+}
+
+/* Dice */
+.diceRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.die {
+  width: 52px;
+  height: 52px;
+  background-color: #f5f0e0;
+  border: 2px solid #c8a000;
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 6px;
+  box-sizing: border-box;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #1a1a1a;
+  border-radius: 50%;
+  align-self: center;
+  justify-self: center;
+}
+
+.dotHidden {
+  visibility: hidden;
+}
+
+/* Other players */
+.playersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.playerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+}
+
+.playerRow.eliminated {
+  opacity: 0.4;
+}
+
+.playerRow.activeTurn {
+  border: 1px solid #ffd700;
+}
+
+.playerName {
+  flex: 1;
+  font-weight: bold;
+  color: #e8f5e9;
+}
+
+.diceCount {
+  font-size: 0.9rem;
+  color: #a5d6a7;
+}
+
+.badgeEliminated {
+  background-color: #c62828;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: bold;
+}
+
+/* Current bid */
+.bidDisplay {
+  text-align: center;
+  font-size: 1.4rem;
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.bidNone {
+  text-align: center;
+  font-size: 1rem;
+  color: #a5d6a7;
+  font-style: italic;
+}
+
+/* Bid controls */
+.bidControls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.selectLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: #c8e6c9;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.select {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.select:focus {
+  border-color: #ffd700;
+}
+
+.btnBid {
+  padding: 0.55rem 1.6rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #2e7d32;
+  color: #fff;
+  box-shadow: 0 3px 0 #1b5e20;
+  transition: transform 0.1s ease, filter 0.1s ease;
+  letter-spacing: 0.04em;
+}
+
+.btnBid:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btnBid:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+.btnBid:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+.btnChallenge {
+  padding: 0.55rem 1.6rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background-color: #c62828;
+  color: #fff;
+  box-shadow: 0 3px 0 #7f0000;
+  transition: transform 0.1s ease, filter 0.1s ease;
+  letter-spacing: 0.04em;
+}
+
+.btnChallenge:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btnChallenge:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+.btnChallenge:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+/* Results */
+.resultsTitle {
+  color: #ffd700;
+  font-size: 1.3rem;
+  text-align: center;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.resultsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.placement {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 1.1rem;
+  width: 1.5rem;
+}
+
+.resultPlayerId {
+  flex: 1;
+  color: #e8f5e9;
+}
