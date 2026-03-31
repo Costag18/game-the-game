@@ -29,6 +29,8 @@ function Die({ value }) {
 export default function LiarsDice({ gameState, onAction, playerId, nicknames }) {
   const [bidQuantity, setBidQuantity] = useState(1);
   const [bidFaceValue, setBidFaceValue] = useState(2);
+  const [acked, setAcked] = useState(false);
+  const [lastAckedPhase, setLastAckedPhase] = useState(null);
 
   if (!gameState) {
     return (
@@ -46,11 +48,25 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
     isMyTurn,
     phase,
     eliminated,
+    challengeResult,
   } = gameState;
 
   const isFinished = phase === 'finished';
+  const isChallenging = phase === 'challenging';
+
+  // Reset ack when we leave challenging phase
+  if (phase !== 'challenging' && lastAckedPhase === 'challenging') {
+    setAcked(false);
+  }
+  if (phase !== lastAckedPhase) {
+    setLastAckedPhase(phase);
+  }
 
   function getStatusText() {
+    if (isChallenging && challengeResult) {
+      const loserName = displayName(challengeResult.loser, nicknames);
+      return `Challenge! ${loserName} loses a die.`;
+    }
     if (isFinished) return 'Game Over!';
     if (eliminated) return 'You have been eliminated.';
     if (isMyTurn) return 'Your turn — bid or challenge!';
@@ -168,6 +184,43 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
               Challenge
             </button>
           </div>
+        </section>
+      )}
+
+      {/* Challenge reveal */}
+      {isChallenging && challengeResult && (
+        <section className={styles.panel}>
+          <h3 className={styles.panelTitle}>Challenge!</h3>
+          <p className={styles.challengeInfo}>
+            Bid: {challengeResult.bid.quantity} &times; {challengeResult.bid.faceValue}s
+            &mdash; Actual count: <strong>{challengeResult.actualCount}</strong>
+          </p>
+          <p className={styles.challengeInfo}>
+            {displayName(challengeResult.challenger, nicknames)} challenged {displayName(challengeResult.bidder, nicknames)}
+            &mdash; <strong>{displayName(challengeResult.loser, nicknames)}</strong> loses a die!
+          </p>
+          <div className={styles.revealGrid}>
+            {Object.entries(challengeResult.allDice).map(([pid, dice]) => (
+              <div key={pid} className={styles.revealPlayer}>
+                <span className={styles.revealName}>{displayName(pid, nicknames)}</span>
+                <div className={styles.diceRow}>
+                  {dice.map((val, i) => (
+                    <Die key={i} value={val} />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          {!acked ? (
+            <button className={styles.btnContinue} onClick={() => {
+              setAcked(true);
+              onAction({ type: 'acknowledge' });
+            }}>
+              Continue
+            </button>
+          ) : (
+            <p className={styles.waitingSmall}>Waiting for others...</p>
+          )}
         </section>
       )}
 

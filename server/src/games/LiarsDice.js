@@ -16,6 +16,8 @@ export class LiarsDice extends BaseGame {
     this.eliminated = []; // players in elimination order (first eliminated = index 0)
     this.currentBid = null; // { quantity, faceValue }
     this.lastBidder = null;
+    this.challengeResult = null; // { challenger, bidder, bid, actualCount, loser, allDice }
+    this.challengeAcknowledged = new Set();
   }
 
   startGame() {
@@ -62,27 +64,37 @@ export class LiarsDice extends BaseGame {
   }
 
   handleAction(playerId, action) {
-    if (this.state !== 'bidding') return;
-    if (playerId !== this.currentTurnPlayer) return;
+    if (this.state === 'bidding') {
+      if (playerId !== this.currentTurnPlayer) return;
 
-    if (action.type === 'bid') {
-      const { quantity, faceValue } = action;
-      if (!this._isBidValid(quantity, faceValue)) return;
-      this.currentBid = { quantity, faceValue };
-      this.lastBidder = playerId;
-      this.nextTurn();
-    } else if (action.type === 'challenge') {
-      if (!this.currentBid) return; // can't challenge if no bid has been made
-      this.transition('challenge');
-      this._resolveChallenge(playerId);
+      if (action.type === 'bid') {
+        const { quantity, faceValue } = action;
+        if (!this._isBidValid(quantity, faceValue)) return;
+        this.currentBid = { quantity, faceValue };
+        this.lastBidder = playerId;
+        this.nextTurn();
+      } else if (action.type === 'challenge') {
+        if (!this.currentBid) return;
+        this.transition('challenge');
+        this._resolveChallenge(playerId);
+      }
+    } else if (this.state === 'challenging') {
+      if (action.type === 'acknowledge') {
+        this.challengeAcknowledged.add(playerId);
+        // All non-eliminated players must acknowledge
+        const needAck = this.players.filter((p) => !this.eliminated.includes(p));
+        const allAcked = needAck.every((p) => this.challengeAcknowledged.has(p));
+        if (allAcked) {
+          this._advanceAfterChallenge();
+        }
+      }
     }
   }
 
   _resolveChallenge(challenger) {
     const { quantity, faceValue } = this.currentBid;
     const actualCount = this._countFaceValue(faceValue);
-    // If actual count >= bid quantity, bid was correct or conservative -> challenger loses a die
-    // If actual count < bid quantity, bid was too high -> bidder loses a die
+
     let loser;
     if (actualCount >= quantity) {
       loser = challenger;
@@ -90,31 +102,44 @@ export class LiarsDice extends BaseGame {
       loser = this.lastBidder;
     }
 
+    // Store challenge result with ALL dice revealed before modifying
+    this.challengeResult = {
+      challenger,
+      bidder: this.lastBidder,
+      bid: { ...this.currentBid },
+      actualCount,
+      loser,
+      allDice: Object.fromEntries(
+        this.activePlayers.map((p) => [p, [...(this.dice[p] || [])]])
+      ),
+    };
+    this.challengeAcknowledged = new Set();
+    // Stay in 'challenging' state — wait for players to see the dice reveal
+  }
+
+  _advanceAfterChallenge() {
+    const { loser, challenger } = this.challengeResult;
+
     this.dice[loser] = this.dice[loser].slice(0, -1);
 
-    // Check if loser is eliminated
     if (this.dice[loser].length === 0) {
       this.eliminated.push(loser);
       this.removePlayer(loser);
     }
 
-    // Reset bid
     this.currentBid = null;
     this.lastBidder = null;
+    this.challengeResult = null;
 
-    // Check if game is over
     if (this.activePlayers.length <= 1) {
       this.transition('finish');
       return;
     }
 
-    // Re-roll and start new bidding round
-    // The loser starts next round (if not eliminated), else the challenger
     let nextPlayer;
     if (this.activePlayers.includes(loser)) {
       nextPlayer = loser;
     } else {
-      // loser was eliminated — challenger starts (if still active), else current turn
       nextPlayer = this.activePlayers.includes(challenger)
         ? challenger
         : this.currentTurnPlayer;
@@ -125,12 +150,15 @@ export class LiarsDice extends BaseGame {
   }
 
   getStateForPlayer(playerId) {
+    const isChallenge = this.state === 'challenging';
     const otherPlayers = this.players
       .filter((p) => p !== playerId)
       .map((p) => ({
         playerId: p,
         diceCount: (this.dice[p] || []).length,
         eliminated: this.eliminated.includes(p),
+        // Reveal dice during challenge
+        dice: isChallenge && this.challengeResult ? (this.challengeResult.allDice[p] || []) : null,
       }));
     return {
       myDice: this.dice[playerId] || [],
@@ -140,6 +168,7 @@ export class LiarsDice extends BaseGame {
       isMyTurn: this.currentTurnPlayer === playerId && this.state === 'bidding',
       phase: this.state,
       eliminated: this.eliminated.includes(playerId),
+      challengeResult: isChallenge ? this.challengeResult : null,
     };
   }
 
