@@ -3,7 +3,15 @@ import styles from './RoundResults.module.css';
 export default function RoundResults({ roundResults, onContinue }) {
   if (!roundResults) return null;
 
-  const { standings = [], roundDeltas = {} } = roundResults;
+  const { standings = [], scores = {}, gameResults = null } = roundResults;
+
+  // Build a map of playerId -> game result info (hand description etc.)
+  const gameResultMap = {};
+  if (gameResults && Array.isArray(gameResults)) {
+    for (const r of gameResults) {
+      gameResultMap[r.playerId] = r;
+    }
+  }
 
   return (
     <div className={styles.container}>
@@ -15,20 +23,28 @@ export default function RoundResults({ roundResults, onContinue }) {
             <tr>
               <th className={styles.th}>Rank</th>
               <th className={styles.th}>Player</th>
+              <th className={styles.th}>Hand</th>
               <th className={styles.th}>Score</th>
               <th className={styles.th}>Round</th>
             </tr>
           </thead>
           <tbody>
             {standings.map((entry, index) => {
-              const delta = roundDeltas?.[entry.playerId] ?? 0;
-              const playerLabel = entry.nickname ?? entry.playerId?.slice(0, 8);
+              const roundScore = scores?.[entry.playerId];
+              const delta = roundScore?.total ?? 0;
+              const playerLabel = entry.nickname || entry.playerId?.slice(0, 8);
+              const gameResult = gameResultMap[entry.playerId];
+              const handDesc = gameResult?.handDescription || gameResult?.handTotal != null
+                ? (gameResult?.handDescription || `${gameResult.handTotal}`)
+                : '';
+
               return (
                 <tr key={entry.playerId} className={styles.row}>
                   <td className={styles.rank}>
                     {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                   </td>
                   <td className={styles.playerName}>{playerLabel}</td>
+                  <td className={styles.handDesc}>{handDesc}</td>
                   <td className={styles.score}>{entry.score.toLocaleString()}</td>
                   <td className={`${styles.delta} ${delta >= 0 ? styles.positive : styles.negative}`}>
                     {delta >= 0 ? `+${delta}` : delta}

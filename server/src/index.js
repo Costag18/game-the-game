@@ -195,16 +195,16 @@ io.on(EVENTS.CONNECTION, (socket) => {
         io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
           placements: shuffled,
           scores: roundScores,
-          standings: tm.getStandings(),
+          standings: tm.getStandings().map((s) => ({
+            ...s,
+            nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+          })),
+          gameResults: null,
         });
         io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
 
         if (tm.isTournamentOver()) {
-          io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, {
-            winner: tm.getWinner(),
-            standings: tm.getStandings(),
-            roundHistory: tm.roundHistory,
-          });
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
           tournaments.delete(lobbyId);
           lobbyManager.setStatus(lobbyId, 'waiting');
         }
@@ -271,7 +271,11 @@ io.on(EVENTS.CONNECTION, (socket) => {
       io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
         placements,
         scores: roundScores,
-        standings: tm.getStandings(),
+        standings: tm.getStandings().map((s) => ({
+          ...s,
+          nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+        })),
+        gameResults: results,
       });
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
 
@@ -292,6 +296,17 @@ io.on(EVENTS.CONNECTION, (socket) => {
     handlePlayerLeave(socket);
   });
 });
+
+function buildTournamentEndPayload(tm, lobby) {
+  return {
+    winner: lobby.nicknames?.[tm.getWinner()] || tm.getWinner().slice(0, 8),
+    standings: tm.getStandings().map((s) => ({
+      ...s,
+      nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+    })),
+    roundHistory: tm.roundHistory,
+  };
+}
 
 function handlePlayerLeave(socket) {
   const lobbyId = lobbyManager.getPlayerLobby(socket.id);

@@ -78,7 +78,13 @@
   color: var(--text-primary);
   font-size: 0.9rem;
   padding: 0.65rem 0.75rem;
-  font-family: monospace;
+}
+
+.handDesc {
+  color: var(--gold);
+  font-size: 0.8rem;
+  font-style: italic;
+  padding: 0.65rem 0.75rem;
 }
 
 .score {

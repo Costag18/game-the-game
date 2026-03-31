@@ -16,7 +16,7 @@ export default function TournamentEnd({ data, onRematch, onLeave }) {
             <div>
               <span className={styles.winnerLabel}>Winner</span>
               <p className={styles.winnerName}>
-                {winner.nickname ?? winner.playerId?.slice(0, 8)}
+                {typeof winner === 'string' ? winner : (winner.nickname ?? winner.playerId?.slice(0, 8))}
               </p>
             </div>
           </div>
