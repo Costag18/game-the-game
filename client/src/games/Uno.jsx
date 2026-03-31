@@ -139,6 +139,7 @@ export default function Uno({ gameState, onAction, nicknames }) {
     otherPlayers,
     drawnCard,
     lastPlayedRank,
+    pendingDrawCount,
     canAct,
   } = gameState;
 
@@ -196,6 +197,8 @@ export default function Uno({ gameState, onAction, nicknames }) {
     if (!isMyTurn) return 'Waiting for your turn...';
     if (isMyTurn && canAct === false) return 'No moves available — pass your turn';
     if (drawnCard) return 'You drew a playable card — play it or pass';
+    if (lastPlayedRank === 'DrawTwo') return `Stack another +2 (${pendingDrawCount} total) or pass`;
+    if (lastPlayedRank === 'WildDrawFour') return `Stack another +4 (${pendingDrawCount} total) or pass`;
     if (lastPlayedRank !== null && lastPlayedRank !== undefined) return `Play another ${lastPlayedRank} or pass`;
     return 'Your turn — play a card or draw';
   }

@@ -142,15 +142,29 @@ export class Uno extends BaseGame {
     } else if (action.type === 'draw') {
       this._handleDraw(playerId);
     } else if (action.type === 'pass') {
-      // Pass after drawing or after consecutive play option
       this.drawnCard = null;
-      this.lastPlayedRank = null;
-      this._advanceTurn();
+      // If passing during a draw stack, apply accumulated draw to next player
+      if (this.pendingDrawCount > 0) {
+        this.lastPlayedRank = null;
+        this._advanceTurn();
+        this._dealCards(this.currentTurnPlayer, this.pendingDrawCount);
+        this.pendingDrawCount = 0;
+        this._advanceTurn();
+      } else {
+        this.lastPlayedRank = null;
+        this._advanceTurn();
+      }
     } else if (action.type === 'forceAdvance') {
-      // Deadlock recovery — force advance if stuck
       this.drawnCard = null;
       this.lastPlayedRank = null;
-      this._advanceTurn();
+      if (this.pendingDrawCount > 0) {
+        this._advanceTurn();
+        this._dealCards(this.currentTurnPlayer, this.pendingDrawCount);
+        this.pendingDrawCount = 0;
+        this._advanceTurn();
+      } else {
+        this._advanceTurn();
+      }
     }
   }
 
@@ -185,14 +199,43 @@ export class Uno extends BaseGame {
     // Check win
     if (hand.length === 0) {
       this.lastPlayedRank = null;
+      // Still apply pending draw effects before finishing
+      if (card.rank === 'DrawTwo' || card.rank === 'WildDrawFour') {
+        this._applyDrawEffect(card);
+      }
       this.transition('finish');
       return;
     }
 
-    // Wild, WildDrawFour, DrawTwo, Skip, Reverse — always end turn immediately
-    if (typeof card.rank !== 'number') {
+    // Stackable cards: DrawTwo and WildDrawFour — allow stacking same rank
+    if (card.rank === 'DrawTwo' || card.rank === 'WildDrawFour') {
+      this.pendingDrawCount += card.rank === 'DrawTwo' ? 2 : 4;
+      const hasAnother = hand.some((c) => c.rank === card.rank);
+      if (hasAnother) {
+        this.lastPlayedRank = card.rank;
+        return; // stay on same player — they can stack more or pass
+      }
+      // No more to stack — apply accumulated draw to next player and skip them
+      this.lastPlayedRank = null;
+      this._advanceTurn();
+      const nextPlayer = this.currentTurnPlayer;
+      this._dealCards(nextPlayer, this.pendingDrawCount);
+      this.pendingDrawCount = 0;
+      this._advanceTurn();
+      return;
+    }
+
+    // Skip, Reverse — always end turn immediately
+    if (card.rank === 'Skip' || card.rank === 'Reverse') {
       this.lastPlayedRank = null;
       this._applyCardEffect(card);
+      return;
+    }
+
+    // Wild (no draw) — always end turn immediately
+    if (card.rank === 'Wild') {
+      this.lastPlayedRank = null;
+      this._advanceTurn();
       return;
     }
 
@@ -200,7 +243,6 @@ export class Uno extends BaseGame {
     const hasAnother = hand.some((c) => c.rank === card.rank);
     if (hasAnother) {
       this.lastPlayedRank = card.rank;
-      // Don't advance turn — player can play another of the same rank or pass
       return;
     }
 
@@ -215,27 +257,22 @@ export class Uno extends BaseGame {
     } else if (card.rank === 'Reverse') {
       this.direction *= -1;
       if (this.players.length === 2) {
-        // In 2-player, Reverse acts like a Skip
         this._advanceTurn();
         this._advanceTurn();
       } else {
         this._advanceTurn();
       }
-    } else if (card.rank === 'DrawTwo') {
-      // Next player draws 2 and is skipped
-      this._advanceTurn();
-      const nextPlayer = this.currentTurnPlayer;
-      this._dealCards(nextPlayer, 2);
-      this._advanceTurn();
-    } else if (card.rank === 'WildDrawFour') {
-      // Next player draws 4 and is skipped
-      this._advanceTurn();
-      const nextPlayer = this.currentTurnPlayer;
-      this._dealCards(nextPlayer, 4);
-      this._advanceTurn();
     } else {
       this._advanceTurn();
     }
+  }
+
+  /** Apply pending draw effect when player wins with a draw card */
+  _applyDrawEffect(card) {
+    const drawAmount = this.pendingDrawCount + (card.rank === 'DrawTwo' ? 2 : 4);
+    this._advanceTurn();
+    this._dealCards(this.currentTurnPlayer, drawAmount);
+    this.pendingDrawCount = 0;
   }
 
   _handleDraw(playerId) {
@@ -313,6 +350,7 @@ export class Uno extends BaseGame {
       phase: this.state,
       drawnCard: isMyTurn && this.drawnCard ? true : false,
       lastPlayedRank: isMyTurn ? this.lastPlayedRank : null,
+      pendingDrawCount: isMyTurn ? this.pendingDrawCount : 0,
       canAct: isMyTurn ? playerCanAct : undefined,
       otherPlayers: this.players
         .filter((p) => p !== playerId)
