@@ -62,18 +62,57 @@
   line-height: 1.4;
 }
 
-.tutorialWrapper {
-  margin-top: 0.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+/* Popdown / collapsible sections */
+.popdown {
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
-.tutorialLabel {
+.popdownToggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-dark);
+  border: none;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  color: var(--gold);
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  transition: background 0.2s;
+}
+
+.popdownToggle:hover {
+  background: rgba(212, 168, 67, 0.08);
+}
+
+.popdownArrow {
+  font-size: 0.7rem;
   color: var(--text-secondary);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+}
+
+.popdownContent {
+  background: var(--bg-dark);
+  border-top: 1px solid var(--gold-dim);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wagerInfo {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.wagerInfo li {
+  margin-bottom: 0.3rem;
 }
 
 .tutorialVideo {

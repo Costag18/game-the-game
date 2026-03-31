@@ -3,24 +3,33 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { GAMES } from '../../../shared/gameList.js';
 import styles from './WagerPhase.module.css';
 
+function Popdown({ title, children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={styles.popdown}>
+      <button className={styles.popdownToggle} onClick={() => setOpen(!open)}>
+        <span>{title}</span>
+        <span className={styles.popdownArrow}>{open ? '▲' : '▼'}</span>
+      </button>
+      {open && <div className={styles.popdownContent}>{children}</div>}
+    </div>
+  );
+}
+
 function TutorialVideo({ embedUrl, watchUrl, gameName }) {
   const [embedFailed, setEmbedFailed] = useState(false);
-
   const handleError = useCallback(() => setEmbedFailed(true), []);
 
   if (embedFailed || !embedUrl) {
     return (
-      <div className={styles.tutorialWrapper}>
-        <a href={watchUrl} target="_blank" rel="noopener noreferrer" className={styles.tutorialLink}>
-          Watch how to play {gameName} on YouTube
-        </a>
-      </div>
+      <a href={watchUrl} target="_blank" rel="noopener noreferrer" className={styles.tutorialLink}>
+        Watch how to play {gameName} on YouTube
+      </a>
     );
   }
 
   return (
-    <div className={styles.tutorialWrapper}>
-      <span className={styles.tutorialLabel}>How to play:</span>
+    <>
       <iframe
         className={styles.tutorialVideo}
         src={embedUrl}
@@ -32,7 +41,7 @@ function TutorialVideo({ embedUrl, watchUrl, gameName }) {
       <a href={watchUrl} target="_blank" rel="noopener noreferrer" className={styles.tutorialLink}>
         Open on YouTube
       </a>
-    </div>
+    </>
   );
 }
 
@@ -73,11 +82,24 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
             <span className={styles.gameLabel}>Selected Game</span>
             <span className={styles.gameName}>{game.name}</span>
             <p className={styles.gameDesc}>{game.description}</p>
-            {game.tutorial && (
-              <TutorialVideo embedUrl={embedUrl} watchUrl={game.tutorial} gameName={game.name} />
-            )}
           </div>
         )}
+
+        {game?.tutorial && (
+          <Popdown title="Game Instructions">
+            <TutorialVideo embedUrl={embedUrl} watchUrl={game.tutorial} gameName={game.name} />
+          </Popdown>
+        )}
+
+        <Popdown title="How Wagering Works">
+          <ul className={styles.wagerInfo}>
+            <li>Wager up to 50% of your current points each round.</li>
+            <li>All wagers go into a shared pot.</li>
+            <li>The pot is split among the top 3 finishers: 1st gets 50%, 2nd gets 30%, 3rd gets 20%.</li>
+            <li>Your wager is deducted from your score when you lock in.</li>
+            <li>You also earn base points for your placement each round.</li>
+          </ul>
+        </Popdown>
 
         <div className={styles.scoreRow}>
           <span className={styles.scoreLabel}>Your Points</span>
