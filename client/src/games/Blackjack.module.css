@@ -1,0 +1,223 @@
+.table {
+  min-height: 100vh;
+  background-color: #1a6b35;
+  background-image:
+    radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  font-family: 'Georgia', serif;
+  gap: 1.5rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #ffd700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.waiting {
+  font-size: 1.2rem;
+  color: #c8e6c9;
+  margin-top: 4rem;
+}
+
+/* Sections */
+.dealerSection,
+.playerSection,
+.othersSection {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  max-width: 640px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sectionHeading {
+  color: #ffd700;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Hand */
+.handSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.handLabel {
+  color: #ffd700;
+  font-size: 1.1rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.handTotal {
+  color: #e8f5e9;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.cardRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* Cards */
+.card {
+  width: 56px;
+  height: 80px;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.cardRed {
+  color: #c62828;
+}
+
+.cardBlack {
+  color: #212121;
+}
+
+.cardHidden {
+  background-color: #1a237e;
+  border-color: #3949ab;
+  color: #7986cb;
+  font-size: 1.5rem;
+  cursor: default;
+}
+
+.cardRank {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.cardSuit {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* Other players */
+.otherPlayersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.otherPlayer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.08);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+}
+
+.otherPlayerId {
+  font-weight: bold;
+  flex: 1;
+  color: #e8f5e9;
+}
+
+.otherCardCount {
+  font-size: 0.85rem;
+  color: #a5d6a7;
+}
+
+.badgeBusted {
+  background-color: #c62828;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: bold;
+}
+
+.badgeStood {
+  background-color: #f9a825;
+  color: #212121;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-weight: bold;
+}
+
+/* Status */
+.statusText {
+  font-size: 1.05rem;
+  color: #fff9c4;
+  margin: 0;
+  text-align: center;
+  min-height: 1.5em;
+}
+
+/* Action buttons */
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btnHit,
+.btnStand {
+  padding: 0.6rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: transform 0.1s ease, filter 0.1s ease;
+}
+
+.btnHit:hover,
+.btnStand:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.btnHit:active,
+.btnStand:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+.btnHit {
+  background-color: #2e7d32;
+  color: #fff;
+  box-shadow: 0 3px 0 #1b5e20;
+}
+
+.btnStand {
+  background-color: #c62828;
+  color: #fff;
+  box-shadow: 0 3px 0 #7f0000;
+}

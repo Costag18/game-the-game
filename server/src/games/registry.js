@@ -1,3 +1,5 @@
+import { Blackjack } from './Blackjack.js';
+
 const gameEngines = {};
 
 export function registerGame(gameId, EngineClass) {
@@ -17,3 +19,5 @@ export function isGameRegistered(gameId) {
 export function getRegisteredGames() {
   return Object.keys(gameEngines);
 }
+
+registerGame('blackjack', Blackjack);
