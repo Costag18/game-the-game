@@ -67,7 +67,7 @@ function GameRouter() {
 
   function handleContinueAfterResults() {
     tournament.clearRoundResults();
-    // Server will emit ROUND_START for next round or TOURNAMENT_END
+    socket?.emit(EVENTS.NEXT_ROUND);
   }
 
   function handleLeave() {

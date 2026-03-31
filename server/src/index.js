@@ -202,6 +202,31 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
+  socket.on(EVENTS.NEXT_ROUND, () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'results') return;
+
+    if (tm.isTournamentOver()) {
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, {
+        winner: tm.getWinner(),
+        standings: tm.getStandings(),
+        roundHistory: tm.roundHistory,
+      });
+      tournaments.delete(lobbyId);
+      lobbyManager.setStatus(lobbyId, 'waiting');
+    } else {
+      tm.startNextRound();
+      const lobby = lobbyManager.getLobby(lobbyId);
+      const eligible = getEligibleGames(lobby.players.length);
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      io.to(lobbyId).emit(EVENTS.ROUND_START, {
+        round: tm.currentRound,
+        eligibleGames: eligible,
+      });
+    }
+  });
+
   socket.on(EVENTS.GAME_ACTION, (action) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);

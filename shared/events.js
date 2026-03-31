@@ -24,6 +24,7 @@ export const EVENTS = {
   WAGER_LOCKED: 'tournament:wagerLocked',
   ROUND_START: 'tournament:roundStart',
   ROUND_RESULTS: 'tournament:roundResults',
+  NEXT_ROUND: 'tournament:nextRound',
   TOURNAMENT_END: 'tournament:end',
   GAME_STATE: 'game:state',
   GAME_ACTION: 'game:action',
