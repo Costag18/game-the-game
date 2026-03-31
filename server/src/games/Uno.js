@@ -78,6 +78,8 @@ export class Uno extends BaseGame {
     this.direction = 1; // 1 = clockwise, -1 = counter-clockwise
     this.skipNext = false;
     this.pendingDrawCount = 0; // for DrawTwo / WildDrawFour accumulation
+    this.drawnCard = null; // card just drawn (can be played immediately)
+    this.lastPlayedRank = null; // track for consecutive same-rank plays
   }
 
   startGame() {
@@ -88,6 +90,8 @@ export class Uno extends BaseGame {
     this.direction = 1;
     this.skipNext = false;
     this.pendingDrawCount = 0;
+    this.drawnCard = null;
+    this.lastPlayedRank = null;
 
     // Deal 7 cards to each player
     for (const p of this.players) {
@@ -137,6 +141,11 @@ export class Uno extends BaseGame {
       this._handlePlay(playerId, action.cardIndex, action.chosenColor);
     } else if (action.type === 'draw') {
       this._handleDraw(playerId);
+    } else if (action.type === 'pass') {
+      // Pass after drawing (chose not to play the drawn card)
+      this.drawnCard = null;
+      this.lastPlayedRank = null;
+      this._advanceTurn();
     }
   }
 
@@ -152,6 +161,7 @@ export class Uno extends BaseGame {
     // Remove from hand
     hand.splice(cardIndex, 1);
     this.discardPile.push(card);
+    this.drawnCard = null; // clear drawn card state after playing
 
     // Set color
     if (isWild(card)) {
@@ -164,10 +174,23 @@ export class Uno extends BaseGame {
 
     // Check win
     if (hand.length === 0) {
+      this.lastPlayedRank = null;
       this.transition('finish');
       return;
     }
 
+    // Check if player has another card of the same rank (for consecutive plays)
+    // Only for number cards — action/wild cards apply effects immediately
+    if (typeof card.rank === 'number') {
+      const hasAnother = hand.some((c) => c.rank === card.rank);
+      if (hasAnother) {
+        this.lastPlayedRank = card.rank;
+        // Don't advance turn — player can play another of the same rank or pass
+        return;
+      }
+    }
+
+    this.lastPlayedRank = null;
     // Apply card effects then advance turn
     this._applyCardEffect(card);
   }
@@ -203,15 +226,27 @@ export class Uno extends BaseGame {
   }
 
   _handleDraw(playerId) {
-    const card = this.drawPile.pop();
+    if (this.drawnCard) return; // already drew this turn
+
+    let card = this.drawPile.pop();
+    if (!card) {
+      this._reshuffleDiscardIntoDraw();
+      card = this.drawPile.pop();
+    }
+
     if (card) {
       this.hands[playerId].push(card);
-    } else {
-      // Reshuffle discard pile (keep top card)
-      this._reshuffleDiscardIntoDraw();
-      const newCard = this.drawPile.pop();
-      if (newCard) this.hands[playerId].push(newCard);
+      const topCard = this.discardPile[this.discardPile.length - 1];
+      if (canPlay(card, topCard, this.currentColor)) {
+        // Player can choose to play this card or pass
+        this.drawnCard = card;
+        return; // don't advance — wait for play or pass
+      }
     }
+
+    // Can't play drawn card, auto-advance
+    this.drawnCard = null;
+    this.lastPlayedRank = null;
     this._advanceTurn();
   }
 
@@ -240,14 +275,17 @@ export class Uno extends BaseGame {
 
   getStateForPlayer(playerId) {
     const topCard = this.discardPile[this.discardPile.length - 1] || null;
+    const isMyTurn = this.currentTurnPlayer === playerId && this.state === 'playing';
     return {
       myHand: this.hands[playerId] || [],
       topDiscard: topCard,
       currentColor: this.currentColor,
       direction: this.direction,
       drawPileSize: this.drawPile.length,
-      isMyTurn: this.currentTurnPlayer === playerId && this.state === 'playing',
+      isMyTurn,
       phase: this.state,
+      drawnCard: isMyTurn && this.drawnCard ? true : false, // has drawn, can play or pass
+      lastPlayedRank: isMyTurn ? this.lastPlayedRank : null, // can play consecutive
       otherPlayers: this.players
         .filter((p) => p !== playerId)
         .map((p) => ({

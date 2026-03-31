@@ -96,6 +96,23 @@
   align-items: center;
 }
 
+.passButton {
+  margin-top: 0.5rem;
+  padding: 0.4rem 1.2rem;
+  background: var(--warning, #f39c12);
+  color: #1a0a0a;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.passButton:hover {
+  opacity: 0.85;
+}
+
 .colorIndicator {
   margin: 0.4rem 0 0 0;
   font-size: 0.8rem;

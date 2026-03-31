@@ -136,6 +136,8 @@ export default function Uno({ gameState, onAction }) {
     isMyTurn,
     phase,
     otherPlayers,
+    drawnCard,
+    lastPlayedRank,
   } = gameState;
 
   const isFinished = phase === 'finished';
@@ -162,15 +164,23 @@ export default function Uno({ gameState, onAction }) {
   }
 
   function handleDraw() {
-    if (!isMyTurn) return;
+    if (!isMyTurn || drawnCard) return;
     onAction({ type: 'draw' });
+    setSelectedIndex(null);
+  }
+
+  function handlePass() {
+    if (!isMyTurn) return;
+    onAction({ type: 'pass' });
     setSelectedIndex(null);
   }
 
   function getStatusText() {
     if (isFinished) return 'Game Over';
-    if (isMyTurn) return 'Your turn — play a card or draw';
-    return 'Waiting for your turn...';
+    if (!isMyTurn) return 'Waiting for your turn...';
+    if (drawnCard) return 'You drew a playable card — play it or pass';
+    if (lastPlayedRank !== null && lastPlayedRank !== undefined) return `Play another ${lastPlayedRank} or pass`;
+    return 'Your turn — play a card or draw';
   }
 
   return (
@@ -198,12 +208,17 @@ export default function Uno({ gameState, onAction }) {
         <div className={styles.drawPileArea}>
           <p className={styles.pileLabel}>Draw</p>
           <button
-            className={[styles.card, styles.cardDraw, isMyTurn ? styles.cardPlayable : ''].join(' ')}
+            className={[styles.card, styles.cardDraw, (isMyTurn && !drawnCard && !lastPlayedRank) ? styles.cardPlayable : ''].join(' ')}
             onClick={handleDraw}
-            disabled={!isMyTurn}
+            disabled={!isMyTurn || drawnCard || (lastPlayedRank !== null && lastPlayedRank !== undefined)}
           >
             <span className={styles.cardRank}>↓</span>
           </button>
+          {isMyTurn && (drawnCard || (lastPlayedRank !== null && lastPlayedRank !== undefined)) && (
+            <button className={styles.passButton} onClick={handlePass}>
+              Pass
+            </button>
+          )}
         </div>
         <div className={styles.directionIndicator}>
           {direction === 1 ? '→ CW' : '← CCW'}
