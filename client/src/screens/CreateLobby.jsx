@@ -41,7 +41,7 @@ export default function CreateLobby({ onNavigate, onJoinLobby }) {
       maxPlayers: Number(maxPlayers),
       isPrivate,
       winCondition,
-      target: Number(target),
+      winTarget: Number(target),
     };
 
     socket.emit(EVENTS.CREATE_LOBBY, payload, (res) => {
