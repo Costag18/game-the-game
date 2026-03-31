@@ -10,15 +10,13 @@ export class Scorer {
     return Math.floor(basePoints * SCORING.PLACEMENT_MULTIPLIERS[index]);
   }
 
-  static calculateWagerPayouts(wagers, placements) {
-    const totalPot = Object.values(wagers).reduce((sum, w) => sum + w, 0);
-    const payouts = {};
-    for (const playerId of Object.keys(wagers)) payouts[playerId] = 0;
-    if (totalPot === 0) return payouts;
-    for (let i = 0; i < SCORING.WAGER_POT_SPLIT.length && i < placements.length; i++) {
-      payouts[placements[i]] = Math.floor(totalPot * SCORING.WAGER_POT_SPLIT[i]);
-    }
-    return payouts;
+  /**
+   * Wager return by placement: wager * return multiplier.
+   * 1st = 2x back (net +1x), 2nd = 1.5x (net +0.5x), 3rd = 1x (break even), 4th+ = 0 (lose wager).
+   */
+  static calculateWagerReturn(wager, placement) {
+    const index = Math.min(placement - 1, SCORING.WAGER_RETURN.length - 1);
+    return Math.floor(wager * SCORING.WAGER_RETURN[index]);
   }
 
   static validateWager(amount, currentPoints) {
@@ -35,7 +33,6 @@ export class Scorer {
    */
   static calculateRoundScores(placements, wagers, roundNumber, gameResults = null) {
     const basePoints = Scorer.getBasePoints(roundNumber);
-    const wagerPayouts = Scorer.calculateWagerPayouts(wagers, placements);
     const scores = {};
 
     // Build a placement map — if gameResults has ties, use those placements
@@ -50,12 +47,12 @@ export class Scorer {
 
     for (let i = 0; i < placements.length; i++) {
       const playerId = placements[i];
-      // Use tied placement from game results if available, otherwise index-based
       const placement = placementMap[playerId] || (i + 1);
       const base = Scorer.calculatePlacementPoints(placement, basePoints);
       const wagerCost = wagers[playerId] || 0;
-      const wagerPayout = wagerPayouts[playerId] || 0;
-      scores[playerId] = { placement, base, wagerCost, wagerPayout, total: base + wagerPayout - wagerCost };
+      const wagerReturn = Scorer.calculateWagerReturn(wagerCost, placement);
+      const wagerNet = wagerReturn - wagerCost; // positive if profit, negative if loss
+      scores[playerId] = { placement, base, wagerCost, wagerReturn, wagerNet, total: base + wagerNet };
     }
     return scores;
   }

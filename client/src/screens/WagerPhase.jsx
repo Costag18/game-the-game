@@ -94,10 +94,13 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
         <Popdown title="How Wagering Works">
           <ul className={styles.wagerInfo}>
             <li>Wager up to 50% of your current points each round.</li>
-            <li>All wagers go into a shared pot.</li>
-            <li>The pot is split among the top 3 finishers: 1st gets 50%, 2nd gets 30%, 3rd gets 20%.</li>
-            <li>Your wager is deducted from your score when you lock in.</li>
-            <li>You also earn base points for your placement each round.</li>
+            <li>Your wager multiplies based on how you place:</li>
+            <li><strong style={{color: 'var(--gold)'}}>1st place</strong> — 2x wager back (double your bet)</li>
+            <li><strong style={{color: 'var(--gold)'}}>2nd place</strong> — 1.5x wager back</li>
+            <li><strong style={{color: 'var(--gold)'}}>3rd place</strong> — 1x wager back (break even)</li>
+            <li><strong style={{color: 'var(--text-secondary)'}}>4th+</strong> — lose your wager</li>
+            <li>You also earn base points for your placement regardless of wager.</li>
+            <li>High risk, high reward — wager big if you're confident!</li>
           </ul>
         </Popdown>
 
