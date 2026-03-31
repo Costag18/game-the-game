@@ -144,10 +144,18 @@ export default function Uno({ gameState, onAction, nicknames }) {
 
   const isFinished = phase === 'finished';
 
+  // During consecutive play, only same-rank cards are playable
+  const inConsecutivePlay = lastPlayedRank !== null && lastPlayedRank !== undefined;
+
+  function isCardPlayable(card) {
+    if (inConsecutivePlay) return card.rank === lastPlayedRank;
+    return canPlay(card, topDiscard, currentColor);
+  }
+
   function handleCardClick(index) {
     if (!isMyTurn) return;
     const card = myHand[index];
-    if (!canPlay(card, topDiscard, currentColor)) return;
+    if (!isCardPlayable(card)) return;
 
     if (isWild(card)) {
       setPendingCardIndex(index);
@@ -248,7 +256,7 @@ export default function Uno({ gameState, onAction, nicknames }) {
               key={i}
               card={card}
               selected={selectedIndex === i}
-              playable={isMyTurn && canPlay(card, topDiscard, currentColor)}
+              playable={isMyTurn && isCardPlayable(card)}
               onClick={isMyTurn ? () => handleCardClick(i) : null}
             />
           ))}

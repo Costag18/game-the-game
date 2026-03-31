@@ -161,7 +161,12 @@ export class Uno extends BaseGame {
     const card = hand[cardIndex];
     const topCard = this.discardPile[this.discardPile.length - 1];
 
-    if (!canPlay(card, topCard, this.currentColor)) return;
+    // During consecutive play, only allow cards matching lastPlayedRank
+    if (this.lastPlayedRank != null) {
+      if (card.rank !== this.lastPlayedRank) return;
+    } else if (!canPlay(card, topCard, this.currentColor)) {
+      return;
+    }
 
     // Remove from hand
     hand.splice(cardIndex, 1);
@@ -288,10 +293,15 @@ export class Uno extends BaseGame {
     const topCard = this.discardPile[this.discardPile.length - 1] || null;
     const isMyTurn = this.currentTurnPlayer === playerId && this.state === 'playing';
 
-    // Check if player has any playable cards
     const hand = this.hands[playerId] || [];
-    const hasPlayableCard = isMyTurn && hand.some((c) => canPlay(c, topCard, this.currentColor));
-    const canDraw = isMyTurn && !this.drawnCard;
+    let playerCanAct = true;
+    if (isMyTurn) {
+      const hasPlayableCard = hand.some((c) => canPlay(c, topCard, this.currentColor));
+      const canDraw = !this.drawnCard;
+      const inConsecutivePlay = this.lastPlayedRank != null;
+      const hasDrawnPlayable = !!this.drawnCard;
+      playerCanAct = hasPlayableCard || canDraw || inConsecutivePlay || hasDrawnPlayable;
+    }
 
     return {
       myHand: hand,
@@ -301,9 +311,9 @@ export class Uno extends BaseGame {
       drawPileSize: this.drawPile.length,
       isMyTurn,
       phase: this.state,
-      drawnCard: isMyTurn && this.drawnCard ? true : false, // has drawn, can play or pass
-      lastPlayedRank: isMyTurn ? this.lastPlayedRank : null, // can play consecutive
-      canAct: isMyTurn && (hasPlayableCard || canDraw || !!this.drawnCard || this.lastPlayedRank != null),
+      drawnCard: isMyTurn && this.drawnCard ? true : false,
+      lastPlayedRank: isMyTurn ? this.lastPlayedRank : null,
+      canAct: isMyTurn ? playerCanAct : undefined,
       otherPlayers: this.players
         .filter((p) => p !== playerId)
         .map((p) => ({
