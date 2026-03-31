@@ -383,11 +383,30 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.revealRow:last-child {
+  border-bottom: none;
+}
+
+.revealPlayerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 100px;
 }
 
 .revealPlayerId {
-  min-width: 60px;
   font-weight: bold;
   color: #e0f7fa;
   font-size: 0.9rem;
+}
+
+.handLabel {
+  color: var(--gold-light, #f0d68a);
+  font-size: 0.8rem;
+  font-style: italic;
+  font-weight: 600;
 }

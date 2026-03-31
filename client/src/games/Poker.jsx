@@ -157,13 +157,18 @@ export default function Poker({ gameState, onAction, playerId }) {
                 {/* Card backs (or revealed cards in showdown) */}
                 <div className={styles.otherCardRow}>
                   {revealedHands && revealedHands[p.playerId]
-                    ? revealedHands[p.playerId].map((card, i) => (
+                    ? (revealedHands[p.playerId].cards || revealedHands[p.playerId]).map?.((card, i) => (
                         <Card key={i} card={card} small />
+                      )) ?? Array.from({ length: p.cardCount }).map((_, i) => (
+                        <Card key={i} hidden small />
                       ))
                     : Array.from({ length: p.cardCount }).map((_, i) => (
                         <Card key={i} hidden small />
                       ))}
                 </div>
+                {revealedHands && revealedHands[p.playerId]?.handDescription && (
+                  <span className={styles.handLabel}>{revealedHands[p.playerId].handDescription}</span>
+                )}
 
                 <span className={styles.otherChips}>{p.chips} chips</span>
                 {p.bet > 0 && <span className={styles.otherBet}>bet: {p.bet}</span>}
@@ -229,15 +234,22 @@ export default function Poker({ gameState, onAction, playerId }) {
         {/* Show results when finished */}
         {isFinished && revealedHands && Object.keys(revealedHands).length > 0 && (
           <div className={styles.revealSection}>
-            <h4 className={styles.revealHeading}>Revealed Hands</h4>
-            {Object.entries(revealedHands).map(([pid, cards]) => (
-              <div key={pid} className={styles.revealRow}>
-                <span className={styles.revealPlayerId}>{pid}:</span>
-                <div className={styles.cardRow}>
-                  {cards.map((card, i) => <Card key={i} card={card} small />)}
+            <h4 className={styles.revealHeading}>Showdown</h4>
+            {Object.entries(revealedHands).map(([pid, data]) => {
+              const cards = data?.cards || (Array.isArray(data) ? data : []);
+              const desc = data?.handDescription;
+              return (
+                <div key={pid} className={styles.revealRow}>
+                  <div className={styles.revealPlayerInfo}>
+                    <span className={styles.revealPlayerId}>{pid.slice(0, 8)}</span>
+                    {desc && <span className={styles.handLabel}>{desc}</span>}
+                  </div>
+                  <div className={styles.cardRow}>
+                    {cards.map((card, i) => <Card key={i} card={card} small />)}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>

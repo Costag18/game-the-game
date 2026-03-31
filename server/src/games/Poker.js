@@ -453,10 +453,17 @@ export class Poker extends BaseGame {
           folded: this.folded.has(p),
           cardCount: (this.holeCards[p] || []).length,
         })),
-      // In showdown/finished reveal all hole cards
+      // In showdown/finished reveal all hole cards + hand descriptions
       revealedHands: this.state === 'showdown' || this.state === 'finished'
         ? Object.fromEntries(
-            nonFolded.map((p) => [p, this.holeCards[p] || []])
+            nonFolded.map((p) => {
+              const allCards = [...(this.holeCards[p] || []), ...this.communityCards];
+              const hand = allCards.length >= 5 ? evaluateHand(allCards) : null;
+              return [p, {
+                cards: this.holeCards[p] || [],
+                handDescription: hand ? hand.description : 'N/A',
+              }];
+            })
           )
         : {},
     };
