@@ -1,15 +1,18 @@
 import { BaseGame } from './BaseGame.js';
 import { Deck } from '../utils/Deck.js';
 
+const HANDS_PER_GAME = 5;
+
 export class Blackjack extends BaseGame {
   constructor(players) {
     super(players, {
-      states: ['waiting', 'playing', 'dealerTurn', 'finished'],
+      states: ['waiting', 'playing', 'dealerTurn', 'reveal', 'finished'],
       initialState: 'waiting',
       transitions: {
         waiting: { start: 'playing' },
         playing: { allDone: 'dealerTurn' },
-        dealerTurn: { resolve: 'finished' },
+        dealerTurn: { resolve: 'reveal' },
+        reveal: { nextHand: 'playing', finish: 'finished' },
       },
     });
     this.deck = new Deck();
@@ -17,33 +20,57 @@ export class Blackjack extends BaseGame {
     this.dealerHand = [];
     this.busted = [];
     this.stood = [];
+    this.handNumber = 0;
+    this.wins = {}; // playerId -> win count across hands
+    this.handResults = []; // history of each hand
+    this.acknowledged = new Set();
   }
 
   startGame() {
+    this.handNumber = 0;
+    this.wins = {};
+    this.handResults = [];
+    for (const p of this.players) this.wins[p] = 0;
+    this.transition('start');
+    this._startHand();
+  }
+
+  _startHand() {
+    this.handNumber++;
     this.deck.reset();
     this.hands = {};
     this.dealerHand = [];
     this.busted = [];
     this.stood = [];
+    this.acknowledged = new Set();
+
     for (const p of this.players) this.hands[p] = this.deck.dealMultiple(2);
     this.dealerHand = this.deck.dealMultiple(2);
-    this.transition('start');
     this.setTurnPlayer(this.players[0]);
   }
 
   handleAction(playerId, action) {
-    if (this.state !== 'playing') return;
-    if (playerId !== this.currentTurnPlayer) return;
-    if (action.type === 'hit') {
-      const card = this.deck.deal();
-      if (card) this.hands[playerId].push(card);
-      if (this.calculateHandValue(this.hands[playerId]) > 21) {
-        this.busted.push(playerId);
+    if (this.state === 'playing') {
+      if (playerId !== this.currentTurnPlayer) return;
+
+      if (action.type === 'hit') {
+        const card = this.deck.deal();
+        if (card) this.hands[playerId].push(card);
+        if (this.calculateHandValue(this.hands[playerId]) > 21) {
+          this.busted.push(playerId);
+          this.advanceToNextPlayer();
+        }
+      } else if (action.type === 'stand') {
+        this.stood.push(playerId);
         this.advanceToNextPlayer();
       }
-    } else if (action.type === 'stand') {
-      this.stood.push(playerId);
-      this.advanceToNextPlayer();
+    } else if (this.state === 'reveal') {
+      if (action.type === 'acknowledge') {
+        this.acknowledged.add(playerId);
+        if (this.players.every((p) => this.acknowledged.has(p))) {
+          this._advanceAfterReveal();
+        }
+      }
     }
   }
 
@@ -54,12 +81,52 @@ export class Blackjack extends BaseGame {
     if (remaining.length === 0) {
       this.transition('allDone');
       this.dealerPlay();
+      this._recordHandResult();
       this.transition('resolve');
+      this.acknowledged = new Set();
     } else {
       let next = this.nextTurn();
       while (this.busted.includes(next) || this.stood.includes(next)) {
         next = this.nextTurn();
       }
+    }
+  }
+
+  _recordHandResult() {
+    const dealerTotal = this.calculateHandValue(this.dealerHand);
+    const dealerBusted = dealerTotal > 21;
+
+    // Determine winner of this hand
+    const playerTotals = this.players.map((p) => {
+      const total = this.calculateHandValue(this.hands[p]);
+      const busted = this.busted.includes(p);
+      let score;
+      if (busted) score = 0;
+      else if (dealerBusted) score = total;
+      else score = total > dealerTotal ? total : (total === dealerTotal ? total : 0);
+      return { playerId: p, handTotal: total, busted, score };
+    });
+
+    playerTotals.sort((a, b) => b.score - a.score || b.handTotal - a.handTotal);
+    // Award a win to the top scorer (if they beat the dealer)
+    if (playerTotals[0].score > 0) {
+      this.wins[playerTotals[0].playerId]++;
+    }
+
+    this.handResults.push({
+      hand: this.handNumber,
+      dealerTotal,
+      dealerBusted,
+      players: playerTotals,
+    });
+  }
+
+  _advanceAfterReveal() {
+    if (this.handNumber >= HANDS_PER_GAME) {
+      this.transition('finish');
+    } else {
+      this.transition('nextHand');
+      this._startHand();
     }
   }
 
@@ -82,11 +149,12 @@ export class Blackjack extends BaseGame {
   }
 
   getStateForPlayer(playerId) {
+    const isRevealOrFinished = this.state === 'reveal' || this.state === 'finished';
     return {
       myHand: this.hands[playerId] || [],
       myTotal: this.calculateHandValue(this.hands[playerId] || []),
-      dealerShowing: this.state === 'finished' ? this.dealerHand : [this.dealerHand[0]],
-      dealerTotal: this.state === 'finished' ? this.calculateHandValue(this.dealerHand) : null,
+      dealerShowing: isRevealOrFinished ? this.dealerHand : [this.dealerHand[0]],
+      dealerTotal: isRevealOrFinished ? this.calculateHandValue(this.dealerHand) : null,
       otherPlayers: this.players.filter((p) => p !== playerId).map((p) => ({
         playerId: p,
         cardCount: (this.hands[p] || []).length,
@@ -97,26 +165,29 @@ export class Blackjack extends BaseGame {
       busted: this.busted.includes(playerId),
       stood: this.stood.includes(playerId),
       phase: this.state,
+      handNumber: this.handNumber,
+      totalHands: HANDS_PER_GAME,
+      wins: { ...this.wins },
+      handResults: this.handResults,
     };
   }
 
   isComplete() { return this.state === 'finished'; }
 
   getResults() {
-    const dealerTotal = this.calculateHandValue(this.dealerHand);
-    const dealerBusted = dealerTotal > 21;
-    const playerScores = this.players.map((p) => {
-      const total = this.calculateHandValue(this.hands[p]);
-      const busted = this.busted.includes(p);
-      let score;
-      if (busted) score = 0;
-      else if (dealerBusted) score = total;
-      else score = total > dealerTotal ? total : (total === dealerTotal ? total : 0);
-      return { playerId: p, handTotal: total, busted, score };
-    });
-    playerScores.sort((a, b) => b.score - a.score || b.handTotal - a.handTotal);
-    return playerScores.map((ps, i) => ({
-      playerId: ps.playerId, placement: i + 1, handTotal: ps.handTotal, busted: ps.busted,
+    // Sort by wins descending, then by last hand total
+    const scored = this.players.map((p) => ({
+      playerId: p,
+      wins: this.wins[p] || 0,
+      handTotal: this.calculateHandValue(this.hands[p] || []),
+    }));
+    scored.sort((a, b) => b.wins - a.wins || b.handTotal - a.handTotal);
+    return scored.map((s, i) => ({
+      playerId: s.playerId,
+      placement: i + 1,
+      handTotal: s.handTotal,
+      wins: s.wins,
+      handDescription: `${s.wins} win${s.wins !== 1 ? 's' : ''}`,
     }));
   }
 }

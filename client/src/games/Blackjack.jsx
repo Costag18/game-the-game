@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './Blackjack.module.css';
 import { displayName } from '../utils/displayName.js';
 
@@ -63,12 +64,26 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
     busted,
     stood,
     phase,
+    handNumber = 1,
+    totalHands = 5,
+    wins = {},
+    handResults = [],
   } = gameState;
 
   const isFinished = phase === 'finished';
+  const isReveal = phase === 'reveal';
+  const [acked, setAcked] = useState(false);
+  const [lastAckedHand, setLastAckedHand] = useState(0);
+
+  // Reset ack when hand advances
+  if (handNumber !== lastAckedHand && phase === 'playing') {
+    if (acked) setAcked(false);
+    if (lastAckedHand !== handNumber) setLastAckedHand(handNumber);
+  }
 
   function getStatusText() {
     if (isFinished) return 'Game Over';
+    if (isReveal) return `Hand ${handNumber} complete!`;
     if (phase === 'dealerTurn') return "Dealer's turn...";
     if (busted) return 'You busted!';
     if (stood) return 'You stood. Waiting for others...';
@@ -76,9 +91,38 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
     return 'Waiting for your turn...';
   }
 
+  function handleAcknowledge() {
+    setAcked(true);
+    onAction({ type: 'acknowledge' });
+  }
+
   return (
     <div className={styles.table}>
       <h1 className={styles.title}>Blackjack</h1>
+
+      {/* Hand info + wins */}
+      <div className={styles.infoBar}>
+        <span className={styles.infoBadge}>Hand {handNumber}/{totalHands}</span>
+        {Object.entries(wins).map(([pid, w]) => (
+          <span key={pid} className={styles.infoBadge}>
+            {displayName(pid, nicknames)}: {w} win{w !== 1 ? 's' : ''}
+          </span>
+        ))}
+      </div>
+
+      {/* Previous hand results */}
+      {handResults.length > 0 && (
+        <div className={styles.handHistory}>
+          {handResults.map((hr) => (
+            <span key={hr.hand} className={styles.handHistoryItem}>
+              Hand {hr.hand}: Dealer {hr.dealerBusted ? 'busted' : hr.dealerTotal}
+              {hr.players[0]?.score > 0
+                ? ` — ${displayName(hr.players[0].playerId, nicknames)} won`
+                : ' — dealer won'}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Dealer section */}
       <section className={styles.dealerSection}>
@@ -86,9 +130,9 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
           cards={dealerShowing || []}
           label="Dealer"
           total={dealerTotal}
-          showHoleCard={isFinished}
+          showHoleCard={isReveal || isFinished}
         />
-        {!isFinished && (
+        {!isReveal && !isFinished && (
           <div className={`${styles.card} ${styles.cardHidden}`}>?</div>
         )}
       </section>
@@ -130,6 +174,16 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
               Stand
             </button>
           </div>
+        )}
+
+        {/* Continue button between hands */}
+        {isReveal && !acked && (
+          <button className={styles.btnContinue} onClick={handleAcknowledge}>
+            Continue
+          </button>
+        )}
+        {isReveal && acked && (
+          <p className={styles.waitingSmall}>Waiting for other players...</p>
         )}
       </section>
     </div>

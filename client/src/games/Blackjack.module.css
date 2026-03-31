@@ -235,3 +235,71 @@
   color: #fff;
   box-shadow: 0 3px 0 #4a0e0e;
 }
+
+.infoBar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.infoBadge {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  border-radius: 20px;
+  padding: 0.3rem 1rem;
+  font-size: 0.85rem;
+  color: #d4a843;
+  letter-spacing: 0.04em;
+}
+
+.handHistory {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.handHistoryItem {
+  font-size: 0.75rem;
+  color: #b8a88a;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+}
+
+.btnContinue {
+  padding: 0.7rem 2.5rem;
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
+  color: #1a0a0a;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 3px 0 #5c4a10;
+  transition: filter 0.15s, transform 0.1s;
+  margin-top: 0.75rem;
+}
+
+.btnContinue:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.waitingSmall {
+  color: #b8a88a;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
