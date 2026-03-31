@@ -329,3 +329,78 @@
   border: 2px solid #ef5350;
   color: #ef9a9a;
 }
+
+/* Guess whole word */
+.guessWordSection {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 168, 67, 0.25);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.guessWordLabel {
+  color: #d4a843;
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.guessWordRow {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.guessWordInput {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(212, 168, 67, 0.4);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+}
+
+.guessWordInput:focus {
+  outline: none;
+  border-color: #d4a843;
+}
+
+.guessWordBtn {
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(135deg, #c0392b 0%, #7b1e1e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: filter 0.15s;
+}
+
+.guessWordBtn:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.guessWordBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.guessWordWarning {
+  color: #ef9a9a;
+  font-size: 0.78rem;
+  font-style: italic;
+  margin: 0;
+}

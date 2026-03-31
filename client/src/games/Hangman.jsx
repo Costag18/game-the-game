@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './Hangman.module.css';
 import { displayName } from '../utils/displayName.js';
 
@@ -71,10 +72,18 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
   const isFinished = phase === 'finished';
   const guessedSet = new Set(guessedLetters || []);
 
+  const [wordGuess, setWordGuess] = useState('');
+
   function handleGuess(letter) {
     if (!isMyTurn || isEliminated) return;
     if (guessedSet.has(letter)) return;
     onAction({ type: 'guess', letter });
+  }
+
+  function handleGuessWord() {
+    if (isEliminated || !wordGuess.trim()) return;
+    onAction({ type: 'guessWord', word: wordGuess.trim() });
+    setWordGuess('');
   }
 
   return (
@@ -139,6 +148,32 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Guess the whole word — available to any non-eliminated player at any time */}
+      {!isFinished && !isEliminated && (
+        <div className={styles.guessWordSection}>
+          <span className={styles.guessWordLabel}>Guess the word:</span>
+          <div className={styles.guessWordRow}>
+            <input
+              type="text"
+              className={styles.guessWordInput}
+              value={wordGuess}
+              onChange={(e) => setWordGuess(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleGuessWord()}
+              placeholder="Type your guess..."
+              maxLength={20}
+            />
+            <button
+              className={styles.guessWordBtn}
+              onClick={handleGuessWord}
+              disabled={!wordGuess.trim()}
+            >
+              Guess
+            </button>
+          </div>
+          <p className={styles.guessWordWarning}>Correct = instant win. Wrong = eliminated!</p>
         </div>
       )}
 

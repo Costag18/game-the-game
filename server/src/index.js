@@ -247,18 +247,23 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || tm.phase !== 'results') return;
+    const lobby = lobbyManager.getLobby(lobbyId);
+    if (!lobby) return;
+
+    // Track who has acknowledged
+    if (!tm.resultsAcknowledged) tm.resultsAcknowledged = new Set();
+    tm.resultsAcknowledged.add(socket.id);
+
+    // Wait for all players
+    if (!lobby.players.every((p) => tm.resultsAcknowledged.has(p))) return;
+    tm.resultsAcknowledged = null;
 
     if (tm.isTournamentOver()) {
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, {
-        winner: tm.getWinner(),
-        standings: tm.getStandings(),
-        roundHistory: tm.roundHistory,
-      });
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
       tournaments.delete(lobbyId);
       lobbyManager.setStatus(lobbyId, 'waiting');
     } else {
       tm.startNextRound();
-      const lobby = lobbyManager.getLobby(lobbyId);
       const eligible = getEligibleGames(lobby.players.length);
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
       io.to(lobbyId).emit(EVENTS.ROUND_START, {

@@ -26,6 +26,7 @@ export class Hangman extends BaseGame {
     this.wrongCounts = {};
     this.eliminated = [];
     this.revealed = new Array(this.word.length).fill(false);
+    this.wordGuessWinner = null;
 
     for (const p of this.players) {
       this.wrongCounts[p] = 0;
@@ -45,8 +46,39 @@ export class Hangman extends BaseGame {
 
   handleAction(playerId, action) {
     if (this.state !== 'playing') return;
-    if (playerId !== this.currentTurnPlayer) return;
     if (this.eliminated.includes(playerId)) return;
+
+    // Full word guess — any player can attempt on any turn
+    if (action.type === 'guessWord') {
+      const guess = (action.word || '').toLowerCase().trim();
+      if (!guess || guess.length === 0) return;
+
+      if (guess === this.word) {
+        // Correct! Reveal all letters, this player wins
+        this.revealed = new Array(this.word.length).fill(true);
+        this.wordGuessWinner = playerId;
+        this.transition('finish');
+        return;
+      } else {
+        // Wrong! Player is eliminated
+        this.wrongCounts[playerId] = MAX_WRONG;
+        if (!this.eliminated.includes(playerId)) {
+          this.eliminated.push(playerId);
+          this.removePlayer(playerId);
+        }
+
+        if (this._allEliminated()) {
+          this.transition('finish');
+          return;
+        }
+
+        // If it was their turn, the turn already moved via removePlayer
+        return;
+      }
+    }
+
+    // Letter guess — only on your turn
+    if (playerId !== this.currentTurnPlayer) return;
 
     if (action.type === 'guess') {
       const letter = action.letter;
@@ -130,12 +162,17 @@ export class Hangman extends BaseGame {
   }
 
   getResults() {
+    // If someone guessed the word, they're first
     const survivors = this.players
       .filter((p) => !this.eliminated.includes(p))
       .map((p) => ({ playerId: p, wrongCount: this.wrongCounts[p] || 0, eliminated: false }))
-      .sort((a, b) => a.wrongCount - b.wrongCount);
+      .sort((a, b) => {
+        // Word guess winner always first
+        if (a.playerId === this.wordGuessWinner) return -1;
+        if (b.playerId === this.wordGuessWinner) return 1;
+        return a.wrongCount - b.wrongCount;
+      });
 
-    // Eliminated players: last eliminated = highest placement (among eliminated)
     const eliminatedOrdered = [...this.eliminated].reverse().map((p) => ({
       playerId: p,
       wrongCount: this.wrongCounts[p] || 0,

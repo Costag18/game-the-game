@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import styles from './RoundResults.module.css';
 
 export default function RoundResults({ roundResults, onContinue }) {
+  const [acked, setAcked] = useState(false);
   if (!roundResults) {
     return (
       <div className={styles.container}>
@@ -67,9 +69,13 @@ export default function RoundResults({ roundResults, onContinue }) {
           </tbody>
         </table>
 
-        <button className={styles.btnContinue} onClick={onContinue}>
-          Continue
-        </button>
+        {!acked ? (
+          <button className={styles.btnContinue} onClick={() => { setAcked(true); onContinue(); }}>
+            Continue
+          </button>
+        ) : (
+          <p className={styles.waitingText}>Waiting for other players...</p>
+        )}
       </div>
     </div>
   );
