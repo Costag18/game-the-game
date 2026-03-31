@@ -48,8 +48,11 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.CREATE_LOBBY, (options, callback) => {
     try {
       const lobby = lobbyManager.createLobby(socket.id, options);
+      if (socket.data.nickname) {
+        lobbyManager.setNickname(socket.id, socket.data.nickname);
+      }
       socket.join(lobby.id);
-      if (typeof callback === 'function') callback({ success: true, lobby });
+      if (typeof callback === 'function') callback({ success: true, lobby: lobbyManager.getLobby(lobby.id) });
     } catch (err) {
       if (typeof callback === 'function') callback({ success: false, error: err.message });
     }
@@ -58,13 +61,17 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.JOIN_LOBBY, ({ lobbyId, code }, callback) => {
     try {
       const lobby = lobbyManager.joinLobby(lobbyId, socket.id, code);
+      if (socket.data.nickname) {
+        lobbyManager.setNickname(socket.id, socket.data.nickname);
+      }
       socket.join(lobbyId);
+      const updated = lobbyManager.getLobby(lobbyId);
       io.to(lobbyId).emit(EVENTS.PLAYER_JOINED, {
         playerId: socket.id,
         nickname: socket.data.nickname || socket.id,
       });
-      io.to(lobbyId).emit(EVENTS.LOBBY_STATE, lobby);
-      if (typeof callback === 'function') callback({ success: true, lobby });
+      io.to(lobbyId).emit(EVENTS.LOBBY_STATE, updated);
+      if (typeof callback === 'function') callback({ success: true, lobby: updated });
     } catch (err) {
       if (typeof callback === 'function') callback({ success: false, error: err.message });
     }
@@ -74,8 +81,12 @@ io.on(EVENTS.CONNECTION, (socket) => {
     try {
       const lobby = lobbyManager.findLobbyByCode(code);
       if (!lobby) throw new Error('No lobby found with that code');
-      const updated = lobbyManager.joinLobby(lobby.id, socket.id, lobby.code);
+      lobbyManager.joinLobby(lobby.id, socket.id, lobby.code);
+      if (socket.data.nickname) {
+        lobbyManager.setNickname(socket.id, socket.data.nickname);
+      }
       socket.join(lobby.id);
+      const updated = lobbyManager.getLobby(lobby.id);
       io.to(lobby.id).emit(EVENTS.PLAYER_JOINED, {
         playerId: socket.id,
         nickname: socket.data.nickname || socket.id,
