@@ -144,6 +144,27 @@
   text-shadow: 0 2px 8px rgba(212, 168, 67, 0.4);
 }
 
+.btnContinue {
+  padding: 0.7rem 2.5rem;
+  background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
+  color: #1a0a0a;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Georgia', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 3px 0 #5c4a10;
+  transition: filter 0.15s, transform 0.1s;
+}
+
+.btnContinue:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
 /* Choice buttons */
 .choiceButtons {
   display: flex;

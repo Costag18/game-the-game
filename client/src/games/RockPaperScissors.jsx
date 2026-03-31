@@ -37,6 +37,8 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
     phase,
     roundNumber,
     scores,
+    myId,
+    opponentId,
     myChoice,
     opponentChoice,
     lastRoundResult,
@@ -46,27 +48,26 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
   const isReveal = phase === 'reveal' || phase === 'finished';
   const isFinished = phase === 'finished';
 
-  const playerIds = Object.keys(scores);
-  const myId = playerIds[0]; // first key is "me" from server perspective
-  const opponentId = playerIds[1];
+  const myName = displayName(myId, nicknames);
+  const oppName = displayName(opponentId, nicknames);
 
   function getRoundResultText() {
     if (!lastRoundResult) return '';
     if (lastRoundResult.tie) return "It's a tie!";
-    if (lastRoundResult.winner === myId) return 'You win this round!';
-    return 'Opponent wins this round!';
+    const winnerName = displayName(lastRoundResult.winner, nicknames);
+    return `${winnerName} wins this round!`;
   }
 
   function getStatusText() {
     if (isFinished) {
       const myScore = scores[myId] || 0;
       const oppScore = scores[opponentId] || 0;
-      if (myScore > oppScore) return 'You win the match!';
-      if (oppScore > myScore) return 'Opponent wins the match!';
+      if (myScore > oppScore) return `${myName} wins the match!`;
+      if (oppScore > myScore) return `${oppName} wins the match!`;
       return "It's a draw!";
     }
     if (isReveal) return getRoundResultText();
-    if (hasChosen) return 'Waiting for opponent...';
+    if (hasChosen) return `Waiting for ${oppName}...`;
     return 'Choose your move!';
   }
 
@@ -82,7 +83,7 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
 
       {/* Scoreboard */}
       <div className={styles.scoreboard}>
-        {playerIds.map((pid) => (
+        {[myId, opponentId].filter(Boolean).map((pid) => (
           <div key={pid} className={styles.scoreCard}>
             <span className={styles.playerName}>{displayName(pid, nicknames)}</span>
             <span className={styles.scoreValue}>{scores[pid] ?? 0}</span>
@@ -93,17 +94,9 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
       {/* Reveal area */}
       {isReveal && (
         <div className={styles.revealArea}>
-          <ChoiceDisplay
-            choice={myChoice}
-            label="You"
-            hidden={false}
-          />
+          <ChoiceDisplay choice={myChoice} label={myName} hidden={false} />
           <span className={styles.vs}>VS</span>
-          <ChoiceDisplay
-            choice={opponentChoice}
-            label="Opponent"
-            hidden={false}
-          />
+          <ChoiceDisplay choice={opponentChoice} label={oppName} hidden={false} />
         </div>
       )}
 
@@ -111,6 +104,16 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
       <p className={`${styles.statusText} ${isFinished ? styles.statusFinished : ''}`}>
         {getStatusText()}
       </p>
+
+      {/* Continue button after reveal (not finished) */}
+      {phase === 'reveal' && (
+        <button
+          className={styles.btnContinue}
+          onClick={() => onAction({ type: 'acknowledge' })}
+        >
+          Continue
+        </button>
+      )}
 
       {/* Action buttons — only shown when in round phase and not yet chosen */}
       {phase === 'round' && !hasChosen && (
@@ -135,7 +138,7 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
             <span>{CHOICE_EMOJI[myChoice]}</span>
             <span className={styles.chosenLabel}>You chose {CHOICE_LABEL[myChoice]}</span>
           </div>
-          <p className={styles.waitingText}>Waiting for opponent...</p>
+          <p className={styles.waitingText}>Waiting for {oppName}...</p>
         </div>
       )}
     </div>

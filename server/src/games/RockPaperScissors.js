@@ -42,19 +42,35 @@ export class RockPaperScissors extends BaseGame {
   }
 
   handleAction(playerId, action) {
-    if (this.state !== 'round') return;
     if (!this.players.includes(playerId)) return;
-    if (action.type !== 'choose') return;
-    if (!['rock', 'paper', 'scissors'].includes(action.choice)) return;
-    if (this.choices[playerId] !== undefined) return; // already chose
 
-    this.choices[playerId] = action.choice;
+    if (this.state === 'round') {
+      if (action.type !== 'choose') return;
+      if (!['rock', 'paper', 'scissors'].includes(action.choice)) return;
+      if (this.choices[playerId] !== undefined) return;
 
-    // Check if all players have chosen
-    const allChosen = this.players.every((p) => this.choices[p] !== undefined);
-    if (allChosen) {
-      this.transition('reveal');
-      this._resolveRound();
+      this.choices[playerId] = action.choice;
+
+      const allChosen = this.players.every((p) => this.choices[p] !== undefined);
+      if (allChosen) {
+        this.transition('reveal');
+        this._resolveRound();
+        this.acknowledged = new Set();
+      }
+    } else if (this.state === 'reveal') {
+      if (action.type === 'acknowledge') {
+        this.acknowledged.add(playerId);
+        if (this.players.every((p) => this.acknowledged.has(p))) {
+          // Check if match is over
+          const [p1, p2] = this.players;
+          if (this.scores[p1] >= 3 || this.scores[p2] >= 3) {
+            this.transition('finish');
+          } else {
+            this.transition('next');
+            this._beginRound();
+          }
+        }
+      }
     }
   }
 
@@ -79,11 +95,7 @@ export class RockPaperScissors extends BaseGame {
     } else {
       this.lastRoundResult = { winner: null, tie: true };
     }
-
-    // Check if someone won the match (first to 3)
-    if (this.scores[p1] >= 3 || this.scores[p2] >= 3) {
-      this.transition('finish');
-    }
+    // Stay in 'reveal' — wait for both players to acknowledge
   }
 
   // Called externally to advance to the next round after reveal
@@ -101,6 +113,8 @@ export class RockPaperScissors extends BaseGame {
       phase: this.state,
       roundNumber: this.roundNumber,
       scores: { ...this.scores },
+      myId: playerId,
+      opponentId,
       myChoice: this.choices[playerId] ?? null,
       opponentChoice: isReveal ? (this.choices[opponentId] ?? null) : null,
       lastRoundResult: isReveal ? this.lastRoundResult : null,
