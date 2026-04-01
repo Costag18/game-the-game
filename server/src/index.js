@@ -206,6 +206,13 @@ io.on(EVENTS.CONNECTION, (socket) => {
       newScore: tm.scores[socket.id],
     });
     io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+
+    // Check if gambling triggered a point threshold win
+    if (tm.isTournamentOver()) {
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+      tournaments.delete(lobbyId);
+      lobbyManager.setStatus(lobbyId, 'waiting');
+    }
   });
 
   socket.on(EVENTS.SLOTS_SPIN, ({ amount }) => {
@@ -225,9 +232,9 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     let multiplier = 0;
     if (reels[0] === reels[1] && reels[1] === reels[2]) {
-      multiplier = reels[0] === 'seven' ? 5 : 3; // triple 7s = 5x, other triples = 3x
+      multiplier = reels[0] === 'seven' ? 5 : 3;
     } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
-      multiplier = 1.5; // any pair = 1.5x
+      multiplier = 1.5;
     }
 
     const payout = Math.floor(amount * multiplier);
@@ -242,6 +249,13 @@ io.on(EVENTS.CONNECTION, (socket) => {
       newScore: tm.scores[socket.id],
     });
     io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+
+    // Check if gambling triggered a point threshold win
+    if (tm.isTournamentOver()) {
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+      tournaments.delete(lobbyId);
+      lobbyManager.setStatus(lobbyId, 'waiting');
+    }
   });
 
   socket.on(EVENTS.WAGER_SUBMIT, (amount) => {
