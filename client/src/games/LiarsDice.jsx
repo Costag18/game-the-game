@@ -12,10 +12,10 @@ const DOT_POSITIONS = {
   6: [0, 2, 3, 5, 6, 8],
 };
 
-function Die({ value }) {
+function Die({ value, highlight }) {
   const active = DOT_POSITIONS[value] || [];
   return (
-    <div className={styles.die}>
+    <div className={`${styles.die} ${highlight ? styles.dieHighlight : ''}`}>
       {Array.from({ length: 9 }, (_, i) => (
         <div
           key={i}
@@ -103,9 +103,12 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
           <h3 className={styles.panelTitle}>Your Dice ({myDice.length})</h3>
           <div className={styles.diceRow}>
             {myDice.map((val, i) => (
-              <Die key={i} value={val} />
+              <Die key={i} value={val} highlight={val === 1} />
             ))}
           </div>
+          {myDice.some((d) => d === 1) && (
+            <p className={styles.wildNote}>1s are wild — they count as any face value!</p>
+          )}
         </section>
       )}
 
@@ -199,13 +202,14 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
             {displayName(challengeResult.challenger, nicknames)} challenged {displayName(challengeResult.bidder, nicknames)}
             &mdash; <strong>{displayName(challengeResult.loser, nicknames)}</strong> loses a die!
           </p>
+          <p className={styles.wildNote}>1s are wild and count as any face value</p>
           <div className={styles.revealGrid}>
             {Object.entries(challengeResult.allDice).map(([pid, dice]) => (
               <div key={pid} className={styles.revealPlayer}>
                 <span className={styles.revealName}>{displayName(pid, nicknames)}</span>
                 <div className={styles.diceRow}>
                   {dice.map((val, i) => (
-                    <Die key={i} value={val} />
+                    <Die key={i} value={val} highlight={val === challengeResult.bid.faceValue || val === 1} />
                   ))}
                 </div>
               </div>
