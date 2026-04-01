@@ -227,88 +227,6 @@ function SlotsPanel({ socket, myScore }) {
   );
 }
 
-// --- Plinko ---
-const PLINKO_MULTIPLIERS = [5, 2, 1.5, 1, 0.3, 1, 1.5, 2, 5];
-
-function PlinkoPanel({ socket, myScore }) {
-  const [wager, setWager] = useState(10);
-  const [dropping, setDropping] = useState(false);
-  const [result, setResult] = useState(null);
-  const [activeSlot, setActiveSlot] = useState(null); // slot being scanned
-  const [landedSlot, setLandedSlot] = useState(null); // final slot
-
-  const maxWager = Math.floor((myScore || 0) * 0.5);
-
-  useEffect(() => {
-    if (!socket) return;
-    function onResult(data) {
-      // Animate: scan across slots quickly, then land on the result
-      let step = 0;
-      const scanInterval = setInterval(() => {
-        setActiveSlot(step % 9);
-        step++;
-        if (step > 12) {
-          clearInterval(scanInterval);
-          setActiveSlot(null);
-          setLandedSlot(data.slot);
-          setResult(data);
-          setDropping(false);
-        }
-      }, 100);
-    }
-    socket.on(EVENTS.PLINKO_RESULT, onResult);
-    return () => socket.off(EVENTS.PLINKO_RESULT, onResult);
-  }, [socket]);
-
-  useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
-
-  function handleDrop() {
-    if (dropping || maxWager <= 0) return;
-    setDropping(true);
-    setResult(null);
-    setActiveSlot(null);
-    setLandedSlot(null);
-    socket.emit(EVENTS.PLINKO_DROP, { amount: wager });
-  }
-
-  const isBroke = maxWager <= 0;
-
-  return (
-    <div className={styles.miniGame}>
-      <h3 className={styles.miniTitle}>Plinko</h3>
-      <div className={styles.plinkoBoard}>
-        {PLINKO_MULTIPLIERS.map((m, i) => (
-          <div key={i} className={[
-            styles.plinkoSlot,
-            landedSlot === i ? styles.plinkoSlotLanded : '',
-            activeSlot === i ? styles.plinkoSlotScan : '',
-          ].filter(Boolean).join(' ')}>
-            <span className={styles.plinkoMult}>{m}x</span>
-          </div>
-        ))}
-      </div>
-      {result && !dropping && result.net != null && (
-        <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>
-          {result.net >= 0 ? `+${result.net}` : result.net} ({result.multiplier}x)
-        </p>
-      )}
-      {!isBroke ? (
-        <>
-          <div className={styles.coinWagerRow}>
-            <span className={styles.coinWagerLabel}>Bet:</span>
-            <span className={styles.coinWagerAmount}>{wager}</span>
-          </div>
-          <input type="range" min={1} max={maxWager} value={wager}
-            onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} disabled={dropping} />
-          <button className={styles.btnSpin} onClick={handleDrop} disabled={dropping || isBroke}>
-            {dropping ? 'Dropping...' : 'DROP'}
-          </button>
-        </>
-      ) : <p className={styles.coinBroke}>No points to gamble!</p>}
-    </div>
-  );
-}
-
 // --- Wheel of Fortune ---
 const WHEEL_SEGMENTS = [0, 0.5, 1, 0.5, 2, 0.5, 1, 0.5, 3, 0.5, 1, 0.5, 5, 0.5, 1, 0.5, 10, 0.5, 1, 0.5];
 const WHEEL_COLORS = WHEEL_SEGMENTS.map((m) =>
@@ -438,7 +356,8 @@ function BJLitePanel({ socket, myScore }) {
 
   function handleDeal() {
     if (maxWager <= 0) return;
-    setGameState(null);
+    // Don't null out state — server will send new playing state immediately
+    // This prevents the UI from unmounting/remounting and causing a visual jerk
     socket.emit(EVENTS.BJ_LITE_START, { amount: wager });
   }
 
@@ -623,7 +542,6 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
       <div className={styles.sidebarArea}>
         <CoinFlipPanel socket={socket} myScore={myScore} />
         <SlotsPanel socket={socket} myScore={myScore} />
-        <PlinkoPanel socket={socket} myScore={myScore} />
         <WheelPanel socket={socket} myScore={myScore} />
         <BJLitePanel socket={socket} myScore={myScore} />
       </div>
