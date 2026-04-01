@@ -60,6 +60,8 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
   const {
     displayWord,
     word,
+    wordGuessed,
+    wordGuessWinner,
     guessedLetters,
     playerStates,
     currentTurnPlayer,
@@ -93,7 +95,13 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
       {/* Status */}
       <div className={styles.statusBar}>
         {isFinished ? (
-          <span className={styles.statusFinished}>Game Over</span>
+          <span className={styles.statusFinished}>
+            {wordGuessed
+              ? (wordGuessWinner
+                ? `${displayName(wordGuessWinner, nicknames)} guessed the word!`
+                : 'Word solved!')
+              : 'Nobody guessed the word!'}
+          </span>
         ) : isEliminated ? (
           <span className={styles.statusEliminated}>You have been eliminated!</span>
         ) : isMyTurn ? (
@@ -113,7 +121,10 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
         {/* Center: Word display */}
         <div className={styles.wordArea}>
           {isFinished && word ? (
-            <p className={styles.revealedWord}>{word.toUpperCase()}</p>
+            <div className={styles.revealSection}>
+              <p className={styles.revealLabel}>The word was:</p>
+              <p className={styles.revealedWord}>{word.toUpperCase()}</p>
+            </div>
           ) : (
             <div className={styles.wordDisplay}>
               {(displayWord || []).map((char, i) => (

@@ -125,11 +125,26 @@
   letter-spacing: 0.02em;
 }
 
+.revealSection {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.revealLabel {
+  font-size: 0.9rem;
+  color: #b8a88a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+}
+
 .revealedWord {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: bold;
   color: #a5d6a7;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   margin: 0;
 }
 

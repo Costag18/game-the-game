@@ -213,12 +213,6 @@ io.on(EVENTS.CONNECTION, (socket) => {
             gameResults: results,
           });
           io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
-
-          if (tm.isTournamentOver()) {
-            io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
-            tournaments.delete(lobbyId);
-            lobbyManager.setStatus(lobbyId, 'waiting');
-          }
         } else {
           const nicknames = lobby.nicknames || {};
           for (const playerId of lobby.players) {
@@ -320,26 +314,27 @@ io.on(EVENTS.CONNECTION, (socket) => {
       const roundScores = tm.completeRound(placements, results);
 
       io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
-      io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
-        placements,
-        scores: roundScores,
-        gameId: tm.selectedGame,
-        standings: tm.getStandings().map((s) => ({
-          ...s,
-          nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
-        })),
-        gameResults: results,
-      });
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
 
-      if (tm.isTournamentOver()) {
-        io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, {
-          winner: tm.getWinner(),
-          standings: tm.getStandings(),
-          roundHistory: tm.roundHistory,
+      // Delay round results for games with reveals (e.g., Hangman word reveal)
+      const revealDelay = tm.selectedGame === 'hangman' ? 5000 : 0;
+      const emitRoundEnd = () => {
+        io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
+          placements,
+          scores: roundScores,
+          gameId: tm.selectedGame,
+          standings: tm.getStandings().map((s) => ({
+            ...s,
+            nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+          })),
+          gameResults: results,
         });
-        tournaments.delete(lobbyId);
-        lobbyManager.setStatus(lobbyId, 'waiting');
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      };
+
+      if (revealDelay > 0) {
+        setTimeout(emitRoundEnd, revealDelay);
+      } else {
+        emitRoundEnd();
       }
     }
   });

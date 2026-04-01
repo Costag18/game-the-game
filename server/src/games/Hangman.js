@@ -146,7 +146,9 @@ export class Hangman extends BaseGame {
 
     return {
       displayWord,
-      word: this.isComplete() ? this.word : undefined, // reveal word when game ends
+      word: this.isComplete() ? this.word : undefined,
+      wordGuessed: this.isComplete() ? this._isWordComplete() : undefined,
+      wordGuessWinner: this.isComplete() ? (this.wordGuessWinner || null) : undefined,
       guessedLetters: [...this.guessedLetters],
       playerStates,
       currentTurnPlayer: this.currentTurnPlayer,
