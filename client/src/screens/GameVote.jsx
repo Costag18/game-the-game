@@ -234,18 +234,27 @@ function PlinkoPanel({ socket, myScore }) {
   const [wager, setWager] = useState(10);
   const [dropping, setDropping] = useState(false);
   const [result, setResult] = useState(null);
-  const [ballSlot, setBallSlot] = useState(null);
+  const [activeSlot, setActiveSlot] = useState(null); // slot being scanned
+  const [landedSlot, setLandedSlot] = useState(null); // final slot
 
   const maxWager = Math.floor((myScore || 0) * 0.5);
 
   useEffect(() => {
     if (!socket) return;
     function onResult(data) {
-      setTimeout(() => {
-        setBallSlot(data.slot);
-        setResult(data);
-        setDropping(false);
-      }, 1500);
+      // Animate: scan across slots quickly, then land on the result
+      let step = 0;
+      const scanInterval = setInterval(() => {
+        setActiveSlot(step % 9);
+        step++;
+        if (step > 12) {
+          clearInterval(scanInterval);
+          setActiveSlot(null);
+          setLandedSlot(data.slot);
+          setResult(data);
+          setDropping(false);
+        }
+      }, 100);
     }
     socket.on(EVENTS.PLINKO_RESULT, onResult);
     return () => socket.off(EVENTS.PLINKO_RESULT, onResult);
@@ -257,7 +266,8 @@ function PlinkoPanel({ socket, myScore }) {
     if (dropping || maxWager <= 0) return;
     setDropping(true);
     setResult(null);
-    setBallSlot(null);
+    setActiveSlot(null);
+    setLandedSlot(null);
     socket.emit(EVENTS.PLINKO_DROP, { amount: wager });
   }
 
@@ -268,12 +278,15 @@ function PlinkoPanel({ socket, myScore }) {
       <h3 className={styles.miniTitle}>Plinko</h3>
       <div className={styles.plinkoBoard}>
         {PLINKO_MULTIPLIERS.map((m, i) => (
-          <div key={i} className={`${styles.plinkoSlot} ${ballSlot === i ? styles.plinkoSlotActive : ''}`}>
+          <div key={i} className={[
+            styles.plinkoSlot,
+            landedSlot === i ? styles.plinkoSlotLanded : '',
+            activeSlot === i ? styles.plinkoSlotScan : '',
+          ].filter(Boolean).join(' ')}>
             <span className={styles.plinkoMult}>{m}x</span>
           </div>
         ))}
       </div>
-      {dropping && <div className={styles.plinkoBall} />}
       {result && !dropping && result.net != null && (
         <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>
           {result.net >= 0 ? `+${result.net}` : result.net} ({result.multiplier}x)
@@ -314,9 +327,15 @@ function WheelPanel({ socket, myScore }) {
     if (!socket) return;
     function onResult(data) {
       const segAngle = 360 / data.totalSegments;
-      const targetAngle = 360 - (data.segmentIndex * segAngle + segAngle / 2);
+      // Segment center angle from 3 o'clock. Pointer is at top (-90deg).
+      // We need to rotate so the segment's center aligns with the top.
+      const segCenter = data.segmentIndex * segAngle + segAngle / 2;
+      const targetAngle = -(segCenter + 90); // negative because we rotate the wheel
       const spins = 5 * 360;
-      setRotation((prev) => prev + spins + targetAngle - (prev % 360));
+      setRotation((prev) => {
+        const base = Math.ceil(prev / 360) * 360; // normalize to next full rotation
+        return base + spins + targetAngle;
+      });
       setTimeout(() => {
         setResult(data);
         setSpinning(false);

@@ -582,9 +582,16 @@
   transition: background 0.3s, box-shadow 0.3s;
 }
 
-.plinkoSlotActive {
+.plinkoSlotScan {
+  background: rgba(212, 168, 67, 0.3);
+  border-color: var(--gold, #d4a843);
+}
+
+.plinkoSlotLanded {
   background: var(--gold, #d4a843);
-  box-shadow: 0 0 10px rgba(212, 168, 67, 0.6);
+  box-shadow: 0 0 12px rgba(212, 168, 67, 0.7);
+  transform: scaleY(1.1);
+  transition: all 0.2s ease-out;
 }
 
 .plinkoMult {
@@ -593,25 +600,8 @@
   color: var(--text-secondary, #b8a88a);
 }
 
-.plinkoSlotActive .plinkoMult {
+.plinkoSlotLanded .plinkoMult {
   color: #1a0a0a;
-}
-
-.plinkoBall {
-  width: 14px;
-  height: 14px;
-  background: radial-gradient(circle at 35% 35%, #f7d96e, #d4a843);
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-  animation: plinkoDrop 1.5s ease-in forwards;
-}
-
-@keyframes plinkoDrop {
-  0% { transform: translateY(-20px); opacity: 1; }
-  25% { transform: translateY(0px) translateX(-8px); }
-  50% { transform: translateY(4px) translateX(6px); }
-  75% { transform: translateY(8px) translateX(-4px); }
-  100% { transform: translateY(12px); opacity: 0.5; }
 }
 
 /* ===================== Wheel of Fortune ===================== */
