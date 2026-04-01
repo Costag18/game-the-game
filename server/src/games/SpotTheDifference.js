@@ -48,9 +48,18 @@ function injectDifferences(original, count) {
   }
   const picked = available.slice(0, count);
 
+  // Shapes where rotation is invisible (symmetric at all angles)
+  const SYMMETRIC_SHAPES = new Set(['circle', 'square', 'cross']);
+
   for (const idx of picked) {
     const cell = modified[idx];
-    const mutationType = Math.floor(Math.random() * 4);
+
+    // Build valid mutation types for this cell
+    const mutations = [0, 1, 2]; // color, shape, size — always valid
+    if (!SYMMETRIC_SHAPES.has(cell.shape)) {
+      mutations.push(3); // rotation — only for non-symmetric shapes
+    }
+    const mutationType = mutations[Math.floor(Math.random() * mutations.length)];
 
     switch (mutationType) {
       case 0: // color swap
