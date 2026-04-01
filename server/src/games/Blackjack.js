@@ -71,6 +71,9 @@ export class Blackjack extends BaseGame {
           this._advanceAfterReveal();
         }
       }
+    } else if (this.state === 'finished') {
+      // Ignore actions after game ends
+      return;
     }
   }
 

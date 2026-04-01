@@ -224,15 +224,30 @@ export class Poker extends BaseGame {
       this.bets[p] = 0;
     }
 
-    // Deal 2 hole cards to each player
+    // Auto-fold broke players (0 chips) at hand start
+    for (const p of this.players) {
+      if (this.chips[p] <= 0) {
+        this.folded.add(p);
+      }
+    }
+
+    // Deal 2 hole cards to each player (even folded, for state consistency)
     for (const p of this.players) {
       this.holeCards[p] = this.deck.dealMultiple(2);
     }
 
-    // Post blinds
-    const activePlayers = this._activePlayers();
+    // Post blinds (only among non-folded players)
+    const activePlayers = this._nonFoldedPlayers();
     const n = activePlayers.length;
-    if (n < 2) return;
+    if (n <= 1) {
+      // Only one player left — they win by default
+      if (n === 1) {
+        this.chips[activePlayers[0]] += this.pot;
+        this.pot = 0;
+      }
+      this._forceFinish();
+      return;
+    }
 
     const sbIdx = this.dealerIndex % n;
     const bbIdx = (this.dealerIndex + 1) % n;
@@ -518,14 +533,20 @@ export class Poker extends BaseGame {
 
   _finishHandOrGame() {
     if (this.handNumber >= HANDS_PER_GAME) {
-      // All hands played — finish the game
       this.state = 'finished';
-    } else {
-      // Move dealer button and start next hand
-      this.dealerIndex = (this.dealerIndex + 1) % this.players.length;
-      this.state = 'preflop'; // reset state for next hand
-      this._startHand();
+      return;
     }
+
+    // End early if only 1 player has chips (no competition)
+    const playersWithChips = this.players.filter((p) => this.chips[p] > 0);
+    if (playersWithChips.length <= 1) {
+      this.state = 'finished';
+      return;
+    }
+
+    this.dealerIndex = (this.dealerIndex + 1) % this.players.length;
+    this.state = 'preflop';
+    this._startHand();
   }
 
   // -------------------------------------------------------------------------
@@ -536,6 +557,7 @@ export class Poker extends BaseGame {
     const nonFolded = this._nonFoldedPlayers();
     return {
       phase: this.state,
+      isBroke: (this.chips[playerId] ?? 0) <= 0,
       myHoleCards: this.holeCards[playerId] || [],
       communityCards: this.communityCards,
       pot: this.pot,
