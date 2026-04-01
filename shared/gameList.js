@@ -54,6 +54,14 @@ export const GAMES = {
   spotTheDifference: {
     id: 'spotTheDifference', name: 'Spot the Difference', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.SPOT_DIFFERENCE, description: 'Race to find differences between two grids. First to spot wins!',
+    instructions: [
+      'Two grids of colored shapes are shown side by side — one is the original, the other has been modified.',
+      'Click on any cell where you spot a difference between the two grids (color, shape, size, or rotation).',
+      'First player to click a difference gets +150 points. Wrong clicks cost -25 points with a 1-second cooldown.',
+      'There are 3 rounds with increasing difficulty: 5, 7, then 9 differences to find.',
+      'Each round has a 45-second timer. The round ends when all differences are found or time runs out.',
+      'Highest total score across all rounds wins!',
+    ],
   },
 };
 

@@ -103,6 +103,18 @@
   gap: 0.5rem;
 }
 
+.instructionsList {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.instructionsList li {
+  margin-bottom: 0.4rem;
+}
+
 .wagerInfo {
   color: var(--text-secondary);
   font-size: 0.85rem;

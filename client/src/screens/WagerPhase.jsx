@@ -118,9 +118,18 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
           </div>
         )}
 
-        {game?.tutorial && (
+        {(game?.tutorial || game?.instructions) && (
           <Popdown title="Game Instructions">
-            <TutorialVideo embedUrl={embedUrl} watchUrl={game.tutorial} gameName={game.name} />
+            {game.tutorial && (
+              <TutorialVideo embedUrl={embedUrl} watchUrl={game.tutorial} gameName={game.name} />
+            )}
+            {game.instructions && (
+              <ul className={styles.instructionsList}>
+                {game.instructions.map((line, i) => (
+                  <li key={i}>{line}</li>
+                ))}
+              </ul>
+            )}
           </Popdown>
         )}
 
