@@ -86,10 +86,35 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
     (otherPlayers ? otherPlayers.reduce((s, p) => s + p.diceCount, 0) : 0);
   const maxQuantity = Math.max(totalDice, 1);
 
-  // Build quantity options starting from current bid quantity (or 1 for first bid)
-  const minQuantity = currentBid ? currentBid.quantity : 1;
+  // Build valid bid options based on current bid
+  const cq = currentBid?.quantity ?? 0;
+  const cf = currentBid?.faceValue ?? 1;
+
+  // Quantity options: same quantity (if higher face values exist) or higher
+  const canBidSameQuantity = cq > 0 && cf < 6; // can raise face value at same quantity
+  const minQuantity = canBidSameQuantity ? cq : (cq > 0 ? cq + 1 : 1);
   const quantityOptions = Array.from({ length: maxQuantity }, (_, i) => i + 1)
     .filter((q) => q >= minQuantity);
+
+  // Face value options depend on selected quantity
+  const faceValueOptions = (() => {
+    if (!currentBid) return [2, 3, 4, 5, 6]; // first bid, any face
+    if (bidQuantity > cq) return [2, 3, 4, 5, 6]; // higher quantity, any face
+    if (bidQuantity === cq) return [2, 3, 4, 5, 6].filter((v) => v > cf); // same quantity, higher face only
+    return []; // shouldn't happen
+  })();
+
+  // Auto-correct face value if current selection is invalid
+  if (faceValueOptions.length > 0 && !faceValueOptions.includes(bidFaceValue)) {
+    setBidFaceValue(faceValueOptions[0]);
+  }
+
+  // Auto-correct quantity if current selection is invalid
+  if (quantityOptions.length > 0 && !quantityOptions.includes(bidQuantity)) {
+    setBidQuantity(quantityOptions[0]);
+  }
+
+  const canBid = quantityOptions.length > 0 && faceValueOptions.length > 0;
 
   return (
     <div className={styles.table}>
@@ -171,12 +196,12 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
                 value={bidFaceValue}
                 onChange={(e) => setBidFaceValue(Number(e.target.value))}
               >
-                {[2, 3, 4, 5, 6].map((v) => (
+                {faceValueOptions.map((v) => (
                   <option key={v} value={v}>{v}</option>
                 ))}
               </select>
             </label>
-            <button className={styles.btnBid} onClick={handleBid}>
+            <button className={styles.btnBid} onClick={handleBid} disabled={!canBid}>
               Bid
             </button>
             <button
