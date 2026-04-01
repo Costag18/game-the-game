@@ -153,6 +153,7 @@ export class SpotTheDifference extends BaseGame {
   }
 
   _endRound() {
+    if (this.state !== 'playing') return; // guard against double-call
     this._clearTimers();
 
     this.roundHistory.push({
@@ -176,6 +177,7 @@ export class SpotTheDifference extends BaseGame {
   }
 
   _advanceAfterRoundEnd() {
+    if (this.state !== 'roundEnd') return; // guard against double-call
     this._clearTimers();
     if (this.round >= TOTAL_ROUNDS) {
       this.transition('finish');
@@ -193,16 +195,15 @@ export class SpotTheDifference extends BaseGame {
   handleAction(playerId, action) {
     if (!this.players.includes(playerId)) return;
 
-    // Safety: if timer should have expired but hasn't transitioned, force it
-    if (this.state === 'playing' && this._roundStartTime && Date.now() >= this._roundStartTime + ROUND_TIMER_MS) {
-      this._endRound();
-      return;
-    }
-
     if (this.state === 'playing') {
-      if (action.type === 'click') {
+      // Safety: if timer should have expired but hasn't transitioned, force it
+      if (this._roundStartTime && Date.now() >= this._roundStartTime + ROUND_TIMER_MS) {
+        this._endRound();
+        // Don't return — fall through so the state broadcast happens in index.js
+      } else if (action.type === 'click') {
         this._handleClick(playerId, action.index);
       }
+      // ping and other unknown actions are ignored but still trigger state broadcast
     } else if (this.state === 'roundEnd') {
       if (action.type === 'acknowledge') {
         this.acknowledged.add(playerId);
