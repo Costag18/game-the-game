@@ -384,11 +384,8 @@ export class Poker extends BaseGame {
       }
     }
 
-    // Everyone has acted or is all-in — round is complete
-    // Fallback to next player anyway (isBettingRoundComplete will catch it)
-    const nextIdx = (curIdx + 1) % active.length;
-    this.currentTurnPlayer = active[nextIdx];
-    this.turnIndex = this.players.indexOf(this.currentTurnPlayer);
+    // Everyone has acted or is all-in — betting round is complete, advance stage
+    this._advanceStage();
   }
 
   _collectBets() {

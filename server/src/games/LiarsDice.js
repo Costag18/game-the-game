@@ -81,12 +81,7 @@ export class LiarsDice extends BaseGame {
     } else if (this.state === 'challenging') {
       if (action.type === 'acknowledge') {
         this.challengeAcknowledged.add(playerId);
-        // All non-eliminated players must acknowledge
-        const needAck = this.players.filter((p) => !this.eliminated.includes(p));
-        const allAcked = needAck.every((p) => this.challengeAcknowledged.has(p));
-        if (allAcked) {
-          this._advanceAfterChallenge();
-        }
+        this._checkChallengeAckComplete();
       }
     }
   }
@@ -114,7 +109,28 @@ export class LiarsDice extends BaseGame {
       ),
     };
     this.challengeAcknowledged = new Set();
+    this._startChallengeAckTimer();
     // Stay in 'challenging' state — wait for players to see the dice reveal
+  }
+
+  _checkChallengeAckComplete() {
+    if (this.state !== 'challenging') return;
+    const needAck = this.players.filter((p) => !this.eliminated.includes(p));
+    if (!needAck.every((p) => this.challengeAcknowledged.has(p))) return;
+    if (this._challengeTimer) { clearTimeout(this._challengeTimer); this._challengeTimer = null; }
+    this._advanceAfterChallenge();
+  }
+
+  _startChallengeAckTimer() {
+    if (this._challengeTimer) clearTimeout(this._challengeTimer);
+    this._challengeTimer = setTimeout(() => {
+      if (this.state !== 'challenging') return;
+      // Auto-ack all non-eliminated players
+      for (const p of this.players) {
+        if (!this.eliminated.includes(p)) this.challengeAcknowledged.add(p);
+      }
+      this._checkChallengeAckComplete();
+    }, 10000); // 10 second auto-advance
   }
 
   _advanceAfterChallenge() {

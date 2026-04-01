@@ -67,14 +67,28 @@ export class Blackjack extends BaseGame {
     } else if (this.state === 'reveal') {
       if (action.type === 'acknowledge') {
         this.acknowledged.add(playerId);
-        if (this.players.every((p) => this.acknowledged.has(p))) {
-          this._advanceAfterReveal();
-        }
+        this._checkRevealComplete();
       }
     } else if (this.state === 'finished') {
       // Ignore actions after game ends
       return;
     }
+  }
+
+  _checkRevealComplete() {
+    if (this.state !== 'reveal') return;
+    if (!this.players.every((p) => this.acknowledged.has(p))) return;
+    if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+    this._advanceAfterReveal();
+  }
+
+  _startRevealTimer() {
+    if (this._revealTimer) clearTimeout(this._revealTimer);
+    this._revealTimer = setTimeout(() => {
+      if (this.state !== 'reveal') return;
+      for (const p of this.players) this.acknowledged.add(p);
+      this._checkRevealComplete();
+    }, 10000);
   }
 
   advanceToNextPlayer() {
@@ -87,6 +101,7 @@ export class Blackjack extends BaseGame {
       this._recordHandResult();
       this.transition('resolve');
       this.acknowledged = new Set();
+      this._startRevealTimer();
     } else {
       let next = this.nextTurn();
       while (this.busted.includes(next) || this.stood.includes(next)) {

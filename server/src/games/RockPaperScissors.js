@@ -56,22 +56,37 @@ export class RockPaperScissors extends BaseGame {
         this.transition('reveal');
         this._resolveRound();
         this.acknowledged = new Set();
+        this._startRevealTimer();
       }
     } else if (this.state === 'reveal') {
       if (action.type === 'acknowledge') {
         this.acknowledged.add(playerId);
-        if (this.players.every((p) => this.acknowledged.has(p))) {
-          // Check if match is over
-          const [p1, p2] = this.players;
-          if (this.scores[p1] >= 3 || this.scores[p2] >= 3) {
-            this.transition('finish');
-          } else {
-            this.transition('next');
-            this._beginRound();
-          }
-        }
+        this._checkRevealComplete();
       }
     }
+  }
+
+  _checkRevealComplete() {
+    if (this.state !== 'reveal') return;
+    if (!this.players.every((p) => this.acknowledged.has(p))) return;
+    if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+    const [p1, p2] = this.players;
+    if (this.scores[p1] >= 3 || this.scores[p2] >= 3) {
+      this.transition('finish');
+    } else {
+      this.transition('next');
+      this._beginRound();
+    }
+  }
+
+  _startRevealTimer() {
+    if (this._revealTimer) clearTimeout(this._revealTimer);
+    this._revealTimer = setTimeout(() => {
+      if (this.state !== 'reveal') return;
+      // Auto-ack all players who haven't acknowledged
+      for (const p of this.players) this.acknowledged.add(p);
+      this._checkRevealComplete();
+    }, 10000); // 10 second auto-advance
   }
 
   _resolveRound() {
