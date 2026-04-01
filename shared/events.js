@@ -31,4 +31,6 @@ export const EVENTS = {
   GAME_ERROR: 'game:error',
   GAME_COMPLETE: 'game:complete',
   TURN_TIMER: 'game:turnTimer',
+  COIN_FLIP: 'tournament:coinFlip',
+  COIN_FLIP_RESULT: 'tournament:coinFlipResult',
 };

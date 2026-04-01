@@ -186,6 +186,28 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
+  socket.on(EVENTS.COIN_FLIP, ({ amount, choice }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+
+    const score = tm.scores[socket.id] ?? 0;
+    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    if (choice !== 'heads' && choice !== 'tails') return;
+
+    const result = Math.random() < 0.5 ? 'heads' : 'tails';
+    const won = result === choice;
+    tm.scores[socket.id] += won ? amount : -amount;
+
+    socket.emit(EVENTS.COIN_FLIP_RESULT, {
+      result,
+      won,
+      amount,
+      newScore: tm.scores[socket.id],
+    });
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+  });
+
   socket.on(EVENTS.WAGER_SUBMIT, (amount) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);

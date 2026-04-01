@@ -1,13 +1,26 @@
-.container {
+/* Outer layout: side-by-side on desktop, stacked on mobile */
+.outerLayout {
   min-height: 100vh;
   background-color: var(--felt-dark);
   background-image:
     radial-gradient(ellipse at top, var(--felt-green) 0%, var(--felt-dark) 60%);
   display: flex;
   flex-direction: column;
+  font-family: var(--font-body);
+}
+
+@media (min-width: 960px) {
+  .outerLayout {
+    flex-direction: row;
+  }
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   padding: 2rem 1.5rem;
-  font-family: var(--font-body);
 }
 
 .header {
@@ -204,4 +217,208 @@
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* ===================== Coin Flip Panel ===================== */
+
+.coinPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: var(--bg-panel, #2a1515);
+  border-top: 2px solid var(--gold-dim, #8a7230);
+}
+
+@media (min-width: 960px) {
+  .coinPanel {
+    width: 280px;
+    min-height: 100vh;
+    border-top: none;
+    border-left: 2px solid var(--gold-dim, #8a7230);
+    justify-content: center;
+  }
+}
+
+.coinTitle {
+  font-family: var(--font-heading, Georgia);
+  color: var(--gold, #d4a843);
+  font-size: 1.2rem;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(212, 168, 67, 0.3);
+}
+
+.coinSubtitle {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.8rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* 3D Coin */
+.coinScene {
+  perspective: 400px;
+  width: 90px;
+  height: 90px;
+  margin: 0.5rem 0;
+}
+
+.coin {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.1s;
+}
+
+.coinFace {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading, Georgia);
+  font-size: 2rem;
+  font-weight: 700;
+  backface-visibility: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.coinHeads {
+  background: radial-gradient(circle at 35% 35%, #f7d96e 0%, #d4a843 40%, #a07820 100%);
+  color: #5a3a0a;
+  border: 3px solid #b8922e;
+}
+
+.coinTails {
+  background: radial-gradient(circle at 35% 35%, #d0d0d0 0%, #a0a0a0 40%, #707070 100%);
+  color: #333;
+  border: 3px solid #888;
+  transform: rotateX(180deg);
+}
+
+.coinSpinning {
+  animation: coinFlipSpin 1.5s ease-out forwards;
+}
+
+.coinLandHeads {
+  transform: rotateX(0deg);
+  transition: transform 0.3s ease-out;
+}
+
+.coinLandTails {
+  transform: rotateX(180deg);
+  transition: transform 0.3s ease-out;
+}
+
+@keyframes coinFlipSpin {
+  0% { transform: rotateX(0deg); }
+  100% { transform: rotateX(1800deg); }
+}
+
+/* Result text */
+.coinWin {
+  color: var(--success, #5cb85c);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+  animation: resultPop 0.3s ease-out;
+}
+
+.coinLose {
+  color: var(--danger, #d9534f);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+  animation: resultPop 0.3s ease-out;
+}
+
+@keyframes resultPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Wager controls */
+.coinWagerRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.coinWagerLabel {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.85rem;
+}
+
+.coinWagerAmount {
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.coinSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  max-width: 200px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-dark, #1a0a0a);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--gold, #d4a843);
+}
+
+.coinSlider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.coinButtons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btnHeads, .btnTails {
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-heading, Georgia);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btnHeads {
+  background: linear-gradient(135deg, #f7d96e 0%, #d4a843 100%);
+  color: #5a3a0a;
+}
+
+.btnTails {
+  background: linear-gradient(135deg, #c0c0c0 0%, #888 100%);
+  color: #333;
+}
+
+.btnHeads:hover:not(:disabled), .btnTails:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnHeads:disabled, .btnTails:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.coinBroke {
+  color: var(--text-secondary, #b8a88a);
+  font-style: italic;
+  font-size: 0.85rem;
+  margin: 0;
 }

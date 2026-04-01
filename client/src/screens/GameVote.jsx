@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { displayName } from '../utils/displayName.js';
@@ -31,13 +31,111 @@ const GAME_PREVIEWS = {
   spotTheDifference: previewSpotDiff,
 };
 
+function CoinFlipPanel({ socket, myScore }) {
+  const [wager, setWager] = useState(10);
+  const [spinning, setSpinning] = useState(false);
+  const [result, setResult] = useState(null); // { result, won, amount }
+  const [animClass, setAnimClass] = useState('');
+
+  const maxWager = Math.floor((myScore || 0) * 0.5);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onResult(data) {
+      // Delay showing result until animation completes
+      setTimeout(() => {
+        setResult(data);
+        setAnimClass(data.result === 'heads' ? styles.coinLandHeads : styles.coinLandTails);
+        setSpinning(false);
+      }, 1500);
+    }
+    socket.on(EVENTS.COIN_FLIP_RESULT, onResult);
+    return () => socket.off(EVENTS.COIN_FLIP_RESULT, onResult);
+  }, [socket]);
+
+  // Clamp wager if score changed
+  useEffect(() => {
+    if (wager > maxWager) setWager(Math.max(1, maxWager));
+  }, [maxWager]);
+
+  function handleFlip(choice) {
+    if (spinning || maxWager <= 0) return;
+    setSpinning(true);
+    setResult(null);
+    setAnimClass(styles.coinSpinning);
+    socket.emit(EVENTS.COIN_FLIP, { amount: wager, choice });
+  }
+
+  const isBroke = maxWager <= 0;
+
+  return (
+    <div className={styles.coinPanel}>
+      <h3 className={styles.coinTitle}>Coin Flip</h3>
+      <p className={styles.coinSubtitle}>Gamble your points while you wait!</p>
+
+      {/* Coin */}
+      <div className={styles.coinScene}>
+        <div className={`${styles.coin} ${animClass}`}>
+          <div className={styles.coinFace + ' ' + styles.coinHeads}>H</div>
+          <div className={styles.coinFace + ' ' + styles.coinTails}>T</div>
+        </div>
+      </div>
+
+      {/* Result */}
+      {result && !spinning && (
+        <p className={result.won ? styles.coinWin : styles.coinLose}>
+          {result.won ? `+${result.amount}` : `-${result.amount}`} — {result.result}!
+        </p>
+      )}
+
+      {/* Wager slider */}
+      {!isBroke ? (
+        <>
+          <div className={styles.coinWagerRow}>
+            <span className={styles.coinWagerLabel}>Wager:</span>
+            <span className={styles.coinWagerAmount}>{wager}</span>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={maxWager}
+            value={wager}
+            onChange={(e) => setWager(Number(e.target.value))}
+            className={styles.coinSlider}
+            disabled={spinning}
+          />
+
+          {/* Heads / Tails buttons */}
+          <div className={styles.coinButtons}>
+            <button
+              className={styles.btnHeads}
+              onClick={() => handleFlip('heads')}
+              disabled={spinning || isBroke}
+            >
+              Heads
+            </button>
+            <button
+              className={styles.btnTails}
+              onClick={() => handleFlip('tails')}
+              disabled={spinning || isBroke}
+            >
+              Tails
+            </button>
+          </div>
+        </>
+      ) : (
+        <p className={styles.coinBroke}>No points to gamble!</p>
+      )}
+    </div>
+  );
+}
+
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
   const [voted, setVoted] = useState(false);
   const [voteCounts, setVoteCounts] = useState({});
 
   useEffect(() => {
-    // Reset vote state when eligible games change (new round)
     setVoted(false);
     setVoteCounts({});
   }, [eligibleGames]);
@@ -61,6 +159,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
   const winCondition = tournamentState?.winCondition;
   const winTarget = tournamentState?.winTarget;
   const standings = tournamentState?.standings || [];
+  const myScore = tournamentState?.scores?.[socket?.id] ?? 0;
 
   const roundLabel = winCondition === 'fixedRounds'
     ? `Round ${round} of ${winTarget}`
@@ -70,69 +169,72 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
     : null;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <img src={voteImg} alt="Vote for the Next Game" className={styles.titleImage} />
-        <p className={styles.subtitle}>{roundLabel}</p>
-        {targetLabel && <p className={styles.subtitle}>{targetLabel}</p>}
-      </div>
-
-      {/* Player standings */}
-      {standings.length > 0 && (
-        <div className={styles.standings}>
-          <p className={styles.standingsTitle}>Leaderboard</p>
-          {standings.map((entry, i) => (
-            <div key={entry.playerId} className={styles.standingRow}>
-              <span className={styles.standingRank}>
-                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
-              </span>
-              <span className={styles.standingName}>{displayName(entry.playerId, nicknames)}</span>
-              <span className={styles.standingScore}>{entry.score} pts</span>
-            </div>
-          ))}
+    <div className={styles.outerLayout}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <img src={voteImg} alt="Vote for the Next Game" className={styles.titleImage} />
+          <p className={styles.subtitle}>{roundLabel}</p>
+          {targetLabel && <p className={styles.subtitle}>{targetLabel}</p>}
         </div>
-      )}
 
-      <div className={styles.grid}>
-        {eligibleGames.map((game) => {
-          const count = voteCounts[game.id] ?? 0;
-          return (
-            <button
-              key={game.id}
-              className={`${styles.card} ${voted ? styles.cardDisabled : ''}`}
-              onClick={() => handleVote(game.id)}
-              disabled={voted}
-            >
-              {GAME_PREVIEWS[game.id] && (
-                <div className={styles.previewWrapper}>
-                  <img
-                    src={GAME_PREVIEWS[game.id]}
-                    alt={game.name}
-                    className={styles.previewImage}
-                  />
-                  <div className={styles.previewOverlay} />
-                </div>
-              )}
-              <div className={styles.cardContent}>
-                <h3 className={styles.gameName}>{game.name}</h3>
-                <p className={styles.gameDesc}>{game.description}</p>
-                <div className={styles.cardFooter}>
-                  <span className={styles.playerRange}>
-                    {game.minPlayers}–{game.maxPlayers} players
-                  </span>
-                  {count > 0 && (
-                    <span className={styles.voteCount}>{count} vote{count !== 1 ? 's' : ''}</span>
-                  )}
-                </div>
+        {standings.length > 0 && (
+          <div className={styles.standings}>
+            <p className={styles.standingsTitle}>Leaderboard</p>
+            {standings.map((entry, i) => (
+              <div key={entry.playerId} className={styles.standingRow}>
+                <span className={styles.standingRank}>
+                  {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                </span>
+                <span className={styles.standingName}>{displayName(entry.playerId, nicknames)}</span>
+                <span className={styles.standingScore}>{entry.score} pts</span>
               </div>
-            </button>
-          );
-        })}
+            ))}
+          </div>
+        )}
+
+        <div className={styles.grid}>
+          {eligibleGames.map((game) => {
+            const count = voteCounts[game.id] ?? 0;
+            return (
+              <button
+                key={game.id}
+                className={`${styles.card} ${voted ? styles.cardDisabled : ''}`}
+                onClick={() => handleVote(game.id)}
+                disabled={voted}
+              >
+                {GAME_PREVIEWS[game.id] && (
+                  <div className={styles.previewWrapper}>
+                    <img
+                      src={GAME_PREVIEWS[game.id]}
+                      alt={game.name}
+                      className={styles.previewImage}
+                    />
+                    <div className={styles.previewOverlay} />
+                  </div>
+                )}
+                <div className={styles.cardContent}>
+                  <h3 className={styles.gameName}>{game.name}</h3>
+                  <p className={styles.gameDesc}>{game.description}</p>
+                  <div className={styles.cardFooter}>
+                    <span className={styles.playerRange}>
+                      {game.minPlayers}–{game.maxPlayers} players
+                    </span>
+                    {count > 0 && (
+                      <span className={styles.voteCount}>{count} vote{count !== 1 ? 's' : ''}</span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {voted && (
+          <p className={styles.waiting}>Waiting for other players...</p>
+        )}
       </div>
 
-      {voted && (
-        <p className={styles.waiting}>Waiting for other players...</p>
-      )}
+      <CoinFlipPanel socket={socket} myScore={myScore} />
     </div>
   );
 }
