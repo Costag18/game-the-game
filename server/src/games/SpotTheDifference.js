@@ -4,6 +4,17 @@ const SHAPES = ['circle', 'square', 'triangle', 'diamond', 'star', 'hexagon', 'c
 const COLORS = ['#e53935', '#1e88e5', '#43a047', '#fdd835', '#8e24aa', '#fb8c00', '#00acc1', '#6d4c41'];
 const SIZES = ['small', 'medium', 'large'];
 const ROTATIONS = [0, 90, 180, 270];
+
+// Per-shape rotations that always look visibly different from each other.
+// Symmetric shapes are excluded entirely (handled separately).
+// For each shape, rotations are chosen so no two look identical.
+const VISIBLE_ROTATIONS = {
+  triangle:  [0, 90, 180, 270],  // 3-fold symmetry at 120/240, so 90 vs 0 is always visible
+  diamond:   [0, 45, 90, 135],   // 2-fold symmetry at 180, so avoid pairs that differ by 180
+  star:      [0, 36, 72, 144],   // 5-fold symmetry at 72-degree steps; use offsets that cross boundaries
+  hexagon:   [0, 30, 90, 150],   // 6-fold symmetry at 60-degree steps; use offsets that cross boundaries
+  heart:     [0, 90, 180, 270],  // no rotational symmetry, all look different
+};
 const GRID_SIZE = 36; // 6x6
 const TOTAL_ROUNDS = 3;
 const ROUND_TIMER_MS = 45000;
@@ -19,14 +30,19 @@ function randomFromExcluding(arr, exclude) {
   return filtered.length > 0 ? randomFrom(filtered) : randomFrom(arr);
 }
 
+function getRotationsForShape(shape) {
+  return VISIBLE_ROTATIONS[shape] || ROTATIONS;
+}
+
 function generateGrid() {
   const grid = [];
   for (let i = 0; i < GRID_SIZE; i++) {
+    const shape = randomFrom(SHAPES);
     grid.push({
-      shape: randomFrom(SHAPES),
+      shape,
       color: randomFrom(COLORS),
       size: randomFrom(SIZES),
-      rotation: randomFrom(ROTATIONS),
+      rotation: randomFrom(getRotationsForShape(shape)),
     });
   }
   return grid;
@@ -65,14 +81,15 @@ function injectDifferences(original, count) {
       case 0: // color swap
         cell.color = randomFromExcluding(COLORS, cell.color);
         break;
-      case 1: // shape swap
+      case 1: // shape swap (also reset rotation to valid value for new shape)
         cell.shape = randomFromExcluding(SHAPES, cell.shape);
+        cell.rotation = randomFrom(getRotationsForShape(cell.shape));
         break;
       case 2: // size change
         cell.size = randomFromExcluding(SIZES, cell.size);
         break;
-      case 3: // rotation change
-        cell.rotation = randomFromExcluding(ROTATIONS, cell.rotation);
+      case 3: // rotation change (uses shape-specific visible rotations)
+        cell.rotation = randomFromExcluding(getRotationsForShape(cell.shape), cell.rotation);
         break;
     }
 
