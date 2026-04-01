@@ -12,7 +12,7 @@
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .title {
@@ -28,41 +28,63 @@
   width: 100%;
   height: auto;
   margin-bottom: 0.25rem;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
 }
 
 .subtitle {
   color: var(--text-secondary);
   font-size: 0.95rem;
-  margin: 0;
+  margin: 0.25rem 0 0;
 }
 
+/* Leaderboard */
 .standings {
   display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.4rem;
   width: 100%;
-  max-width: 600px;
+  max-width: 420px;
+  background: var(--bg-panel, #2a1515);
+  border: 1px solid var(--gold-dim, #8a7230);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.standingsTitle {
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.25rem;
+  text-align: center;
 }
 
 .standingRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(212, 168, 67, 0.2);
-  border-radius: 8px;
-  padding: 0.4rem 0.9rem;
+  gap: 0.6rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.standingRow:first-of-type {
+  background: rgba(212, 168, 67, 0.08);
 }
 
 .standingRank {
   font-size: 1rem;
+  min-width: 1.5rem;
+  text-align: center;
 }
 
 .standingName {
   color: var(--text-primary, #f0e6d3);
   font-size: 0.9rem;
   font-weight: 600;
+  flex: 1;
 }
 
 .standingScore {

@@ -80,6 +80,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
       {/* Player standings */}
       {standings.length > 0 && (
         <div className={styles.standings}>
+          <p className={styles.standingsTitle}>Leaderboard</p>
           {standings.map((entry, i) => (
             <div key={entry.playerId} className={styles.standingRow}>
               <span className={styles.standingRank}>
