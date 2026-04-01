@@ -16,11 +16,6 @@ export const GAMES = {
     turnTimer: TIMERS.CARD_GAME, description: 'First to empty your hand wins.',
     tutorial: 'https://www.youtube.com/watch?v=sWoSZmHsCls',
   },
-  war: {
-    id: 'war', name: 'War', minPlayers: 2, maxPlayers: 2,
-    turnTimer: TIMERS.CARD_GAME, description: 'Flip and compare. Highest card takes both.',
-    tutorial: 'https://www.youtube.com/watch?v=03s-hH-DE7E',
-  },
   goFish: {
     id: 'goFish', name: 'Go Fish', minPlayers: 2, maxPlayers: 6,
     turnTimer: TIMERS.CARD_GAME, description: 'Collect the most sets of four.',

@@ -13,7 +13,7 @@ import TournamentEnd from './screens/TournamentEnd.jsx';
 import BlackjackGame from './games/Blackjack.jsx';
 import PokerGame from './games/Poker.jsx';
 import UnoGame from './games/Uno.jsx';
-import WarGame from './games/War.jsx';
+
 import GoFishGame from './games/GoFish.jsx';
 import CrazyEightsGame from './games/CrazyEights.jsx';
 import RpsGame from './games/RockPaperScissors.jsx';
@@ -28,7 +28,7 @@ const GAME_COMPONENTS = {
   blackjack: BlackjackGame,
   poker: PokerGame,
   uno: UnoGame,
-  war: WarGame,
+
   goFish: GoFishGame,
   crazyEights: CrazyEightsGame,
   rps: RpsGame,

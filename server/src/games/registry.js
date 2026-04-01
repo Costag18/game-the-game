@@ -1,7 +1,7 @@
 import { Blackjack } from './Blackjack.js';
 import { Poker } from './Poker.js';
 import { RockPaperScissors } from './RockPaperScissors.js';
-import { War } from './War.js';
+
 import { MemoryMatch } from './MemoryMatch.js';
 import { LiarsDice } from './LiarsDice.js';
 import { Uno } from './Uno.js';
@@ -32,7 +32,7 @@ export function getRegisteredGames() {
 
 registerGame('blackjack', Blackjack);
 registerGame('rps', RockPaperScissors);
-registerGame('war', War);
+
 registerGame('memoryMatch', MemoryMatch);
 registerGame('liarsDice', LiarsDice);
 registerGame('uno', Uno);
