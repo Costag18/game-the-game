@@ -54,9 +54,11 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
   const isFinished = phase === 'finished';
   const isChallenging = phase === 'challenging';
 
-  // Reset ack when we leave challenging phase
+  // Reset ack and bid selections when a new round starts
   if (phase !== 'challenging' && lastAckedPhase === 'challenging') {
     setAcked(false);
+    setBidQuantity(1);
+    setBidFaceValue(2);
   }
   if (phase !== lastAckedPhase) {
     setLastAckedPhase(phase);
