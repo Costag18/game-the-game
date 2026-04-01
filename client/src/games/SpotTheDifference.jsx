@@ -106,12 +106,21 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
   const [acked, setAcked] = useState(false);
   const flashTimer = useRef(null);
 
+  const [showContinue, setShowContinue] = useState(false);
+
   // Reset ack when phase changes
   const prevPhase = useRef(null);
   useEffect(() => {
     if (gameState?.phase !== prevPhase.current) {
       setAcked(false);
+      setShowContinue(false);
       prevPhase.current = gameState?.phase;
+
+      // Delay showing Continue button so players can see missed differences
+      if (gameState?.phase === 'roundEnd') {
+        const t = setTimeout(() => setShowContinue(true), 3000);
+        return () => clearTimeout(t);
+      }
     }
   }, [gameState?.phase]);
 
@@ -253,9 +262,13 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
             Found {foundCount} of {totalDifferences} differences
           </p>
           {!acked ? (
-            <button className={styles.btnContinue} onClick={handleAcknowledge}>
-              Continue
-            </button>
+            showContinue ? (
+              <button className={styles.btnContinue} onClick={handleAcknowledge}>
+                Continue
+              </button>
+            ) : (
+              <p className={styles.waitingSmall}>Reviewing missed differences...</p>
+            )
           ) : (
             <p className={styles.waitingSmall}>Waiting for others...</p>
           )}

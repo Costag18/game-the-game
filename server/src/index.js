@@ -197,6 +197,45 @@ io.on(EVENTS.CONNECTION, (socket) => {
       if (isGameRegistered(tm.selectedGame)) {
         const game = createGame(tm.selectedGame, lobby.players);
         tm.activeGame = game;
+
+        // Set up timer-driven state broadcast for games that need it
+        if (typeof game.setOnStateChange === 'function') {
+          game.setOnStateChange(() => {
+            const currentLobby = lobbyManager.getLobby(lobbyId);
+            if (!currentLobby) return;
+            const nicks = currentLobby.nicknames || {};
+            for (const pid of currentLobby.players) {
+              const ps = io.sockets.sockets.get(pid);
+              if (ps) {
+                ps.emit(EVENTS.GAME_STATE, {
+                  gameId: tm.selectedGame,
+                  state: game.getStateForPlayer(pid),
+                  nicknames: nicks,
+                });
+              }
+            }
+            // Check if game completed from timer
+            if (game.isComplete()) {
+              const results = game.getResults();
+              const placements = results.map((r) => r.playerId);
+              tm.activeGame = null;
+              const roundScores = tm.completeRound(placements, results);
+              io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
+              io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
+                placements,
+                scores: roundScores,
+                gameId: tm.selectedGame,
+                standings: tm.getStandings().map((s) => ({
+                  ...s,
+                  nickname: currentLobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+                })),
+                gameResults: results,
+              });
+              io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+            }
+          });
+        }
+
         game.startGame();
 
         // Check if game completed immediately (e.g., roulette all players broke)

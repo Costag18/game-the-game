@@ -101,6 +101,17 @@ export class SpotTheDifference extends BaseGame {
     this._ackTimer = null;
   }
 
+  /** Set a callback to be called when state changes from a timer (not from handleAction). */
+  setOnStateChange(callback) {
+    this._onStateChange = callback;
+  }
+
+  _emitChange() {
+    if (typeof this._onStateChange === 'function') {
+      this._onStateChange();
+    }
+  }
+
   startGame() {
     for (const p of this.players) {
       this.scores[p] = 0;
@@ -134,6 +145,7 @@ export class SpotTheDifference extends BaseGame {
     this._roundTimer = setTimeout(() => {
       if (this.state === 'playing') {
         this._endRound();
+        this._emitChange();
       }
     }, ROUND_TIMER_MS);
 
@@ -158,6 +170,7 @@ export class SpotTheDifference extends BaseGame {
       if (this.state === 'roundEnd') {
         for (const p of this.players) this.acknowledged.add(p);
         this._advanceAfterRoundEnd();
+        this._emitChange();
       }
     }, 10000);
   }
