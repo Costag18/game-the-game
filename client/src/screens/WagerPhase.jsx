@@ -45,6 +45,38 @@ function TutorialVideo({ embedUrl, watchUrl, gameName }) {
   );
 }
 
+const ORDINALS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'];
+
+function WagerTable({ wagerReturns, wager }) {
+  const example = wager || 100;
+  return (
+    <table className={styles.wagerTable}>
+      <thead>
+        <tr>
+          <th>Placement</th>
+          <th>Return</th>
+          <th>Example ({example} wager)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {wagerReturns.map((mult, i) => {
+          const net = Math.floor(example * mult) - example;
+          const cls = net > 0 ? styles.wagerProfit : net === 0 ? styles.wagerEven : styles.wagerLoss;
+          return (
+            <tr key={i}>
+              <td>{ORDINALS[i] || `#${i + 1}`}</td>
+              <td>{mult}x back</td>
+              <td className={cls}>
+                {net > 0 ? `+${net} profit` : net === 0 ? 'break even' : `${net} loss`}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
 export default function WagerPhase({ tournamentState, voteResult, onSubmitWager }) {
   const { socket } = useSocketContext();
   const [wagerLocked, setWagerLocked] = useState(false);
@@ -57,6 +89,7 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
 
   const gameId = voteResult?.selectedGame ?? voteResult?.gameId;
   const game = gameId ? GAMES[gameId] : null;
+  const wagerReturns = voteResult?.wagerReturns || [2.0, 1.5, 1.0, 0, 0, 0];
 
   // Convert YouTube watch URL to embed URL (nocookie for better compatibility)
   function getEmbedUrl(url) {
@@ -94,21 +127,7 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
         <Popdown title="How Wagering Works">
           <div className={styles.wagerInfo}>
             <p>Wager up to 50% of your current points each round. Your wager multiplies based on how you place — high risk, high reward!</p>
-            <table className={styles.wagerTable}>
-              <thead>
-                <tr>
-                  <th>Placement</th>
-                  <th>Wager Return</th>
-                  <th>Example (wager 100)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>1st</td><td>2x back</td><td className={styles.wagerProfit}>+100 profit</td></tr>
-                <tr><td>2nd</td><td>1.5x back</td><td className={styles.wagerProfit}>+50 profit</td></tr>
-                <tr><td>3rd</td><td>1x back</td><td className={styles.wagerEven}>break even</td></tr>
-                <tr><td>4th+</td><td>0x back</td><td className={styles.wagerLoss}>-100 loss</td></tr>
-              </tbody>
-            </table>
+            <WagerTable wagerReturns={wagerReturns} wager={wager || 100} />
             <p>You also earn base points for your placement regardless of wager.</p>
           </div>
         </Popdown>

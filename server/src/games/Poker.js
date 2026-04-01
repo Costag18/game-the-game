@@ -243,10 +243,24 @@ export class Poker extends BaseGame {
     this._postBlind(bbPlayer, BIG_BLIND);
     this.currentBet = BIG_BLIND;
 
-    // First to act preflop = player after big blind
-    const firstActIdx = (bbIdx + 1) % n;
-    this.setTurnPlayer(activePlayers[firstActIdx]);
+    // Mark all-in players (from blind posts) as already acted
     this.actedThisRound = new Set();
+    for (const p of activePlayers) {
+      if (this.chips[p] <= 0) {
+        this.actedThisRound.add(p);
+      }
+    }
+
+    // First to act preflop = first player with chips after big blind
+    let firstActIdx = (bbIdx + 1) % n;
+    for (let i = 0; i < n; i++) {
+      const idx = (firstActIdx + i) % n;
+      if (this.chips[activePlayers[idx]] > 0) {
+        firstActIdx = idx;
+        break;
+      }
+    }
+    this.setTurnPlayer(activePlayers[firstActIdx]);
   }
 
   _postBlind(playerId, amount) {
@@ -343,6 +357,20 @@ export class Poker extends BaseGame {
     if (active.length === 0) return;
     const cur = this.currentTurnPlayer;
     const curIdx = active.indexOf(cur);
+
+    // Find next player who can actually act (has chips and hasn't acted)
+    for (let i = 1; i <= active.length; i++) {
+      const nextIdx = (curIdx + i) % active.length;
+      const next = active[nextIdx];
+      if (this.chips[next] > 0 && !this.actedThisRound.has(next)) {
+        this.currentTurnPlayer = next;
+        this.turnIndex = this.players.indexOf(this.currentTurnPlayer);
+        return;
+      }
+    }
+
+    // Everyone has acted or is all-in — round is complete
+    // Fallback to next player anyway (isBettingRoundComplete will catch it)
     const nextIdx = (curIdx + 1) % active.length;
     this.currentTurnPlayer = active[nextIdx];
     this.turnIndex = this.players.indexOf(this.currentTurnPlayer);
@@ -388,16 +416,47 @@ export class Poker extends BaseGame {
     this.currentBet = 0;
     this.actedThisRound = new Set();
     this.lastRaiser = null;
-    // First to act post-flop: first non-folded player left of dealer
+
     const active = this._nonFoldedPlayers();
     if (active.length === 0) return;
+
+    // Mark all-in players (0 chips) as already acted — they can't do anything
+    for (const p of active) {
+      if (this.chips[p] <= 0) {
+        this.actedThisRound.add(p);
+      }
+    }
+
+    // If everyone is all-in or only one can act, skip straight to next stage
+    if (this._isBettingRoundComplete()) {
+      this._advanceStage();
+      return;
+    }
+
+    // First to act post-flop: first non-folded, non-all-in player left of dealer
+    const canAct = active.filter((p) => this.chips[p] > 0);
+    if (canAct.length === 0) {
+      this._advanceStage();
+      return;
+    }
+
     const n = active.length;
-    // Start from player after dealer
     const dealerPlayer = this.players[this.dealerIndex % this.players.length];
     let startIdx = (active.indexOf(dealerPlayer) + 1) % n;
     if (active.indexOf(dealerPlayer) === -1) startIdx = 0;
-    this.currentTurnPlayer = active[startIdx];
-    this.turnIndex = this.players.indexOf(this.currentTurnPlayer);
+
+    // Find the first player who can actually act
+    for (let i = 0; i < n; i++) {
+      const idx = (startIdx + i) % n;
+      if (this.chips[active[idx]] > 0) {
+        this.currentTurnPlayer = active[idx];
+        this.turnIndex = this.players.indexOf(this.currentTurnPlayer);
+        return;
+      }
+    }
+
+    // Fallback — everyone is all-in
+    this._advanceStage();
   }
 
   _resolveShowdown() {

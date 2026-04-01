@@ -11,12 +11,20 @@ export class Scorer {
   }
 
   /**
-   * Wager return by placement: wager * return multiplier.
-   * 1st = 2x back (net +1x), 2nd = 1.5x (net +0.5x), 3rd = 1x (break even), 4th+ = 0 (lose wager).
+   * Wager return by placement, scaled to player count.
+   * More players = higher rewards for top places, but break-even shifts to middle.
    */
-  static calculateWagerReturn(wager, placement) {
-    const index = Math.min(placement - 1, SCORING.WAGER_RETURN.length - 1);
-    return Math.floor(wager * SCORING.WAGER_RETURN[index]);
+  static calculateWagerReturn(wager, placement, playerCount) {
+    const clamped = Math.min(Math.max(playerCount, 2), 8);
+    const returns = SCORING.WAGER_RETURN_BY_PLAYERS[clamped] || SCORING.WAGER_RETURN_BY_PLAYERS[8];
+    const index = Math.min(placement - 1, returns.length - 1);
+    return Math.floor(wager * returns[index]);
+  }
+
+  /** Get the wager return table for a given player count (for client display). */
+  static getWagerReturnTable(playerCount) {
+    const clamped = Math.min(Math.max(playerCount, 2), 8);
+    return SCORING.WAGER_RETURN_BY_PLAYERS[clamped] || SCORING.WAGER_RETURN_BY_PLAYERS[8];
   }
 
   static validateWager(amount, currentPoints) {
@@ -50,7 +58,7 @@ export class Scorer {
       const placement = placementMap[playerId] || (i + 1);
       const base = Scorer.calculatePlacementPoints(placement, basePoints);
       const wagerCost = wagers[playerId] || 0;
-      const wagerReturn = Scorer.calculateWagerReturn(wagerCost, placement);
+      const wagerReturn = Scorer.calculateWagerReturn(wagerCost, placement, placements.length);
       const wagerNet = wagerReturn - wagerCost; // positive if profit, negative if loss
       scores[playerId] = { placement, base, wagerCost, wagerReturn, wagerNet, total: base + wagerNet };
     }

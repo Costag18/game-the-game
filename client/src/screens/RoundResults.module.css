@@ -32,6 +32,39 @@
   text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
 }
 
+/* Winner banner */
+.winnerBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, rgba(212, 168, 67, 0.15) 0%, rgba(212, 168, 67, 0.05) 100%);
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+}
+
+.winnerTrophy {
+  font-size: 1.8rem;
+}
+
+.winnerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.winnerName {
+  color: var(--gold);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.winnerDetail {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
@@ -53,8 +86,15 @@
   text-align: center;
 }
 
-.th:last-child {
+.thRight {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.5rem 0.75rem;
   text-align: right;
+  border-bottom: 1px solid var(--gold-dim);
+  font-weight: 600;
 }
 
 .row {
@@ -80,11 +120,17 @@
   padding: 0.65rem 0.75rem;
 }
 
-.handDesc {
+.detail {
   color: var(--gold);
   font-size: 0.8rem;
   font-style: italic;
   padding: 0.65rem 0.75rem;
+}
+
+.wagerDelta {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.7;
 }
 
 .score {

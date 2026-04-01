@@ -6,6 +6,7 @@ import path from 'path';
 import { EVENTS } from '../../shared/events.js';
 import { LobbyManager } from './lobby/LobbyManager.js';
 import { TournamentManager } from './tournament/TournamentManager.js';
+import { Scorer } from './tournament/Scorer.js';
 import { createGame, isGameRegistered } from './games/registry.js';
 import { getEligibleGames } from '../../shared/gameList.js';
 
@@ -167,7 +168,11 @@ io.on(EVENTS.CONNECTION, (socket) => {
     if (Object.keys(tm.votes).length >= lobby.players.length) {
       const selectedGame = tm.tallyVotes();
       tm.startWagerPhase();
-      io.to(lobbyId).emit(EVENTS.VOTE_RESULT, { selectedGame });
+      io.to(lobbyId).emit(EVENTS.VOTE_RESULT, {
+        selectedGame,
+        playerCount: lobby.players.length,
+        wagerReturns: Scorer.getWagerReturnTable(lobby.players.length),
+      });
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
     }
   });
