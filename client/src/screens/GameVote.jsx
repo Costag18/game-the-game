@@ -5,6 +5,30 @@ import { displayName } from '../utils/displayName.js';
 import styles from './GameVote.module.css';
 import voteImg from '../assets/images/votefornext.png';
 
+import previewBlackjack from '../assets/gamepreviews/Blackjack.png';
+import previewPoker from '../assets/gamepreviews/ad064bcefa40-no-limit-texas-holdem.png';
+import previewUno from '../assets/gamepreviews/uno3.jpg';
+import previewGoFish from '../assets/gamepreviews/gofish.jpeg';
+import previewCrazyEights from '../assets/gamepreviews/crazyeights800480.png';
+import previewRps from '../assets/gamepreviews/rock-paper-scissor-ft.png';
+import previewLiarsDice from '../assets/gamepreviews/LiarsDice_25CG_PSG25_09.png';
+import previewMemoryMatch from '../assets/gamepreviews/concentration-card-game-1.jpg';
+import previewRoulette from '../assets/gamepreviews/roulettet.jpg';
+import previewHangman from '../assets/gamepreviews/Hangman_web-1024x682.png';
+
+const GAME_PREVIEWS = {
+  blackjack: previewBlackjack,
+  poker: previewPoker,
+  uno: previewUno,
+  goFish: previewGoFish,
+  crazyEights: previewCrazyEights,
+  rps: previewRps,
+  liarsDice: previewLiarsDice,
+  memoryMatch: previewMemoryMatch,
+  roulette: previewRoulette,
+  hangman: previewHangman,
+};
+
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
   const [voted, setVoted] = useState(false);
@@ -76,15 +100,27 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
               onClick={() => handleVote(game.id)}
               disabled={voted}
             >
-              <h3 className={styles.gameName}>{game.name}</h3>
-              <p className={styles.gameDesc}>{game.description}</p>
-              <div className={styles.cardFooter}>
-                <span className={styles.playerRange}>
-                  {game.minPlayers}–{game.maxPlayers} players
-                </span>
-                {count > 0 && (
-                  <span className={styles.voteCount}>{count} vote{count !== 1 ? 's' : ''}</span>
-                )}
+              {GAME_PREVIEWS[game.id] && (
+                <div className={styles.previewWrapper}>
+                  <img
+                    src={GAME_PREVIEWS[game.id]}
+                    alt={game.name}
+                    className={styles.previewImage}
+                  />
+                  <div className={styles.previewOverlay} />
+                </div>
+              )}
+              <div className={styles.cardContent}>
+                <h3 className={styles.gameName}>{game.name}</h3>
+                <p className={styles.gameDesc}>{game.description}</p>
+                <div className={styles.cardFooter}>
+                  <span className={styles.playerRange}>
+                    {game.minPlayers}–{game.maxPlayers} players
+                  </span>
+                  {count > 0 && (
+                    <span className={styles.voteCount}>{count} vote{count !== 1 ? 's' : ''}</span>
+                  )}
+                </div>
               </div>
             </button>
           );
