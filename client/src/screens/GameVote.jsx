@@ -142,7 +142,6 @@ const SLOT_ICONS = {
 function SlotsPanel({ socket, myScore }) {
   const [wager, setWager] = useState(10);
   const [spinning, setSpinning] = useState(false);
-  const [reels, setReels] = useState(['cherry', 'lemon', 'bar']);
   const [result, setResult] = useState(null);
   const [displayReels, setDisplayReels] = useState(['cherry', 'lemon', 'bar']);
 
@@ -151,19 +150,18 @@ function SlotsPanel({ socket, myScore }) {
   useEffect(() => {
     if (!socket) return;
     function onResult(data) {
-      // Stop reels one by one with delays
-      setTimeout(() => setDisplayReels([data.reels[0], displayReels[1], displayReels[2]]), 800);
-      setTimeout(() => setDisplayReels([data.reels[0], data.reels[1], displayReels[2]]), 1200);
+      // Stop reels one by one with staggered delays
+      setTimeout(() => setDisplayReels((prev) => [data.reels[0], prev[1], prev[2]]), 800);
+      setTimeout(() => setDisplayReels((prev) => [prev[0], data.reels[1], prev[2]]), 1200);
       setTimeout(() => {
         setDisplayReels(data.reels);
-        setReels(data.reels);
         setResult(data);
         setSpinning(false);
       }, 1600);
     }
     socket.on(EVENTS.SLOTS_RESULT, onResult);
     return () => socket.off(EVENTS.SLOTS_RESULT, onResult);
-  }, [socket, displayReels]);
+  }, [socket]);
 
   useEffect(() => {
     if (wager > maxWager) setWager(Math.max(1, maxWager));
