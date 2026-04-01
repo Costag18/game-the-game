@@ -10,6 +10,15 @@ import { Scorer } from './tournament/Scorer.js';
 import { createGame, isGameRegistered } from './games/registry.js';
 import { getEligibleGames } from '../../shared/gameList.js';
 
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -148,7 +157,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     tournaments.set(lobbyId, tm);
 
     tm.startNextRound();
-    const eligible = getEligibleGames(lobby.players.length);
+    const eligible = shuffle(getEligibleGames(lobby.players.length));
     io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
     io.to(lobbyId).emit(EVENTS.ROUND_START, {
       round: tm.currentRound,
