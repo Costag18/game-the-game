@@ -158,7 +158,7 @@ function compareHands(a, b) {
 const STARTING_CHIPS = 1000;
 const SMALL_BLIND = 10;
 const BIG_BLIND = 20;
-const HANDS_PER_GAME = 3;
+const HANDS_PER_GAME = 5;
 
 const FSM = {
   initialState: 'waiting',
