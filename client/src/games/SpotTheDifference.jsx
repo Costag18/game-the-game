@@ -61,23 +61,25 @@ function ShapeIcon({ shape, color, size, rotation }) {
   );
 }
 
-function GridCell({ cell, index, onClick, found, foundByMe, wrongFlash }) {
+function GridCell({ cell, index, onClick, found, foundByMe, missed, wrongFlash }) {
   const cls = [
     styles.cell,
     found ? styles.cellFound : '',
     foundByMe ? styles.cellFoundByMe : '',
+    missed ? styles.cellMissed : '',
     wrongFlash ? styles.cellWrong : '',
   ].filter(Boolean).join(' ');
 
   return (
-    <button className={cls} onClick={() => onClick(index)} disabled={found}>
+    <button className={cls} onClick={() => onClick(index)} disabled={found || missed}>
       <ShapeIcon shape={cell.shape} color={cell.color} size={cell.size} rotation={cell.rotation} />
       {found && <span className={styles.checkmark}>&#10003;</span>}
+      {missed && <span className={styles.missedMark}>!</span>}
     </button>
   );
 }
 
-function PuzzleGrid({ label, grid, onCellClick, foundSet, foundByMeSet, wrongFlashIdx }) {
+function PuzzleGrid({ label, grid, onCellClick, foundSet, foundByMeSet, missedSet, wrongFlashIdx }) {
   return (
     <div className={styles.gridWrapper}>
       <h3 className={styles.gridLabel}>{label}</h3>
@@ -90,6 +92,7 @@ function PuzzleGrid({ label, grid, onCellClick, foundSet, foundByMeSet, wrongFla
             onClick={onCellClick}
             found={foundSet.has(i)}
             foundByMe={foundByMeSet.has(i)}
+            missed={missedSet.has(i)}
             wrongFlash={wrongFlashIdx === i}
           />
         ))}
@@ -135,6 +138,7 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
     roundEndTime,
     roundDurationSec,
     otherPlayers,
+    missedDifferences,
   } = gameState;
 
   const isFinished = phase === 'finished';
@@ -154,12 +158,12 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
     return () => clearInterval(interval);
   }, [isPlaying, roundEndTime]);
 
-  // Build found sets
+  // Build found/missed sets
   const foundSet = new Set(foundDifferences.map((d) => d.index));
-  const myId = null; // we detect "foundByMe" by checking foundBy vs otherPlayers
   const foundByMeSet = new Set(
     foundDifferences.filter((d) => !otherPlayers.some((p) => p.playerId === d.foundBy)).map((d) => d.index)
   );
+  const missedSet = new Set(missedDifferences || []);
 
   function handleCellClick(index) {
     if (!isPlaying) return;
@@ -213,6 +217,7 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
             onCellClick={handleCellClick}
             foundSet={foundSet}
             foundByMeSet={foundByMeSet}
+            missedSet={missedSet}
             wrongFlashIdx={wrongFlash}
           />
           <PuzzleGrid
@@ -221,6 +226,7 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
             onCellClick={handleCellClick}
             foundSet={foundSet}
             foundByMeSet={foundByMeSet}
+            missedSet={missedSet}
             wrongFlashIdx={wrongFlash}
           />
         </div>

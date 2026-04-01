@@ -256,6 +256,10 @@ export class SpotTheDifference extends BaseGame {
         found: Array.from(this.foundDifferences.values()).filter((d) => d.foundBy === p).length,
       })),
       roundHistory: this.roundHistory,
+      // Reveal missed differences when round ends or game is finished
+      missedDifferences: (this.state === 'roundEnd' || this.state === 'finished')
+        ? [...this.differenceIndices].filter((idx) => !this.foundDifferences.has(idx))
+        : [],
     };
   }
 

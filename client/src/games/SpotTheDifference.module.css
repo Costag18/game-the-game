@@ -157,6 +157,21 @@
   box-shadow: 0 0 6px rgba(76, 175, 80, 0.4);
 }
 
+.cellMissed {
+  border-color: #fdd835;
+  background: rgba(253, 216, 53, 0.2);
+  box-shadow: 0 0 6px rgba(253, 216, 53, 0.4);
+}
+
+.missedMark {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  color: #fdd835;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
 .cellWrong {
   animation: wrongFlash 0.5s ease;
 }
