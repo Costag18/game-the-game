@@ -269,13 +269,14 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     // Simulate ball bouncing through 8 rows of pegs (left/right each row)
     const path = [];
-    let position = 4; // start center (0-8 slots = 9 slots)
+    let offset = 0; // tracks how far right from center
     for (let row = 0; row < 8; row++) {
       const goRight = Math.random() < 0.5;
-      position += goRight ? 1 : 0;
+      offset += goRight ? 1 : -1;
       path.push(goRight ? 'R' : 'L');
     }
-    // position is now 0-8 (9 slots)
+    // offset ranges from -8 to +8, map to slot 0-8
+    const position = Math.min(8, Math.max(0, Math.round((offset + 8) / 2)));
     const PLINKO_MULTIPLIERS = [5, 2, 1.5, 1, 0.3, 1, 1.5, 2, 5];
     const multiplier = PLINKO_MULTIPLIERS[position];
     const payout = Math.floor(amount * multiplier);

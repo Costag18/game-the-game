@@ -274,7 +274,7 @@ function PlinkoPanel({ socket, myScore }) {
         ))}
       </div>
       {dropping && <div className={styles.plinkoBall} />}
-      {result && !dropping && (
+      {result && !dropping && result.net != null && (
         <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>
           {result.net >= 0 ? `+${result.net}` : result.net} ({result.multiplier}x)
         </p>
@@ -361,13 +361,16 @@ function WheelPanel({ socket, myScore }) {
             );
           })}
           {WHEEL_SEGMENTS.map((m, i) => {
-            const midAngle = ((i + 0.5) * segAngle * Math.PI) / 180;
-            const tx = 100 + 65 * Math.cos(midAngle);
-            const ty = 100 + 65 * Math.sin(midAngle);
+            const midDeg = (i + 0.5) * segAngle;
+            const midRad = (midDeg * Math.PI) / 180;
+            const tx = 100 + 60 * Math.cos(midRad);
+            const ty = 100 + 60 * Math.sin(midRad);
+            // Rotate text to face outward, flip if on left half so it's readable
+            const textAngle = midDeg > 90 && midDeg < 270 ? midDeg + 180 : midDeg;
             return (
               <text key={`t${i}`} x={tx} y={ty} textAnchor="middle" dominantBaseline="middle"
-                fill="#fff" fontSize="8" fontWeight="700"
-                transform={`rotate(${(i + 0.5) * segAngle}, ${tx}, ${ty})`}>
+                fill="#fff" fontSize="9" fontWeight="700"
+                transform={`rotate(${textAngle}, ${tx}, ${ty})`}>
                 {m}x
               </text>
             );
@@ -463,7 +466,17 @@ function BJLitePanel({ socket, myScore }) {
               <p className={gameState.net >= 0 ? styles.slotsWin : (gameState.net < 0 ? styles.slotsLose : styles.coinWagerLabel)}>
                 {gameState.result === 'push' ? 'Push' : gameState.result === 'win' ? `+${gameState.net} Win!` : `${gameState.net} ${gameState.result === 'bust' ? 'Bust!' : 'Lose'}`}
               </p>
-              <button className={styles.btnSpin} onClick={handleDeal}>Deal Again</button>
+              {maxWager > 0 && (
+                <>
+                  <div className={styles.coinWagerRow}>
+                    <span className={styles.coinWagerLabel}>Bet:</span>
+                    <span className={styles.coinWagerAmount}>{wager}</span>
+                  </div>
+                  <input type="range" min={1} max={maxWager} value={wager}
+                    onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
+                </>
+              )}
+              <button className={styles.btnSpin} onClick={handleDeal} disabled={maxWager <= 0}>Deal Again</button>
             </>
           )}
         </div>
