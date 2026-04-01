@@ -35,4 +35,11 @@ export const EVENTS = {
   COIN_FLIP_RESULT: 'tournament:coinFlipResult',
   SLOTS_SPIN: 'tournament:slotsSpin',
   SLOTS_RESULT: 'tournament:slotsResult',
+  PLINKO_DROP: 'tournament:plinkoDrop',
+  PLINKO_RESULT: 'tournament:plinkoResult',
+  WHEEL_SPIN: 'tournament:wheelSpin',
+  WHEEL_RESULT: 'tournament:wheelResult',
+  BJ_LITE_START: 'tournament:bjLiteStart',
+  BJ_LITE_ACTION: 'tournament:bjLiteAction',
+  BJ_LITE_RESULT: 'tournament:bjLiteResult',
 };

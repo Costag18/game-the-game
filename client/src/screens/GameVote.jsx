@@ -227,6 +227,263 @@ function SlotsPanel({ socket, myScore }) {
   );
 }
 
+// --- Plinko ---
+const PLINKO_MULTIPLIERS = [5, 2, 1.5, 1, 0.3, 1, 1.5, 2, 5];
+
+function PlinkoPanel({ socket, myScore }) {
+  const [wager, setWager] = useState(10);
+  const [dropping, setDropping] = useState(false);
+  const [result, setResult] = useState(null);
+  const [ballSlot, setBallSlot] = useState(null);
+
+  const maxWager = Math.floor((myScore || 0) * 0.5);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onResult(data) {
+      setTimeout(() => {
+        setBallSlot(data.slot);
+        setResult(data);
+        setDropping(false);
+      }, 1500);
+    }
+    socket.on(EVENTS.PLINKO_RESULT, onResult);
+    return () => socket.off(EVENTS.PLINKO_RESULT, onResult);
+  }, [socket]);
+
+  useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
+
+  function handleDrop() {
+    if (dropping || maxWager <= 0) return;
+    setDropping(true);
+    setResult(null);
+    setBallSlot(null);
+    socket.emit(EVENTS.PLINKO_DROP, { amount: wager });
+  }
+
+  const isBroke = maxWager <= 0;
+
+  return (
+    <div className={styles.miniGame}>
+      <h3 className={styles.miniTitle}>Plinko</h3>
+      <div className={styles.plinkoBoard}>
+        {PLINKO_MULTIPLIERS.map((m, i) => (
+          <div key={i} className={`${styles.plinkoSlot} ${ballSlot === i ? styles.plinkoSlotActive : ''}`}>
+            <span className={styles.plinkoMult}>{m}x</span>
+          </div>
+        ))}
+      </div>
+      {dropping && <div className={styles.plinkoBall} />}
+      {result && !dropping && (
+        <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>
+          {result.net >= 0 ? `+${result.net}` : result.net} ({result.multiplier}x)
+        </p>
+      )}
+      {!isBroke ? (
+        <>
+          <div className={styles.coinWagerRow}>
+            <span className={styles.coinWagerLabel}>Bet:</span>
+            <span className={styles.coinWagerAmount}>{wager}</span>
+          </div>
+          <input type="range" min={1} max={maxWager} value={wager}
+            onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} disabled={dropping} />
+          <button className={styles.btnSpin} onClick={handleDrop} disabled={dropping || isBroke}>
+            {dropping ? 'Dropping...' : 'DROP'}
+          </button>
+        </>
+      ) : <p className={styles.coinBroke}>No points to gamble!</p>}
+    </div>
+  );
+}
+
+// --- Wheel of Fortune ---
+const WHEEL_SEGMENTS = [0, 0.5, 1, 0.5, 2, 0.5, 1, 0.5, 3, 0.5, 1, 0.5, 5, 0.5, 1, 0.5, 10, 0.5, 1, 0.5];
+const WHEEL_COLORS = WHEEL_SEGMENTS.map((m) =>
+  m >= 10 ? '#e53935' : m >= 5 ? '#8e24aa' : m >= 3 ? '#1e88e5' : m >= 2 ? '#43a047' : m >= 1 ? '#d4a843' : '#555'
+);
+
+function WheelPanel({ socket, myScore }) {
+  const [wager, setWager] = useState(10);
+  const [spinning, setSpinning] = useState(false);
+  const [result, setResult] = useState(null);
+  const [rotation, setRotation] = useState(0);
+
+  const maxWager = Math.floor((myScore || 0) * 0.5);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onResult(data) {
+      const segAngle = 360 / data.totalSegments;
+      const targetAngle = 360 - (data.segmentIndex * segAngle + segAngle / 2);
+      const spins = 5 * 360;
+      setRotation((prev) => prev + spins + targetAngle - (prev % 360));
+      setTimeout(() => {
+        setResult(data);
+        setSpinning(false);
+      }, 3000);
+    }
+    socket.on(EVENTS.WHEEL_RESULT, onResult);
+    return () => socket.off(EVENTS.WHEEL_RESULT, onResult);
+  }, [socket]);
+
+  useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
+
+  function handleSpin() {
+    if (spinning || maxWager <= 0) return;
+    setSpinning(true);
+    setResult(null);
+    socket.emit(EVENTS.WHEEL_SPIN, { amount: wager });
+  }
+
+  const isBroke = maxWager <= 0;
+  const segCount = WHEEL_SEGMENTS.length;
+  const segAngle = 360 / segCount;
+
+  return (
+    <div className={styles.miniGame}>
+      <h3 className={styles.miniTitle}>Wheel of Fortune</h3>
+      <div className={styles.wheelScene}>
+        <div className={styles.wheelPointer}>&#9660;</div>
+        <svg className={styles.wheelSvg} viewBox="0 0 200 200"
+          style={{ transform: `rotate(${rotation}deg)`, transition: spinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none' }}>
+          {WHEEL_SEGMENTS.map((m, i) => {
+            const startAngle = (i * segAngle * Math.PI) / 180;
+            const endAngle = ((i + 1) * segAngle * Math.PI) / 180;
+            const x1 = 100 + 95 * Math.cos(startAngle);
+            const y1 = 100 + 95 * Math.sin(startAngle);
+            const x2 = 100 + 95 * Math.cos(endAngle);
+            const y2 = 100 + 95 * Math.sin(endAngle);
+            const largeArc = segAngle > 180 ? 1 : 0;
+            return (
+              <path key={i}
+                d={`M100,100 L${x1},${y1} A95,95 0 ${largeArc},1 ${x2},${y2} Z`}
+                fill={WHEEL_COLORS[i]} stroke="#222" strokeWidth="0.5" />
+            );
+          })}
+          {WHEEL_SEGMENTS.map((m, i) => {
+            const midAngle = ((i + 0.5) * segAngle * Math.PI) / 180;
+            const tx = 100 + 65 * Math.cos(midAngle);
+            const ty = 100 + 65 * Math.sin(midAngle);
+            return (
+              <text key={`t${i}`} x={tx} y={ty} textAnchor="middle" dominantBaseline="middle"
+                fill="#fff" fontSize="8" fontWeight="700"
+                transform={`rotate(${(i + 0.5) * segAngle}, ${tx}, ${ty})`}>
+                {m}x
+              </text>
+            );
+          })}
+        </svg>
+      </div>
+      {result && !spinning && (
+        <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>
+          {result.net >= 0 ? `+${result.net}` : result.net} ({result.multiplier}x)
+        </p>
+      )}
+      {!isBroke ? (
+        <>
+          <div className={styles.coinWagerRow}>
+            <span className={styles.coinWagerLabel}>Bet:</span>
+            <span className={styles.coinWagerAmount}>{wager}</span>
+          </div>
+          <input type="range" min={1} max={maxWager} value={wager}
+            onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} disabled={spinning} />
+          <button className={styles.btnSpin} onClick={handleSpin} disabled={spinning || isBroke}>
+            {spinning ? 'Spinning...' : 'SPIN'}
+          </button>
+        </>
+      ) : <p className={styles.coinBroke}>No points to gamble!</p>}
+    </div>
+  );
+}
+
+// --- Blackjack Lite ---
+function BJLitePanel({ socket, myScore }) {
+  const [wager, setWager] = useState(10);
+  const [gameState, setGameState] = useState(null); // null = not started
+
+  const maxWager = Math.floor((myScore || 0) * 0.5);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onResult(data) {
+      setGameState(data);
+    }
+    socket.on(EVENTS.BJ_LITE_RESULT, onResult);
+    return () => socket.off(EVENTS.BJ_LITE_RESULT, onResult);
+  }, [socket]);
+
+  useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
+
+  function handleDeal() {
+    if (maxWager <= 0) return;
+    setGameState(null);
+    socket.emit(EVENTS.BJ_LITE_START, { amount: wager });
+  }
+
+  function handleAction(action) {
+    socket.emit(EVENTS.BJ_LITE_ACTION, { action });
+  }
+
+  const isBroke = maxWager <= 0;
+  const isPlaying = gameState?.phase === 'playing';
+  const isFinished = gameState?.phase === 'finished';
+
+  return (
+    <div className={styles.miniGame}>
+      <h3 className={styles.miniTitle}>Blackjack</h3>
+
+      {gameState ? (
+        <div className={styles.bjArea}>
+          <div className={styles.bjHand}>
+            <span className={styles.bjLabel}>Dealer</span>
+            <div className={styles.bjCards}>
+              {isPlaying ? (
+                <><span className={styles.bjCard}>{gameState.dealerShowing}</span><span className={styles.bjCard + ' ' + styles.bjCardHidden}>?</span></>
+              ) : (
+                gameState.dealerCards?.map((c, i) => <span key={i} className={styles.bjCard}>{c}</span>)
+              )}
+            </div>
+            {isFinished && <span className={styles.bjTotal}>{gameState.dealerTotal}</span>}
+          </div>
+          <div className={styles.bjHand}>
+            <span className={styles.bjLabel}>You</span>
+            <div className={styles.bjCards}>
+              {gameState.playerCards?.map((c, i) => <span key={i} className={styles.bjCard}>{c}</span>)}
+            </div>
+            <span className={styles.bjTotal}>{gameState.playerTotal}</span>
+          </div>
+          {isPlaying && (
+            <div className={styles.bjActions}>
+              <button className={styles.btnHeads} onClick={() => handleAction('hit')}>Hit</button>
+              <button className={styles.btnTails} onClick={() => handleAction('stand')}>Stand</button>
+            </div>
+          )}
+          {isFinished && (
+            <>
+              <p className={gameState.net >= 0 ? styles.slotsWin : (gameState.net < 0 ? styles.slotsLose : styles.coinWagerLabel)}>
+                {gameState.result === 'push' ? 'Push' : gameState.result === 'win' ? `+${gameState.net} Win!` : `${gameState.net} ${gameState.result === 'bust' ? 'Bust!' : 'Lose'}`}
+              </p>
+              <button className={styles.btnSpin} onClick={handleDeal}>Deal Again</button>
+            </>
+          )}
+        </div>
+      ) : (
+        !isBroke ? (
+          <>
+            <div className={styles.coinWagerRow}>
+              <span className={styles.coinWagerLabel}>Bet:</span>
+              <span className={styles.coinWagerAmount}>{wager}</span>
+            </div>
+            <input type="range" min={1} max={maxWager} value={wager}
+              onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
+            <button className={styles.btnSpin} onClick={handleDeal}>DEAL</button>
+          </>
+        ) : <p className={styles.coinBroke}>No points to gamble!</p>
+      )}
+    </div>
+  );
+}
+
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
   const [voted, setVoted] = useState(false);
@@ -334,6 +591,9 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
       <div className={styles.sidebarArea}>
         <CoinFlipPanel socket={socket} myScore={myScore} />
         <SlotsPanel socket={socket} myScore={myScore} />
+        <PlinkoPanel socket={socket} myScore={myScore} />
+        <WheelPanel socket={socket} myScore={myScore} />
+        <BJLitePanel socket={socket} myScore={myScore} />
       </div>
     </div>
   );

@@ -258,6 +258,185 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
+  // --- Plinko ---
+  socket.on(EVENTS.PLINKO_DROP, ({ amount }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+    const score = tm.scores[socket.id] ?? 0;
+    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    const lobby = lobbyManager.getLobby(lobbyId);
+
+    // Simulate ball bouncing through 8 rows of pegs (left/right each row)
+    const path = [];
+    let position = 4; // start center (0-8 slots = 9 slots)
+    for (let row = 0; row < 8; row++) {
+      const goRight = Math.random() < 0.5;
+      position += goRight ? 1 : 0;
+      path.push(goRight ? 'R' : 'L');
+    }
+    // position is now 0-8 (9 slots)
+    const PLINKO_MULTIPLIERS = [5, 2, 1.5, 1, 0.3, 1, 1.5, 2, 5];
+    const multiplier = PLINKO_MULTIPLIERS[position];
+    const payout = Math.floor(amount * multiplier);
+    tm.scores[socket.id] += payout - amount;
+
+    socket.emit(EVENTS.PLINKO_RESULT, {
+      path, slot: position, multiplier, wager: amount, payout,
+      net: payout - amount, newScore: tm.scores[socket.id],
+    });
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+    if (tm.isTournamentOver()) {
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+      tournaments.delete(lobbyId);
+      lobbyManager.setStatus(lobbyId, 'waiting');
+    }
+  });
+
+  // --- Wheel of Fortune ---
+  socket.on(EVENTS.WHEEL_SPIN, ({ amount }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+    const score = tm.scores[socket.id] ?? 0;
+    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    const lobby = lobbyManager.getLobby(lobbyId);
+
+    const WHEEL_SEGMENTS = [0, 0.5, 1, 0.5, 2, 0.5, 1, 0.5, 3, 0.5, 1, 0.5, 5, 0.5, 1, 0.5, 10, 0.5, 1, 0.5];
+    const segmentIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length);
+    const multiplier = WHEEL_SEGMENTS[segmentIndex];
+    const payout = Math.floor(amount * multiplier);
+    tm.scores[socket.id] += payout - amount;
+
+    socket.emit(EVENTS.WHEEL_RESULT, {
+      segmentIndex, multiplier, totalSegments: WHEEL_SEGMENTS.length,
+      segments: WHEEL_SEGMENTS, wager: amount, payout,
+      net: payout - amount, newScore: tm.scores[socket.id],
+    });
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+    if (tm.isTournamentOver()) {
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+      tournaments.delete(lobbyId);
+      lobbyManager.setStatus(lobbyId, 'waiting');
+    }
+  });
+
+  // --- Blackjack Lite ---
+  socket.on(EVENTS.BJ_LITE_START, ({ amount }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+    const score = tm.scores[socket.id] ?? 0;
+    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+
+    // Deal cards (simple deck: 1-13, suit doesn't matter for BJ)
+    function drawCard() { return Math.floor(Math.random() * 13) + 1; }
+    function cardValue(c) { if (c === 1) return 11; if (c >= 10) return 10; return c; }
+    function handTotal(cards) {
+      let total = cards.reduce((s, c) => s + cardValue(c), 0);
+      let aces = cards.filter((c) => c === 1).length;
+      while (total > 21 && aces > 0) { total -= 10; aces--; }
+      return total;
+    }
+    function cardName(c) {
+      const names = {1:'A',2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K'};
+      return names[c] || String(c);
+    }
+
+    const playerCards = [drawCard(), drawCard()];
+    const dealerCards = [drawCard(), drawCard()];
+
+    // Store the hand in a temporary map on the tournament
+    if (!tm._bjLiteHands) tm._bjLiteHands = {};
+    tm._bjLiteHands[socket.id] = {
+      playerCards, dealerCards, wager: amount, drawCard, handTotal, cardName, finished: false,
+    };
+
+    socket.emit(EVENTS.BJ_LITE_RESULT, {
+      phase: 'playing',
+      playerCards: playerCards.map(cardName),
+      playerTotal: handTotal(playerCards),
+      dealerShowing: cardName(dealerCards[0]),
+      wager: amount,
+    });
+  });
+
+  socket.on(EVENTS.BJ_LITE_ACTION, ({ action }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+    if (!tm._bjLiteHands?.[socket.id]) return;
+    const lobby = lobbyManager.getLobby(lobbyId);
+
+    const hand = tm._bjLiteHands[socket.id];
+    if (hand.finished) return;
+    const { playerCards, dealerCards, wager, drawCard, handTotal, cardName } = hand;
+
+    if (action === 'hit') {
+      playerCards.push(drawCard());
+      if (handTotal(playerCards) > 21) {
+        // Bust
+        hand.finished = true;
+        tm.scores[socket.id] -= wager;
+        socket.emit(EVENTS.BJ_LITE_RESULT, {
+          phase: 'finished',
+          playerCards: playerCards.map(cardName),
+          playerTotal: handTotal(playerCards),
+          dealerCards: dealerCards.map(cardName),
+          dealerTotal: handTotal(dealerCards),
+          result: 'bust', net: -wager, newScore: tm.scores[socket.id],
+        });
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+        delete tm._bjLiteHands[socket.id];
+        if (tm.isTournamentOver()) {
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+          tournaments.delete(lobbyId);
+          lobbyManager.setStatus(lobbyId, 'waiting');
+        }
+        return;
+      }
+      socket.emit(EVENTS.BJ_LITE_RESULT, {
+        phase: 'playing',
+        playerCards: playerCards.map(cardName),
+        playerTotal: handTotal(playerCards),
+        dealerShowing: cardName(dealerCards[0]),
+        wager,
+      });
+    } else if (action === 'stand') {
+      // Dealer plays
+      while (handTotal(dealerCards) < 17) dealerCards.push(drawCard());
+      const pTotal = handTotal(playerCards);
+      const dTotal = handTotal(dealerCards);
+      hand.finished = true;
+
+      let result, net;
+      if (dTotal > 21 || pTotal > dTotal) {
+        result = 'win'; net = wager;
+      } else if (pTotal === dTotal) {
+        result = 'push'; net = 0;
+      } else {
+        result = 'lose'; net = -wager;
+      }
+      tm.scores[socket.id] += net;
+
+      socket.emit(EVENTS.BJ_LITE_RESULT, {
+        phase: 'finished',
+        playerCards: playerCards.map(cardName),
+        playerTotal: pTotal,
+        dealerCards: dealerCards.map(cardName),
+        dealerTotal: dTotal,
+        result, net, newScore: tm.scores[socket.id],
+      });
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      delete tm._bjLiteHands[socket.id];
+      if (tm.isTournamentOver()) {
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+        tournaments.delete(lobbyId);
+        lobbyManager.setStatus(lobbyId, 'waiting');
+      }
+    }
+  });
+
   socket.on(EVENTS.WAGER_SUBMIT, (amount) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);

@@ -537,3 +537,166 @@
   margin: 0;
   opacity: 0.7;
 }
+
+/* ===================== Shared Mini Game Panel ===================== */
+
+.miniGame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.25rem;
+  background: var(--bg-panel, #2a1515);
+  border-top: 1px solid var(--gold-dim, #8a7230);
+}
+
+.miniTitle {
+  font-family: var(--font-heading, Georgia);
+  color: var(--gold, #d4a843);
+  font-size: 1.1rem;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(212, 168, 67, 0.3);
+}
+
+/* ===================== Plinko ===================== */
+
+.plinkoBoard {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: #111;
+  border: 2px solid var(--gold-dim, #8a7230);
+  border-radius: 0 0 8px 8px;
+  border-top: none;
+}
+
+.plinkoSlot {
+  width: 24px;
+  height: 32px;
+  background: #222;
+  border-radius: 0 0 4px 4px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2px;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.plinkoSlotActive {
+  background: var(--gold, #d4a843);
+  box-shadow: 0 0 10px rgba(212, 168, 67, 0.6);
+}
+
+.plinkoMult {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--text-secondary, #b8a88a);
+}
+
+.plinkoSlotActive .plinkoMult {
+  color: #1a0a0a;
+}
+
+.plinkoBall {
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 35% 35%, #f7d96e, #d4a843);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  animation: plinkoDrop 1.5s ease-in forwards;
+}
+
+@keyframes plinkoDrop {
+  0% { transform: translateY(-20px); opacity: 1; }
+  25% { transform: translateY(0px) translateX(-8px); }
+  50% { transform: translateY(4px) translateX(6px); }
+  75% { transform: translateY(8px) translateX(-4px); }
+  100% { transform: translateY(12px); opacity: 0.5; }
+}
+
+/* ===================== Wheel of Fortune ===================== */
+
+.wheelScene {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.wheelSvg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--gold-dim, #8a7230), 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.wheelPointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  color: var(--gold, #d4a843);
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* ===================== Blackjack Lite ===================== */
+
+.bjArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.bjHand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.bjLabel {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bjCards {
+  display: flex;
+  gap: 4px;
+}
+
+.bjCard {
+  width: 32px;
+  height: 44px;
+  background: #f5f5dc;
+  border: 1.5px solid #999;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #333;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.bjCardHidden {
+  background: linear-gradient(135deg, #b71c1c, #d32f2f);
+  color: #fff;
+  border-color: #8b0000;
+}
+
+.bjTotal {
+  color: var(--gold, #d4a843);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.bjActions {
+  display: flex;
+  gap: 0.5rem;
+}
