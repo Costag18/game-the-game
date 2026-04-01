@@ -132,13 +132,27 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
     myScore,
     myRoundScore,
     myWrongGuesses,
-    timeLeft,
+    roundEndTime,
+    roundDurationSec,
     otherPlayers,
   } = gameState;
 
   const isFinished = phase === 'finished';
   const isPlaying = phase === 'playing';
   const isRoundEnd = phase === 'roundEnd';
+
+  // Local countdown timer
+  const [timeLeft, setTimeLeft] = useState(roundDurationSec || 0);
+  useEffect(() => {
+    if (!isPlaying || !roundEndTime) { setTimeLeft(0); return; }
+    function tick() {
+      const remaining = Math.max(0, Math.ceil((roundEndTime - Date.now()) / 1000));
+      setTimeLeft(remaining);
+    }
+    tick();
+    const interval = setInterval(tick, 500);
+    return () => clearInterval(interval);
+  }, [isPlaying, roundEndTime]);
 
   // Build found sets
   const foundSet = new Set(foundDifferences.map((d) => d.index));

@@ -228,9 +228,9 @@ export class SpotTheDifference extends BaseGame {
   }
 
   getStateForPlayer(playerId) {
-    const timeLeft = this.state === 'playing' && this._roundStartTime
-      ? Math.max(0, Math.ceil((ROUND_TIMER_MS - (Date.now() - this._roundStartTime)) / 1000))
-      : 0;
+    const roundEndTime = this.state === 'playing' && this._roundStartTime
+      ? this._roundStartTime + ROUND_TIMER_MS
+      : null;
 
     return {
       phase: this.state,
@@ -248,7 +248,8 @@ export class SpotTheDifference extends BaseGame {
       myScore: this.scores[playerId] || 0,
       myRoundScore: this.roundScores[playerId] || 0,
       myWrongGuesses: this.wrongGuesses[playerId] || 0,
-      timeLeft,
+      roundEndTime,
+      roundDurationSec: ROUND_TIMER_MS / 1000,
       otherPlayers: this.players.filter((p) => p !== playerId).map((p) => ({
         playerId: p,
         score: this.scores[p] || 0,
