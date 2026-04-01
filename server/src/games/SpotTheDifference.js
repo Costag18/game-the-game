@@ -193,6 +193,12 @@ export class SpotTheDifference extends BaseGame {
   handleAction(playerId, action) {
     if (!this.players.includes(playerId)) return;
 
+    // Safety: if timer should have expired but hasn't transitioned, force it
+    if (this.state === 'playing' && this._roundStartTime && Date.now() >= this._roundStartTime + ROUND_TIMER_MS) {
+      this._endRound();
+      return;
+    }
+
     if (this.state === 'playing') {
       if (action.type === 'click') {
         this._handleClick(playerId, action.index);
