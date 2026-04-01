@@ -130,6 +130,105 @@ function CoinFlipPanel({ socket, myScore }) {
   );
 }
 
+const SLOT_ICONS = {
+  cherry: '\uD83C\uDF52',
+  lemon: '\uD83C\uDF4B',
+  bar: '\uD83C\uDF7A',
+  seven: '7\uFE0F\u20E3',
+  diamond: '\uD83D\uDC8E',
+  bell: '\uD83D\uDD14',
+};
+
+function SlotsPanel({ socket, myScore }) {
+  const [wager, setWager] = useState(10);
+  const [spinning, setSpinning] = useState(false);
+  const [reels, setReels] = useState(['cherry', 'lemon', 'bar']);
+  const [result, setResult] = useState(null);
+  const [displayReels, setDisplayReels] = useState(['cherry', 'lemon', 'bar']);
+
+  const maxWager = Math.floor((myScore || 0) * 0.5);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onResult(data) {
+      // Stop reels one by one with delays
+      setTimeout(() => setDisplayReels([data.reels[0], displayReels[1], displayReels[2]]), 800);
+      setTimeout(() => setDisplayReels([data.reels[0], data.reels[1], displayReels[2]]), 1200);
+      setTimeout(() => {
+        setDisplayReels(data.reels);
+        setReels(data.reels);
+        setResult(data);
+        setSpinning(false);
+      }, 1600);
+    }
+    socket.on(EVENTS.SLOTS_RESULT, onResult);
+    return () => socket.off(EVENTS.SLOTS_RESULT, onResult);
+  }, [socket, displayReels]);
+
+  useEffect(() => {
+    if (wager > maxWager) setWager(Math.max(1, maxWager));
+  }, [maxWager]);
+
+  function handleSpin() {
+    if (spinning || maxWager <= 0) return;
+    setSpinning(true);
+    setResult(null);
+    socket.emit(EVENTS.SLOTS_SPIN, { amount: wager });
+  }
+
+  const isBroke = maxWager <= 0;
+
+  return (
+    <div className={styles.slotsPanel}>
+      <h3 className={styles.slotsTitle}>Slots</h3>
+
+      {/* Reels */}
+      <div className={styles.slotsWindow}>
+        {[0, 1, 2].map((i) => (
+          <div key={i} className={`${styles.slotReel} ${spinning ? styles.slotReelSpin : ''}`}>
+            <span className={styles.slotSymbol}>
+              {SLOT_ICONS[spinning ? ['cherry', 'lemon', 'bar', 'seven', 'diamond', 'bell'][Math.floor(Math.random() * 6)] : displayReels[i]] || '?'}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Result */}
+      {result && !spinning && (
+        <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>
+          {result.net >= 0 ? `+${result.net}` : result.net}
+          {result.multiplier >= 3 ? ' JACKPOT!' : result.multiplier > 0 ? ' Winner!' : ''}
+        </p>
+      )}
+
+      {/* Controls */}
+      {!isBroke ? (
+        <>
+          <div className={styles.coinWagerRow}>
+            <span className={styles.coinWagerLabel}>Bet:</span>
+            <span className={styles.coinWagerAmount}>{wager}</span>
+          </div>
+          <input
+            type="range"
+            min={1}
+            max={maxWager}
+            value={wager}
+            onChange={(e) => setWager(Number(e.target.value))}
+            className={styles.coinSlider}
+            disabled={spinning}
+          />
+          <button className={styles.btnSpin} onClick={handleSpin} disabled={spinning || isBroke}>
+            {spinning ? 'Spinning...' : 'SPIN'}
+          </button>
+          <p className={styles.slotsOdds}>3x match = 3x (7s = 5x) | Pair = 1.5x</p>
+        </>
+      ) : (
+        <p className={styles.coinBroke}>No points to gamble!</p>
+      )}
+    </div>
+  );
+}
+
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
   const [voted, setVoted] = useState(false);
@@ -234,7 +333,10 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
         )}
       </div>
 
-      <CoinFlipPanel socket={socket} myScore={myScore} />
+      <div className={styles.sidebarArea}>
+        <CoinFlipPanel socket={socket} myScore={myScore} />
+        <SlotsPanel socket={socket} myScore={myScore} />
+      </div>
     </div>
   );
 }

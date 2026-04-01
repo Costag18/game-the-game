@@ -221,6 +221,24 @@
 
 /* ===================== Coin Flip Panel ===================== */
 
+/* Sidebar area: stacks coin flip + slots */
+.sidebarArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 2px solid var(--gold-dim, #8a7230);
+}
+
+@media (min-width: 960px) {
+  .sidebarArea {
+    width: 280px;
+    min-height: 100vh;
+    border-top: none;
+    border-left: 2px solid var(--gold-dim, #8a7230);
+    overflow-y: auto;
+  }
+}
+
 .coinPanel {
   display: flex;
   flex-direction: column;
@@ -228,17 +246,6 @@
   gap: 0.75rem;
   padding: 1.5rem;
   background: var(--bg-panel, #2a1515);
-  border-top: 2px solid var(--gold-dim, #8a7230);
-}
-
-@media (min-width: 960px) {
-  .coinPanel {
-    width: 280px;
-    min-height: 100vh;
-    border-top: none;
-    border-left: 2px solid var(--gold-dim, #8a7230);
-    justify-content: center;
-  }
 }
 
 .coinTitle {
@@ -421,4 +428,112 @@
   font-style: italic;
   font-size: 0.85rem;
   margin: 0;
+}
+
+/* ===================== Slots Panel ===================== */
+
+.slotsPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background: var(--bg-dark, #1a0a0a);
+  border-top: 1px solid var(--gold-dim, #8a7230);
+}
+
+.slotsTitle {
+  font-family: var(--font-heading, Georgia);
+  color: var(--gold, #d4a843);
+  font-size: 1.2rem;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(212, 168, 67, 0.3);
+}
+
+.slotsWindow {
+  display: flex;
+  gap: 6px;
+  background: #111;
+  border: 3px solid var(--gold-dim, #8a7230);
+  border-radius: 10px;
+  padding: 8px 12px;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.slotReel {
+  width: 60px;
+  height: 64px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  border: 1px solid #444;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.slotReelSpin {
+  animation: reelSpin 0.15s linear infinite;
+}
+
+@keyframes reelSpin {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+
+.slotSymbol {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.slotsWin {
+  color: var(--success, #5cb85c);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+  animation: resultPop 0.3s ease-out;
+}
+
+.slotsLose {
+  color: var(--danger, #d9534f);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+  animation: resultPop 0.3s ease-out;
+}
+
+.btnSpin {
+  background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-heading, Georgia);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.6rem 2rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 3px 8px rgba(229, 57, 53, 0.3);
+}
+
+.btnSpin:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnSpin:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.slotsOdds {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.7rem;
+  text-align: center;
+  margin: 0;
+  opacity: 0.7;
 }

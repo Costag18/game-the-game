@@ -208,6 +208,42 @@ io.on(EVENTS.CONNECTION, (socket) => {
     io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
   });
 
+  socket.on(EVENTS.SLOTS_SPIN, ({ amount }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+
+    const score = tm.scores[socket.id] ?? 0;
+    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+
+    const SYMBOLS = ['cherry', 'lemon', 'bar', 'seven', 'diamond', 'bell'];
+    const reels = [
+      SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+      SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+      SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
+    ];
+
+    let multiplier = 0;
+    if (reels[0] === reels[1] && reels[1] === reels[2]) {
+      multiplier = reels[0] === 'seven' ? 5 : 3; // triple 7s = 5x, other triples = 3x
+    } else if (reels[0] === reels[1] || reels[1] === reels[2] || reels[0] === reels[2]) {
+      multiplier = 1.5; // any pair = 1.5x
+    }
+
+    const payout = Math.floor(amount * multiplier);
+    tm.scores[socket.id] += payout - amount;
+
+    socket.emit(EVENTS.SLOTS_RESULT, {
+      reels,
+      multiplier,
+      wager: amount,
+      payout,
+      net: payout - amount,
+      newScore: tm.scores[socket.id],
+    });
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+  });
+
   socket.on(EVENTS.WAGER_SUBMIT, (amount) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
