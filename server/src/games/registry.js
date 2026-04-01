@@ -9,6 +9,7 @@ import { CrazyEights } from './CrazyEights.js';
 import { GoFish } from './GoFish.js';
 import { Roulette } from './Roulette.js';
 import { Hangman } from './Hangman.js';
+import { SpotTheDifference } from './SpotTheDifference.js';
 
 const gameEngines = {};
 
@@ -41,3 +42,4 @@ registerGame('goFish', GoFish);
 registerGame('roulette', Roulette);
 registerGame('hangman', Hangman);
 registerGame('poker', Poker);
+registerGame('spotTheDifference', SpotTheDifference);

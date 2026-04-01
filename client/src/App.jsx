@@ -21,6 +21,7 @@ import LiarsDiceGame from './games/LiarsDice.jsx';
 import MemoryMatchGame from './games/MemoryMatch.jsx';
 import RouletteGame from './games/Roulette.jsx';
 import HangmanGame from './games/Hangman.jsx';
+import SpotTheDifferenceGame from './games/SpotTheDifference.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -36,6 +37,7 @@ const GAME_COMPONENTS = {
   memoryMatch: MemoryMatchGame,
   roulette: RouletteGame,
   hangman: HangmanGame,
+  spotTheDifference: SpotTheDifferenceGame,
 };
 
 function GameRouter() {

@@ -51,6 +51,10 @@ export const GAMES = {
     turnTimer: TIMERS.CARD_GAME, description: 'Guess the word. Fewest wrong guesses wins.',
     tutorial: 'https://www.youtube.com/watch?v=leW9ZotUVYo',
   },
+  spotTheDifference: {
+    id: 'spotTheDifference', name: 'Spot the Difference', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.SPOT_DIFFERENCE, description: 'Race to find differences between two grids. First to spot wins!',
+  },
 };
 
 export function getEligibleGames(playerCount) {

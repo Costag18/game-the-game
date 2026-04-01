@@ -22,6 +22,7 @@ export const TIMERS = {
   ROULETTE: 60,
   VOTE: 20,
   WAGER: 30,
+  SPOT_DIFFERENCE: 45,
   RECONNECT_GRACE: 45,
 };
 
