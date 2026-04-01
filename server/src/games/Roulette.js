@@ -1,7 +1,7 @@
 import { BaseGame } from './BaseGame.js';
 
 const RED_NUMBERS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
-const TOTAL_ROUNDS = 3;
+const TOTAL_ROUNDS = 5;
 
 export class Roulette extends BaseGame {
   constructor(players) {
@@ -129,22 +129,42 @@ export class Roulette extends BaseGame {
 
     this.history.push({ round: this.round, result, payouts });
     this.acknowledged = new Set();
-    // Stay in 'spinning' state — wait for players to acknowledge the result
+
+    // Auto-acknowledge for broke players — they don't need to click through
+    for (const p of this.players) {
+      if (this.chips[p] <= 0) {
+        this.acknowledged.add(p);
+      }
+    }
+
+    // If all players are now broke, everyone auto-acked
+    if (this.players.every((p) => this.acknowledged.has(p))) {
+      this._advanceAfterSpin();
+    }
   }
 
   _advanceAfterSpin() {
+    // End if all rounds played
     if (this.round >= TOTAL_ROUNDS) {
       this.transition('finish');
-    } else {
-      this.round++;
-      this.spinResult = null; // clear so next betting round doesn't show old result
-      for (const p of this.players) {
-        this.bets[p] = [];
-        this.betSubmitted[p] = false;
-      }
-      this.transition('nextRound');
-      this._autoSkipBrokePlayers();
+      return;
     }
+
+    // End early if at most one player has chips (no competition left)
+    const playersWithChips = this.players.filter((p) => this.chips[p] > 0);
+    if (playersWithChips.length <= 1) {
+      this.transition('finish');
+      return;
+    }
+
+    this.round++;
+    this.spinResult = null;
+    for (const p of this.players) {
+      this.bets[p] = [];
+      this.betSubmitted[p] = false;
+    }
+    this.transition('nextRound');
+    this._autoSkipBrokePlayers();
   }
 
   _calculatePayout(bet, result) {
@@ -181,6 +201,7 @@ export class Roulette extends BaseGame {
 
     return {
       myChips: this.chips[playerId] || 0,
+      isBroke: (this.chips[playerId] || 0) <= 0,
       myBets: this.bets[playerId] || [],
       myBetSubmitted: this.betSubmitted[playerId] || false,
       spinResult: this.state === 'spinning' || this.state === 'finished'
