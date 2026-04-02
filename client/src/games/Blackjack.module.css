@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-heading);
   gap: 1.5rem;
   border: 8px solid #5c3317;
   box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
@@ -51,7 +51,7 @@
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-heading);
   text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   border-top: 1px solid rgba(212, 168, 67, 0.3);
   padding-top: 0.5rem;
@@ -73,7 +73,7 @@
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-heading);
 }
 
 .handTotal {

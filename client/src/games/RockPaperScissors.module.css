@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Black Ops One', cursive;
+  font-family: var(--font-heading);
   gap: 1.5rem;
   border: 8px solid #5c3317;
   box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);

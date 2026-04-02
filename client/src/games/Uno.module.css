@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Bungee Shade', cursive;
+  font-family: var(--font-heading);
   gap: 1.5rem;
   position: relative;
   border: 8px solid #5c3317;
@@ -296,7 +296,7 @@
 
 .colorPickerTitle {
   font-size: 1.2rem;
-  font-family: 'Bungee Shade', cursive;
+  font-family: var(--font-heading);
   color: #d4a843;
   margin: 0;
   font-weight: bold;
