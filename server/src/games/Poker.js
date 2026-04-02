@@ -160,6 +160,8 @@ const SMALL_BLIND = 10;
 const BIG_BLIND = 20;
 const HANDS_PER_GAME = 5;
 
+const REVEAL_DELAY_MS = 4000;
+
 const FSM = {
   initialState: 'waiting',
   transitions: {
@@ -168,7 +170,8 @@ const FSM = {
     flop: { deal: 'turn', finish: 'finished' },
     turn: { deal: 'river', finish: 'finished' },
     river: { showdown: 'showdown', finish: 'finished' },
-    showdown: { finish: 'finished', newhand: 'preflop' },
+    showdown: { reveal: 'reveal', finish: 'finished' },
+    reveal: { finish: 'finished', newhand: 'preflop' },
   },
 };
 
@@ -192,6 +195,9 @@ export class Poker extends BaseGame {
   }
 
   // -------------------------------------------------------------------------
+  setOnStateChange(callback) { this._onStateChange = callback; }
+  _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
+
   // Setup
   // -------------------------------------------------------------------------
 
@@ -507,7 +513,17 @@ export class Poker extends BaseGame {
       communityCards: [...this.communityCards],
     });
 
-    this._finishHandOrGame();
+    this.lastHandWinner = winnerName;
+    this.transition('reveal');
+    this._emitChange();
+
+    // Auto-advance after reveal delay
+    this._revealTimer = setTimeout(() => {
+      if (this.state === 'reveal') {
+        this._finishHandOrGame();
+        this._emitChange();
+      }
+    }, REVEAL_DELAY_MS);
   }
 
   _forceFinish() {
@@ -525,10 +541,21 @@ export class Poker extends BaseGame {
       communityCards: [...this.communityCards],
     });
 
-    this._finishHandOrGame();
+    this.lastHandWinner = winner;
+    this.transition('reveal');
+    this._emitChange();
+
+    this._revealTimer = setTimeout(() => {
+      if (this.state === 'reveal') {
+        this._finishHandOrGame();
+        this._emitChange();
+      }
+    }, REVEAL_DELAY_MS);
   }
 
   _finishHandOrGame() {
+    if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+
     if (this.handNumber >= HANDS_PER_GAME) {
       this.state = 'finished';
       return;
@@ -576,8 +603,8 @@ export class Poker extends BaseGame {
           folded: this.folded.has(p),
           cardCount: (this.holeCards[p] || []).length,
         })),
-      // In showdown/finished reveal all hole cards + hand descriptions
-      revealedHands: this.state === 'showdown' || this.state === 'finished'
+      // In showdown/reveal/finished reveal all hole cards + hand descriptions
+      revealedHands: ['showdown', 'reveal', 'finished'].includes(this.state)
         ? Object.fromEntries(
             nonFolded.map((p) => {
               const allCards = [...(this.holeCards[p] || []), ...this.communityCards];
@@ -589,6 +616,7 @@ export class Poker extends BaseGame {
             })
           )
         : {},
+      lastHandWinner: ['reveal', 'finished'].includes(this.state) ? this.lastHandWinner : null,
     };
   }
 

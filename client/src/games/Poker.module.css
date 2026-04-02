@@ -420,6 +420,14 @@
   border-bottom: none;
 }
 
+.revealRowWinner {
+  background: rgba(212, 168, 67, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem 0.5rem;
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.15);
+}
+
 .revealPlayerInfo {
   display: flex;
   flex-direction: column;

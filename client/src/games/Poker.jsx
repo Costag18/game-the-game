@@ -87,6 +87,7 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
     folded,
     otherPlayers,
     revealedHands,
+    lastHandWinner,
     handNumber = 1,
     totalHands = 3,
     handResults = [],
@@ -94,7 +95,8 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
 
   const iAmFolded = folded && folded.includes(playerId);
   const isActive = ['preflop', 'flop', 'turn', 'river'].includes(phase);
-  const isFinished = phase === 'finished' || phase === 'showdown';
+  const isReveal = phase === 'reveal';
+  const isFinished = phase === 'finished' || phase === 'showdown' || phase === 'reveal';
 
   const toCall = Math.max(0, currentBet - myBet);
   const canCheck = isMyTurn && toCall === 0;
@@ -119,8 +121,11 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
   }
 
   function getStatusText() {
+    if (phase === 'reveal' && lastHandWinner) {
+      return `${displayName(lastHandWinner, nicknames)} wins the hand!`;
+    }
     if (iAmFolded) return 'You folded.';
-    if (phase === 'finished') return 'Hand complete!';
+    if (phase === 'finished') return 'Game Over!';
     if (phase === 'showdown') return 'Showdown!';
     if (isMyTurn) return 'Your turn — choose an action.';
     return 'Waiting for other players...';
@@ -254,10 +259,13 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
             {Object.entries(revealedHands).map(([pid, data]) => {
               const cards = data?.cards || (Array.isArray(data) ? data : []);
               const desc = data?.handDescription;
+              const isWinner = pid === lastHandWinner;
               return (
-                <div key={pid} className={styles.revealRow}>
+                <div key={pid} className={`${styles.revealRow} ${isWinner ? styles.revealRowWinner : ''}`}>
                   <div className={styles.revealPlayerInfo}>
-                    <span className={styles.revealPlayerId}>{displayName(pid, nicknames)}</span>
+                    <span className={styles.revealPlayerId}>
+                      {isWinner && '🏆 '}{displayName(pid, nicknames)}
+                    </span>
                     {desc && <span className={styles.handLabel}>{desc}</span>}
                   </div>
                   <div className={styles.cardRow}>
