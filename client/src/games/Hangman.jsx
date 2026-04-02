@@ -69,6 +69,9 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
     myWrongCount,
     isEliminated,
     phase,
+    round,
+    totalRounds,
+    scores,
   } = gameState;
 
   const isFinished = phase === 'finished';
@@ -91,6 +94,9 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
   return (
     <div className={styles.table}>
       <h1 className={styles.title}>Hangman</h1>
+      {round && totalRounds && (
+        <p className={styles.roundInfo}>Word {round} of {totalRounds}</p>
+      )}
 
       {/* Status */}
       <div className={styles.statusBar}>

@@ -90,6 +90,14 @@
 @media (min-width: 960px) {
   .container {
     height: 100vh;
+    scrollbar-width: none;
+  }
+  .container::-webkit-scrollbar { display: none; }
+}
+
+@media (max-width: 959px) {
+  .container {
+    overflow-y: visible;
   }
 }
 
@@ -307,6 +315,14 @@
     border-left: 2px solid var(--gold-dim, #8a7230);
     overflow-y: auto;
     flex-shrink: 0;
+    scrollbar-width: none;
+  }
+  .sidebarArea::-webkit-scrollbar { display: none; }
+}
+
+@media (max-width: 959px) {
+  .sidebarArea {
+    overflow-y: visible;
   }
 }
 

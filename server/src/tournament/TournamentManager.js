@@ -79,7 +79,7 @@ export class TournamentManager {
   }
 
   isTournamentOver() {
-    if (this.winCondition === 'fixedRounds') return this.currentRound >= this.winTarget;
+    if (this.winCondition === 'fixedRounds') return this.roundHistory.length >= this.winTarget;
     if (this.winCondition === 'pointThreshold') return Object.values(this.scores).some((s) => s >= this.winTarget);
     return false;
   }

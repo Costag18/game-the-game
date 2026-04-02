@@ -22,6 +22,12 @@
   letter-spacing: 0.05em;
 }
 
+.roundInfo {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 .waiting {
   font-size: 1.2rem;
   color: #b39ddb;
