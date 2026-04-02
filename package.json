@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd client && npm install --include=dev && npm run build && cd ../server && npm install",
+    "build": "cd client && npm ci --include=dev && npm run build && cd ../server && npm ci --omit=dev",
     "start": "node server/src/index.js"
   }
 }
