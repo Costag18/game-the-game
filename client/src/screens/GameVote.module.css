@@ -1,6 +1,6 @@
 /* Outer layout: side-by-side on desktop, stacked on mobile */
 .outerLayout {
-  height: 100vh;
+  min-height: 100vh;
   background-color: var(--felt-dark);
   background-image:
     radial-gradient(ellipse at top, var(--felt-green) 0%, var(--felt-dark) 60%);
@@ -8,7 +8,13 @@
   flex-direction: column;
   font-family: var(--font-body);
   position: relative;
-  overflow: hidden;
+}
+
+@media (min-width: 960px) {
+  .outerLayout {
+    height: 100vh;
+    overflow: hidden;
+  }
 }
 
 /* Coins background at top */
@@ -84,21 +90,15 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1.5rem;
-  overflow-y: auto;
 }
 
 @media (min-width: 960px) {
   .container {
     height: 100vh;
+    overflow-y: auto;
     scrollbar-width: none;
   }
   .container::-webkit-scrollbar { display: none; }
-}
-
-@media (max-width: 959px) {
-  .container {
-    overflow-y: visible;
-  }
 }
 
 .header {
@@ -320,11 +320,6 @@
   .sidebarArea::-webkit-scrollbar { display: none; }
 }
 
-@media (max-width: 959px) {
-  .sidebarArea {
-    overflow-y: visible;
-  }
-}
 
 .coinPanel {
   display: flex;
