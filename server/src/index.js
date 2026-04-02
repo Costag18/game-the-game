@@ -770,6 +770,7 @@ function getTournamentState(tm, lobbyId) {
   const state = tm.getState();
   const lobby = lobbyManager.getLobby(lobbyId);
   const nicks = lobby?.nicknames || {};
+  state.nicknames = nicks;
   state.standings = state.standings.map((s) => ({
     ...s,
     nickname: nicks[s.playerId] || s.playerId.slice(0, 8),

@@ -74,7 +74,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
             {standings.map((entry, i) => (
               <div key={entry.playerId} className={styles.standingRow}>
                 <span className={styles.standingRank}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
-                <span className={styles.standingName}>{displayName(entry.playerId, nicknames)}</span>
+                <span className={styles.standingName}>{entry.nickname || displayName(entry.playerId, nicknames)}</span>
                 <span className={styles.standingScore}>{entry.score} pts</span>
               </div>
             ))}
