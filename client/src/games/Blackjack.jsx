@@ -100,12 +100,12 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
     <div className={styles.table}>
       <h1 className={styles.title}>Blackjack</h1>
 
-      {/* Hand info + wins */}
+      {/* Hand info + scores */}
       <div className={styles.infoBar}>
         <span className={styles.infoBadge}>Hand {handNumber}/{totalHands}</span>
         {Object.entries(wins).map(([pid, w]) => (
           <span key={pid} className={styles.infoBadge}>
-            {displayName(pid, nicknames)}: {w} win{w !== 1 ? 's' : ''}
+            {displayName(pid, nicknames)}: {w} pts
           </span>
         ))}
       </div>
@@ -114,12 +114,19 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
       {handResults.length > 0 && (
         <div className={styles.handHistory}>
           {handResults.map((hr) => (
-            <span key={hr.hand} className={styles.handHistoryItem}>
-              Hand {hr.hand}: Dealer {hr.dealerBusted ? 'busted' : hr.dealerTotal}
-              {hr.players[0]?.score > 0
-                ? ` — ${displayName(hr.players[0].playerId, nicknames)} won`
-                : ' — dealer won'}
-            </span>
+            <div key={hr.hand} className={styles.handHistoryItem}>
+              <strong>Hand {hr.hand}:</strong> Dealer {hr.dealerBusted ? 'BUST' : hr.dealerTotal}
+              {hr.players.map((pr) => (
+                <span key={pr.playerId} className={styles.handHistoryPlayer}>
+                  {' '}{displayName(pr.playerId, nicknames)}: {pr.handTotal}
+                  {pr.result === 'blackjack' && ' BJ!'}
+                  {pr.result === 'win' && ' ✓'}
+                  {pr.result === 'push' && ' ═'}
+                  {pr.result === 'bust' && ' ✗'}
+                  {pr.result === 'lose' && ' ✗'}
+                </span>
+              ))}
+            </div>
           ))}
         </div>
       )}

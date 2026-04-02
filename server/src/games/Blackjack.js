@@ -113,29 +113,40 @@ export class Blackjack extends BaseGame {
   _recordHandResult() {
     const dealerTotal = this.calculateHandValue(this.dealerHand);
     const dealerBusted = dealerTotal > 21;
+    const dealerBlackjack = this.dealerHand.length === 2 && dealerTotal === 21;
 
-    // Determine winner of this hand
-    const playerTotals = this.players.map((p) => {
-      const total = this.calculateHandValue(this.hands[p]);
+    // Each player independently vs dealer
+    const playerResults = this.players.map((p) => {
+      const hand = this.hands[p] || [];
+      const total = this.calculateHandValue(hand);
       const busted = this.busted.includes(p);
-      let score;
-      if (busted) score = 0;
-      else if (dealerBusted) score = total;
-      else score = total > dealerTotal ? total : (total === dealerTotal ? total : 0);
-      return { playerId: p, handTotal: total, busted, score };
-    });
+      const isBlackjack = hand.length === 2 && total === 21;
 
-    playerTotals.sort((a, b) => b.score - a.score || b.handTotal - a.handTotal);
-    // Award a win to the top scorer (if they beat the dealer)
-    if (playerTotals[0].score > 0) {
-      this.wins[playerTotals[0].playerId]++;
-    }
+      let result, points;
+      if (busted) {
+        result = 'bust'; points = 0;
+      } else if (isBlackjack && !dealerBlackjack) {
+        result = 'blackjack'; points = 3; // blackjack pays more
+      } else if (dealerBusted) {
+        result = 'win'; points = 2;
+      } else if (total > dealerTotal) {
+        result = 'win'; points = 2;
+      } else if (total === dealerTotal) {
+        result = 'push'; points = 1;
+      } else {
+        result = 'lose'; points = 0;
+      }
+
+      this.wins[p] = (this.wins[p] || 0) + points;
+      return { playerId: p, handTotal: total, busted, result, points, isBlackjack };
+    });
 
     this.handResults.push({
       hand: this.handNumber,
       dealerTotal,
       dealerBusted,
-      players: playerTotals,
+      dealerBlackjack,
+      players: playerResults,
     });
   }
 
@@ -195,24 +206,23 @@ export class Blackjack extends BaseGame {
   isComplete() { return this.state === 'finished'; }
 
   getResults() {
-    // Sort by wins descending, then by last hand total
     const scored = this.players.map((p) => ({
       playerId: p,
-      wins: this.wins[p] || 0,
+      score: this.wins[p] || 0,
       handTotal: this.calculateHandValue(this.hands[p] || []),
     }));
-    scored.sort((a, b) => b.wins - a.wins || b.handTotal - a.handTotal);
+    scored.sort((a, b) => b.score - a.score || b.handTotal - a.handTotal);
     let placement = 1;
     return scored.map((s, i) => {
-      if (i > 0 && (s.wins < scored[i - 1].wins || (s.wins === scored[i - 1].wins && s.handTotal < scored[i - 1].handTotal))) {
+      if (i > 0 && s.score < scored[i - 1].score) {
         placement = i + 1;
       }
       return {
         playerId: s.playerId,
         placement,
         handTotal: s.handTotal,
-        wins: s.wins,
-        handDescription: `${s.wins} win${s.wins !== 1 ? 's' : ''}`,
+        wins: s.score,
+        handDescription: `${s.score} pts`,
       };
     });
   }

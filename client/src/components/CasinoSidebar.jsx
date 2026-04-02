@@ -23,7 +23,9 @@ function CoinFlipPanel({ socket, myScore }) {
     if (!socket) return;
     function onResult(data) {
       if (data.newScore != null) setLocalScore(data.newScore);
-      setTimeout(() => { setResult(data); setAnimClass(data.result === 'heads' ? styles.coinLandHeads : styles.coinLandTails); setSpinning(false); }, 1500);
+      // Use the correct spin class so it lands on the right face without snapping
+      setAnimClass(data.result === 'heads' ? styles.coinSpinHeads : styles.coinSpinTails);
+      setTimeout(() => { setResult(data); setSpinning(false); }, 1500);
     }
     socket.on(EVENTS.COIN_FLIP_RESULT, onResult);
     return () => socket.off(EVENTS.COIN_FLIP_RESULT, onResult);
@@ -32,7 +34,7 @@ function CoinFlipPanel({ socket, myScore }) {
 
   function handleFlip(choice) {
     if (spinning || maxWager <= 0) return;
-    setSpinning(true); setResult(null); setAnimClass(styles.coinSpinning);
+    setSpinning(true); setResult(null); setAnimClass('');
     socket.emit(EVENTS.COIN_FLIP, { amount: wager, choice });
   }
   const isBroke = maxWager <= 0;

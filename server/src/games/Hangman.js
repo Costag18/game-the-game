@@ -80,12 +80,21 @@ export class Hangman extends BaseGame {
       wordGuessWinner: this.wordGuessWinner,
     });
 
-    if (this.round >= TOTAL_ROUNDS) {
-      this.transition('finish');
-    } else {
-      this._startRound();
+    // Show the word for a few seconds before advancing
+    this.showingWord = true;
+    this.revealedWord = this.word;
+    this._emitChange();
+
+    if (this._roundTimer) clearTimeout(this._roundTimer);
+    this._roundTimer = setTimeout(() => {
+      this.showingWord = false;
+      if (this.round >= TOTAL_ROUNDS) {
+        this.transition('finish');
+      } else {
+        this._startRound();
+      }
       this._emitChange();
-    }
+    }, 4000);
   }
 
   setOnStateChange(cb) { this._onStateChange = cb; }
@@ -174,11 +183,14 @@ export class Hangman extends BaseGame {
       eliminated: this.eliminated.includes(p),
     }));
 
+    const showWord = this.isComplete() || this.showingWord;
+
     return {
       displayWord,
-      word: this.isComplete() ? this.word : undefined,
-      wordGuessed: this.isComplete() ? this._isWordComplete() : undefined,
-      wordGuessWinner: this.isComplete() ? (this.wordGuessWinner || null) : undefined,
+      word: showWord ? (this.revealedWord || this.word) : undefined,
+      wordGuessed: showWord ? this._isWordComplete() : undefined,
+      wordGuessWinner: showWord ? (this.wordGuessWinner || null) : undefined,
+      showingWord: !!this.showingWord,
       guessedLetters: [...this.guessedLetters],
       playerStates,
       currentTurnPlayer: this.currentTurnPlayer,
