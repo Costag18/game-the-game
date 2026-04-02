@@ -11,7 +11,7 @@
 }
 
 .title {
-  font-family: var(--font-heading, Georgia);
+  font-family: 'Special Elite', cursive;
   color: var(--gold, #d4a843);
   font-size: 1.6rem;
   margin: 0;

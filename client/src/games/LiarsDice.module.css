@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Creepster', cursive;
   gap: 1.5rem;
   border: 8px solid #5c3317;
   box-shadow: inset 0 0 30px rgba(0,0,0,0.3), 0 0 20px rgba(0,0,0,0.5);
@@ -15,7 +15,7 @@
 
 .title {
   font-size: 2.5rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Creepster', cursive;
   color: #d4a843;
   text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
@@ -51,7 +51,7 @@
 }
 
 .panelTitle {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Creepster', cursive;
   color: #d4a843;
   font-size: 1rem;
   text-transform: uppercase;
@@ -275,7 +275,7 @@
 
 /* Results */
 .resultsTitle {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Creepster', cursive;
   color: #d4a843;
   font-size: 1.3rem;
   text-align: center;

@@ -6,7 +6,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Bungee Shade', cursive;
   gap: 1.5rem;
   position: relative;
   border: 8px solid #5c3317;
@@ -16,7 +16,7 @@
 
 .title {
   font-size: 2.5rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Bungee Shade', cursive;
   color: #d4a843;
   text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
   margin: 0;
@@ -296,7 +296,7 @@
 
 .colorPickerTitle {
   font-size: 1.2rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Bungee Shade', cursive;
   color: #d4a843;
   margin: 0;
   font-weight: bold;
