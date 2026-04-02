@@ -283,16 +283,31 @@ export class Uno extends BaseGame {
       this.hands[playerId].push(card);
       const topCard = this.discardPile[this.discardPile.length - 1];
       if (canPlay(card, topCard, this.currentColor)) {
-        // Player can choose to play this card or pass
         this.drawnCard = card;
-        return; // don't advance — wait for play or pass
+        return;
+      }
+    } else {
+      // No cards left — check if game should end
+      if (this._isStalemate()) {
+        this.transition('finish');
+        return;
       }
     }
 
-    // Can't play drawn card, auto-advance
     this.drawnCard = null;
     this.lastPlayedRank = null;
     this._advanceTurn();
+  }
+
+  _isStalemate() {
+    if (this.drawPile.length > 0) return false;
+    if (this.discardPile.length > 1) return false;
+    const topCard = this.discardPile[this.discardPile.length - 1];
+    for (const p of this.players) {
+      const hand = this.hands[p] || [];
+      if (hand.some((c) => canPlay(c, topCard, this.currentColor))) return false;
+    }
+    return true;
   }
 
   _dealCards(playerId, count) {

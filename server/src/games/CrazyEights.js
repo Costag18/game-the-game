@@ -136,9 +136,27 @@ export class CrazyEights extends BaseGame {
     if (this.drawPile.length > 0) {
       const card = this.drawPile.pop();
       this.hands[playerId].push(card);
+    } else {
+      // No cards left to draw — check if game should end
+      if (this._isStalemate()) {
+        this.transition('finish');
+        return;
+      }
     }
-    // Turn ends after drawing — player can play the drawn card on their next turn
     this._advanceTurn();
+  }
+
+  _isStalemate() {
+    if (this.drawPile.length > 0) return false;
+    // Check if reshuffling would help
+    if (this.discardPile.length > 1) return false;
+    // No draw pile and no reshuffle possible — check if anyone can play
+    const topCard = this.discardPile[this.discardPile.length - 1];
+    for (const p of this.players) {
+      const hand = this.hands[p] || [];
+      if (hand.some((c) => canPlay(c, topCard, this.activeSuit))) return false;
+    }
+    return true; // nobody can play or draw
   }
 
   _reshuffleDiscardIntoDraw() {
