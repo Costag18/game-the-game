@@ -810,6 +810,92 @@ function buildTournamentEndPayload(tm, lobby) {
 function handlePlayerLeave(socket) {
   const lobbyId = lobbyManager.getPlayerLobby(socket.id);
   if (!lobbyId) return;
+
+  // Clean up casino session
+  cleanupCasinoSession(socket.id);
+
+  // Handle mid-tournament leave
+  const tm = tournaments.get(lobbyId);
+  if (tm) {
+    // Remove from tournament player list
+    tm.players = tm.players.filter((p) => p !== socket.id);
+
+    // If an active game exists, remove from it
+    if (tm.activeGame) {
+      try {
+        tm.activeGame.removePlayer?.(socket.id);
+      } catch (e) { /* ignore */ }
+    }
+
+    const lobby = lobbyManager.getLobby(lobbyId);
+
+    // If only 1 or 0 players remain, end the tournament
+    if (tm.players.length <= 1) {
+      if (tm.players.length === 1 && lobby) {
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+      }
+      tournaments.delete(lobbyId);
+      if (lobby) lobbyManager.setStatus(lobbyId, 'waiting');
+    } else {
+      // Broadcast updated state to remaining players
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+
+      // If waiting for this player's vote/wager, check if we can advance
+      if (tm.phase === 'voting' && lobby) {
+        if (Object.keys(tm.votes).length >= tm.players.length) {
+          const selectedGame = tm.tallyVotes();
+          tm.startWagerPhase();
+          io.to(lobbyId).emit(EVENTS.VOTE_RESULT, {
+            selectedGame,
+            playerCount: tm.players.length,
+            wagerReturns: Scorer.getWagerReturnTable(tm.players.length),
+          });
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+        }
+      } else if (tm.phase === 'wagering') {
+        // Remove their wager requirement
+        tm.wagerSubmitted?.delete(socket.id);
+        if (tm.allWagersIn()) {
+          // Trigger game start logic (simplified — emit wager locked)
+          tm.startPlaying();
+          io.to(lobbyId).emit(EVENTS.WAGER_LOCKED, { wagers: { ...tm.wagers } });
+        }
+      }
+
+      // If active game, broadcast new state and check completion
+      if (tm.activeGame) {
+        if (lobby) {
+          const nicknames = lobby.nicknames || {};
+          for (const pid of tm.players) {
+            const ps = io.sockets.sockets.get(pid);
+            if (ps) {
+              ps.emit(EVENTS.GAME_STATE, {
+                gameId: tm.selectedGame,
+                state: tm.activeGame.getStateForPlayer(pid),
+                nicknames,
+              });
+            }
+          }
+        }
+        if (tm.activeGame.isComplete()) {
+          const results = tm.activeGame.getResults();
+          const placements = results.map((r) => r.playerId);
+          tm.activeGame = null;
+          const roundScores = tm.completeRound(placements, results);
+          io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
+          io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
+            placements, scores: roundScores, gameId: tm.selectedGame,
+            standings: tm.getStandings().map((s) => ({
+              ...s, nickname: lobby?.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+            })),
+            gameResults: results,
+          });
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+        }
+      }
+    }
+  }
+
   const lobby = lobbyManager.leaveLobby(lobbyId, socket.id);
   socket.leave(lobbyId);
   if (lobby) {
