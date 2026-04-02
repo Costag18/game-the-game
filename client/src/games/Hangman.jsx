@@ -72,6 +72,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
     round,
     totalRounds,
     scores,
+    showingWord,
   } = gameState;
 
   const isFinished = phase === 'finished';
@@ -126,10 +127,18 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
 
         {/* Center: Word display */}
         <div className={styles.wordArea}>
-          {isFinished && word ? (
+          {(isFinished || showingWord) && word ? (
             <div className={styles.revealSection}>
               <p className={styles.revealLabel}>The word was:</p>
               <p className={styles.revealedWord}>{word.toUpperCase()}</p>
+              {showingWord && !isFinished && (
+                <p className={styles.revealLabel}>
+                  {wordGuessed
+                    ? (wordGuessWinner ? 'Guessed correctly!' : 'Word solved!')
+                    : 'Nobody guessed it!'}
+                  {' '}Next word in a moment...
+                </p>
+              )}
             </div>
           ) : (
             <div className={styles.wordDisplay}>
@@ -148,7 +157,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
       </div>
 
       {/* Keyboard */}
-      {!isFinished && (
+      {!isFinished && !showingWord && (
         <div className={styles.keyboard}>
           {ALPHABET.map((letter) => {
             const used = guessedSet.has(letter);
@@ -169,7 +178,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
       )}
 
       {/* Guess the whole word — available to any non-eliminated player at any time */}
-      {!isFinished && !isEliminated && (
+      {!isFinished && !isEliminated && !showingWord && (
         <div className={styles.guessWordSection}>
           <span className={styles.guessWordLabel}>Guess the word:</span>
           <div className={styles.guessWordRow}>
