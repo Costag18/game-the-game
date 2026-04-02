@@ -307,7 +307,7 @@ export class Poker extends BaseGame {
       this.folded.add(playerId);
       this.actedThisRound.add(playerId);
       // If only one player left, they win immediately
-      const remaining = this._activePlayers().filter((p) => !this.folded.has(p));
+      const remaining = this._nonFoldedPlayers();
       if (remaining.length === 1) {
         this._collectBets();
         this.chips[remaining[0]] += this.pot;
@@ -315,6 +315,13 @@ export class Poker extends BaseGame {
         this._forceFinish();
         return;
       }
+      // Advance turn past the folded player, then check round completion
+      if (this._isBettingRoundComplete()) {
+        this._advanceStage();
+      } else {
+        this._nextNonFoldedTurn(playerId);
+      }
+      return;
     } else if (type === 'check') {
       // Only valid if currentBet equals what this player has already bet
       if (this.currentBet > (this.bets[playerId] || 0)) return; // must call or raise
@@ -396,13 +403,30 @@ export class Poker extends BaseGame {
     return true;
   }
 
+  _nextNonFoldedTurn(fromPlayerId) {
+    // Find next non-folded player from a specific player's position in the full player list
+    const allPlayers = this.players;
+    const fromIdx = allPlayers.indexOf(fromPlayerId);
+    for (let i = 1; i <= allPlayers.length; i++) {
+      const nextIdx = (fromIdx + i) % allPlayers.length;
+      const next = allPlayers[nextIdx];
+      if (!this.folded.has(next) && this.chips[next] > 0 && !this.actedThisRound.has(next)) {
+        this.currentTurnPlayer = next;
+        this.turnIndex = nextIdx;
+        return;
+      }
+    }
+    // Everyone acted/folded/all-in — advance stage
+    this._advanceStage();
+  }
+
   _nextActiveTurn() {
     const active = this._nonFoldedPlayers();
     if (active.length === 0) return;
     const cur = this.currentTurnPlayer;
-    const curIdx = active.indexOf(cur);
+    let curIdx = active.indexOf(cur);
+    if (curIdx === -1) curIdx = 0; // safety: if current player folded, start from 0
 
-    // Find next player who can actually act (has chips and hasn't acted)
     for (let i = 1; i <= active.length; i++) {
       const nextIdx = (curIdx + i) % active.length;
       const next = active[nextIdx];
@@ -413,7 +437,6 @@ export class Poker extends BaseGame {
       }
     }
 
-    // Everyone has acted or is all-in — betting round is complete, advance stage
     this._advanceStage();
   }
 
