@@ -11,6 +11,60 @@
   overflow: hidden;
 }
 
+/* Casino decals on sides */
+.outerLayout::before,
+.outerLayout::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+  background-repeat: repeat-y;
+  background-size: 80px 80px, 60px 60px, 70px 70px, 50px 50px, 90px 90px;
+}
+
+.outerLayout::before {
+  left: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5C50 5 10 40 10 60C10 75 25 85 40 75C38 85 35 95 25 95L75 95C65 95 62 85 60 75C75 85 90 75 90 60C90 40 50 5 50 5Z' fill='%23d4a843'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 90C50 90 10 55 10 35C10 15 30 10 50 30C70 10 90 15 90 35C90 55 50 90 50 90Z' fill='%23d4a843'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5L85 50L50 95L15 50Z' fill='%23d4a843'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='10' y='10' width='80' height='80' rx='12' fill='%23d4a843'/%3E%3Ccircle cx='30' cy='30' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='70' cy='30' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='30' cy='70' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='70' cy='70' r='7' fill='%230f3d1a'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23d4a843'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%230f3d1a' stroke-width='3' stroke-dasharray='12 8'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='%230f3d1a' stroke-width='2'/%3E%3C/svg%3E");
+  background-position:
+    20px 30px,
+    60px 180px,
+    30px 330px,
+    80px 480px,
+    10px 630px;
+}
+
+.outerLayout::after {
+  right: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 20C60 10 78 10 78 28C78 40 65 45 55 42C65 42 78 48 78 62C78 76 60 80 50 70C40 80 22 76 22 62C22 48 35 42 45 42C35 45 22 40 22 28C22 10 40 10 50 20ZM42 70C40 82 37 95 28 95L72 95C63 95 60 82 58 70Z' fill='%23d4a843'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 5C50 5 10 40 10 60C10 75 25 85 40 75C38 85 35 95 25 95L75 95C65 95 62 85 60 75C75 85 90 75 90 60C90 40 50 5 50 5Z' fill='%23d4a843'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23d4a843'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%230f3d1a' stroke-width='3' stroke-dasharray='12 8'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='%230f3d1a' stroke-width='2'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 90C50 90 10 55 10 35C10 15 30 10 50 30C70 10 90 15 90 35C90 55 50 90 50 90Z' fill='%23d4a843'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='10' y='10' width='80' height='80' rx='12' fill='%23d4a843'/%3E%3Ccircle cx='30' cy='30' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='70' cy='30' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='30' cy='70' r='7' fill='%230f3d1a'/%3E%3Ccircle cx='70' cy='70' r='7' fill='%230f3d1a'/%3E%3C/svg%3E");
+  background-position:
+    100px 80px,
+    40px 230px,
+    90px 380px,
+    30px 530px,
+    70px 680px;
+}
+
+@media (max-width: 960px) {
+  .outerLayout::before,
+  .outerLayout::after {
+    display: none;
+  }
+}
+
 /* Coins background at top */
 .coinsBackground {
   position: absolute;
