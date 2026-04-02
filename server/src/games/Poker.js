@@ -226,8 +226,10 @@ export class Poker extends BaseGame {
     this.lastRaiser = null;
     this._roundComplete = false;
 
+    this.totalInvested = {};
     for (const p of this.players) {
       this.bets[p] = 0;
+      this.totalInvested[p] = 0;
     }
 
     // Auto-fold broke players (0 chips) at hand start
@@ -442,6 +444,7 @@ export class Poker extends BaseGame {
 
   _collectBets() {
     for (const p of this.players) {
+      this.totalInvested[p] = (this.totalInvested[p] || 0) + (this.bets[p] || 0);
       this.bets[p] = 0;
     }
     this.currentBet = 0;
@@ -524,7 +527,11 @@ export class Poker extends BaseGame {
   }
 
   _resolveShowdown() {
-    // Award pot to best hand
+    // Collect final bets into totalInvested before resolving
+    for (const p of this.players) {
+      this.totalInvested[p] = (this.totalInvested[p] || 0) + (this.bets[p] || 0);
+    }
+
     const contenders = this._nonFoldedPlayers();
     let winnerName = null;
     let bestDesc = null;
@@ -541,7 +548,24 @@ export class Poker extends BaseGame {
         }
       }
       if (winner) {
-        this.chips[winner] += this.pot;
+        // Calculate max the winner can take from each player
+        const winnerInvested = this.totalInvested[winner] || 0;
+        let winnings = 0;
+        for (const p of this.players) {
+          const pInvested = this.totalInvested[p] || 0;
+          // Winner can only win up to what they put in from each player
+          winnings += Math.min(pInvested, winnerInvested);
+        }
+        // Return excess to other players who bet more than winner
+        for (const p of this.players) {
+          if (p === winner) continue;
+          const pInvested = this.totalInvested[p] || 0;
+          const excess = Math.max(0, pInvested - winnerInvested);
+          if (excess > 0) {
+            this.chips[p] += excess;
+          }
+        }
+        this.chips[winner] += winnings;
         this.pot = 0;
         winnerName = winner;
         bestDesc = best?.description;
