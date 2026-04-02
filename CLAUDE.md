@@ -140,6 +140,16 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 ### JSON Serialization
 - Object keys become strings after Socket.IO transmission — always check both `obj[num]` and `obj[String(num)]`
 
+### Casino Session Cleanup
+- Free Play Casino creates a fake lobby + tournament mapped to the player's socket ID
+- **CRITICAL:** Must call `cleanupCasinoSession()` when player creates/joins a real lobby, otherwise all events route to the dead casino tournament and the game freezes
+- Gambling scores are clamped to 0 minimum via `adjustScore()` helper — negative scores break wager validation
+
+### Gambling During Tournament
+- Casino sidebar games work during both `voting` and `wagering` phases
+- All gambling is server-validated with real tournament points
+- `isTournamentOver()` checked after every gamble — can trigger instant win in point threshold mode
+
 ## Conventions
 
 - Server is always source of truth — never trust client state
@@ -148,6 +158,34 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Auto-action on timeout (stand/pass/random/auto-place)
 - Socket.IO rooms for lobby management
 - CSS modules per component, casino theme with varied backgrounds per game
-- Fonts: Cinzel (headings), Raleway (body), Pirata One (game display names)
 - Game vote order randomized server-side each round
 - Keep-alive self-ping every 10 min in production (Render free plan)
+- `npm ci` for faster builds, `--omit=dev` on server in production
+
+## Visual & UX Preferences
+
+The owner cares about:
+- **Touch device support** — all interactions must work without hover (use tap-to-preview + confirm pattern)
+- **Unique visual identity per game** — each game has its own background color and display font
+- **Clear feedback** — players should always know what's happening (status text, timers, visual indicators)
+- **No clutter** — text in small spaces should be moved outside (e.g., Chicken Cross labels below lanes)
+- **Smooth transitions** — no screen jerks on re-renders (don't null out state before server responds)
+- **Decorative elements** — pharaoh with gradient fade, coins background with blur+mask, playing card corner decorations on casino cards
+- **Fonts** — each game title uses a unique Google Font matching its theme. Body text uses Raleway, headings use Cinzel, game card names use Pirata One
+
+## Fonts Per Game
+
+| Game | Font |
+|------|------|
+| Blackjack | Cinzel |
+| Poker | Fascinate Inline |
+| Uno | Bungee Shade |
+| Go Fish | Luckiest Guy |
+| Crazy Eights | Permanent Marker |
+| Rock Paper Scissors | Black Ops One |
+| Liar's Dice | Creepster |
+| Memory Match | Orbitron |
+| Roulette | Cinzel |
+| Hangman | Fredericka the Great |
+| Spot the Difference | Special Elite |
+| Battleship | Archivo Black |
