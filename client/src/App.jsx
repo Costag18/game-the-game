@@ -10,6 +10,7 @@ import GameVote from './screens/GameVote.jsx';
 import WagerPhase from './screens/WagerPhase.jsx';
 import RoundResults from './screens/RoundResults.jsx';
 import TournamentEnd from './screens/TournamentEnd.jsx';
+import CasinoMode from './screens/CasinoMode.jsx';
 import BlackjackGame from './games/Blackjack.jsx';
 import PokerGame from './games/Poker.jsx';
 import UnoGame from './games/Uno.jsx';
@@ -85,6 +86,7 @@ function GameRouter() {
   return (
     <>
       {screen === 'menu' && <MainMenu onNavigate={setScreen} />}
+      {screen === 'casino' && <CasinoMode onBack={() => setScreen('menu')} />}
       {screen === 'lobbyBrowser' && (
         <LobbyBrowser onNavigate={setScreen} onJoinLobby={handleJoinLobby} />
       )}

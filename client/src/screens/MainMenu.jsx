@@ -76,6 +76,13 @@ export default function MainMenu({ onNavigate }) {
           >
             Create Lobby
           </button>
+          <button
+            className={styles.btnCasino}
+            disabled={!connected}
+            onClick={() => onNavigate('casino')}
+          >
+            Free Play Casino
+          </button>
         </div>
       </div>
     </div>

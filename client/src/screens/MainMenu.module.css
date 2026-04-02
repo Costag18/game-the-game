@@ -163,3 +163,29 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.btnCasino {
+  background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 3px 10px rgba(229, 57, 53, 0.3);
+}
+
+.btnCasino:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnCasino:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

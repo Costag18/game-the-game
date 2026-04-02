@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { GAMES } from '../../../shared/gameList.js';
+import CasinoSidebar from '../components/CasinoSidebar.jsx';
 import styles from './WagerPhase.module.css';
 
 function Popdown({ title, children }) {
@@ -106,8 +107,9 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.panel}>
+    <div className={styles.outerLayout}>
+      <div className={styles.container}>
+        <div className={styles.panel}>
         <h2 className={styles.title}>Place Your Wager</h2>
 
         {game && (
@@ -180,5 +182,7 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
         )}
       </div>
     </div>
+    <CasinoSidebar socket={socket} myScore={myScore} />
+  </div>
   );
 }

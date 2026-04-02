@@ -45,4 +45,6 @@ export const EVENTS = {
   CHICKEN_START: 'tournament:chickenStart',
   CHICKEN_ACTION: 'tournament:chickenAction',
   CHICKEN_RESULT: 'tournament:chickenResult',
+  CASINO_JOIN: 'casino:join',
+  CASINO_STATE: 'casino:state',
 };

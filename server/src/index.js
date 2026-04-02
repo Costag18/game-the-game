@@ -189,7 +189,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.COIN_FLIP, ({ amount, choice }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
     const score = tm.scores[socket.id] ?? 0;
@@ -219,7 +219,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.SLOTS_SPIN, ({ amount }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
     const score = tm.scores[socket.id] ?? 0;
@@ -264,7 +264,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.PLINKO_DROP, ({ amount }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
     if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
     const lobby = lobbyManager.getLobby(lobbyId);
@@ -300,7 +300,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.WHEEL_SPIN, ({ amount }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
     if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
     const lobby = lobbyManager.getLobby(lobbyId);
@@ -328,7 +328,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.BJ_LITE_START, ({ amount }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
     if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
 
@@ -367,7 +367,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.BJ_LITE_ACTION, ({ action }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     if (!tm._bjLiteHands?.[socket.id]) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
@@ -444,7 +444,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.CHICKEN_START, ({ amount }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
     if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
 
@@ -471,7 +471,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.CHICKEN_ACTION, ({ action }) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
-    if (!tm || tm.phase !== 'voting') return;
+    if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     if (!tm._chickenGames?.[socket.id]) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
@@ -526,6 +526,31 @@ io.on(EVENTS.CONNECTION, (socket) => {
         lobbyManager.setStatus(lobbyId, 'waiting');
       }
     }
+  });
+
+  // --- Free Play Casino ---
+  socket.on(EVENTS.CASINO_JOIN, () => {
+    const casinoLobbyId = `casino_${socket.id}`;
+    // Clean up any existing casino session
+    if (tournaments.has(casinoLobbyId)) {
+      tournaments.delete(casinoLobbyId);
+    }
+    // Create a fake tournament for solo casino play
+    const tm = new TournamentManager({
+      players: [socket.id],
+      winCondition: 'pointThreshold',
+      winTarget: 999999,
+    });
+    tm.scores[socket.id] = 1000;
+    tm.phase = 'voting'; // allow gambling
+    tournaments.set(casinoLobbyId, tm);
+    // Map this player to the casino "lobby" so gambling handlers can find it
+    lobbyManager.playerToLobby.set(socket.id, casinoLobbyId);
+    lobbyManager.lobbies.set(casinoLobbyId, {
+      id: casinoLobbyId, players: [socket.id], nicknames: {}, status: 'playing',
+    });
+    socket.join(casinoLobbyId);
+    socket.emit(EVENTS.CASINO_STATE, { score: tm.scores[socket.id] });
   });
 
   socket.on(EVENTS.WAGER_SUBMIT, (amount) => {
