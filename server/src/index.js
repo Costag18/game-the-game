@@ -165,6 +165,16 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     lobbyManager.setStatus(lobbyId, 'playing');
 
+    // Ensure all player nicknames are captured (some may have set nickname before joining lobby)
+    for (const pid of lobby.players) {
+      if (!lobby.nicknames[pid]) {
+        const playerSocket = io.sockets.sockets.get(pid);
+        if (playerSocket?.data?.nickname) {
+          lobby.nicknames[pid] = playerSocket.data.nickname;
+        }
+      }
+    }
+
     const tm = new TournamentManager({
       players: [...lobby.players],
       winCondition: lobby.winCondition,
