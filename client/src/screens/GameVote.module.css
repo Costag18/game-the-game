@@ -46,12 +46,15 @@
 }
 
 .pharaohImage {
-  width: 80px;
+  width: 110px;
   height: auto;
   flex-shrink: 0;
-  border-radius: 6px;
-  mask-image: linear-gradient(to right, black 40%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, black 40%, transparent 100%);
+  margin: -0.75rem 0 -0.75rem -1rem;
+  align-self: stretch;
+  object-fit: cover;
+  border-radius: 8px 0 0 8px;
+  mask-image: linear-gradient(to right, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 50%, transparent 100%);
 }
 
 .standingsList {
