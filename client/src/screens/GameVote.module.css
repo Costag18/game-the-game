@@ -19,7 +19,7 @@
   right: 0;
   height: 300px;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
 }
 
