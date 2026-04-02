@@ -190,7 +190,8 @@ function BattleGrid({ label, cells, sunkShips, onClick, clickable, fullReveal })
                 // My board view: cells is array of {ship, hit}
                 const c = cells[idx];
                 if (c?.ship) cellClass += ' ' + styles.cellShip;
-                if (c?.hit) cellClass += ' ' + styles.cellHit;
+                if (c?.hit && c?.ship) cellClass += ' ' + styles.cellHit;
+                else if (c?.hit && !c?.ship) cellClass += ' ' + styles.cellMiss;
               }
 
               return (
@@ -318,14 +319,26 @@ export default function Battleship({ gameState, onAction, nicknames }) {
             cells={myGrid}
             clickable={false}
           />
-          <BattleGrid
-            label="Opponent's Board"
-            cells={opponentShots}
-            sunkShips={opponentSunkShips}
-            onClick={handleFire}
-            clickable={isMyTurn}
-            fullReveal={oppRevealGrid}
-          />
+          <div className={styles.oppBoardArea}>
+            <BattleGrid
+              label="Opponent's Board"
+              cells={opponentShots}
+              sunkShips={opponentSunkShips}
+              onClick={handleFire}
+              clickable={isMyTurn}
+              fullReveal={oppRevealGrid}
+            />
+            {opponentSunkShips && opponentSunkShips.length > 0 && (
+              <div className={styles.sunkList}>
+                <span className={styles.sunkListLabel}>Sunk:</span>
+                {opponentSunkShips.map((s) => (
+                  <span key={s.type} className={styles.sunkShipTag}>
+                    {s.type}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
