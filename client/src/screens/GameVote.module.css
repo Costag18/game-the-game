@@ -519,7 +519,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1.5rem;
-  background: var(--bg-dark, #1a0a0a);
+  background: var(--bg-panel, #2a1515);
   border-top: 1px solid var(--gold-dim, #8a7230);
 }
 

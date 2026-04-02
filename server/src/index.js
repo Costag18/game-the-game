@@ -919,9 +919,17 @@ httpServer.listen(PORT, () => {
   // Keep-alive self-ping to prevent Render free plan from sleeping
   if (isProduction) {
     const KEEP_ALIVE_MS = 10 * 60 * 1000; // every 10 minutes
-    setInterval(() => {
-      fetch(`http://localhost:${PORT}/health`).catch(() => {});
-    }, KEEP_ALIVE_MS);
+    const selfPing = () => {
+      try {
+        fetch(`http://localhost:${PORT}/health`).catch(() => {});
+      } catch {
+        // fetch not available, use http
+        import('http').then((http) => {
+          http.get(`http://localhost:${PORT}/health`, () => {}).on('error', () => {});
+        }).catch(() => {});
+      }
+    };
+    setInterval(selfPing, KEEP_ALIVE_MS);
     console.log('Keep-alive ping enabled (every 10 min)');
   }
 });
