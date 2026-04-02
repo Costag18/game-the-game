@@ -250,6 +250,8 @@ function ChickenPanel({ socket, myScore }) {
   );
 }
 
+export { CoinFlipPanel, SlotsPanel, WheelPanel, BJLitePanel, ChickenPanel };
+
 export default function CasinoSidebar({ socket, myScore }) {
   return (
     <div className={styles.sidebarArea}>

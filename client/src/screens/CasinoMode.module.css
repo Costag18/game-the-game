@@ -1,10 +1,10 @@
 .container {
   min-height: 100vh;
   background-color: var(--bg-dark, #1a0a0a);
-  background-image: radial-gradient(ellipse at top, #2a1515 0%, var(--bg-dark, #1a0a0a) 60%);
+  background-image:
+    radial-gradient(ellipse at top, #2a1515 0%, var(--bg-dark, #1a0a0a) 60%);
   display: flex;
   flex-direction: column;
-  align-items: center;
   font-family: var(--font-body, sans-serif);
 }
 
@@ -12,14 +12,15 @@
   color: var(--gold, #d4a843);
   font-style: italic;
   padding-top: 4rem;
+  text-align: center;
 }
 
+/* Header */
 .header {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 1.25rem 2rem;
-  width: 100%;
+  padding: 1rem 2rem;
   background: var(--bg-panel, #2a1515);
   border-bottom: 2px solid var(--gold-dim, #8a7230);
   flex-wrap: wrap;
@@ -71,4 +72,76 @@
   font-family: var(--font-heading, Georgia);
   font-size: 1.2rem;
   font-weight: 700;
+}
+
+/* Games Grid */
+.gamesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Playing Card Style Game Card */
+.gameCard {
+  position: relative;
+  background: var(--bg-panel, #2a1515);
+  border: 2px solid var(--gold-dim, #8a7230);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gameCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 36px rgba(212, 168, 67, 0.15), 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+
+.gameCardInner {
+  padding: 1rem 0.75rem;
+}
+
+/* Corner decorations */
+.cardCornerTL,
+.cardCornerTR,
+.cardCornerBL,
+.cardCornerBR {
+  position: absolute;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: var(--font-heading, Georgia);
+  opacity: 0.35;
+  user-select: none;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.cardCornerTL { top: 6px; left: 8px; }
+.cardCornerTR { top: 6px; right: 8px; transform: rotate(180deg); }
+.cardCornerBL { bottom: 6px; left: 8px; transform: rotate(180deg); }
+.cardCornerBR { bottom: 6px; right: 8px; }
+
+/* Color the suits */
+.cardCornerTL,
+.cardCornerBR {
+  color: var(--gold, #d4a843);
+}
+
+.cardCornerTR,
+.cardCornerBL {
+  color: var(--text-secondary, #b8a88a);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .gamesGrid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+  }
 }
