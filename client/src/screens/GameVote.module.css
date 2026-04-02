@@ -14,31 +14,28 @@
 /* Coins background at top */
 .coinsBackground {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 300px;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  height: 350px;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
 }
 
 .coinsImage {
-  width: 100%;
-  height: 300px;
+  width: calc(100% + 20px);
+  height: 350px;
   object-fit: cover;
   object-position: center top;
   opacity: 0.25;
-  filter: blur(3px);
+  filter: blur(4px);
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
 }
 
 .coinsGradient {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60%;
-  background: linear-gradient(to top, var(--felt-dark, #0f3d1a) 0%, transparent 100%);
+  display: none;
 }
 
 /* Pharaoh inside leaderboard */
