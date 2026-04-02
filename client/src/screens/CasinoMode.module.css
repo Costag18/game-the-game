@@ -103,7 +103,14 @@
 }
 
 .gameCardInner {
-  padding: 1rem 0.75rem;
+  padding: 1.25rem 1rem;
+  width: 100%;
+}
+
+/* Override sidebar panel styles to fill the card */
+.gameCardInner > div {
+  width: 100%;
+  max-width: none;
 }
 
 /* Corner decorations */

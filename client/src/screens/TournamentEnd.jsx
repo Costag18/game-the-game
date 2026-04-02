@@ -50,10 +50,7 @@ export default function TournamentEnd({ data, onRematch, onLeave }) {
 
         <div className={styles.actions}>
           <button className={styles.btnLeave} onClick={onLeave}>
-            Leave
-          </button>
-          <button className={styles.btnRematch} onClick={onRematch}>
-            Rematch
+            Home
           </button>
         </div>
       </div>
