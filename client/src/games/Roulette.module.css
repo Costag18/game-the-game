@@ -1,6 +1,6 @@
 .table {
   min-height: 100vh;
-  background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
+  background: radial-gradient(ellipse at center, #2a1515 0%, #1a0a0a 60%, #0d0505 100%);
   color: #fff;
   display: flex;
   flex-direction: column;

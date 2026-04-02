@@ -15,6 +15,7 @@ function SetupGrid({ shipTypes, onConfirm }) {
   const [ships, setShips] = useState([]);
   const [currentShipIdx, setCurrentShipIdx] = useState(0);
   const [horizontal, setHorizontal] = useState(true);
+  const [previewCells, setPreviewCells] = useState(null); // { x, y, cells } — tap to preview
   const [hoverCells, setHoverCells] = useState([]);
 
   const currentShip = shipTypes[currentShipIdx] || null;
@@ -32,7 +33,7 @@ function SetupGrid({ shipTypes, onConfirm }) {
   }
 
   function handleHover(x, y) {
-    if (!currentShip) { setHoverCells([]); return; }
+    if (!currentShip || previewCells) { setHoverCells([]); return; }
     const cells = getShipCells(x, y, currentShip.size, horizontal);
     if (cells && cells.every((c) => grid[c] === null)) {
       setHoverCells(cells);
@@ -41,24 +42,43 @@ function SetupGrid({ shipTypes, onConfirm }) {
     }
   }
 
-  function handleClick(x, y) {
+  function handleCellTap(x, y) {
     if (!currentShip || allPlaced) return;
     const cells = getShipCells(x, y, currentShip.size, horizontal);
     if (!cells || cells.some((c) => grid[c] !== null)) return;
-
-    const newGrid = [...grid];
-    for (const c of cells) newGrid[c] = currentShip.type;
-    setGrid(newGrid);
-    setShips([...ships, { ...currentShip, x, y, horizontal, cells }]);
-    setCurrentShipIdx(currentShipIdx + 1);
+    // Set preview — user must confirm with Place button
+    setPreviewCells({ x, y, cells, horizontal });
     setHoverCells([]);
   }
 
-  function handleConfirm() {
+  function handlePlaceConfirm() {
+    if (!previewCells || !currentShip) return;
+    const newGrid = [...grid];
+    for (const c of previewCells.cells) newGrid[c] = currentShip.type;
+    setGrid(newGrid);
+    setShips([...ships, { ...currentShip, x: previewCells.x, y: previewCells.y, horizontal: previewCells.horizontal, cells: previewCells.cells }]);
+    setCurrentShipIdx(currentShipIdx + 1);
+    setPreviewCells(null);
+    setHoverCells([]);
+  }
+
+  function handleRotate() {
+    const newH = !horizontal;
+    setHorizontal(newH);
+    // Update preview if one exists
+    if (previewCells && currentShip) {
+      const cells = getShipCells(previewCells.x, previewCells.y, currentShip.size, newH);
+      if (cells && cells.every((c) => grid[c] === null)) {
+        setPreviewCells({ x: previewCells.x, y: previewCells.y, cells, horizontal: newH });
+      } else {
+        setPreviewCells(null);
+      }
+    }
+  }
+
+  function handleSubmitAll() {
     if (!allPlaced) return;
-    const placements = ships.map((s) => ({
-      x: s.x, y: s.y, horizontal: s.horizontal,
-    }));
+    const placements = ships.map((s) => ({ x: s.x, y: s.y, horizontal: s.horizontal }));
     onConfirm(placements);
   }
 
@@ -66,10 +86,12 @@ function SetupGrid({ shipTypes, onConfirm }) {
     setGrid(new Array(100).fill(null));
     setShips([]);
     setCurrentShipIdx(0);
+    setPreviewCells(null);
     setHoverCells([]);
   }
 
   const hoverSet = new Set(hoverCells);
+  const previewSet = new Set(previewCells?.cells || []);
 
   return (
     <div className={styles.setupArea}>
@@ -77,17 +99,23 @@ function SetupGrid({ shipTypes, onConfirm }) {
         {currentShip ? (
           <p className={styles.setupPrompt}>
             Place your <strong>{currentShip.type}</strong> ({currentShip.size} cells)
+            {previewCells ? ' — tap Place to confirm' : ' — tap a cell'}
           </p>
         ) : (
-          <p className={styles.setupPrompt}>All ships placed!</p>
+          <p className={styles.setupPrompt}>All ships placed! Tap Ready to start.</p>
         )}
         <div className={styles.setupButtons}>
-          <button className={styles.btnRotate} onClick={() => setHorizontal(!horizontal)}>
-            Rotate ({horizontal ? 'H' : 'V'})
+          <button className={styles.btnRotate} onClick={handleRotate}>
+            Rotate ({horizontal ? '→' : '↓'})
           </button>
+          {previewCells && (
+            <button className={styles.btnConfirm} onClick={handlePlaceConfirm}>
+              Place Ship
+            </button>
+          )}
           <button className={styles.btnReset} onClick={handleReset}>Reset</button>
           {allPlaced && (
-            <button className={styles.btnConfirm} onClick={handleConfirm}>Confirm</button>
+            <button className={styles.btnConfirm} onClick={handleSubmitAll}>Ready!</button>
           )}
         </div>
       </div>
@@ -103,6 +131,7 @@ function SetupGrid({ shipTypes, onConfirm }) {
               const idx = y * GRID_SIZE + x;
               const hasShip = grid[idx] !== null;
               const isHover = hoverSet.has(idx);
+              const isPreview = previewSet.has(idx);
               return (
                 <div
                   key={x}
@@ -110,10 +139,11 @@ function SetupGrid({ shipTypes, onConfirm }) {
                     styles.cell,
                     hasShip ? styles.cellShip : '',
                     isHover ? styles.cellHover : '',
+                    isPreview ? styles.cellPreview : '',
                   ].filter(Boolean).join(' ')}
                   onMouseEnter={() => handleHover(x, y)}
                   onMouseLeave={() => setHoverCells([])}
-                  onClick={() => handleClick(x, y)}
+                  onClick={() => handleCellTap(x, y)}
                 />
               );
             })}
