@@ -78,6 +78,11 @@ function OpponentBadge({ label, handCount }) {
   return (
     <div className={styles.opponentBadge}>
       <span className={styles.opponentName}>{label}</span>
+      <span className={styles.opponentCards}>
+        {Array.from({ length: Math.min(handCount, 10) }, (_, i) => (
+          <span key={i} className={styles.miniCardBack} />
+        ))}
+      </span>
       <span className={styles.handCountBadge}>{handCount}</span>
     </div>
   );

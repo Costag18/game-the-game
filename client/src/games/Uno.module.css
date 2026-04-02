@@ -54,6 +54,22 @@
   color: #f0e6d3;
 }
 
+.opponentCards {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.miniCardBack {
+  display: inline-block;
+  width: 14px;
+  height: 20px;
+  background: linear-gradient(135deg, #c62828 0%, #b71c1c 50%, #e53935 100%);
+  border: 1.5px solid #ef5350;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
 .handCountBadge {
   background: linear-gradient(135deg, #d4a843 0%, #8a7230 100%);
   color: #1a0a0a;

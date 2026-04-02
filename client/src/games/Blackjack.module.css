@@ -156,9 +156,20 @@
   color: #e8f5e9;
 }
 
+.otherCards {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  transform-origin: left center;
+  scale: 0.55;
+  margin-right: -1rem;
+}
+
 .otherCardCount {
   font-size: 0.85rem;
   color: #a5d6a7;
+  font-weight: bold;
+  min-width: 2ch;
 }
 
 .badgeBusted {

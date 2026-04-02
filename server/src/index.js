@@ -190,6 +190,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || tm.phase !== 'voting') return;
+    const lobby = lobbyManager.getLobby(lobbyId);
 
     const score = tm.scores[socket.id] ?? 0;
     if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
@@ -219,6 +220,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || tm.phase !== 'voting') return;
+    const lobby = lobbyManager.getLobby(lobbyId);
 
     const score = tm.scores[socket.id] ?? 0;
     if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;

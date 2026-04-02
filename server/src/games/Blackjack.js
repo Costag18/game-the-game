@@ -175,6 +175,7 @@ export class Blackjack extends BaseGame {
       dealerTotal: isRevealOrFinished ? this.calculateHandValue(this.dealerHand) : null,
       otherPlayers: this.players.filter((p) => p !== playerId).map((p) => ({
         playerId: p,
+        cards: this.hands[p] || [],
         cardCount: (this.hands[p] || []).length,
         total: this.calculateHandValue(this.hands[p] || []),
         busted: this.busted.includes(p),
