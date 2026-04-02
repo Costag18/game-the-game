@@ -131,7 +131,10 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
     return 'Waiting for other players...';
   }
 
+  const [showHands, setShowHands] = useState(false);
+
   return (
+    <div className={styles.tableOuter}>
     <div className={styles.table}>
       <h1 className={styles.title}>Texas Hold'em</h1>
 
@@ -277,6 +280,28 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
           </div>
         )}
       </section>
+    </div>
+
+    {/* Hand rankings sidebar */}
+    <div className={styles.handRankings}>
+      <button className={styles.handRankingsToggle} onClick={() => setShowHands(!showHands)}>
+        {showHands ? 'Hide Hands ▶' : '◀ Hand Rankings'}
+      </button>
+      {showHands && (
+        <div className={styles.handRankingsList}>
+          <div className={styles.handRank}><span className={styles.handRankNum}>1</span><span className={styles.handRankName}>Royal Flush</span><span className={styles.handRankDesc}>A K Q J 10 same suit</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>2</span><span className={styles.handRankName}>Straight Flush</span><span className={styles.handRankDesc}>5 in a row, same suit</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>3</span><span className={styles.handRankName}>Four of a Kind</span><span className={styles.handRankDesc}>4 same rank</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>4</span><span className={styles.handRankName}>Full House</span><span className={styles.handRankDesc}>3 of a kind + pair</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>5</span><span className={styles.handRankName}>Flush</span><span className={styles.handRankDesc}>5 same suit</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>6</span><span className={styles.handRankName}>Straight</span><span className={styles.handRankDesc}>5 in a row</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>7</span><span className={styles.handRankName}>Three of a Kind</span><span className={styles.handRankDesc}>3 same rank</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>8</span><span className={styles.handRankName}>Two Pair</span><span className={styles.handRankDesc}>2 different pairs</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>9</span><span className={styles.handRankName}>One Pair</span><span className={styles.handRankDesc}>2 same rank</span></div>
+          <div className={styles.handRank}><span className={styles.handRankNum}>10</span><span className={styles.handRankName}>High Card</span><span className={styles.handRankDesc}>Highest card wins</span></div>
+        </div>
+      )}
+    </div>
     </div>
   );
 }

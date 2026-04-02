@@ -2,9 +2,15 @@
    Poker table layout
    ============================================================ */
 
-.table {
+.tableOuter {
+  display: flex;
   min-height: 100vh;
   background: radial-gradient(ellipse at center, #1e7a3e 0%, #145228 60%, #0d3a1c 100%);
+}
+
+.table {
+  flex: 1;
+  min-height: 100vh;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -446,4 +452,99 @@
   font-size: 0.8rem;
   font-style: italic;
   font-weight: 600;
+}
+
+/* ============================================================
+   Hand Rankings Sidebar
+   ============================================================ */
+
+.handRankings {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.handRankingsToggle {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  border-radius: 4px 0 0 4px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.05em;
+  transition: background 0.2s;
+}
+
+.handRankingsToggle:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.handRankingsList {
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(212, 168, 67, 0.3);
+  border-radius: 6px 0 0 6px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 200px;
+}
+
+.handRank {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.3rem;
+  border-radius: 3px;
+  transition: background 0.15s;
+}
+
+.handRank:hover {
+  background: rgba(212, 168, 67, 0.1);
+}
+
+.handRankNum {
+  color: var(--gold, #d4a843);
+  font-weight: 700;
+  font-size: 0.7rem;
+  min-width: 1.2rem;
+  text-align: center;
+}
+
+.handRankName {
+  color: #f0e6d3;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.handRankDesc {
+  color: #b8a88a;
+  font-size: 0.65rem;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .tableOuter {
+    flex-direction: column;
+  }
+
+  .handRankings {
+    align-items: center;
+  }
+
+  .handRankingsToggle {
+    writing-mode: horizontal-tb;
+    border-radius: 4px;
+    width: auto;
+  }
+
+  .handRankingsList {
+    width: 100%;
+    border-radius: 6px;
+  }
 }
