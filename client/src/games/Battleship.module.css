@@ -45,21 +45,59 @@
   justify-content: center;
 }
 
+.shipStatusLabel {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .shipBadge {
-  background: rgba(0, 100, 200, 0.2);
-  border: 1px solid rgba(100, 180, 255, 0.3);
+  background: rgba(0, 100, 200, 0.15);
+  border: 1px solid rgba(100, 180, 255, 0.25);
   border-radius: 4px;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   color: #8cc4ff;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.shipName {
   text-transform: capitalize;
+  min-width: 3.5rem;
+}
+
+.shipHealth {
+  display: flex;
+  gap: 2px;
+}
+
+.shipSegOk {
+  width: 10px;
+  height: 10px;
+  background: #4caf50;
+  border-radius: 2px;
+}
+
+.shipSegHit {
+  width: 10px;
+  height: 10px;
+  background: #e53935;
+  border-radius: 2px;
 }
 
 .shipSunk {
   background: rgba(200, 50, 50, 0.2);
   border-color: rgba(255, 100, 100, 0.3);
-  color: #ff8888;
-  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.shipSunkLabel {
+  color: #ff6666;
+  font-size: 0.65rem;
+  font-weight: 700;
 }
 
 /* Grid shared */
@@ -116,6 +154,11 @@
 
 .cell:hover {
   border-color: #3a6a9a;
+}
+
+.cell[style*="pointer"]:hover {
+  background: rgba(255, 100, 100, 0.2);
+  border-color: #cc5555;
 }
 
 /* Cell states */

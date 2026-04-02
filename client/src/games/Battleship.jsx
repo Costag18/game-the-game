@@ -150,10 +150,12 @@ function BattleGrid({ label, cells, sunkShips, onClick, clickable, fullReveal })
 
               if (typeof cells === 'object' && !Array.isArray(cells)) {
                 // Opponent view: cells is shot results { idx: 'hit'|'miss' }
-                if (cells[idx] === 'hit') cellClass += ' ' + styles.cellHit;
-                else if (cells[idx] === 'miss') cellClass += ' ' + styles.cellMiss;
+                // Keys may be strings after JSON serialization
+                const shotResult = cells[idx] || cells[String(idx)];
+                if (shotResult === 'hit') cellClass += ' ' + styles.cellHit;
+                else if (shotResult === 'miss') cellClass += ' ' + styles.cellMiss;
                 if (sunkCells.has(idx)) cellClass += ' ' + styles.cellSunk;
-                if (fullReveal && fullReveal[idx]) cellClass += ' ' + styles.cellShipReveal;
+                if (fullReveal && (fullReveal[idx] || fullReveal[String(idx)])) cellClass += ' ' + styles.cellShipReveal;
               } else if (Array.isArray(cells)) {
                 // My board view: cells is array of {ship, hit}
                 const c = cells[idx];
@@ -226,7 +228,8 @@ export default function Battleship({ gameState, onAction, nicknames }) {
 
   function handleFire(cellIndex) {
     if (!isMyTurn) return;
-    if (opponentShots[cellIndex]) return; // already fired here
+    // Keys may be strings from JSON serialization
+    if (opponentShots[cellIndex] || opponentShots[String(cellIndex)]) return;
     onAction({ type: 'fire', cell: cellIndex });
   }
 
@@ -253,9 +256,16 @@ export default function Battleship({ gameState, onAction, nicknames }) {
       {/* Ship status */}
       {(isPlaying || isFinished) && myShips && (
         <div className={styles.shipStatus}>
+          <span className={styles.shipStatusLabel}>Your Fleet:</span>
           {myShips.map((s) => (
             <span key={s.type} className={`${styles.shipBadge} ${s.sunk ? styles.shipSunk : ''}`}>
-              {s.type} ({s.hits}/{s.size})
+              <span className={styles.shipName}>{s.type}</span>
+              <span className={styles.shipHealth}>
+                {Array.from({ length: s.size }, (_, i) => (
+                  <span key={i} className={i < s.hits ? styles.shipSegHit : styles.shipSegOk} />
+                ))}
+              </span>
+              {s.sunk && <span className={styles.shipSunkLabel}>SUNK</span>}
             </span>
           ))}
         </div>
