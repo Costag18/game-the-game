@@ -309,7 +309,7 @@
 
 @media (min-width: 960px) {
   .sidebarArea {
-    width: 280px;
+    width: 340px;
     height: 100vh;
     border-top: none;
     border-left: 2px solid var(--gold-dim, #8a7230);
