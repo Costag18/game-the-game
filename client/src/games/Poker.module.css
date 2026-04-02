@@ -499,9 +499,9 @@
 }
 
 .handRankingsGrid {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   border-top: 1px solid rgba(212, 168, 67, 0.3);
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0.5rem;
@@ -517,44 +517,61 @@
 .handRankCard {
   display: flex;
   flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 168, 67, 0.15);
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.handRankCard:hover {
+  background: rgba(212, 168, 67, 0.08);
+}
+
+.handRankHeader {
+  display: flex;
   align-items: center;
-  gap: 0.2rem;
-  padding: 0.4rem;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: 4px;
+  gap: 0.4rem;
 }
 
 .handRankNum {
   color: var(--gold, #d4a843);
   font-weight: 700;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
+  min-width: 1.3rem;
 }
 
 .handRankName {
   color: #f0e6d3;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  text-align: center;
 }
 
-.miniCards {
+.handRankExample {
   display: flex;
-  gap: 2px;
-  flex-wrap: wrap;
-  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
 }
 
-.miniCard {
-  background: #f5f0e8;
-  color: #2c3e50;
-  font-size: 0.55rem;
-  font-weight: 700;
-  padding: 1px 3px;
-  border-radius: 2px;
-  line-height: 1.2;
-  border: 1px solid #ccc;
+.handRankEx {
+  color: #ccc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
-.miniCardRed {
-  color: #c0392b;
+.handRankSuit {
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.suitRed {
+  color: #e53935;
+}
+
+.handRankDesc {
+  color: #888;
+  font-size: 0.65rem;
+  font-style: italic;
 }

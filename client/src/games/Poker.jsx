@@ -294,31 +294,36 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
     {/* Hand rankings at bottom */}
     <div className={styles.handRankingsBar}>
       <button className={styles.handRankingsToggle} onClick={() => setShowHands(!showHands)}>
-        {showHands ? 'Hide Hand Rankings ▲' : 'Hand Rankings ▼'}
+        {showHands ? 'Hide Hand Rankings ▲' : '♠ ♥ Hand Rankings ♦ ♣'}
       </button>
       {showHands && (
         <div className={styles.handRankingsGrid}>
           {[
-            { name: 'Royal Flush', cards: ['A♠','K♠','Q♠','J♠','10♠'] },
-            { name: 'Straight Flush', cards: ['9♥','8♥','7♥','6♥','5♥'] },
-            { name: 'Four of a Kind', cards: ['K♣','K♦','K♥','K♠','3♦'] },
-            { name: 'Full House', cards: ['J♠','J♥','J♦','8♣','8♠'] },
-            { name: 'Flush', cards: ['A♦','J♦','8♦','6♦','2♦'] },
-            { name: 'Straight', cards: ['10♣','9♦','8♠','7♥','6♣'] },
-            { name: 'Three of a Kind', cards: ['7♠','7♥','7♦','K♣','2♠'] },
-            { name: 'Two Pair', cards: ['A♣','A♦','9♥','9♠','4♣'] },
-            { name: 'One Pair', cards: ['Q♥','Q♠','8♣','5♦','3♠'] },
-            { name: 'High Card', cards: ['A♠','J♦','8♣','5♥','2♠'] },
-          ].map((h, i) => (
-            <div key={i} className={styles.handRankCard}>
-              <span className={styles.handRankNum}>{i + 1}</span>
-              <span className={styles.handRankName}>{h.name}</span>
-              <div className={styles.miniCards}>
-                {h.cards.map((c, j) => {
-                  const isRed = c.includes('♥') || c.includes('♦');
-                  return <span key={j} className={`${styles.miniCard} ${isRed ? styles.miniCardRed : ''}`}>{c}</span>;
-                })}
+            { rank: 1, name: 'Royal Flush', ex: 'A K Q J 10', suit: '♠', color: 'black', desc: 'Same suit' },
+            { rank: 2, name: 'Straight Flush', ex: '9 8 7 6 5', suit: '♥', color: 'red', desc: 'Same suit, in order' },
+            { rank: 3, name: 'Four of a Kind', ex: 'K K K K', suit: '♠♦♥♣', color: 'mixed', desc: '4 matching' },
+            { rank: 4, name: 'Full House', ex: 'J J J 8 8', suit: '', color: 'mixed', desc: '3 + pair' },
+            { rank: 5, name: 'Flush', ex: 'A J 8 6 2', suit: '♦', color: 'red', desc: 'All same suit' },
+            { rank: 6, name: 'Straight', ex: '10 9 8 7 6', suit: '', color: 'mixed', desc: '5 in order' },
+            { rank: 7, name: 'Three of a Kind', ex: '7 7 7', suit: '♠♥♦', color: 'mixed', desc: '3 matching' },
+            { rank: 8, name: 'Two Pair', ex: 'A A 9 9', suit: '', color: 'mixed', desc: '2 pairs' },
+            { rank: 9, name: 'One Pair', ex: 'Q Q', suit: '♥♠', color: 'mixed', desc: '2 matching' },
+            { rank: 10, name: 'High Card', ex: 'A', suit: '♠', color: 'black', desc: 'Highest wins' },
+          ].map((h) => (
+            <div key={h.rank} className={styles.handRankCard}>
+              <div className={styles.handRankHeader}>
+                <span className={styles.handRankNum}>{h.rank}</span>
+                <span className={styles.handRankName}>{h.name}</span>
               </div>
+              <div className={styles.handRankExample}>
+                <span className={styles.handRankEx}>{h.ex}</span>
+                {h.suit && (
+                  <span className={`${styles.handRankSuit} ${h.color === 'red' ? styles.suitRed : ''}`}>
+                    {h.suit}
+                  </span>
+                )}
+              </div>
+              <span className={styles.handRankDesc}>{h.desc}</span>
             </div>
           ))}
         </div>
