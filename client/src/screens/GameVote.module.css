@@ -690,3 +690,128 @@
   display: flex;
   gap: 0.5rem;
 }
+
+/* ===================== Chicken Cross ===================== */
+
+.chickenRoad {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  width: 100%;
+  max-width: 220px;
+  background: #333;
+  border: 2px solid var(--gold-dim, #8a7230);
+  border-radius: 6px;
+  padding: 4px;
+  position: relative;
+  min-height: 200px;
+}
+
+.chickenLane {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0.6rem;
+  background: #444;
+  border-radius: 3px;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.chickenLaneSafe {
+  background: rgba(76, 175, 80, 0.3);
+  border-left: 3px solid #4caf50;
+}
+
+.chickenLaneCrash {
+  background: rgba(229, 57, 53, 0.4);
+  border-left: 3px solid #e53935;
+}
+
+.chickenLaneMult {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.chickenLaneSafe .chickenLaneMult {
+  color: #4caf50;
+}
+
+.chickenLaneCrash .chickenLaneMult {
+  color: #e53935;
+}
+
+.chickenCheck {
+  color: #4caf50;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.chickenSplat {
+  font-size: 1.1rem;
+}
+
+.chickenIcon {
+  position: absolute;
+  right: 8px;
+  font-size: 1.3rem;
+  transition: bottom 0.3s ease-out;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.chickenControls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chickenMultText {
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.chickenButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btnChickenCross {
+  background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-heading, Georgia);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btnChickenCross:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnChickenCashout {
+  background: linear-gradient(135deg, var(--gold, #d4a843) 0%, var(--gold-dim, #8a7230) 100%);
+  color: var(--bg-dark, #1a0a0a);
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-heading, Georgia);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btnChickenCashout:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}

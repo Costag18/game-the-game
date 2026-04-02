@@ -440,6 +440,85 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
+  // --- Chicken Cross ---
+  socket.on(EVENTS.CHICKEN_START, ({ amount }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+    const score = tm.scores[socket.id] ?? 0;
+    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+
+    // Start a chicken run — store state on tournament
+    if (!tm._chickenGames) tm._chickenGames = {};
+    // Crash point: random step between 1 and 8 (earlier steps more likely to survive)
+    const crashStep = Math.floor(Math.random() * 8) + 1;
+    tm._chickenGames[socket.id] = { wager: amount, step: 0, crashStep, alive: true };
+
+    socket.emit(EVENTS.CHICKEN_RESULT, {
+      phase: 'playing', step: 0, multiplier: 1.0, wager: amount, alive: true,
+    });
+  });
+
+  socket.on(EVENTS.CHICKEN_ACTION, ({ action }) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || tm.phase !== 'voting') return;
+    if (!tm._chickenGames?.[socket.id]) return;
+    const lobby = lobbyManager.getLobby(lobbyId);
+
+    const game = tm._chickenGames[socket.id];
+    if (!game.alive) return;
+
+    // Multiplier per step: 1.2x, 1.5x, 1.8x, 2.2x, 2.8x, 3.5x, 4.5x, 6x
+    const MULTIPLIERS = [1.0, 1.2, 1.5, 1.8, 2.2, 2.8, 3.5, 4.5, 6.0];
+
+    if (action === 'cross') {
+      game.step++;
+      if (game.step >= game.crashStep) {
+        // Hit! Lose wager
+        game.alive = false;
+        tm.scores[socket.id] -= game.wager;
+        socket.emit(EVENTS.CHICKEN_RESULT, {
+          phase: 'finished', step: game.step, multiplier: 0,
+          wager: game.wager, net: -game.wager, alive: false,
+          crashStep: game.crashStep, newScore: tm.scores[socket.id],
+        });
+        delete tm._chickenGames[socket.id];
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+        if (tm.isTournamentOver()) {
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+          tournaments.delete(lobbyId);
+          lobbyManager.setStatus(lobbyId, 'waiting');
+        }
+      } else {
+        // Safe! Send updated state
+        const mult = MULTIPLIERS[Math.min(game.step, MULTIPLIERS.length - 1)];
+        socket.emit(EVENTS.CHICKEN_RESULT, {
+          phase: 'playing', step: game.step, multiplier: mult,
+          wager: game.wager, alive: true,
+        });
+      }
+    } else if (action === 'cashout') {
+      // Cash out at current multiplier
+      const mult = MULTIPLIERS[Math.min(game.step, MULTIPLIERS.length - 1)];
+      const payout = Math.floor(game.wager * mult);
+      const net = payout - game.wager;
+      tm.scores[socket.id] += net;
+      socket.emit(EVENTS.CHICKEN_RESULT, {
+        phase: 'finished', step: game.step, multiplier: mult,
+        wager: game.wager, payout, net, alive: true,
+        newScore: tm.scores[socket.id],
+      });
+      delete tm._chickenGames[socket.id];
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      if (tm.isTournamentOver()) {
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+        tournaments.delete(lobbyId);
+        lobbyManager.setStatus(lobbyId, 'waiting');
+      }
+    }
+  });
+
   socket.on(EVENTS.WAGER_SUBMIT, (amount) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);

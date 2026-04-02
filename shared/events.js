@@ -42,4 +42,7 @@ export const EVENTS = {
   BJ_LITE_START: 'tournament:bjLiteStart',
   BJ_LITE_ACTION: 'tournament:bjLiteAction',
   BJ_LITE_RESULT: 'tournament:bjLiteResult',
+  CHICKEN_START: 'tournament:chickenStart',
+  CHICKEN_ACTION: 'tournament:chickenAction',
+  CHICKEN_RESULT: 'tournament:chickenResult',
 };

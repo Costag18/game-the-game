@@ -435,6 +435,135 @@ function BJLitePanel({ socket, myScore }) {
   );
 }
 
+// --- Chicken Cross ---
+const CHICKEN_MULTS = [1.0, 1.2, 1.5, 1.8, 2.2, 2.8, 3.5, 4.5, 6.0];
+const ROAD_LANES = 8;
+
+function ChickenPanel({ socket, myScore }) {
+  const [wager, setWager] = useState(10);
+  const [gameState, setGameState] = useState(null);
+
+  const maxWager = Math.floor((myScore || 0) * 0.5);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onResult(data) { setGameState(data); }
+    socket.on(EVENTS.CHICKEN_RESULT, onResult);
+    return () => socket.off(EVENTS.CHICKEN_RESULT, onResult);
+  }, [socket]);
+
+  useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
+
+  function handleStart() {
+    if (maxWager <= 0) return;
+    socket.emit(EVENTS.CHICKEN_START, { amount: wager });
+  }
+
+  function handleCross() {
+    socket.emit(EVENTS.CHICKEN_ACTION, { action: 'cross' });
+  }
+
+  function handleCashout() {
+    socket.emit(EVENTS.CHICKEN_ACTION, { action: 'cashout' });
+  }
+
+  const isBroke = maxWager <= 0;
+  const isPlaying = gameState?.phase === 'playing';
+  const isFinished = gameState?.phase === 'finished';
+  const step = gameState?.step ?? 0;
+
+  return (
+    <div className={styles.miniGame}>
+      <h3 className={styles.miniTitle}>Chicken Cross</h3>
+
+      {/* Road visualization */}
+      <div className={styles.chickenRoad}>
+        {Array.from({ length: ROAD_LANES }, (_, i) => {
+          const laneIdx = i + 1;
+          const crossed = step >= laneIdx;
+          const crashed = isFinished && !gameState.alive && gameState.crashStep === laneIdx;
+          return (
+            <div key={i} className={[
+              styles.chickenLane,
+              crossed && !crashed ? styles.chickenLaneSafe : '',
+              crashed ? styles.chickenLaneCrash : '',
+            ].filter(Boolean).join(' ')}>
+              <span className={styles.chickenLaneMult}>{CHICKEN_MULTS[laneIdx]}x</span>
+              {crashed && <span className={styles.chickenSplat}>💥</span>}
+              {crossed && !crashed && <span className={styles.chickenCheck}>✓</span>}
+            </div>
+          );
+        })}
+        {/* Chicken position */}
+        {isPlaying && (
+          <div className={styles.chickenIcon} style={{ bottom: `${(step / ROAD_LANES) * 100}%` }}>
+            🐔
+          </div>
+        )}
+      </div>
+
+      {/* Playing state */}
+      {isPlaying && (
+        <div className={styles.chickenControls}>
+          <p className={styles.chickenMultText}>
+            {step === 0 ? 'Ready to cross!' : `${CHICKEN_MULTS[Math.min(step, CHICKEN_MULTS.length - 1)]}x`}
+          </p>
+          <div className={styles.chickenButtons}>
+            <button className={styles.btnChickenCross} onClick={handleCross}>
+              Cross 🐔
+            </button>
+            {step > 0 && (
+              <button className={styles.btnChickenCashout} onClick={handleCashout}>
+                Cash Out
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Finished state */}
+      {isFinished && (
+        <>
+          <p className={gameState.net >= 0 ? styles.slotsWin : styles.slotsLose}>
+            {gameState.alive
+              ? `+${gameState.net} (${gameState.multiplier}x)`
+              : `${gameState.net} — Splat!`}
+          </p>
+          {maxWager > 0 && (
+            <>
+              <div className={styles.coinWagerRow}>
+                <span className={styles.coinWagerLabel}>Bet:</span>
+                <span className={styles.coinWagerAmount}>{wager}</span>
+              </div>
+              <input type="range" min={1} max={maxWager} value={wager}
+                onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
+            </>
+          )}
+          <button className={styles.btnSpin} onClick={handleStart} disabled={maxWager <= 0}>
+            Play Again
+          </button>
+        </>
+      )}
+
+      {/* Initial state */}
+      {!gameState && (
+        !isBroke ? (
+          <>
+            <div className={styles.coinWagerRow}>
+              <span className={styles.coinWagerLabel}>Bet:</span>
+              <span className={styles.coinWagerAmount}>{wager}</span>
+            </div>
+            <input type="range" min={1} max={maxWager} value={wager}
+              onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
+            <button className={styles.btnSpin} onClick={handleStart}>START</button>
+            <p className={styles.slotsOdds}>Cross lanes for bigger multipliers. Cash out or get splat!</p>
+          </>
+        ) : <p className={styles.coinBroke}>No points to gamble!</p>
+      )}
+    </div>
+  );
+}
+
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
   const [voted, setVoted] = useState(false);
@@ -544,6 +673,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
         <SlotsPanel socket={socket} myScore={myScore} />
         <WheelPanel socket={socket} myScore={myScore} />
         <BJLitePanel socket={socket} myScore={myScore} />
+        <ChickenPanel socket={socket} myScore={myScore} />
       </div>
     </div>
   );
