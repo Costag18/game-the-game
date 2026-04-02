@@ -695,27 +695,43 @@
 
 .chickenRoad {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: row;
+  align-items: center;
   gap: 2px;
   width: 100%;
-  max-width: 220px;
   background: #333;
   border: 2px solid var(--gold-dim, #8a7230);
   border-radius: 6px;
   padding: 4px;
-  position: relative;
-  min-height: 200px;
+  overflow-x: auto;
+}
+
+.chickenStart {
+  font-size: 1rem;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.chickenFinish {
+  font-size: 1rem;
+  padding: 0 2px;
+  flex-shrink: 0;
+  animation: resultPop 0.3s ease-out;
 }
 
 .chickenLane {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.3rem 0.6rem;
+  justify-content: center;
+  gap: 2px;
+  padding: 0.3rem 0.15rem;
   background: #444;
   border-radius: 3px;
   transition: background 0.2s;
-  position: relative;
+  min-width: 26px;
+  height: 48px;
+  flex: 1;
 }
 
 .chickenLaneSafe {
@@ -749,15 +765,11 @@
 }
 
 .chickenSplat {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
 }
 
-.chickenIcon {
-  position: absolute;
-  right: 8px;
-  font-size: 1.3rem;
-  transition: bottom 0.3s ease-out;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+.chickenHere {
+  font-size: 0.9rem;
 }
 
 .chickenControls {

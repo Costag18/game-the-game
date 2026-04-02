@@ -476,12 +476,14 @@ function ChickenPanel({ socket, myScore }) {
     <div className={styles.miniGame}>
       <h3 className={styles.miniTitle}>Chicken Cross</h3>
 
-      {/* Road visualization */}
+      {/* Road visualization — horizontal */}
       <div className={styles.chickenRoad}>
+        <div className={styles.chickenStart}>🐔</div>
         {Array.from({ length: ROAD_LANES }, (_, i) => {
           const laneIdx = i + 1;
           const crossed = step >= laneIdx;
           const crashed = isFinished && !gameState.alive && gameState.crashStep === laneIdx;
+          const isChickenHere = isPlaying && step === laneIdx;
           return (
             <div key={i} className={[
               styles.chickenLane,
@@ -490,15 +492,13 @@ function ChickenPanel({ socket, myScore }) {
             ].filter(Boolean).join(' ')}>
               <span className={styles.chickenLaneMult}>{CHICKEN_MULTS[laneIdx]}x</span>
               {crashed && <span className={styles.chickenSplat}>💥</span>}
-              {crossed && !crashed && <span className={styles.chickenCheck}>✓</span>}
+              {isChickenHere && <span className={styles.chickenHere}>🐔</span>}
+              {crossed && !crashed && !isChickenHere && <span className={styles.chickenCheck}>✓</span>}
             </div>
           );
         })}
-        {/* Chicken position */}
-        {isPlaying && (
-          <div className={styles.chickenIcon} style={{ bottom: `${(step / ROAD_LANES) * 100}%` }}>
-            🐔
-          </div>
+        {isFinished && gameState.alive && step >= ROAD_LANES && (
+          <div className={styles.chickenFinish}>🏆</div>
         )}
       </div>
 
