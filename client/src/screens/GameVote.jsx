@@ -5,6 +5,8 @@ import { displayName } from '../utils/displayName.js';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
 import styles from './GameVote.module.css';
 import voteImg from '../assets/images/votefornext.png';
+import pharaohImg from '../assets/images/pharoah.png';
+import coinsImg from '../assets/images/realistic-gold-coins-explosion-clipping-path-isolated_206725-298.avif';
 
 import previewBlackjack from '../assets/gamepreviews/Blackjack.png';
 import previewPoker from '../assets/gamepreviews/ad064bcefa40-no-limit-texas-holdem.png';
@@ -61,6 +63,12 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
 
   return (
     <div className={styles.outerLayout}>
+      {/* Coins background at top */}
+      <div className={styles.coinsBackground}>
+        <img src={coinsImg} alt="" className={styles.coinsImage} />
+        <div className={styles.coinsGradient} />
+      </div>
+
       <div className={styles.container}>
         <div className={styles.header}>
           <img src={voteImg} alt="Vote for the Next Game" className={styles.titleImage} />
@@ -69,15 +77,18 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
         </div>
 
         {standings.length > 0 && (
-          <div className={styles.standings}>
-            <p className={styles.standingsTitle}>Leaderboard</p>
-            {standings.map((entry, i) => (
+          <div className={styles.standingsArea}>
+            <img src={pharaohImg} alt="" className={styles.pharaohImage} />
+            <div className={styles.standings}>
+              <p className={styles.standingsTitle}>Leaderboard</p>
+              {standings.map((entry, i) => (
               <div key={entry.playerId} className={styles.standingRow}>
                 <span className={styles.standingRank}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
                 <span className={styles.standingName}>{entry.nickname || displayName(entry.playerId, nicknames)}</span>
                 <span className={styles.standingScore}>{entry.score} pts</span>
               </div>
             ))}
+            </div>
           </div>
         )}
 

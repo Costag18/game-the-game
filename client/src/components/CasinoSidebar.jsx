@@ -232,7 +232,7 @@ function ChickenPanel({ socket, myScore }) {
         </div>
         {/* Multiplier labels below */}
         <div className={styles.chickenLabels}>
-          <div className={styles.chickenLabelCell}><span className={styles.chickenLaneMult}>GO</span></div>
+          <div className={styles.chickenLabelCell}><span className={styles.chickenLaneMult}>1x</span></div>
           {Array.from({ length: ROAD_LANES }, (_, i) => (
             <div key={i} className={styles.chickenLabelCell}>
               <span className={styles.chickenLaneMult}>{CHICKEN_MULTS[i + 1]}x</span>
