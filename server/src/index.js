@@ -50,6 +50,15 @@ if (isProduction) {
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+function cleanupCasinoSession(playerId) {
+  const casinoId = `casino_${playerId}`;
+  tournaments.delete(casinoId);
+  lobbyManager.lobbies.delete(casinoId);
+  if (lobbyManager.playerToLobby.get(playerId) === casinoId) {
+    lobbyManager.playerToLobby.delete(playerId);
+  }
+}
+
 io.on(EVENTS.CONNECTION, (socket) => {
   console.log(`Player connected: ${socket.id}`);
 
@@ -76,6 +85,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
   socket.on(EVENTS.CREATE_LOBBY, (options, callback) => {
     try {
+      cleanupCasinoSession(socket.id);
       const lobby = lobbyManager.createLobby(socket.id, options);
       if (socket.data.nickname) {
         lobbyManager.setNickname(socket.id, socket.data.nickname);
@@ -89,6 +99,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
   socket.on(EVENTS.JOIN_LOBBY, ({ lobbyId, code }, callback) => {
     try {
+      cleanupCasinoSession(socket.id);
       const lobby = lobbyManager.joinLobby(lobbyId, socket.id, code);
       if (socket.data.nickname) {
         lobbyManager.setNickname(socket.id, socket.data.nickname);
@@ -536,12 +547,11 @@ io.on(EVENTS.CONNECTION, (socket) => {
   });
 
   // --- Free Play Casino ---
+
   socket.on(EVENTS.CASINO_JOIN, () => {
     const casinoLobbyId = `casino_${socket.id}`;
     // Clean up any existing casino session
-    if (tournaments.has(casinoLobbyId)) {
-      tournaments.delete(casinoLobbyId);
-    }
+    cleanupCasinoSession(socket.id);
     // Create a fake tournament for solo casino play
     const tm = new TournamentManager({
       players: [socket.id],
