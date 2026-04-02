@@ -23,6 +23,7 @@ import MemoryMatchGame from './games/MemoryMatch.jsx';
 import RouletteGame from './games/Roulette.jsx';
 import HangmanGame from './games/Hangman.jsx';
 import SpotTheDifferenceGame from './games/SpotTheDifference.jsx';
+import BattleshipGame from './games/Battleship.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -39,6 +40,7 @@ const GAME_COMPONENTS = {
   roulette: RouletteGame,
   hangman: HangmanGame,
   spotTheDifference: SpotTheDifferenceGame,
+  battleship: BattleshipGame,
 };
 
 function GameRouter() {

@@ -63,6 +63,18 @@ export const GAMES = {
       'Highest total score across all rounds wins!',
     ],
   },
+  battleship: {
+    id: 'battleship', name: 'Battleship', minPlayers: 2, maxPlayers: 2,
+    turnTimer: TIMERS.BATTLESHIP, description: 'Place your fleet and sink your opponent\'s ships!',
+    tutorial: 'https://www.youtube.com/watch?v=RY4nAyRgkLo',
+    instructions: [
+      'Place 5 ships on your 10×10 grid during the setup phase (60 seconds).',
+      'Ships: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).',
+      'Take turns firing at your opponent\'s grid. Hits are red, misses are white.',
+      'Hit a ship = fire again! Miss = opponent\'s turn.',
+      'Sink all 5 of your opponent\'s ships to win.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

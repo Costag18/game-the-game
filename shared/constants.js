@@ -23,6 +23,7 @@ export const TIMERS = {
   VOTE: 20,
   WAGER: 30,
   SPOT_DIFFERENCE: 45,
+  BATTLESHIP: 30,
   RECONNECT_GRACE: 45,
 };
 

@@ -56,7 +56,7 @@ getResults()
 
 ## Mini-Games (11)
 
-Blackjack (2-8), Poker/Texas Hold'em (2-8), Uno (2-8), Go Fish (2-6), Crazy Eights (2-6), Rock-Paper-Scissors (2), Liar's Dice (2-8), Memory Match (2-6), Roulette (2-8), Hangman (2-8), Spot the Difference (2-8)
+Blackjack (2-8), Poker/Texas Hold'em (2-8), Uno (2-8), Go Fish (2-6), Crazy Eights (2-6), Rock-Paper-Scissors (2), Liar's Dice (2-8), Memory Match (2-6), Roulette (2-8), Hangman (2-8), Spot the Difference (2-8), Battleship (2)
 
 ## Scoring
 

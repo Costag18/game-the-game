@@ -10,6 +10,7 @@ import { GoFish } from './GoFish.js';
 import { Roulette } from './Roulette.js';
 import { Hangman } from './Hangman.js';
 import { SpotTheDifference } from './SpotTheDifference.js';
+import { Battleship } from './Battleship.js';
 
 const gameEngines = {};
 
@@ -43,3 +44,4 @@ registerGame('roulette', Roulette);
 registerGame('hangman', Hangman);
 registerGame('poker', Poker);
 registerGame('spotTheDifference', SpotTheDifference);
+registerGame('battleship', Battleship);

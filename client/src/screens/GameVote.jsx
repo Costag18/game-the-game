@@ -17,6 +17,7 @@ import previewMemoryMatch from '../assets/gamepreviews/concentration-card-game-1
 import previewRoulette from '../assets/gamepreviews/roulettet.jpg';
 import previewHangman from '../assets/gamepreviews/Hangman_web-1024x682.png';
 import previewSpotDiff from '../assets/gamepreviews/spotthedifference.png';
+import previewBattleship from '../assets/gamepreviews/battleship.jpg';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -30,6 +31,7 @@ const GAME_PREVIEWS = {
   roulette: previewRoulette,
   hangman: previewHangman,
   spotTheDifference: previewSpotDiff,
+  battleship: previewBattleship,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
