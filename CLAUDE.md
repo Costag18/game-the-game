@@ -2,18 +2,19 @@
 
 ## Project Overview
 
-Browser-based multiplayer mini-game tournament platform. Players join lobbies, vote on mini-games, wager points, and compete across rounds to win tournaments.
+Browser-based multiplayer mini-game tournament platform. Players join lobbies, vote on mini-games, wager points, and compete across rounds to win tournaments. Includes a standalone free-play casino with side betting games.
 
 ## Tech Stack
 
-- **Frontend:** React (Vite) — `client/`
+- **Frontend:** React 19 (Vite) — `client/`
 - **Backend:** Node.js + Express + Socket.IO — `server/`
-- **State:** Redis (ioredis)
-- **Shared:** Constants and event names — `shared/`
+- **Shared:** Constants, event names, game list — `shared/`
+- **Fonts:** Cinzel (headings), Raleway (body), Pirata One (display) — Google Fonts
+- **Deploy:** Render (server) + static client build served by Express in production
 
 ## Architecture
 
-Server-authoritative. All game logic runs server-side. Clients send actions, server validates and broadcasts filtered state per player. Each mini-game is an FSM implementing a shared engine interface.
+Server-authoritative. All game logic runs server-side. Clients send actions via Socket.IO, server validates and broadcasts filtered state per player. Each mini-game is an FSM extending `BaseGame`. Timer-driven state changes use `setOnStateChange` callback for broadcasting.
 
 ## Key Commands
 
@@ -23,58 +24,130 @@ cd client && npm install && npm run dev
 
 # Server
 cd server && npm install && npm run dev
-
-# Redis (must be running)
-redis-server
+# Production: npm start
 ```
 
 ## Project Structure
 
 ```
-client/src/components/   — Shared UI (scoreboard, timer, chat)
-client/src/games/        — React component per mini-game
-client/src/screens/      — Menu, Lobby, WaitingRoom, Results
-client/src/hooks/        — useSocket, useGameState, useTournament
-server/src/games/        — FSM game engine per mini-game
-server/src/lobby/        — Room/lobby management
-server/src/tournament/   — Round orchestration, scoring, voting
-server/src/utils/        — Deck, dice, timer, shuffle helpers
-shared/                  — Event names, constants, types
+client/src/components/       — Shared UI (CasinoSidebar, scoreboard, chat)
+client/src/games/            — React component + CSS module per mini-game
+client/src/screens/          — Menu, Lobby, WaitingRoom, GameVote, WagerPhase, Results, CasinoMode
+client/src/hooks/            — useSocket, useTournament
+client/src/assets/           — styles/, images/, gamepreviews/
+server/src/games/            — FSM game engine per mini-game
+server/src/lobby/            — Room/lobby management
+server/src/tournament/       — Round orchestration, scoring (Scorer.js), voting
+server/src/utils/            — Deck, dice, timer, shuffle, words helpers
+shared/                      — events.js, constants.js, gameList.js
 ```
 
 ## Game Engine Interface
 
-Every mini-game server module must implement:
+Every mini-game server module must extend `BaseGame` and implement:
 
 ```js
-startGame(players)
-handleAction(playerId, action)
-getStateForPlayer(playerId)
-isComplete()
-getResults()
+startGame()                    // Initialize state, call transition('start')
+handleAction(playerId, action) // Process player actions, validate, advance state
+getStateForPlayer(playerId)    // Return filtered state (hide opponent info)
+isComplete()                   // Check if game is finished
+getResults()                   // Return [{playerId, placement, ...}] sorted
 ```
 
-## Mini-Games (11)
+Optional for timer-driven games:
+```js
+setOnStateChange(callback)     // Register broadcast callback for timer events
+_emitChange()                  // Call the callback to broadcast state
+```
 
-Blackjack (2-8), Poker/Texas Hold'em (2-8), Uno (2-8), Go Fish (2-6), Crazy Eights (2-6), Rock-Paper-Scissors (2), Liar's Dice (2-8), Memory Match (2-6), Roulette (2-8), Hangman (2-8), Spot the Difference (2-8), Battleship (2)
+## Adding a New Game
 
-## Scoring
+1. Create `server/src/games/YourGame.js` extending BaseGame
+2. Add to `shared/gameList.js` with id, name, minPlayers, maxPlayers, turnTimer, description, tutorial/instructions
+3. Add timer constant to `shared/constants.js` if needed
+4. Register in `server/src/games/registry.js`
+5. Create `client/src/games/YourGame.jsx` + `.module.css`
+6. Add preview image to `client/src/assets/gamepreviews/`
+7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
+8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-- Base points escalate: round N = 100 + (N-1) * 50
+## Mini-Games (12)
+
+| Game | Players | Type |
+|------|---------|------|
+| Blackjack | 2-8 | Turn-based, multi-hand |
+| Texas Hold'em Poker | 2-8 | Turn-based, 5 hands |
+| Uno | 2-8 | Turn-based, card game |
+| Go Fish | 2-6 | Turn-based, card game |
+| Crazy Eights | 2-6 | Turn-based, card game |
+| Rock Paper Scissors | 2 | Simultaneous, best of 5 |
+| Liar's Dice | 2-8 | Turn-based, bluffing (1s are wild) |
+| Memory Match | 2-6 | Turn-based, pairs |
+| Roulette | 2-8 | Simultaneous, 5 rounds |
+| Hangman | 2-8 | Turn-based, word guessing |
+| Spot the Difference | 2-8 | Simultaneous, 3 rounds |
+| Battleship | 2 | Turn-based, setup + firing |
+
+## Casino Side Games
+
+Available during voting/wagering phases and in standalone Free Play Casino mode. All server-validated with real tournament points.
+
+- **Coin Flip** — 50/50, 2x or 0x
+- **Slots** — 3-reel emoji, pair 1.5x / triple 3x / 777 5x
+- **Wheel of Fortune** — 20 segments, 0x to 10x
+- **Blackjack Lite** — Quick solo hand vs dealer
+- **Chicken Cross** — Cross lanes for escalating multipliers, cash out or get splat
+
+## Scoring & Wagering
+
+- All players start with 100 points
+- Base points escalate: round N = 100 + (N-1) × 50
 - Placement multipliers: 1st=100%, 2nd=70%, 3rd=50%, 4th=35%, 5th=25%, 6th+=15%
-- Wagering: 0-50% of current points, pot split 50/30/20 to top 3
+- Wager up to 50% of current points — multiplier scales by player count:
+  - 2 players: 1st 2x / 2nd 0x
+  - 4 players: 1st 2x / 2nd 1.5x / 3rd 0.5x / 4th 0x
+  - 6+ players: 1st 3x / 2nd 2x / 3rd 1.5x / 4th 1x / 5th 0.5x / 6th+ 0x
+- Point threshold mode: gambling can trigger tournament win
+
+## Critical Patterns & Lessons Learned
+
+### Timer-Driven State Broadcasting
+Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnStateChange` callback registered in `index.js`. The callback broadcasts state to all players AND checks `game.isComplete()` for auto-finishing. Without this, clients get stuck when timers expire because `handleAction` is never called.
+
+### Deadlock Prevention
+- All acknowledge/reveal phases need a 10-second auto-advance timer
+- Guard state transitions: `if (this.state !== 'expectedState') return;` to prevent double-execution
+- Auto-skip broke/eliminated/all-in players (Poker, Roulette, Hangman)
+- Client sends a `ping` action if local timer hits 0 and server hasn't transitioned
+
+### Hidden Information
+- `getStateForPlayer()` must NEVER reveal opponent hidden data (ship positions, hole cards, choices)
+- Only reveal on game completion or when specific conditions are met (sunk ship, showdown)
+
+### Tie Handling
+- `getResults()` must assign same placement number to tied players
+- Use `let placement = 1; if (i > 0 && score < prev.score) placement = i + 1;` pattern
+
+### Nicknames
+- Snapshotted at tournament start on TournamentManager constructor
+- Included in every `getState()` call — no stale data
+- Client uses `entry.nickname` from standings, falls back to `displayName()` utility
+
+### Race Conditions
+- Client uses `loadingGame` intermediate screen between WAGER_LOCKED and first GAME_STATE
+- GAME_STATE listener only transitions from `loadingGame` to `playing`, not from other screens
+
+### JSON Serialization
+- Object keys become strings after Socket.IO transmission — always check both `obj[num]` and `obj[String(num)]`
 
 ## Conventions
 
 - Server is always source of truth — never trust client state
 - Each player receives only their own visible game state
-- Turn timers: 30s for card games, 15s for RPS, 60s for roulette bets
-- Auto-action on timeout (stand/pass/random)
-- 30-60 second disconnection grace period with full state resync on reconnect
+- Turn timers: 30s card games, 15s RPS, 45s Spot the Difference, 60s Roulette/Battleship setup
+- Auto-action on timeout (stand/pass/random/auto-place)
 - Socket.IO rooms for lobby management
-- Clean up rooms when all players leave or on inactivity timeout
-- Casino/felt table visual theme: green felt, gold accents, wood trim, serif headings
-
-## Design Spec
-
-Full design document: `docs/superpowers/specs/2026-03-30-game-the-game-design.md`
+- CSS modules per component, casino theme with varied backgrounds per game
+- Fonts: Cinzel (headings), Raleway (body), Pirata One (game display names)
+- Game vote order randomized server-side each round
+- Keep-alive self-ping every 10 min in production (Render free plan)
