@@ -213,7 +213,12 @@ function ChickenPanel({ socket, myScore }) {
     <div className={styles.miniGame}>
       <h3 className={styles.miniTitle}>Chicken Cross</h3>
       <div className={styles.chickenRoad}>
-        <div className={styles.chickenStart}>🐔</div>
+        {/* Lane 0: safe start zone */}
+        <div className={[styles.chickenLane, styles.chickenLaneStart, step === 0 && isPlaying ? '' : styles.chickenLaneSafe].filter(Boolean).join(' ')}>
+          <span className={styles.chickenLaneMult}>START</span>
+          {isPlaying && step === 0 && <span className={styles.chickenHere}>🐔</span>}
+        </div>
+        {/* Lanes 1-8: risk zones */}
         {Array.from({ length: ROAD_LANES }, (_, i) => {
           const laneIdx = i + 1, crossed = step >= laneIdx;
           const crashed = isFinished && !gameState.alive && gameState.crashStep === laneIdx;

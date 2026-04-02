@@ -451,16 +451,17 @@ io.on(EVENTS.CONNECTION, (socket) => {
     // Start a chicken run — store state on tournament
     if (!tm._chickenGames) tm._chickenGames = {};
     // Each lane has an independent chance of crashing. Later lanes are riskier.
-    // Lane 1 is always safe so you can't die instantly.
+    // Player starts at step 0 (safe start lane), first cross goes to step 1.
     // crashStep = 9 means survived all lanes (possible to reach 6x)
-    const LANE_SURVIVE = [1.0, 0.90, 0.85, 0.75, 0.60, 0.50, 0.40, 0.30];
-    let crashStep = 9; // default: survive everything
+    const LANE_SURVIVE = [0.90, 0.85, 0.80, 0.70, 0.60, 0.50, 0.40, 0.30];
+    let crashStep = 9;
     for (let i = 0; i < LANE_SURVIVE.length; i++) {
       if (Math.random() > LANE_SURVIVE[i]) {
-        crashStep = i + 1;
+        crashStep = i + 1; // crash on lane 1-8
         break;
       }
     }
+    // Start at step 0 (safe zone) — first cross moves to step 1
     tm._chickenGames[socket.id] = { wager: amount, step: 0, crashStep, alive: true };
 
     socket.emit(EVENTS.CHICKEN_RESULT, {

@@ -706,10 +706,9 @@
   overflow-x: auto;
 }
 
-.chickenStart {
-  font-size: 1rem;
-  padding: 0 2px;
-  flex-shrink: 0;
+.chickenLaneStart {
+  background: #335533;
+  border-left: 3px solid #4caf50;
 }
 
 .chickenFinish {
