@@ -91,7 +91,7 @@ function SlotsPanel({ socket, myScore }) {
   const isBroke = maxWager <= 0;
 
   return (
-    <div className={styles.slotsPanel}>
+    <div className={styles.miniGame}>
       <h3 className={styles.slotsTitle}>Slots</h3>
       <div className={styles.slotsWindow}>
         {[0, 1, 2].map((i) => (

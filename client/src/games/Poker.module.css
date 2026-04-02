@@ -304,7 +304,8 @@
 .btnFold,
 .btnCheck,
 .btnCall,
-.btnRaise {
+.btnRaise,
+.btnAllIn {
   padding: 0.55rem 1.5rem;
   font-size: 1rem;
   font-weight: 700;
@@ -319,7 +320,8 @@
 .btnFold:hover,
 .btnCheck:hover,
 .btnCall:hover,
-.btnRaise:hover {
+.btnRaise:hover,
+.btnAllIn:hover {
   filter: brightness(1.15);
   transform: translateY(-1px);
 }
@@ -327,7 +329,8 @@
 .btnFold:active,
 .btnCheck:active,
 .btnCall:active,
-.btnRaise:active {
+.btnRaise:active,
+.btnAllIn:active {
   transform: translateY(0);
   filter: brightness(0.92);
 }
@@ -362,6 +365,12 @@
   cursor: not-allowed;
   transform: none;
   filter: none;
+}
+
+.btnAllIn {
+  background: linear-gradient(135deg, #e53935 0%, #b71c1c 100%);
+  color: #fff;
+  box-shadow: 0 3px 0 #7a0c0c;
 }
 
 .raiseRow {

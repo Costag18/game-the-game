@@ -101,7 +101,8 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
   const toCall = Math.max(0, currentBet - myBet);
   const canCheck = isMyTurn && toCall === 0;
   const canCall = isMyTurn && toCall > 0;
-  const canRaise = isMyTurn && !iAmFolded;
+  const canRaise = isMyTurn && !iAmFolded && myChips > 0;
+  const canAllIn = isMyTurn && !iAmFolded && myChips > 0;
   const minRaise = currentBet + 20;
 
   function handleFold() {
@@ -118,6 +119,9 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
     if (!amt || isNaN(amt)) return;
     onAction({ type: 'raise', amount: amt });
     setRaiseAmount('');
+  }
+  function handleAllIn() {
+    onAction({ type: 'allin' });
   }
 
   function getStatusText() {
@@ -250,6 +254,11 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
                 >
                   Raise
                 </button>
+                {canAllIn && (
+                  <button className={styles.btnAllIn} onClick={handleAllIn}>
+                    All In ({myChips})
+                  </button>
+                )}
               </div>
             )}
           </div>

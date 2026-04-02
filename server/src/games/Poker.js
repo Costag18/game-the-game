@@ -322,7 +322,7 @@ export class Poker extends BaseGame {
     } else if (type === 'call') {
       const toCall = this.currentBet - (this.bets[playerId] || 0);
       if (toCall <= 0) return; // nothing to call
-      const actual = Math.min(toCall, this.chips[playerId]);
+      const actual = Math.min(toCall, this.chips[playerId]); // all-in if short
       this.chips[playerId] -= actual;
       this.bets[playerId] = (this.bets[playerId] || 0) + actual;
       this.pot += actual;
@@ -330,17 +330,40 @@ export class Poker extends BaseGame {
     } else if (type === 'raise') {
       const raiseTotal = Number(amount);
       if (!raiseTotal || isNaN(raiseTotal)) return;
+      const myChips = this.chips[playerId];
+      const myBet = this.bets[playerId] || 0;
+      const toAdd = raiseTotal - myBet;
+
+      // Allow all-in for less than minimum raise
       const minBet = this.currentBet + BIG_BLIND;
-      if (raiseTotal < minBet) return; // raise must be at least min
-      const toAdd = raiseTotal - (this.bets[playerId] || 0);
-      if (toAdd > this.chips[playerId]) return; // can't afford
-      this.chips[playerId] -= toAdd;
-      this.bets[playerId] = raiseTotal;
-      this.pot += toAdd;
-      this.currentBet = raiseTotal;
-      this.lastRaiser = playerId;
-      // Reset acted set so everyone else must act again
-      this.actedThisRound = new Set([playerId]);
+      if (raiseTotal < minBet && toAdd < myChips) return; // must meet min unless going all-in
+
+      const actualAdd = Math.min(toAdd, myChips);
+      this.chips[playerId] -= actualAdd;
+      this.bets[playerId] = myBet + actualAdd;
+      this.pot += actualAdd;
+      if (this.bets[playerId] > this.currentBet) {
+        this.currentBet = this.bets[playerId];
+        this.lastRaiser = playerId;
+        this.actedThisRound = new Set([playerId]);
+      } else {
+        this.actedThisRound.add(playerId);
+      }
+    } else if (type === 'allin') {
+      // Go all-in: bet everything
+      const myChips = this.chips[playerId];
+      if (myChips <= 0) return;
+      const myBet = this.bets[playerId] || 0;
+      this.bets[playerId] = myBet + myChips;
+      this.pot += myChips;
+      this.chips[playerId] = 0;
+      if (this.bets[playerId] > this.currentBet) {
+        this.currentBet = this.bets[playerId];
+        this.lastRaiser = playerId;
+        this.actedThisRound = new Set([playerId]);
+      } else {
+        this.actedThisRound.add(playerId);
+      }
     } else {
       return; // unknown action
     }
