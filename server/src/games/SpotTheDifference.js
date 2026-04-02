@@ -30,7 +30,10 @@ function randomFromExcluding(arr, exclude) {
   return filtered.length > 0 ? randomFrom(filtered) : randomFrom(arr);
 }
 
+const SYMMETRIC_SHAPES = new Set(['circle', 'square', 'cross']);
+
 function getRotationsForShape(shape) {
+  if (SYMMETRIC_SHAPES.has(shape)) return [0]; // always 0, rotation is invisible
   return VISIBLE_ROTATIONS[shape] || ROTATIONS;
 }
 
@@ -63,9 +66,6 @@ function injectDifferences(original, count) {
     [available[i], available[j]] = [available[j], available[i]];
   }
   const picked = available.slice(0, count);
-
-  // Shapes where rotation is invisible (symmetric at all angles)
-  const SYMMETRIC_SHAPES = new Set(['circle', 'square', 'cross']);
 
   for (const idx of picked) {
     const cell = modified[idx];
