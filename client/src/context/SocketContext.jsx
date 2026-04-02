@@ -18,7 +18,16 @@ export function SocketProvider({ children }) {
     newSocket.on('connect', () => setConnected(true));
     newSocket.on('disconnect', () => setConnected(false));
     setSocket(newSocket);
-    return () => { newSocket.disconnect(); };
+
+    // Keep-alive: ping server every 5 min to prevent Render from sleeping
+    const keepAlive = setInterval(() => {
+      fetch(`${url}/health`).catch(() => {});
+    }, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(keepAlive);
+      newSocket.disconnect();
+    };
   }, []);
 
   return (
