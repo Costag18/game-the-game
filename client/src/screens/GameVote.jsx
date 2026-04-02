@@ -77,17 +77,19 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
         </div>
 
         {standings.length > 0 && (
-          <div className={styles.standingsArea}>
-            <img src={pharaohImg} alt="" className={styles.pharaohImage} />
-            <div className={styles.standings}>
-              <p className={styles.standingsTitle}>Leaderboard</p>
-              {standings.map((entry, i) => (
-              <div key={entry.playerId} className={styles.standingRow}>
-                <span className={styles.standingRank}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
-                <span className={styles.standingName}>{entry.nickname || displayName(entry.playerId, nicknames)}</span>
-                <span className={styles.standingScore}>{entry.score} pts</span>
+          <div className={styles.standings}>
+            <p className={styles.standingsTitle}>Leaderboard</p>
+            <div className={styles.standingsInner}>
+              <img src={pharaohImg} alt="" className={styles.pharaohImage} />
+              <div className={styles.standingsList}>
+                {standings.map((entry, i) => (
+                  <div key={entry.playerId} className={styles.standingRow}>
+                    <span className={styles.standingRank}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
+                    <span className={styles.standingName}>{entry.nickname || displayName(entry.playerId, nicknames)}</span>
+                    <span className={styles.standingScore}>{entry.score} pts</span>
+                  </div>
+                ))}
               </div>
-            ))}
             </div>
           </div>
         )}
