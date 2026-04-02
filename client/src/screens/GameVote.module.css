@@ -695,57 +695,73 @@
 
 .chickenRoad {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 2px;
+  flex-direction: column;
+  align-items: stretch;
   width: 100%;
+  gap: 0;
+}
+
+.chickenLanes {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
   background: #333;
   border: 2px solid var(--gold-dim, #8a7230);
-  border-radius: 6px;
+  border-radius: 6px 6px 0 0;
   padding: 4px;
-  overflow-x: auto;
+}
+
+.chickenLabels {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  padding: 2px 4px;
 }
 
 .chickenLaneStart {
   background: #335533;
-  border-left: 3px solid #4caf50;
 }
 
 .chickenFinish {
   font-size: 1rem;
   padding: 0 2px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
   animation: resultPop 0.3s ease-out;
 }
 
 .chickenLane {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  padding: 0.3rem 0.15rem;
   background: #444;
   border-radius: 3px;
   transition: background 0.2s;
-  min-width: 26px;
-  height: 48px;
+  min-width: 24px;
+  height: 36px;
   flex: 1;
 }
 
 .chickenLaneSafe {
   background: rgba(76, 175, 80, 0.3);
-  border-left: 3px solid #4caf50;
+  border-bottom: 2px solid #4caf50;
 }
 
 .chickenLaneCrash {
   background: rgba(229, 57, 53, 0.4);
-  border-left: 3px solid #e53935;
+  border-bottom: 2px solid #e53935;
+}
+
+.chickenLabelCell {
+  flex: 1;
+  min-width: 24px;
+  text-align: center;
 }
 
 .chickenLaneMult {
   color: var(--text-secondary, #b8a88a);
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   font-weight: 600;
 }
 

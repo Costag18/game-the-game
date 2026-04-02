@@ -213,26 +213,32 @@ function ChickenPanel({ socket, myScore }) {
     <div className={styles.miniGame}>
       <h3 className={styles.miniTitle}>Chicken Cross</h3>
       <div className={styles.chickenRoad}>
-        {/* Lane 0: safe start zone */}
-        <div className={[styles.chickenLane, styles.chickenLaneStart, step === 0 && isPlaying ? '' : styles.chickenLaneSafe].filter(Boolean).join(' ')}>
-          <span className={styles.chickenLaneMult}>START</span>
-          {isPlaying && step === 0 && <span className={styles.chickenHere}>🐔</span>}
+        {/* Lane blocks */}
+        <div className={styles.chickenLanes}>
+          <div className={[styles.chickenLane, styles.chickenLaneStart, step > 0 ? styles.chickenLaneSafe : ''].filter(Boolean).join(' ')}>
+            {isPlaying && step === 0 ? <span>🐔</span> : step > 0 ? <span>✓</span> : null}
+          </div>
+          {Array.from({ length: ROAD_LANES }, (_, i) => {
+            const laneIdx = i + 1, crossed = step >= laneIdx;
+            const crashed = isFinished && !gameState.alive && gameState.crashStep === laneIdx;
+            const here = isPlaying && step === laneIdx;
+            return (
+              <div key={i} className={[styles.chickenLane, crossed && !crashed ? styles.chickenLaneSafe : '', crashed ? styles.chickenLaneCrash : ''].filter(Boolean).join(' ')}>
+                {crashed ? <span>💥</span> : here ? <span>🐔</span> : crossed && !crashed ? <span>✓</span> : null}
+              </div>
+            );
+          })}
+          {isFinished && gameState.alive && step >= ROAD_LANES && <div className={styles.chickenFinish}>🏆</div>}
         </div>
-        {/* Lanes 1-8: risk zones */}
-        {Array.from({ length: ROAD_LANES }, (_, i) => {
-          const laneIdx = i + 1, crossed = step >= laneIdx;
-          const crashed = isFinished && !gameState.alive && gameState.crashStep === laneIdx;
-          const here = isPlaying && step === laneIdx;
-          return (
-            <div key={i} className={[styles.chickenLane, crossed && !crashed ? styles.chickenLaneSafe : '', crashed ? styles.chickenLaneCrash : ''].filter(Boolean).join(' ')}>
-              <span className={styles.chickenLaneMult}>{CHICKEN_MULTS[laneIdx]}x</span>
-              {crashed && <span className={styles.chickenSplat}>💥</span>}
-              {here && <span className={styles.chickenHere}>🐔</span>}
-              {crossed && !crashed && !here && <span className={styles.chickenCheck}>✓</span>}
+        {/* Multiplier labels below */}
+        <div className={styles.chickenLabels}>
+          <div className={styles.chickenLabelCell}><span className={styles.chickenLaneMult}>GO</span></div>
+          {Array.from({ length: ROAD_LANES }, (_, i) => (
+            <div key={i} className={styles.chickenLabelCell}>
+              <span className={styles.chickenLaneMult}>{CHICKEN_MULTS[i + 1]}x</span>
             </div>
-          );
-        })}
-        {isFinished && gameState.alive && step >= ROAD_LANES && <div className={styles.chickenFinish}>🏆</div>}
+          ))}
+        </div>
       </div>
       {isPlaying && (
         <div className={styles.chickenControls}>
