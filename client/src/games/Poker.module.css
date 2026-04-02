@@ -464,13 +464,18 @@
 }
 
 /* ============================================================
-   Hand Rankings Sidebar
+   Hand Rankings Bottom Bar
    ============================================================ */
 
-.handRankings {
+.tableOuter {
+  flex-direction: column;
+}
+
+.handRankingsBar {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .handRankingsToggle {
@@ -478,12 +483,10 @@
   border: 1px solid rgba(212, 168, 67, 0.3);
   color: var(--gold, #d4a843);
   font-family: var(--font-heading, Georgia);
-  font-size: 0.75rem;
-  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  padding: 0.4rem 1.2rem;
   cursor: pointer;
-  border-radius: 4px 0 0 4px;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
+  border-radius: 6px 6px 0 0;
   letter-spacing: 0.05em;
   transition: background 0.2s;
 }
@@ -492,68 +495,63 @@
   background: rgba(0, 0, 0, 0.7);
 }
 
-.handRankingsList {
-  background: rgba(0, 0, 0, 0.85);
-  border: 1px solid rgba(212, 168, 67, 0.3);
-  border-radius: 6px 0 0 6px;
-  padding: 0.6rem;
+.handRankingsGrid {
+  background: rgba(0, 0, 0, 0.8);
+  border-top: 1px solid rgba(212, 168, 67, 0.3);
+  padding: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .handRankingsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.handRankCard {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  width: 200px;
-}
-
-.handRank {
-  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.3rem;
-  border-radius: 3px;
-  transition: background 0.15s;
-}
-
-.handRank:hover {
-  background: rgba(212, 168, 67, 0.1);
+  gap: 0.2rem;
+  padding: 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px;
 }
 
 .handRankNum {
   color: var(--gold, #d4a843);
   font-weight: 700;
-  font-size: 0.7rem;
-  min-width: 1.2rem;
-  text-align: center;
+  font-size: 0.65rem;
 }
 
 .handRankName {
   color: #f0e6d3;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  flex: 1;
+  text-align: center;
 }
 
-.handRankDesc {
-  color: #b8a88a;
-  font-size: 0.65rem;
-  text-align: right;
+.miniCards {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-@media (max-width: 768px) {
-  .tableOuter {
-    flex-direction: column;
-  }
+.miniCard {
+  background: #f5f0e8;
+  color: #2c3e50;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 1px 3px;
+  border-radius: 2px;
+  line-height: 1.2;
+  border: 1px solid #ccc;
+}
 
-  .handRankings {
-    align-items: center;
-  }
-
-  .handRankingsToggle {
-    writing-mode: horizontal-tb;
-    border-radius: 4px;
-    width: auto;
-  }
-
-  .handRankingsList {
-    width: 100%;
-    border-radius: 6px;
-  }
+.miniCardRed {
+  color: #c0392b;
 }

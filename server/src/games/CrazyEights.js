@@ -129,20 +129,15 @@ export class CrazyEights extends BaseGame {
   }
 
   _handleDraw(playerId) {
-    // Draw until you can play or pile is empty
-    let drew = false;
-    while (this.drawPile.length > 0) {
+    // Draw ONE card from the pile
+    if (this.drawPile.length === 0) {
+      this._reshuffleDiscardIntoDraw();
+    }
+    if (this.drawPile.length > 0) {
       const card = this.drawPile.pop();
       this.hands[playerId].push(card);
-      drew = true;
-      const topCard = this.discardPile[this.discardPile.length - 1];
-      if (canPlay(card, topCard, this.activeSuit)) {
-        // Drew a playable card — stop drawing and advance turn
-        break;
-      }
     }
-
-    // If draw pile empty and nothing playable found, just advance turn
+    // Turn ends after drawing — player can play the drawn card on their next turn
     this._advanceTurn();
   }
 
