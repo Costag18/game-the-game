@@ -19,6 +19,11 @@ function shuffle(arr) {
   return a;
 }
 
+function adjustScore(tm, playerId, delta) {
+  tm.scores[playerId] = Math.max(0, (tm.scores[playerId] || 0) + delta);
+  return tm.scores[playerId];
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -199,7 +204,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     const result = Math.random() < 0.5 ? 'heads' : 'tails';
     const won = result === choice;
-    tm.scores[socket.id] += won ? amount : -amount;
+    adjustScore(tm, socket.id, won ? amount : -amount);
 
     socket.emit(EVENTS.COIN_FLIP_RESULT, {
       result,
@@ -241,7 +246,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
 
     const payout = Math.floor(amount * multiplier);
-    tm.scores[socket.id] += payout - amount;
+    adjustScore(tm, socket.id, payout - amount);
 
     socket.emit(EVENTS.SLOTS_RESULT, {
       reels,
@@ -283,7 +288,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const PLINKO_MULTIPLIERS = [5, 2, 1.5, 1, 0.3, 1, 1.5, 2, 5];
     const multiplier = PLINKO_MULTIPLIERS[position];
     const payout = Math.floor(amount * multiplier);
-    tm.scores[socket.id] += payout - amount;
+    adjustScore(tm, socket.id, payout - amount);
 
     socket.emit(EVENTS.PLINKO_RESULT, {
       path, slot: position, multiplier, wager: amount, payout,
@@ -310,7 +315,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const segmentIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length);
     const multiplier = WHEEL_SEGMENTS[segmentIndex];
     const payout = Math.floor(amount * multiplier);
-    tm.scores[socket.id] += payout - amount;
+    adjustScore(tm, socket.id, payout - amount);
 
     socket.emit(EVENTS.WHEEL_RESULT, {
       segmentIndex, multiplier, totalSegments: WHEEL_SEGMENTS.length,
@@ -381,7 +386,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       if (handTotal(playerCards) > 21) {
         // Bust
         hand.finished = true;
-        tm.scores[socket.id] -= wager;
+        adjustScore(tm, socket.id, -wager);
         socket.emit(EVENTS.BJ_LITE_RESULT, {
           phase: 'finished',
           playerCards: playerCards.map(cardName),
@@ -421,7 +426,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       } else {
         result = 'lose'; net = -wager;
       }
-      tm.scores[socket.id] += net;
+      adjustScore(tm, socket.id, net);
 
       socket.emit(EVENTS.BJ_LITE_RESULT, {
         phase: 'finished',
@@ -514,7 +519,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       const mult = MULTIPLIERS[Math.min(game.step, MULTIPLIERS.length - 1)];
       const payout = Math.floor(game.wager * mult);
       const net = payout - game.wager;
-      tm.scores[socket.id] += net;
+      adjustScore(tm, socket.id, net);
       socket.emit(EVENTS.CHICKEN_RESULT, {
         phase: 'finished', step: game.step, multiplier: mult,
         wager: game.wager, payout, net, alive: true,

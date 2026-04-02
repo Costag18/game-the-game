@@ -12,11 +12,17 @@ function CoinFlipPanel({ socket, myScore }) {
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
   const [animClass, setAnimClass] = useState('');
-  const maxWager = Math.floor((myScore || 0) * 0.5);
+  const [localScore, setLocalScore] = useState(null);
+  const score = localScore ?? myScore;
+  const maxWager = Math.floor((score || 0) * 0.5);
+
+  // Sync local score when parent score updates
+  useEffect(() => { setLocalScore(null); }, [myScore]);
 
   useEffect(() => {
     if (!socket) return;
     function onResult(data) {
+      if (data.newScore != null) setLocalScore(data.newScore);
       setTimeout(() => { setResult(data); setAnimClass(data.result === 'heads' ? styles.coinLandHeads : styles.coinLandTails); setSpinning(false); }, 1500);
     }
     socket.on(EVENTS.COIN_FLIP_RESULT, onResult);
