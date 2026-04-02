@@ -150,6 +150,36 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - All gambling is server-validated with real tournament points
 - `isTournamentOver()` checked after every gamble — can trigger instant win in point threshold mode
 
+### Tournament End Timing (fixedRounds)
+- `isTournamentOver()` for fixedRounds checks `roundHistory.length >= winTarget`, NOT `currentRound`
+- `currentRound` is incremented by `startNextRound()` before the round plays, so checking it causes premature tournament end when gambling during voting
+
+### Player Disconnect Mid-Game
+- `handlePlayerLeave()` removes player from tournament and active game
+- If 1 player remains, tournament ends with them as winner
+- If waiting for their vote/wager, auto-advances without them
+- Active game broadcasts updated state and checks completion
+
+### Poker-Specific Lessons
+- FSM must allow `reveal` transition from ALL betting states (preflop/flop/turn/river), not just showdown — folding triggers `_forceFinish()` → `transition('reveal')` from any state
+- After fold, advance turn using full player list position, not the non-folded list (folded player has indexOf -1)
+- All-in: unmatched bets returned via `totalInvested` tracking — winner can only win what they put in from each player
+- All-in for less than minimum raise is allowed (short-stack rule)
+
+### Blackjack Rules
+- Multiplayer blackjack: each player independently vs dealer (not "top scorer wins")
+- Blackjack (21 on 2 cards) = 3pts, Beat dealer = 2pts, Push = 1pt, Bust/Lose = 0pts
+
+### Crazy Eights / Uno Empty Deck
+- Draw only 1 card per turn (not loop until playable)
+- When draw pile empty: reshuffle discard pile (minus top card) back in
+- If reshuffle impossible (discard has 1 card) and no player can play: stalemate → game ends
+
+### Keep-Alive (Render Free Plan)
+- Server-side self-ping does NOT work — Render ignores internal requests
+- Client-side fetch to `/health` every 5 min DOES work — counts as external traffic
+- Keep-alive is in `client/src/context/SocketContext.jsx`
+
 ## Conventions
 
 - Server is always source of truth — never trust client state
@@ -159,7 +189,6 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Socket.IO rooms for lobby management
 - CSS modules per component, casino theme with varied backgrounds per game
 - Game vote order randomized server-side each round
-- Keep-alive self-ping every 10 min in production (Render free plan)
 - `npm ci` for faster builds, `--omit=dev` on server in production
 
 ## Visual & UX Preferences
