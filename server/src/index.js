@@ -804,6 +804,15 @@ if (isProduction) {
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Keep-alive self-ping to prevent Render free plan from sleeping
+  if (isProduction) {
+    const KEEP_ALIVE_MS = 10 * 60 * 1000; // every 10 minutes
+    setInterval(() => {
+      fetch(`http://localhost:${PORT}/health`).catch(() => {});
+    }, KEEP_ALIVE_MS);
+    console.log('Keep-alive ping enabled (every 10 min)');
+  }
 });
 
 export { io, app, httpServer, lobbyManager, tournaments };

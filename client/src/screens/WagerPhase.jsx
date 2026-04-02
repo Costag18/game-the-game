@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { GAMES } from '../../../shared/gameList.js';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
@@ -87,6 +87,11 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
   const maxWager = Math.floor(myScore * 0.5);
 
   const [wager, setWager] = useState(0);
+
+  // Clamp wager when score changes from side gambling
+  useEffect(() => {
+    if (wager > maxWager) setWager(Math.max(0, maxWager));
+  }, [maxWager]);
 
   const gameId = voteResult?.selectedGame ?? voteResult?.gameId;
   const game = gameId ? GAMES[gameId] : null;
