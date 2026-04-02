@@ -171,9 +171,9 @@
 }
 
 .gameName {
-  font-family: var(--font-heading);
+  font-family: var(--font-display, var(--font-heading));
   color: var(--gold);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   margin: 0;
 }
 
