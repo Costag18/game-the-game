@@ -158,7 +158,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     tm.startNextRound();
     const eligible = shuffle(getEligibleGames(lobby.players.length));
-    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
     io.to(lobbyId).emit(EVENTS.ROUND_START, {
       round: tm.currentRound,
       eligibleGames: eligible,
@@ -182,7 +182,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
         playerCount: lobby.players.length,
         wagerReturns: Scorer.getWagerReturnTable(lobby.players.length),
       });
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
     }
   });
 
@@ -206,7 +206,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       amount,
       newScore: tm.scores[socket.id],
     });
-    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
 
     // Check if gambling triggered a point threshold win
     if (tm.isTournamentOver()) {
@@ -250,7 +250,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       net: payout - amount,
       newScore: tm.scores[socket.id],
     });
-    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
 
     // Check if gambling triggered a point threshold win
     if (tm.isTournamentOver()) {
@@ -288,7 +288,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       path, slot: position, multiplier, wager: amount, payout,
       net: payout - amount, newScore: tm.scores[socket.id],
     });
-    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
     if (tm.isTournamentOver()) {
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
       tournaments.delete(lobbyId);
@@ -316,7 +316,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       segments: WHEEL_SEGMENTS, wager: amount, payout,
       net: payout - amount, newScore: tm.scores[socket.id],
     });
-    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
     if (tm.isTournamentOver()) {
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
       tournaments.delete(lobbyId);
@@ -389,7 +389,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
           dealerTotal: handTotal(dealerCards),
           result: 'bust', net: -wager, newScore: tm.scores[socket.id],
         });
-        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
         delete tm._bjLiteHands[socket.id];
         if (tm.isTournamentOver()) {
           io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
@@ -430,7 +430,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
         dealerTotal: dTotal,
         result, net, newScore: tm.scores[socket.id],
       });
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
       delete tm._bjLiteHands[socket.id];
       if (tm.isTournamentOver()) {
         io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
@@ -494,7 +494,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
           crashStep: game.crashStep, newScore: tm.scores[socket.id],
         });
         delete tm._chickenGames[socket.id];
-        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
         if (tm.isTournamentOver()) {
           io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
           tournaments.delete(lobbyId);
@@ -520,7 +520,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
         newScore: tm.scores[socket.id],
       });
       delete tm._chickenGames[socket.id];
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
       if (tm.isTournamentOver()) {
         io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
         tournaments.delete(lobbyId);
@@ -608,7 +608,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
                 })),
                 gameResults: results,
               });
-              io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+              io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
             }
           });
         }
@@ -633,7 +633,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
             })),
             gameResults: results,
           });
-          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
         } else {
           const nicknames = lobby.nicknames || {};
           for (const playerId of lobby.players) {
@@ -661,7 +661,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
           })),
           gameResults: null,
         });
-        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
 
         if (tm.isTournamentOver()) {
           io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
@@ -694,7 +694,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     } else {
       tm.startNextRound();
       const eligible = getEligibleGames(lobby.players.length);
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
       io.to(lobbyId).emit(EVENTS.ROUND_START, {
         round: tm.currentRound,
         eligibleGames: eligible,
@@ -749,7 +749,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
           })),
           gameResults: results,
         });
-        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, tm.getState());
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm, lobbyId));
       };
 
       if (revealDelay > 0) {
@@ -765,6 +765,17 @@ io.on(EVENTS.CONNECTION, (socket) => {
     handlePlayerLeave(socket);
   });
 });
+
+function getTournamentState(tm, lobbyId) {
+  const state = tm.getState();
+  const lobby = lobbyManager.getLobby(lobbyId);
+  const nicks = lobby?.nicknames || {};
+  state.standings = state.standings.map((s) => ({
+    ...s,
+    nickname: nicks[s.playerId] || s.playerId.slice(0, 8),
+  }));
+  return state;
+}
 
 function buildTournamentEndPayload(tm, lobby) {
   return {
