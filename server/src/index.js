@@ -194,7 +194,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const lobby = lobbyManager.getLobby(lobbyId);
     if (!lobby || lobby.hostId !== socket.id) return;
-    if (lobby.players.length < 2) return;
+    if (lobby.players.length < 1) return;
 
     lobbyManager.setStatus(lobbyId, 'playing');
 

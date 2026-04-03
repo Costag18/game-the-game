@@ -54,16 +54,18 @@ function CoinFlipPanel({ socket, myScore }) {
           {result.won ? `+${result.amount}` : `-${result.amount}`} — {result.result}!
         </p>
       )}
-      {!spinning && (!isBroke ? (
-        <>
-          <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Wager:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
-          <input type="range" min={1} max={maxWager} value={wager} onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
-          <div className={styles.coinButtons}>
-            <button className={styles.btnHeads} onClick={() => handleFlip('heads')}>Heads</button>
-            <button className={styles.btnTails} onClick={() => handleFlip('tails')}>Tails</button>
-          </div>
-        </>
-      ) : <p className={styles.coinBroke}>No points to gamble!</p>)}
+      <div style={{ visibility: spinning ? 'hidden' : 'visible' }}>
+        {!isBroke ? (
+          <>
+            <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Wager:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
+            <input type="range" min={1} max={maxWager} value={wager} onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
+            <div className={styles.coinButtons}>
+              <button className={styles.btnHeads} onClick={() => handleFlip('heads')}>Heads</button>
+              <button className={styles.btnTails} onClick={() => handleFlip('tails')}>Tails</button>
+            </div>
+          </>
+        ) : <p className={styles.coinBroke}>No points to gamble!</p>}
+      </div>
     </div>
   );
 }
@@ -101,14 +103,16 @@ function SlotsPanel({ socket, myScore }) {
         ))}
       </div>
       {result && !spinning && <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>{result.net >= 0 ? `+${result.net}` : result.net}{result.multiplier >= 3 ? ' JACKPOT!' : result.multiplier > 0 ? ' Winner!' : ''}</p>}
-      {!spinning && (!isBroke ? (
-        <>
-          <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Bet:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
-          <input type="range" min={1} max={maxWager} value={wager} onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
-          <button className={styles.btnSpin} onClick={handleSpin}>SPIN</button>
-          <p className={styles.slotsOdds}>3x match = 3x (7s = 5x) | Pair = 1.5x</p>
-        </>
-      ) : <p className={styles.coinBroke}>No points to gamble!</p>)}
+      <div style={{ visibility: spinning ? 'hidden' : 'visible' }}>
+        {!isBroke ? (
+          <>
+            <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Bet:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
+            <input type="range" min={1} max={maxWager} value={wager} onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
+            <button className={styles.btnSpin} onClick={handleSpin}>SPIN</button>
+            <p className={styles.slotsOdds}>3x match = 3x (7s = 5x) | Pair = 1.5x</p>
+          </>
+        ) : <p className={styles.coinBroke}>No points to gamble!</p>}
+      </div>
     </div>
   );
 }
@@ -159,13 +163,15 @@ function WheelPanel({ socket, myScore }) {
         </svg>
       </div>
       {result && !spinning && <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>{result.net >= 0 ? `+${result.net}` : result.net} ({result.multiplier}x)</p>}
-      {!spinning && (!isBroke ? (
-        <>
-          <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Bet:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
-          <input type="range" min={1} max={maxWager} value={wager} onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
-          <button className={styles.btnSpin} onClick={handleSpin}>SPIN</button>
-        </>
-      ) : <p className={styles.coinBroke}>No points to gamble!</p>)}
+      <div style={{ visibility: spinning ? 'hidden' : 'visible' }}>
+        {!isBroke ? (
+          <>
+            <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Bet:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
+            <input type="range" min={1} max={maxWager} value={wager} onChange={(e) => setWager(Number(e.target.value))} className={styles.coinSlider} />
+            <button className={styles.btnSpin} onClick={handleSpin}>SPIN</button>
+          </>
+        ) : <p className={styles.coinBroke}>No points to gamble!</p>}
+      </div>
     </div>
   );
 }

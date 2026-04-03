@@ -57,6 +57,8 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
   const winCondition = tournamentState?.winCondition;
   const winTarget = tournamentState?.winTarget;
   const standings = tournamentState?.standings || [];
+  const playerCount = standings.length;
+  const needsMorePlayers = playerCount < 2;
   const myScore = tournamentState?.scores?.[socket?.id] ?? 0;
 
   const roundLabel = winCondition === 'fixedRounds' ? `Round ${round} of ${winTarget}` : `Round ${round}`;
@@ -100,7 +102,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
           {eligibleGames.map((game) => {
             const count = voteCounts[game.id] ?? 0;
             return (
-              <button key={game.id} className={`${styles.card} ${voted ? styles.cardDisabled : ''}`} onClick={() => handleVote(game.id)} disabled={voted}>
+              <button key={game.id} className={`${styles.card} ${voted || needsMorePlayers ? styles.cardDisabled : ''}`} onClick={() => !needsMorePlayers && handleVote(game.id)} disabled={voted || needsMorePlayers}>
                 {GAME_PREVIEWS[game.id] && (
                   <div className={styles.previewWrapper}>
                     <img src={GAME_PREVIEWS[game.id]} alt={game.name} className={styles.previewImage} />
@@ -120,7 +122,8 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
           })}
         </div>
 
-        {voted && <p className={styles.waiting}>Waiting for other players...</p>}
+        {needsMorePlayers && <p className={styles.waiting}>Waiting for players to join...</p>}
+        {voted && !needsMorePlayers && <p className={styles.waiting}>Waiting for other players...</p>}
       </div>
 
       <CasinoSidebar socket={socket} myScore={myScore} />

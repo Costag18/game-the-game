@@ -26,7 +26,7 @@ export default function WaitingRoom({ lobby: initialLobby, onNavigate }) {
   const hostId = lobby.hostId ?? lobby.host;
   const myId = socket?.id;
   const isHost = myId === hostId;
-  const canStart = isHost && players.length >= LOBBY.MIN_PLAYERS;
+  const canStart = isHost && players.length >= 1;
 
   const winTarget = lobby.winTarget ?? lobby.target;
   const winConditionLabel =
