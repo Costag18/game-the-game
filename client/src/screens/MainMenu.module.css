@@ -190,3 +190,12 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+.version {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.7rem;
+  opacity: 0.4;
+}
