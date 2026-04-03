@@ -221,10 +221,12 @@ export default function Battleship({ gameState, onAction, nicknames }) {
     );
   }
 
+  const [selectedTarget, setSelectedTarget] = useState(null);
+
   const {
-    phase, myGrid, myShips, opponentShots, opponentSunkShips,
-    opponentFullGrid, isMyTurn, currentTurnPlayer, setupReady,
-    setupEndTime, turnEndTime, shipTypes,
+    phase, myGrid, myShips, opponents = [], myEliminated,
+    isMyTurn, currentTurnPlayer, setupReady,
+    setupEndTime, turnEndTime, shipTypes, eliminated = [],
   } = gameState;
 
   const isSetup = phase === 'setup';
@@ -257,26 +259,33 @@ export default function Battleship({ gameState, onAction, nicknames }) {
     onAction({ type: 'placeShips', ships: placements });
   }
 
+  // Auto-select first alive opponent
+  const aliveOpponents = opponents.filter((o) => !o.eliminated);
+  const target = selectedTarget && aliveOpponents.find((o) => o.playerId === selectedTarget)
+    ? selectedTarget
+    : aliveOpponents[0]?.playerId;
+  const targetOpp = opponents.find((o) => o.playerId === target);
+
   function handleFire(cellIndex) {
-    if (!isMyTurn) return;
-    // Keys may be strings from JSON serialization
-    if (opponentShots[cellIndex] || opponentShots[String(cellIndex)]) return;
-    onAction({ type: 'fire', cell: cellIndex });
+    if (!isMyTurn || !target) return;
+    const shots = targetOpp?.shots || {};
+    if (shots[cellIndex] || shots[String(cellIndex)]) return;
+    onAction({ type: 'fire', cell: cellIndex, targetPlayer: target });
   }
 
   function getStatusText() {
     if (isFinished) return 'Game Over!';
+    if (myEliminated) return 'You have been eliminated!';
     if (isSetup) {
-      if (setupReady?.me) return 'Waiting for opponent to place ships...';
+      if (setupReady?.me) return `Waiting for others... (${setupReady.count}/${setupReady.total} ready)`;
       return `Place your ships! (${timeLeft}s)`;
     }
     if (isMyTurn) return `Your turn — fire! (${timeLeft}s)`;
     return `Waiting for ${displayName(currentTurnPlayer, nicknames)}...`;
   }
 
-  // Build opponent full grid for finished state reveal
-  const oppRevealGrid = isFinished && opponentFullGrid
-    ? opponentFullGrid.reduce((acc, ship, i) => { if (ship) acc[i] = ship; return acc; }, {})
+  const oppRevealGrid = isFinished && targetOpp?.fullGrid
+    ? targetOpp.fullGrid.reduce((acc, ship, i) => { if (ship) acc[i] = ship; return acc; }, {})
     : null;
 
   return (
@@ -313,33 +322,51 @@ export default function Battleship({ gameState, onAction, nicknames }) {
 
       {/* Playing / Finished Phase */}
       {(isPlaying || isFinished) && (
-        <div className={styles.battleArea}>
-          <BattleGrid
-            label="Your Board"
-            cells={myGrid}
-            clickable={false}
-          />
-          <div className={styles.oppBoardArea}>
+        <>
+          {/* Target selector tabs (if more than 1 opponent) */}
+          {opponents.length > 1 && (
+            <div className={styles.targetTabs}>
+              {opponents.map((opp) => (
+                <button
+                  key={opp.playerId}
+                  className={`${styles.targetTab} ${opp.playerId === target ? styles.targetTabActive : ''} ${opp.eliminated ? styles.targetTabElim : ''}`}
+                  onClick={() => setSelectedTarget(opp.playerId)}
+                >
+                  {displayName(opp.playerId, nicknames)}
+                  {opp.eliminated && ' ☠'}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className={styles.battleArea}>
             <BattleGrid
-              label="Opponent's Board"
-              cells={opponentShots}
-              sunkShips={opponentSunkShips}
-              onClick={handleFire}
-              clickable={isMyTurn}
-              fullReveal={oppRevealGrid}
+              label="Your Board"
+              cells={myGrid}
+              clickable={false}
             />
-            {opponentSunkShips && opponentSunkShips.length > 0 && (
-              <div className={styles.sunkList}>
-                <span className={styles.sunkListLabel}>Sunk:</span>
-                {opponentSunkShips.map((s) => (
-                  <span key={s.type} className={styles.sunkShipTag}>
-                    {s.type}
-                  </span>
-                ))}
+            {targetOpp && (
+              <div className={styles.oppBoardArea}>
+                <BattleGrid
+                  label={`${displayName(target, nicknames)}'s Board${targetOpp.eliminated ? ' (Eliminated)' : ''}`}
+                  cells={targetOpp.shots}
+                  sunkShips={targetOpp.sunkShips}
+                  onClick={handleFire}
+                  clickable={isMyTurn && !targetOpp.eliminated}
+                  fullReveal={oppRevealGrid}
+                />
+                {targetOpp.sunkShips && targetOpp.sunkShips.length > 0 && (
+                  <div className={styles.sunkList}>
+                    <span className={styles.sunkListLabel}>Sunk:</span>
+                    {targetOpp.sunkShips.map((s) => (
+                      <span key={s.type} className={styles.sunkShipTag}>{s.type}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
-        </div>
+        </>
       )}
     </div>
   );

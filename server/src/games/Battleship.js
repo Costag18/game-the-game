@@ -13,16 +13,13 @@ const SHIP_TYPES = [
   { type: 'destroyer', size: 2 },
 ];
 
-function toIndex(x, y) { return y * GRID_SIZE + x; }
-function toXY(index) { return { x: index % GRID_SIZE, y: Math.floor(index / GRID_SIZE) }; }
-
 function getShipCells(x, y, size, horizontal) {
   const cells = [];
   for (let i = 0; i < size; i++) {
     const cx = horizontal ? x + i : x;
     const cy = horizontal ? y : y + i;
-    if (cx >= GRID_SIZE || cy >= GRID_SIZE) return null; // out of bounds
-    cells.push(toIndex(cx, cy));
+    if (cx >= GRID_SIZE || cy >= GRID_SIZE) return null;
+    cells.push(cy * GRID_SIZE + cx);
   }
   return cells;
 }
@@ -30,7 +27,6 @@ function getShipCells(x, y, size, horizontal) {
 function autoPlaceShips(existingGrid, shipsToPlace) {
   const grid = [...existingGrid];
   const placed = [];
-
   for (const ship of shipsToPlace) {
     let attempts = 0;
     while (attempts < 200) {
@@ -62,8 +58,8 @@ export class Battleship extends BaseGame {
     });
 
     this.boards = {};
-    this.shots = {};      // playerId -> Set of cell indices they've been shot at
-    this.firedAt = {};    // playerId -> Set of cell indices they've fired at opponent
+    this.firedAt = {};      // firedAt[shooterId][targetId] = Set of cells
+    this.eliminated = new Set();
     this.setupReady = new Set();
     this._setupTimer = null;
     this._turnTimer = null;
@@ -81,13 +77,15 @@ export class Battleship extends BaseGame {
   startGame() {
     for (const p of this.players) {
       this.boards[p] = { grid: new Array(TOTAL_CELLS).fill(null), ships: [] };
-      this.shots[p] = new Set();
-      this.firedAt[p] = new Set();
+      this.firedAt[p] = {};
+      for (const other of this.players) {
+        if (other !== p) this.firedAt[p][other] = new Set();
+      }
     }
+    this.eliminated = new Set();
     this.setupReady = new Set();
     this.transition('start');
 
-    // Setup timer — auto-place remaining ships after 60s
     this._setupTimer = setTimeout(() => {
       if (this.state !== 'setup') return;
       for (const p of this.players) {
@@ -131,15 +129,18 @@ export class Battleship extends BaseGame {
   }
 
   _autoFire(playerId) {
-    const opponentId = this.players.find((p) => p !== playerId);
-    // Find a cell that hasn't been fired at yet
+    // Pick a random alive opponent and random unfired cell
+    const targets = this.players.filter((p) => p !== playerId && !this.eliminated.has(p));
+    if (targets.length === 0) return;
+    const targetId = targets[Math.floor(Math.random() * targets.length)];
+    const fired = this.firedAt[playerId]?.[targetId] || new Set();
     const available = [];
     for (let i = 0; i < TOTAL_CELLS; i++) {
-      if (!this.firedAt[playerId].has(i)) available.push(i);
+      if (!fired.has(i)) available.push(i);
     }
     if (available.length === 0) return;
     const cell = available[Math.floor(Math.random() * available.length)];
-    this._processShot(playerId, cell);
+    this._processShot(playerId, targetId, cell);
   }
 
   handleAction(playerId, action) {
@@ -150,17 +151,20 @@ export class Battleship extends BaseGame {
         this._handlePlaceShips(playerId, action.ships);
       }
     } else if (this.state === 'playing') {
-      // Safety: auto-fire if turn timer should have expired
       if (this._turnEndTime && Date.now() >= this._turnEndTime) {
         this._autoFire(this.currentTurnPlayer);
         return;
       }
       if (playerId !== this.currentTurnPlayer) return;
       if (action.type === 'fire') {
-        const cell = action.cell;
+        const { cell, targetPlayer } = action;
         if (typeof cell !== 'number' || cell < 0 || cell >= TOTAL_CELLS) return;
-        if (this.firedAt[playerId].has(cell)) return; // already fired here
-        this._processShot(playerId, cell);
+        if (!targetPlayer || !this.players.includes(targetPlayer)) return;
+        if (targetPlayer === playerId) return;
+        if (this.eliminated.has(targetPlayer)) return;
+        const fired = this.firedAt[playerId]?.[targetPlayer] || new Set();
+        if (fired.has(cell)) return;
+        this._processShot(playerId, targetPlayer, cell);
       }
     }
   }
@@ -176,12 +180,10 @@ export class Battleship extends BaseGame {
       const shipDef = SHIP_TYPES[i];
       const placement = ships[i];
       if (!placement || typeof placement.x !== 'number' || typeof placement.y !== 'number') return;
-
       const horizontal = !!placement.horizontal;
       const cells = getShipCells(placement.x, placement.y, shipDef.size, horizontal);
-      if (!cells) return; // out of bounds
-      if (cells.some((c) => grid[c] !== null)) return; // overlap
-
+      if (!cells) return;
+      if (cells.some((c) => grid[c] !== null)) return;
       for (const c of cells) grid[c] = shipDef.type;
       placedShips.push({ type: shipDef.type, size: shipDef.size, cells, hits: [] });
     }
@@ -194,70 +196,93 @@ export class Battleship extends BaseGame {
     }
   }
 
-  _processShot(shooterId, cell) {
-    const targetId = this.players.find((p) => p !== shooterId);
-    this.firedAt[shooterId].add(cell);
-    this.shots[targetId].add(cell);
+  _processShot(shooterId, targetId, cell) {
+    if (!this.firedAt[shooterId]) this.firedAt[shooterId] = {};
+    if (!this.firedAt[shooterId][targetId]) this.firedAt[shooterId][targetId] = new Set();
+    this.firedAt[shooterId][targetId].add(cell);
 
     const targetBoard = this.boards[targetId];
     const isHit = targetBoard.grid[cell] !== null;
 
     if (isHit) {
-      // Find which ship was hit
       const ship = targetBoard.ships.find((s) => s.cells.includes(cell));
       if (ship && !ship.hits.includes(cell)) {
         ship.hits.push(cell);
       }
 
-      // Check if all ships sunk
+      // Check if this target is eliminated (all ships sunk)
       const allSunk = targetBoard.ships.every((s) => s.hits.length >= s.size);
       if (allSunk) {
-        this._clearTimers();
-        this.transition('finish');
-        return;
+        this.eliminated.add(targetId);
+        // Check if game over (only 1 alive)
+        const alive = this.players.filter((p) => !this.eliminated.has(p));
+        if (alive.length <= 1) {
+          this._clearTimers();
+          this.transition('finish');
+          return;
+        }
       }
 
-      // Hit = shoot again (restart turn timer)
+      // Hit = shoot again
       this._startTurnTimer();
     } else {
-      // Miss = next player's turn
-      this.nextTurn();
+      // Miss = next alive player's turn
+      this._advanceToNextAlive();
       this._startTurnTimer();
     }
   }
 
+  _advanceToNextAlive() {
+    const n = this.players.length;
+    let idx = this.players.indexOf(this.currentTurnPlayer);
+    for (let i = 1; i <= n; i++) {
+      const nextIdx = (idx + i) % n;
+      const next = this.players[nextIdx];
+      if (!this.eliminated.has(next)) {
+        this.currentTurnPlayer = next;
+        this.turnIndex = nextIdx;
+        return;
+      }
+    }
+  }
+
   getStateForPlayer(playerId) {
-    const opponentId = this.players.find((p) => p !== playerId);
     const myBoard = this.boards[playerId];
-    const oppBoard = this.boards[opponentId];
     const isFinished = this.state === 'finished';
 
-    // My board: show everything
-    const myGridView = myBoard ? myBoard.grid.map((cell, i) => ({
-      ship: cell,
-      hit: this.shots[playerId]?.has(i) || false,
-    })) : [];
+    // My board
+    const myGridView = myBoard ? myBoard.grid.map((cell, i) => {
+      const wasShot = this.players.some((p) => p !== playerId && this.firedAt[p]?.[playerId]?.has(i));
+      return { ship: cell, hit: wasShot };
+    }) : [];
 
     const myShipsStatus = myBoard ? myBoard.ships.map((s) => ({
       type: s.type, size: s.size, cells: s.cells,
       hits: s.hits.length, sunk: s.hits.length >= s.size,
     })) : [];
 
-    // Opponent board: only show my shots and results, plus sunk ship outlines
-    const oppShotResults = {};
-    if (this.firedAt[playerId]) {
-      for (const cell of this.firedAt[playerId]) {
-        oppShotResults[cell] = oppBoard.grid[cell] !== null ? 'hit' : 'miss';
+    // Opponent boards
+    const opponents = this.players.filter((p) => p !== playerId).map((oppId) => {
+      const oppBoard = this.boards[oppId];
+      const fired = this.firedAt[playerId]?.[oppId] || new Set();
+      const shotResults = {};
+      for (const cell of fired) {
+        shotResults[cell] = oppBoard.grid[cell] !== null ? 'hit' : 'miss';
       }
-    }
+      const sunkShips = oppBoard ? oppBoard.ships
+        .filter((s) => s.hits.length >= s.size)
+        .map((s) => ({ type: s.type, size: s.size, cells: s.cells }))
+        : [];
+      const fullGrid = isFinished ? oppBoard.grid : null;
 
-    const oppSunkShips = oppBoard ? oppBoard.ships
-      .filter((s) => s.hits.length >= s.size)
-      .map((s) => ({ type: s.type, size: s.size, cells: s.cells }))
-      : [];
-
-    // On finished, reveal opponent's full board
-    const oppFullGrid = isFinished && oppBoard ? oppBoard.grid : null;
+      return {
+        playerId: oppId,
+        eliminated: this.eliminated.has(oppId),
+        shots: shotResults,
+        sunkShips,
+        fullGrid,
+      };
+    });
 
     const turnTimeLeft = this.state === 'playing' && this._turnEndTime
       ? this._turnEndTime : null;
@@ -266,19 +291,20 @@ export class Battleship extends BaseGame {
       phase: this.state,
       myGrid: myGridView,
       myShips: myShipsStatus,
-      opponentShots: oppShotResults,
-      opponentSunkShips: oppSunkShips,
-      opponentFullGrid: oppFullGrid,
-      isMyTurn: this.currentTurnPlayer === playerId && this.state === 'playing',
+      myEliminated: this.eliminated.has(playerId),
+      opponents,
+      isMyTurn: this.currentTurnPlayer === playerId && this.state === 'playing' && !this.eliminated.has(playerId),
       currentTurnPlayer: this.currentTurnPlayer,
       setupReady: this.state === 'setup' ? {
         me: this.setupReady.has(playerId),
-        opponent: this.setupReady.has(opponentId),
+        count: this.setupReady.size,
+        total: this.players.length,
       } : null,
       setupEndTime: this.state === 'setup' && this._setupStartTime
         ? this._setupStartTime + SETUP_TIMER_MS : null,
       turnEndTime: turnTimeLeft,
       shipTypes: SHIP_TYPES,
+      eliminated: [...this.eliminated],
     };
   }
 
@@ -288,20 +314,24 @@ export class Battleship extends BaseGame {
     const entries = this.players.map((p) => {
       const board = this.boards[p];
       const shipsRemaining = board ? board.ships.filter((s) => s.hits.length < s.size).length : 0;
-      const totalHits = board ? board.ships.reduce((sum, s) => sum + s.hits.length, 0) : 0;
-      return { playerId: p, shipsRemaining, totalHits };
+      return { playerId: p, shipsRemaining, eliminated: this.eliminated.has(p) };
     });
 
-    entries.sort((a, b) => b.shipsRemaining - a.shipsRemaining);
+    // Sort: non-eliminated first by ships remaining, then eliminated in reverse order
+    entries.sort((a, b) => {
+      if (a.eliminated && !b.eliminated) return 1;
+      if (!a.eliminated && b.eliminated) return -1;
+      return b.shipsRemaining - a.shipsRemaining;
+    });
 
     let placement = 1;
     return entries.map((e, i) => {
-      if (i > 0 && e.shipsRemaining < entries[i - 1].shipsRemaining) {
+      if (i > 0 && (e.eliminated !== entries[i - 1].eliminated || e.shipsRemaining < entries[i - 1].shipsRemaining)) {
         placement = i + 1;
       }
       return {
         ...e, placement,
-        handDescription: `${e.shipsRemaining} ships left`,
+        handDescription: e.eliminated ? 'Eliminated' : `${e.shipsRemaining} ships left`,
       };
     });
   }

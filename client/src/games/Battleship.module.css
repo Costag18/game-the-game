@@ -333,6 +333,40 @@
   text-transform: capitalize;
 }
 
+/* Target tabs */
+.targetTabs {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.targetTab {
+  background: rgba(0, 60, 120, 0.3);
+  border: 1px solid rgba(100, 180, 255, 0.2);
+  color: #8cc4ff;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.targetTab:hover {
+  background: rgba(0, 60, 120, 0.5);
+}
+
+.targetTabActive {
+  background: rgba(0, 80, 160, 0.5);
+  border-color: #64b4ff;
+  font-weight: 600;
+}
+
+.targetTabElim {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .battleArea {

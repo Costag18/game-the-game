@@ -64,7 +64,7 @@ export const GAMES = {
     ],
   },
   battleship: {
-    id: 'battleship', name: 'Battleship', minPlayers: 2, maxPlayers: 2,
+    id: 'battleship', name: 'Battleship', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.BATTLESHIP, description: 'Place your fleet and sink your opponent\'s ships!',
     tutorial: 'https://www.youtube.com/watch?v=RY4nAyRgkLo',
     instructions: [
