@@ -22,7 +22,11 @@ body {
 @media (min-width: 960px) {
   .gameWithPet {
     flex-direction: row;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+  }
+  .gameWithPet > div:last-child {
+    flex: 1;
+    min-width: 0;
+    overflow-y: auto;
   }
 }

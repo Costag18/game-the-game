@@ -127,16 +127,13 @@ function GameRouter() {
           );
         }
         return (
-          <div className="gameWithPet">
-            <PetSidebar />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <GameComponent
-                gameState={tournament.gameState?.state}
-                nicknames={tournament.gameState?.nicknames || {}}
-                onAction={tournament.sendAction}
-              />
-            </div>
-          </div>
+          <>
+            <GameComponent
+              gameState={tournament.gameState?.state}
+              nicknames={tournament.gameState?.nicknames || {}}
+              onAction={tournament.sendAction}
+            />
+          </>
         );
       })()}
       {screen === 'loadingGame' && (
