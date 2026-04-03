@@ -47,4 +47,6 @@ export const EVENTS = {
   CHICKEN_RESULT: 'tournament:chickenResult',
   CASINO_JOIN: 'casino:join',
   CASINO_STATE: 'casino:state',
+  EMOTE_SEND: 'emote:send',
+  EMOTE_BROADCAST: 'emote:broadcast',
 };

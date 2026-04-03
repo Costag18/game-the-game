@@ -1,0 +1,141 @@
+/* ===================== Emote Overlay ===================== */
+
+.emoteOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* --- Trigger button --- */
+.emoteTrigger {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim, #8a7230);
+  background: rgba(42, 21, 21, 0.85);
+  color: var(--gold, #d4a843);
+  font-size: 1.4rem;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 102;
+}
+
+.emoteTrigger:hover {
+  transform: scale(1.1);
+  border-color: var(--gold, #d4a843);
+  box-shadow: 0 2px 16px rgba(212, 168, 67, 0.3);
+}
+
+.emoteTriggerOpen {
+  border-color: var(--gold, #d4a843);
+  box-shadow: 0 2px 16px rgba(212, 168, 67, 0.4);
+}
+
+/* --- Dropdown menu --- */
+.emoteMenu {
+  position: absolute;
+  top: calc(1rem + 52px);
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: rgba(42, 21, 21, 0.92);
+  border: 1px solid var(--gold-dim, #8a7230);
+  border-radius: 12px;
+  pointer-events: auto;
+  z-index: 101;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: menuSlideDown 0.15s ease-out;
+}
+
+@keyframes menuSlideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.emoteBtn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s, transform 0.1s;
+}
+
+.emoteBtn:hover {
+  background: rgba(212, 168, 67, 0.15);
+  transform: scale(1.2);
+}
+
+.emoteBtn:active {
+  transform: scale(0.9);
+}
+
+/* --- Floating emojis --- */
+.floatingEmoji {
+  position: fixed;
+  bottom: -60px;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 99;
+  will-change: transform;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3));
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+}
+
+.wobble1 { animation-name: floatUp1; }
+.wobble2 { animation-name: floatUp2; }
+.wobble3 { animation-name: floatUp3; }
+.wobble4 { animation-name: floatUp4; }
+
+/* 4 wobble variants — each includes vertical travel via translateY */
+@keyframes floatUp1 {
+  0%   { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
+  20%  { transform: translateX(25px) translateY(-22vh) scale(1.1); }
+  40%  { transform: translateX(-20px) translateY(-44vh) scale(0.95); }
+  60%  { transform: translateX(15px) translateY(-66vh) scale(1.05); }
+  80%  { transform: translateX(-10px) translateY(-88vh) scale(1); opacity: 0.8; }
+  100% { transform: translateX(5px) translateY(-115vh) scale(0.9); opacity: 0; }
+}
+
+@keyframes floatUp2 {
+  0%   { transform: translateX(0) translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  25%  { transform: translateX(-30px) translateY(-28vh) rotate(-15deg) scale(1.15); }
+  50%  { transform: translateX(20px) translateY(-55vh) rotate(10deg) scale(0.9); }
+  75%  { transform: translateX(-15px) translateY(-82vh) rotate(-5deg) scale(1.05); opacity: 0.7; }
+  100% { transform: translateX(10px) translateY(-115vh) rotate(8deg) scale(0.85); opacity: 0; }
+}
+
+@keyframes floatUp3 {
+  0%   { transform: translateX(0) translateY(0) scale(1); opacity: 1; }
+  15%  { transform: translateX(18px) translateY(-17vh) scale(1.2); }
+  35%  { transform: translateX(-25px) translateY(-40vh) scale(0.9); }
+  55%  { transform: translateX(30px) translateY(-63vh) scale(1.1); }
+  75%  { transform: translateX(-12px) translateY(-86vh) scale(1); opacity: 0.6; }
+  100% { transform: translateX(8px) translateY(-115vh) scale(0.8); opacity: 0; }
+}
+
+@keyframes floatUp4 {
+  0%   { transform: translateX(0) translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  20%  { transform: translateX(-15px) translateY(-23vh) rotate(12deg) scale(1.1); }
+  45%  { transform: translateX(25px) translateY(-52vh) rotate(-8deg) scale(1.05); }
+  70%  { transform: translateX(-20px) translateY(-80vh) rotate(5deg) scale(0.95); opacity: 0.7; }
+  100% { transform: translateX(0px) translateY(-115vh) rotate(-3deg) scale(0.85); opacity: 0; }
+}

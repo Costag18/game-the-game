@@ -188,6 +188,23 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
+  // --- Emote Reactions ---
+  socket.on(EVENTS.EMOTE_SEND, (data) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    const emoji = data?.emoji;
+    if (!emoji || typeof emoji !== 'string') return;
+    // Rate-limit: 500ms between emotes per player
+    const now = Date.now();
+    if (socket.data._lastEmote && now - socket.data._lastEmote < 500) return;
+    socket.data._lastEmote = now;
+    io.to(lobbyId).emit(EVENTS.EMOTE_BROADCAST, {
+      emoji,
+      playerId: socket.id,
+      nickname: socket.data.nickname || socket.id,
+    });
+  });
+
   // --- Tournament Events ---
 
   socket.on(EVENTS.START_TOURNAMENT, () => {

@@ -13,6 +13,7 @@ import RoundResults from './screens/RoundResults.jsx';
 import TournamentEnd from './screens/TournamentEnd.jsx';
 import CasinoMode from './screens/CasinoMode.jsx';
 import PetSidebar from './components/PetSidebar.jsx';
+import EmoteOverlay from './components/EmoteOverlay.jsx';
 import BlackjackGame from './games/Blackjack.jsx';
 import PokerGame from './games/Poker.jsx';
 import UnoGame from './games/Uno.jsx';
@@ -173,6 +174,7 @@ function GameRouter() {
           onLeave={handleLeave}
         />
       )}
+      {['gameVote', 'wagerPhase', 'playing'].includes(screen) && <EmoteOverlay />}
     </>
   );
 }
