@@ -103,7 +103,7 @@ function SlotsPanel({ socket, myScore }) {
         ))}
       </div>
       {result && !spinning && <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>{result.net >= 0 ? `+${result.net}` : result.net}{result.multiplier >= 3 ? ' JACKPOT!' : result.multiplier > 0 ? ' Winner!' : ''}</p>}
-      <div style={{ visibility: spinning ? 'hidden' : 'visible' }}>
+      <div style={{ visibility: spinning ? 'hidden' : 'visible', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
         {!isBroke ? (
           <>
             <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Bet:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
@@ -163,7 +163,7 @@ function WheelPanel({ socket, myScore }) {
         </svg>
       </div>
       {result && !spinning && <p className={result.net >= 0 ? styles.slotsWin : styles.slotsLose}>{result.net >= 0 ? `+${result.net}` : result.net} ({result.multiplier}x)</p>}
-      <div style={{ visibility: spinning ? 'hidden' : 'visible' }}>
+      <div style={{ visibility: spinning ? 'hidden' : 'visible', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
         {!isBroke ? (
           <>
             <div className={styles.coinWagerRow}><span className={styles.coinWagerLabel}>Bet:</span><span className={styles.coinWagerAmount}>{wager}</span></div>
