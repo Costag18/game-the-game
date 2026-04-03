@@ -12,6 +12,7 @@ import WagerPhase from './screens/WagerPhase.jsx';
 import RoundResults from './screens/RoundResults.jsx';
 import TournamentEnd from './screens/TournamentEnd.jsx';
 import CasinoMode from './screens/CasinoMode.jsx';
+import PetSidebar from './components/PetSidebar.jsx';
 import BlackjackGame from './games/Blackjack.jsx';
 import PokerGame from './games/Poker.jsx';
 import UnoGame from './games/Uno.jsx';
@@ -126,11 +127,16 @@ function GameRouter() {
           );
         }
         return (
-          <GameComponent
-            gameState={tournament.gameState?.state}
-            nicknames={tournament.gameState?.nicknames || {}}
-            onAction={tournament.sendAction}
-          />
+          <div style={{ display: 'flex', minHeight: '100vh' }}>
+            <PetSidebar />
+            <div style={{ flex: 1 }}>
+              <GameComponent
+                gameState={tournament.gameState?.state}
+                nicknames={tournament.gameState?.nicknames || {}}
+                onAction={tournament.sendAction}
+              />
+            </div>
+          </div>
         );
       })()}
       {screen === 'loadingGame' && (

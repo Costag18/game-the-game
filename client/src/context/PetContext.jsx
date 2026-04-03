@@ -3,11 +3,15 @@ import { createContext, useContext, useEffect, useReducer, useCallback } from 'r
 const PetContext = createContext(null);
 
 const SHOP_ITEMS = [
+  { id: 'bowtie', name: 'Bow Tie', emoji: '🎀', cost: 10 },
   { id: 'hat', name: 'Hat', emoji: '🎩', cost: 20 },
-  { id: 'sunglasses', name: 'Sunglasses', emoji: '😎', cost: 30 },
-  { id: 'crown', name: 'Crown', emoji: '👑', cost: 50 },
-  { id: 'bowtie', name: 'Bow Tie', emoji: '🎀', cost: 15 },
   { id: 'scarf', name: 'Scarf', emoji: '🧣', cost: 25 },
+  { id: 'sunglasses', name: 'Shades', emoji: '🕶️', cost: 35 },
+  { id: 'crown', name: 'Crown', emoji: '👑', cost: 50 },
+  { id: 'diamond', name: 'Diamond', emoji: '💎', cost: 75 },
+  { id: 'trophy', name: 'Trophy', emoji: '🏆', cost: 100 },
+  { id: 'rocket', name: 'Rocket', emoji: '🚀', cost: 150 },
+  { id: 'rainbow', name: 'Rainbow', emoji: '🌈', cost: 200 },
 ];
 
 const INITIAL_STATE = {
@@ -48,7 +52,7 @@ function petReducer(state, action) {
       return {
         ...state,
         happiness: Math.min(100, state.happiness + 20),
-        petCooldown: 10, // 10 ticks = ~5 min at 30s/tick
+        petCooldown: 3, // 3 ticks = 30s at 10s/tick
       };
     }
     case 'SLEEP': {
@@ -56,7 +60,7 @@ function petReducer(state, action) {
       return {
         ...state,
         energy: Math.min(100, state.energy + 30),
-        sleepCooldown: 30, // 30 ticks = ~15 min
+        sleepCooldown: 6, // 6 ticks = 60s
       };
     }
     case 'ADD_COINS': {
@@ -86,9 +90,9 @@ function petReducer(state, action) {
 export function PetProvider({ children }) {
   const [state, dispatch] = useReducer(petReducer, INITIAL_STATE);
 
-  // Decay stats every 30 seconds
+  // Decay stats every 10 seconds
   useEffect(() => {
-    const interval = setInterval(() => dispatch({ type: 'TICK' }), 30000);
+    const interval = setInterval(() => dispatch({ type: 'TICK' }), 10000);
     return () => clearInterval(interval);
   }, []);
 

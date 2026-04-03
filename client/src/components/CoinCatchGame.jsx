@@ -4,7 +4,7 @@ import styles from './PetSidebar.module.css';
 
 const GAME_DURATION = 15000;
 const SPAWN_INTERVAL = 600;
-const FALL_SPEED = 2.5;
+const FALL_SPEED_PX_PER_MS = 0.15; // Delta-time based, not frame-rate dependent
 const COIN_SIZE = 28;
 
 export default function CoinCatchGame() {
@@ -19,6 +19,7 @@ export default function CoinCatchGame() {
   const coinsRef = useRef([]);
   const scoreRef = useRef(0);
   const nextId = useRef(0);
+  const lastFrameTime = useRef(0);
 
   const startGame = useCallback(() => {
     setPlaying(true);
@@ -27,6 +28,7 @@ export default function CoinCatchGame() {
     scoreRef.current = 0;
     coinsRef.current = [];
     nextId.current = 0;
+    lastFrameTime.current = Date.now();
     setTimeLeft(GAME_DURATION / 1000);
   }, []);
 
@@ -39,8 +41,8 @@ export default function CoinCatchGame() {
     const areaH = area.offsetHeight;
 
     const startTime = Date.now();
+    lastFrameTime.current = startTime;
 
-    // Spawn coins
     const spawnInterval = setInterval(() => {
       if (Date.now() - startTime > GAME_DURATION) return;
       const id = nextId.current++;
@@ -48,9 +50,11 @@ export default function CoinCatchGame() {
       coinsRef.current.push({ id, x, y: -COIN_SIZE, caught: false });
     }, SPAWN_INTERVAL);
 
-    // Animation loop
     function animate() {
-      const elapsed = Date.now() - startTime;
+      const now = Date.now();
+      const dt = now - lastFrameTime.current;
+      lastFrameTime.current = now;
+      const elapsed = now - startTime;
       setTimeLeft(Math.max(0, Math.ceil((GAME_DURATION - elapsed) / 1000)));
 
       if (elapsed >= GAME_DURATION) {
@@ -62,10 +66,10 @@ export default function CoinCatchGame() {
         return;
       }
 
-      // Move coins down
+      // Move coins using delta time
       coinsRef.current = coinsRef.current.filter((c) => {
         if (c.caught) return false;
-        c.y += FALL_SPEED;
+        c.y += FALL_SPEED_PX_PER_MS * dt;
         return c.y < areaH + COIN_SIZE;
       });
 
@@ -114,7 +118,7 @@ export default function CoinCatchGame() {
               <div
                 key={c.id}
                 className={styles.catchCoin}
-                style={{ left: c.x, top: c.y }}
+                style={{ left: c.x - 10, top: c.y - 10 }}
                 onClick={() => handleCoinClick(c.id)}
                 onTouchStart={(e) => { e.preventDefault(); handleCoinClick(c.id); }}
               >

@@ -181,6 +181,10 @@
   font-size: 0.9rem;
   font-weight: 600;
   flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
 }
 
 .standingScore {
