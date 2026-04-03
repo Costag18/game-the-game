@@ -314,6 +314,11 @@
   flex-direction: column;
   gap: 0;
   border-top: 2px solid var(--gold-dim, #8a7230);
+  order: 3;
+}
+
+@media (min-width: 960px) {
+  .sidebarArea { order: 0; }
 }
 
 @media (min-width: 960px) {
