@@ -353,3 +353,190 @@
 .catchCoin:active {
   transform: scale(0.7);
 }
+
+/* Mini-games section */
+.miniGamesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--gold-dim, #8a7230);
+  padding-top: 0.5rem;
+}
+
+/* Shared mini-game styles */
+.miniGameBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+}
+
+.miniGameTitle {
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.miniGameMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.miniGameDesc {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.7rem;
+  margin: 0;
+  text-align: center;
+}
+
+.miniGameBtn {
+  background: linear-gradient(135deg, var(--gold, #d4a843) 0%, var(--gold-dim, #8a7230) 100%);
+  color: var(--bg-dark, #1a0a0a);
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.8rem;
+  font-family: var(--font-heading, Georgia);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.miniGameBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.miniGamePlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.miniGameWin {
+  color: var(--success, #5cb85c);
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.miniGameLose {
+  color: var(--danger, #d9534f);
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Stop the Clock */
+.clockDisplay {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  text-shadow: 0 2px 8px rgba(212, 168, 67, 0.3);
+}
+
+.clockTarget {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.75rem;
+  margin: 0;
+}
+
+/* Color Match */
+.colorWord {
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.colorTimer {
+  height: 4px;
+  background: var(--gold, #d4a843);
+  border-radius: 2px;
+  transition: width 0.05s linear;
+  align-self: flex-start;
+}
+
+.colorBtns {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.colorYes {
+  background: #43a047;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.colorNo {
+  background: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Treasure Chest */
+.chestRow {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.chest {
+  width: 55px;
+  height: 55px;
+  background: rgba(212, 168, 67, 0.1);
+  border: 2px solid var(--gold-dim, #8a7230);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.chest:hover:not(:disabled) {
+  transform: scale(1.05);
+  border-color: var(--gold, #d4a843);
+}
+
+.chest:disabled {
+  cursor: default;
+}
+
+.chestPicked {
+  border-color: var(--gold, #d4a843);
+  background: rgba(212, 168, 67, 0.2);
+  transform: scale(1.1);
+}
+
+.chestRevealed {
+  opacity: 0.5;
+}
+
+.chestIcon {
+  font-size: 1.8rem;
+}
+
+.chestPrize {
+  font-size: 0.85rem;
+  font-weight: 700;
+}

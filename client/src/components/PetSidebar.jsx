@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { usePet } from '../context/PetContext.jsx';
 import CoinCatchGame from './CoinCatchGame.jsx';
+import { StopTheClock, ColorMatch, TreasureChest } from './PetMiniGames.jsx';
 import styles from './PetSidebar.module.css';
 
 const PET_FACES = {
@@ -126,8 +127,14 @@ export default function PetSidebar() {
         )}
       </div>
 
-      {/* Coin catch game */}
-      <CoinCatchGame />
+      {/* Mini-games */}
+      <div className={styles.miniGamesSection}>
+        <span className={styles.sectionLabel}>Mini-Games</span>
+        <CoinCatchGame />
+        <StopTheClock />
+        <ColorMatch />
+        <TreasureChest />
+      </div>
     </div>
   );
 }
