@@ -85,7 +85,7 @@ export default function MainMenu({ onNavigate }) {
           </button>
         </div>
       </div>
-      <span className={styles.version}>v1.0.8</span>
+      <span className={styles.version}>v1.0.9</span>
     </div>
   );
 }
