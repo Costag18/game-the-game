@@ -125,16 +125,27 @@ export default function CreateLobby({ onNavigate, onJoinLobby }) {
               <label className={styles.label} htmlFor="target">
                 {winCondition === LOBBY.WIN_CONDITIONS.FIXED_ROUNDS ? 'Rounds' : 'Target Points'}
               </label>
-              <select
+              <input
                 id="target"
-                className={styles.select}
+                className={styles.input}
+                type="number"
+                min={winCondition === LOBBY.WIN_CONDITIONS.FIXED_ROUNDS ? 1 : 100}
+                max={winCondition === LOBBY.WIN_CONDITIONS.FIXED_ROUNDS ? 50 : 99999}
                 value={target}
                 onChange={(e) => setTarget(e.target.value)}
-              >
+              />
+              <div className={styles.presets}>
                 {targetOptions.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                  <button
+                    key={opt}
+                    type="button"
+                    className={`${styles.presetBtn} ${Number(target) === opt ? styles.presetActive : ''}`}
+                    onClick={() => setTarget(opt)}
+                  >
+                    {opt}
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
           </div>
 

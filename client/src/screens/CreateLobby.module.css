@@ -123,6 +123,33 @@
   border-color: var(--gold);
 }
 
+.presets {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+}
+
+.presetBtn {
+  background: rgba(212, 168, 67, 0.1);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.presetBtn:hover {
+  background: rgba(212, 168, 67, 0.2);
+}
+
+.presetActive {
+  background: rgba(212, 168, 67, 0.25);
+  border-color: var(--gold);
+  font-weight: 700;
+}
+
 .checkbox {
   width: 20px;
   height: 20px;

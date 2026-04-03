@@ -86,6 +86,12 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.CREATE_LOBBY, (options, callback) => {
     try {
       cleanupCasinoSession(socket.id);
+      // Clamp custom win targets to safe ranges
+      if (options.winCondition === 'fixedRounds') {
+        options.winTarget = Math.max(1, Math.min(50, Number(options.winTarget) || 5));
+      } else if (options.winCondition === 'pointThreshold') {
+        options.winTarget = Math.max(100, Math.min(99999, Number(options.winTarget) || 1000));
+      }
       const lobby = lobbyManager.createLobby(socket.id, options);
       if (socket.data.nickname) {
         lobbyManager.setNickname(socket.id, socket.data.nickname);
