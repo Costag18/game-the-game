@@ -31,29 +31,22 @@ export default function PetSidebar() {
 
   const [shopOpen, setShopOpen] = useState(false);
 
-  const equippedItem = shopItems.find((i) => i.id === equipped);
+  // Get equipped items by slot
+  const headItem = shopItems.find((i) => i.id === equipped?.head);
+  const neckItem = shopItems.find((i) => i.id === equipped?.neck);
+  const eyesItem = shopItems.find((i) => i.id === equipped?.eyes);
+  const sideItem = shopItems.find((i) => i.id === equipped?.side);
 
   return (
     <div className={styles.petSidebar}>
       {/* Pet Display */}
       <div className={styles.petDisplay}>
         <div className={styles.petAvatar}>
-          {equippedItem && ['hat', 'crown', 'rainbow'].includes(equippedItem.id) && (
-            <span className={styles.accessoryTop}>{equippedItem.emoji}</span>
-          )}
+          {headItem && <span className={styles.accessoryTop}>{headItem.emoji}</span>}
+          {eyesItem && <span className={styles.accessoryEyes}>{eyesItem.emoji}</span>}
           <span className={styles.petFace}>{PET_FACES[mood]}</span>
-          {equippedItem && equippedItem.id === 'bowtie' && (
-            <span className={styles.accessoryNeck}>{equippedItem.emoji}</span>
-          )}
-          {equippedItem && equippedItem.id === 'sunglasses' && (
-            <span className={styles.accessoryEyes}>{equippedItem.emoji}</span>
-          )}
-          {equippedItem && equippedItem.id === 'scarf' && (
-            <span className={styles.accessoryNeck}>{equippedItem.emoji}</span>
-          )}
-          {equippedItem && ['diamond', 'trophy', 'rocket'].includes(equippedItem.id) && (
-            <span className={styles.accessorySide}>{equippedItem.emoji}</span>
-          )}
+          {neckItem && <span className={styles.accessoryNeck}>{neckItem.emoji}</span>}
+          {sideItem && <span className={styles.accessorySide}>{sideItem.emoji}</span>}
         </div>
         <span className={styles.petName}>{name}</span>
         <span className={styles.coinCount}>🪙 {coins}</span>
@@ -90,8 +83,8 @@ export default function PetSidebar() {
               return (
                 <button
                   key={itemId}
-                  className={`${styles.itemBtn} ${equipped === itemId ? styles.itemEquipped : ''}`}
-                  onClick={() => equip(equipped === itemId ? null : itemId)}
+                  className={`${styles.itemBtn} ${Object.values(equipped || {}).includes(itemId) ? styles.itemEquipped : ''}`}
+                  onClick={() => equip(itemId)}
                   title={item.name}
                 >
                   {item.emoji}

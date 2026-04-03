@@ -3,15 +3,14 @@ import { createContext, useContext, useEffect, useReducer, useCallback } from 'r
 const PetContext = createContext(null);
 
 const SHOP_ITEMS = [
-  { id: 'bowtie', name: 'Bow Tie', emoji: '🎀', cost: 10 },
-  { id: 'hat', name: 'Hat', emoji: '🎩', cost: 20 },
-  { id: 'scarf', name: 'Scarf', emoji: '🧣', cost: 25 },
-  { id: 'sunglasses', name: 'Shades', emoji: '🕶️', cost: 35 },
-  { id: 'crown', name: 'Crown', emoji: '👑', cost: 50 },
-  { id: 'diamond', name: 'Diamond', emoji: '💎', cost: 75 },
-  { id: 'trophy', name: 'Trophy', emoji: '🏆', cost: 100 },
-  { id: 'rocket', name: 'Rocket', emoji: '🚀', cost: 150 },
-  { id: 'rainbow', name: 'Rainbow', emoji: '🌈', cost: 200 },
+  { id: 'bowtie', name: 'Bow Tie', emoji: '🎀', cost: 10, slot: 'neck' },
+  { id: 'hat', name: 'Hat', emoji: '🎩', cost: 20, slot: 'head' },
+  { id: 'sunglasses', name: 'Shades', emoji: '🕶️', cost: 35, slot: 'eyes' },
+  { id: 'crown', name: 'Crown', emoji: '👑', cost: 50, slot: 'head' },
+  { id: 'diamond', name: 'Diamond', emoji: '💎', cost: 75, slot: 'side' },
+  { id: 'trophy', name: 'Trophy', emoji: '🏆', cost: 100, slot: 'side' },
+  { id: 'rocket', name: 'Rocket', emoji: '🚀', cost: 150, slot: 'side' },
+  { id: 'rainbow', name: 'Rainbow', emoji: '🌈', cost: 200, slot: 'head' },
 ];
 
 const INITIAL_STATE = {
@@ -20,7 +19,7 @@ const INITIAL_STATE = {
   happiness: 80,
   energy: 80,
   inventory: [],
-  equipped: null,
+  equipped: {}, // { head: 'crown', neck: 'bowtie', eyes: null, side: null }
   petCooldown: 0,
   sleepCooldown: 0,
   name: 'Buddy',
@@ -77,7 +76,16 @@ function petReducer(state, action) {
       };
     }
     case 'EQUIP': {
-      return { ...state, equipped: action.itemId };
+      const item = SHOP_ITEMS.find((i) => i.id === action.itemId);
+      if (!item) return state;
+      const newEquipped = { ...state.equipped };
+      // Toggle: if already equipped in that slot, unequip
+      if (newEquipped[item.slot] === action.itemId) {
+        newEquipped[item.slot] = null;
+      } else {
+        newEquipped[item.slot] = action.itemId;
+      }
+      return { ...state, equipped: newEquipped };
     }
     case 'SET_NAME': {
       return { ...state, name: action.name };
