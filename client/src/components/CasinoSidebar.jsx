@@ -279,24 +279,29 @@ export { CoinFlipPanel, SlotsPanel, WheelPanel, BJLitePanel, ChickenPanel };
 
 export default function CasinoSidebar({ socket, myScore }) {
   const scrollRef = useRef(null);
-  const [scrollPos, setScrollPos] = useState({ atTop: true, atBottom: false });
+  const [fadePct, setFadePct] = useState({ top: 0, bottom: 0 });
 
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
     function handleScroll() {
-      const atTop = el.scrollTop < 10;
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
-      setScrollPos({ atTop, atBottom });
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      if (maxScroll <= 0) { setFadePct({ top: 0, bottom: 0 }); return; }
+      const ratio = el.scrollTop / maxScroll;          // 0 = top, 1 = bottom
+      setFadePct({ top: Math.min(ratio, 1) , bottom: Math.min(1 - ratio, 1) });
     }
     el.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => el.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const MAX_FADE = 40; // max percentage of sidebar height
+  const topH = `${fadePct.top * MAX_FADE}%`;
+  const botH = `${fadePct.bottom * MAX_FADE}%`;
+
   return (
     <div className={styles.sidebarWrapper}>
-      {!scrollPos.atTop && <div className={styles.fadeTop} />}
+      <div className={styles.fadeTop} style={{ height: topH, opacity: fadePct.top > 0.01 ? 1 : 0 }} />
       <div className={styles.sidebarArea} ref={scrollRef}>
         <CoinFlipPanel socket={socket} myScore={myScore} />
         <SlotsPanel socket={socket} myScore={myScore} />
@@ -304,7 +309,7 @@ export default function CasinoSidebar({ socket, myScore }) {
         <BJLitePanel socket={socket} myScore={myScore} />
         <ChickenPanel socket={socket} myScore={myScore} />
       </div>
-      {!scrollPos.atBottom && <div className={styles.fadeBottom} />}
+      <div className={styles.fadeBottom} style={{ height: botH, opacity: fadePct.bottom > 0.01 ? 1 : 0 }} />
     </div>
   );
 }

@@ -362,38 +362,25 @@
 
 .sidebarArea::-webkit-scrollbar { display: none; }
 
-/* Fade overlays — pure CSS via pseudo-elements on the wrapper */
-.sidebarWrapper::before,
-.sidebarWrapper::after {
-  content: '';
-  display: none;
+/* Fade overlays — dynamically sized by JS scroll position */
+.fadeTop, .fadeBottom {
   position: absolute;
   left: 0;
   right: 0;
-  height: 60px;
   pointer-events: none;
   z-index: 5;
+  transition: height 0.15s ease-out, opacity 0.15s ease-out;
 }
 
-@media (min-width: 960px) {
-  .sidebarWrapper::before,
-  .sidebarWrapper::after {
-    display: block;
-  }
-}
-
-.sidebarWrapper::before {
+.fadeTop {
   top: 0;
   background: linear-gradient(to bottom, var(--bg-panel, #2a1515) 0%, transparent 100%);
 }
 
-.sidebarWrapper::after {
+.fadeBottom {
   bottom: 0;
   background: linear-gradient(to top, var(--bg-panel, #2a1515) 0%, transparent 100%);
 }
-
-/* Keep old class names so CasinoSidebar JSX still compiles (no-ops) */
-.fadeTop, .fadeBottom { display: none; }
 
 
 
