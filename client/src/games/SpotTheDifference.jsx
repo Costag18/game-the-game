@@ -5,7 +5,7 @@ import { displayName } from '../utils/displayName.js';
 const GRID_COLS = 6;
 
 function ShapeIcon({ shape, color, size, rotation }) {
-  const sizeMap = { small: 20, medium: 30, large: 40 };
+  const sizeMap = { small: 16, medium: 28, large: 42 };
   const s = sizeMap[size] || 30;
   const half = s / 2;
 

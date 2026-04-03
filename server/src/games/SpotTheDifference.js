@@ -30,7 +30,8 @@ function randomFromExcluding(arr, exclude) {
   return filtered.length > 0 ? randomFrom(filtered) : randomFrom(arr);
 }
 
-const SYMMETRIC_SHAPES = new Set(['circle', 'square', 'cross']);
+// Shapes where rotation differences are invisible or too subtle at small size
+const SYMMETRIC_SHAPES = new Set(['circle', 'square', 'cross', 'star', 'hexagon']);
 
 function getRotationsForShape(shape) {
   if (SYMMETRIC_SHAPES.has(shape)) return [0]; // always 0, rotation is invisible
