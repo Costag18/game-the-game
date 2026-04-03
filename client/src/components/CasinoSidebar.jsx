@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { EVENTS } from '../../../shared/events.js';
 import styles from '../screens/GameVote.module.css';
 
@@ -278,13 +278,33 @@ function ChickenPanel({ socket, myScore }) {
 export { CoinFlipPanel, SlotsPanel, WheelPanel, BJLitePanel, ChickenPanel };
 
 export default function CasinoSidebar({ socket, myScore }) {
+  const scrollRef = useRef(null);
+  const [scrollPos, setScrollPos] = useState({ atTop: true, atBottom: false });
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    function handleScroll() {
+      const atTop = el.scrollTop < 10;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
+      setScrollPos({ atTop, atBottom });
+    }
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className={styles.sidebarArea}>
-      <CoinFlipPanel socket={socket} myScore={myScore} />
-      <SlotsPanel socket={socket} myScore={myScore} />
-      <WheelPanel socket={socket} myScore={myScore} />
-      <BJLitePanel socket={socket} myScore={myScore} />
-      <ChickenPanel socket={socket} myScore={myScore} />
+    <div className={styles.sidebarWrapper}>
+      {!scrollPos.atTop && <div className={styles.fadeTop} />}
+      <div className={styles.sidebarArea} ref={scrollRef}>
+        <CoinFlipPanel socket={socket} myScore={myScore} />
+        <SlotsPanel socket={socket} myScore={myScore} />
+        <WheelPanel socket={socket} myScore={myScore} />
+        <BJLitePanel socket={socket} myScore={myScore} />
+        <ChickenPanel socket={socket} myScore={myScore} />
+      </div>
+      {!scrollPos.atBottom && <div className={styles.fadeBottom} />}
     </div>
   );
 }

@@ -319,22 +319,57 @@
 /* ===================== Coin Flip Panel ===================== */
 
 /* Sidebar area: stacks coin flip + slots */
+.sidebarWrapper {
+  position: relative;
+  order: 3;
+  flex: 1;
+  min-width: 0;
+  border-top: 2px solid var(--gold-dim, #8a7230);
+}
+
+@media (min-width: 960px) {
+  .sidebarWrapper {
+    order: 0;
+    flex: none;
+    width: 260px;
+    height: 100vh;
+    border-top: none;
+    border-left: 2px solid var(--gold-dim, #8a7230);
+  }
+}
+
 .sidebarArea {
   display: flex;
   flex-direction: column;
   gap: 0;
-  border-top: 2px solid var(--gold-dim, #8a7230);
-  order: 3;
-  flex: 1;
-  min-width: 0;
 }
 
 @media (min-width: 960px) {
   .sidebarArea {
-    order: 0;
-    flex: none;
-    width: 260px;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
   }
+  .sidebarArea::-webkit-scrollbar { display: none; }
+}
+
+.fadeTop, .fadeBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.fadeTop {
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg-panel, #2a1515) 0%, transparent 100%);
+}
+
+.fadeBottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg-panel, #2a1515) 0%, transparent 100%);
 }
 
 @media (min-width: 960px) {
@@ -491,7 +526,7 @@
   outline: none;
   cursor: pointer;
   accent-color: var(--gold, #d4a843);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
 }
 
 .coinSlider:disabled {
