@@ -19,13 +19,20 @@ export function SocketProvider({ children }) {
     newSocket.on('disconnect', () => setConnected(false));
     setSocket(newSocket);
 
-    // Keep-alive: ping server every 5 min to prevent Render from sleeping
-    const keepAlive = setInterval(() => {
-      fetch(`${url}/health`).catch(() => {});
-    }, 5 * 60 * 1000);
+    // Keep-alive: ping server every 2 min to prevent Render from sleeping
+    const ping = () => fetch(`${url}/health`).catch(() => {});
+    const keepAlive = setInterval(ping, 2 * 60 * 1000);
+
+    // Also ping when tab becomes visible (browser throttles background intervals)
+    const onVisible = () => { if (document.visibilityState === 'visible') ping(); };
+    document.addEventListener('visibilitychange', onVisible);
+
+    // Ping immediately on load
+    ping();
 
     return () => {
       clearInterval(keepAlive);
+      document.removeEventListener('visibilitychange', onVisible);
       newSocket.disconnect();
     };
   }, []);
