@@ -3,6 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { CoinFlipPanel, SlotsPanel, WheelPanel, BJLitePanel, ChickenPanel } from '../components/CasinoSidebar.jsx';
 import PetSidebar from '../components/PetSidebar.jsx';
+import { usePet } from '../context/PetContext.jsx';
 import styles from './CasinoMode.module.css';
 
 const CARD_DECORATIONS = [
@@ -32,6 +33,62 @@ function GameCard({ children, decoration }) {
       </div>
       <span className={styles.cardCornerBL}>{br}</span>
       <span className={styles.cardCornerBR}>{br}</span>
+    </div>
+  );
+}
+
+const PET_FACES = { happy: '😊', neutral: '😐', sad: '😢' };
+const SLOT_LABELS = { head: '🎩 Head', neck: '👔 Neck', eyes: '👓 Eyes', side: '✨ Side' };
+
+function BuddyCustomizer() {
+  const { mood, equipped, shopItems, equip } = usePet();
+
+  const headItem = shopItems.find((i) => i.id === equipped?.head);
+  const neckItem = shopItems.find((i) => i.id === equipped?.neck);
+  const eyesItem = shopItems.find((i) => i.id === equipped?.eyes);
+  const sideItem = shopItems.find((i) => i.id === equipped?.side);
+
+  // Group items by slot
+  const slots = {};
+  for (const item of shopItems) {
+    if (!slots[item.slot]) slots[item.slot] = [];
+    slots[item.slot].push(item);
+  }
+
+  return (
+    <div className={styles.customizer}>
+      <h3 className={styles.customizerTitle}>Customize Buddy</h3>
+      <div className={styles.customizerPreview}>
+        {headItem && <span className={styles.cAccessoryTop}>{headItem.emoji}</span>}
+        {eyesItem && <span className={styles.cAccessoryEyes}>{eyesItem.emoji}</span>}
+        <span className={styles.cFace}>{PET_FACES[mood]}</span>
+        {neckItem && <span className={styles.cAccessoryNeck}>{neckItem.emoji}</span>}
+        {sideItem && <span className={styles.cAccessorySide}>{sideItem.emoji}</span>}
+      </div>
+      <p className={styles.customizerHint}>All items unlocked — try them on!</p>
+      {Object.entries(slots).map(([slot, items]) => (
+        <div key={slot} className={styles.customizerSlot}>
+          <span className={styles.customizerSlotLabel}>{SLOT_LABELS[slot] || slot}</span>
+          <div className={styles.customizerItems}>
+            <button
+              className={`${styles.customizerItem} ${!equipped?.[slot] ? styles.customizerItemActive : ''}`}
+              onClick={() => equip(equipped?.[slot] || items[0]?.id)}
+            >
+              ❌
+            </button>
+            {items.map((item) => (
+              <button
+                key={item.id}
+                className={`${styles.customizerItem} ${equipped?.[slot] === item.id ? styles.customizerItemActive : ''}`}
+                onClick={() => equip(item.id)}
+                title={item.name}
+              >
+                {item.emoji}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -74,8 +131,10 @@ export default function CasinoMode({ onBack }) {
           <span className={styles.scoreValue}>{score.toLocaleString()}</span>
         </div>
       </div>
-      <PetSidebar />
       <div className={styles.gamesGrid}>
+        <GameCard decoration={0}>
+          <BuddyCustomizer />
+        </GameCard>
         {GAMES.map((g) => (
           <GameCard key={g.key} decoration={g.deco}>
             <g.Component socket={socket} myScore={score} />

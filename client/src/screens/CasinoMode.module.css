@@ -152,3 +152,116 @@
     gap: 1rem;
   }
 }
+
+/* Buddy Customizer */
+.customizer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.customizerTitle {
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.customizerPreview {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(212, 168, 67, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.cFace { font-size: 3rem; }
+
+.cAccessoryTop {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.cAccessoryEyes {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%) scale(1.5);
+  font-size: 1.1rem;
+}
+
+.cAccessoryNeck {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-40%) rotate(-12deg);
+  font-size: 1.2rem;
+}
+
+.cAccessorySide {
+  position: absolute;
+  top: 8px;
+  right: -10px;
+  font-size: 1.3rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.customizerHint {
+  color: var(--text-secondary, #b8a88a);
+  font-size: 0.7rem;
+  font-style: italic;
+  margin: 0;
+}
+
+.customizerSlot {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.customizerSlotLabel {
+  color: var(--gold, #d4a843);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.customizerItems {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.customizerItem {
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(212, 168, 67, 0.2);
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.customizerItem:hover {
+  border-color: var(--gold, #d4a843);
+  background: rgba(212, 168, 67, 0.1);
+}
+
+.customizerItemActive {
+  border-color: var(--gold, #d4a843);
+  background: rgba(212, 168, 67, 0.2);
+  box-shadow: 0 0 6px rgba(212, 168, 67, 0.3);
+}
