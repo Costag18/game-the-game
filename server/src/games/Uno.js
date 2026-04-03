@@ -327,13 +327,21 @@ export class Uno extends BaseGame {
 
   _advanceTurn() {
     const n = this.players.length;
+    if (n === 0) return;
     let idx = this.players.indexOf(this.currentTurnPlayer);
-    if (idx === -1) idx = 0; // safety: recover if currentTurnPlayer is invalid
-    idx = ((idx + this.direction) % n + n) % n;
+    if (idx === -1) idx = 0;
+    const dir = this.direction > 0 ? 1 : -1;
+    idx = ((idx + dir) % n + n) % n;
     this.currentTurnPlayer = this.players[idx];
     this.turnIndex = idx;
-    this.drawnCard = null; // clear draw state for new turn
+    this.drawnCard = null;
     this.lastPlayedRank = null;
+
+    // Safety: if currentTurnPlayer is not in the players list, reset
+    if (!this.players.includes(this.currentTurnPlayer)) {
+      this.currentTurnPlayer = this.players[0];
+      this.turnIndex = 0;
+    }
   }
 
   getStateForPlayer(playerId) {
