@@ -28,7 +28,7 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 260px;
+    width: 220px;
     height: 100vh;
     z-index: 50;
     overflow-y: auto;
@@ -36,6 +36,6 @@ body {
   }
   .petFixedSidebar::-webkit-scrollbar { display: none; }
   .gameMainArea {
-    margin-left: 260px;
+    margin-left: 220px;
   }
 }

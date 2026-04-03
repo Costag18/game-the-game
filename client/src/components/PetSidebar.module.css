@@ -14,7 +14,8 @@
 @media (min-width: 960px) {
   .petSidebar {
     order: 0;
-    width: 260px;
+    width: 220px;
+    flex: none;
     height: 100vh;
     border-top: none;
     border-right: 2px solid var(--gold-dim, #8a7230);

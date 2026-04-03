@@ -5,7 +5,7 @@
   background-image:
     radial-gradient(ellipse at top, var(--felt-green) 0%, var(--felt-dark) 60%);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
   font-family: var(--font-body);
   position: relative;
@@ -13,7 +13,6 @@
 
 @media (min-width: 960px) {
   .outerLayout {
-    flex-direction: row;
     flex-wrap: nowrap;
     height: 100vh;
     overflow: hidden;
@@ -331,7 +330,11 @@
 }
 
 @media (min-width: 960px) {
-  .sidebarArea { order: 0; flex: none; }
+  .sidebarArea {
+    order: 0;
+    flex: none;
+    width: 260px;
+  }
 }
 
 @media (min-width: 960px) {
