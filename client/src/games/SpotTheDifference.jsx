@@ -20,7 +20,7 @@ function ShapeIcon({ shape, color, size, rotation }) {
       case 'triangle':
         return <polygon points={`${half},${s * 0.1} ${s * 0.9},${s * 0.9} ${s * 0.1},${s * 0.9}`} fill={color} />;
       case 'diamond':
-        return <polygon points={`${half},${s * 0.05} ${s * 0.95},${half} ${half},${s * 0.95} ${s * 0.05},${half}`} fill={color} />;
+        return <polygon points={`${half},0 ${s * 0.85},${half} ${half},${s} ${s * 0.15},${half}`} fill={color} />;
       case 'star': {
         const pts = [];
         for (let i = 0; i < 10; i++) {

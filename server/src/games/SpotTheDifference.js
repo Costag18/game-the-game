@@ -9,11 +9,10 @@ const ROTATIONS = [0, 90, 180, 270];
 // Symmetric shapes are excluded entirely (handled separately).
 // For each shape, rotations are chosen so no two look identical.
 const VISIBLE_ROTATIONS = {
-  triangle:  [0, 90, 180, 270],  // 3-fold symmetry at 120/240, so 90 vs 0 is always visible
-  diamond:   [0, 45, 90, 135],   // 2-fold symmetry at 180, so avoid pairs that differ by 180
-  star:      [0, 36, 72, 144],   // 5-fold symmetry at 72-degree steps; use offsets that cross boundaries
-  hexagon:   [0, 30, 90, 150],   // 6-fold symmetry at 60-degree steps; use offsets that cross boundaries
-  heart:     [0, 90, 180, 270],  // no rotational symmetry, all look different
+  square:    [0, 45],            // 0 = square, 45 = tilted diamond look
+  triangle:  [0, 90, 180, 270],
+  diamond:   [0, 45],            // 0 = diamond, 45 = looks like square
+  heart:     [0, 90, 180, 270],
 };
 const GRID_SIZE = 36; // 6x6
 const TOTAL_ROUNDS = 3;
@@ -31,7 +30,8 @@ function randomFromExcluding(arr, exclude) {
 }
 
 // Shapes where rotation differences are invisible or too subtle at small size
-const SYMMETRIC_SHAPES = new Set(['circle', 'square', 'cross', 'star', 'hexagon']);
+// (only these get rotation=0 always, no rotation mutations)
+const SYMMETRIC_SHAPES = new Set(['circle', 'cross', 'star', 'hexagon']);
 
 function getRotationsForShape(shape) {
   if (SYMMETRIC_SHAPES.has(shape)) return [0]; // always 0, rotation is invisible
