@@ -15,7 +15,8 @@ body {
 
 /* Pet sidebar during games — fixed on desktop, below on mobile */
 .petFixedSidebar {
-  display: none;
+  display: block;
+  width: 100%;
 }
 
 .gameMainArea {
