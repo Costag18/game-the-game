@@ -128,11 +128,14 @@ function GameRouter() {
         }
         return (
           <>
-            <GameComponent
-              gameState={tournament.gameState?.state}
-              nicknames={tournament.gameState?.nicknames || {}}
-              onAction={tournament.sendAction}
-            />
+            <div className="petFixedSidebar"><PetSidebar /></div>
+            <div className="gameMainArea">
+              <GameComponent
+                gameState={tournament.gameState?.state}
+                nicknames={tournament.gameState?.nicknames || {}}
+                onAction={tournament.sendAction}
+              />
+            </div>
           </>
         );
       })()}

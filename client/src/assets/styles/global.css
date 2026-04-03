@@ -13,20 +13,29 @@ body {
   min-height: 100vh;
 }
 
-.gameWithPet {
-  display: flex;
-  flex-direction: column;
+/* Pet sidebar during games — fixed on desktop, below on mobile */
+.petFixedSidebar {
+  display: none;
+}
+
+.gameMainArea {
   min-height: 100vh;
 }
 
 @media (min-width: 960px) {
-  .gameWithPet {
-    flex-direction: row;
-    min-height: 100vh;
-  }
-  .gameWithPet > div:last-child {
-    flex: 1;
-    min-width: 0;
+  .petFixedSidebar {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    z-index: 50;
     overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .petFixedSidebar::-webkit-scrollbar { display: none; }
+  .gameMainArea {
+    margin-left: 260px;
   }
 }
