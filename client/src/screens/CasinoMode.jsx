@@ -41,7 +41,7 @@ const PET_FACES = { happy: '😊', neutral: '😐', sad: '😢' };
 const SLOT_LABELS = { head: '🎩 Head', neck: '👔 Neck', eyes: '👓 Eyes', side: '✨ Side' };
 
 function BuddyCustomizer() {
-  const { mood, equipped, shopItems, equip } = usePet();
+  const { mood, equipped, shopItems, equip, setMoodOverride, moodOverride } = usePet();
 
   const headItem = shopItems.find((i) => i.id === equipped?.head);
   const neckItem = shopItems.find((i) => i.id === equipped?.neck);
@@ -59,11 +59,34 @@ function BuddyCustomizer() {
     <div className={styles.customizer}>
       <h3 className={styles.customizerTitle}>Customize Buddy</h3>
       <div className={styles.customizerPreview}>
-        {headItem && <span className={styles.cAccessoryTop}>{headItem.emoji}</span>}
+        {headItem?.id === 'rainbow' && <span className={styles.cAccessoryRainbow}>{headItem.emoji}</span>}
+        {headItem?.id === 'sparkles' && <span className={styles.cAccessorySparkles}>{headItem.emoji}</span>}
+        {headItem?.id === 'helmet' && <span className={styles.cAccessoryHelmet}>{headItem.emoji}</span>}
+        {headItem && !['rainbow', 'sparkles', 'helmet'].includes(headItem.id) && <span className={styles.cAccessoryTop}>{headItem.emoji}</span>}
         {eyesItem && <span className={styles.cAccessoryEyes}>{eyesItem.emoji}</span>}
         <span className={styles.cFace}>{PET_FACES[mood]}</span>
         {neckItem && <span className={styles.cAccessoryNeck}>{neckItem.emoji}</span>}
         {sideItem && <span className={styles.cAccessorySide}>{sideItem.emoji}</span>}
+      </div>
+      <div className={styles.customizerMood}>
+        <span className={styles.customizerSlotLabel}>Mood</span>
+        <div className={styles.customizerItems}>
+          {[
+            { id: null, emoji: '🔄', label: 'Auto' },
+            { id: 'happy', emoji: '😊', label: 'Happy' },
+            { id: 'neutral', emoji: '😐', label: 'Neutral' },
+            { id: 'sad', emoji: '😢', label: 'Sad' },
+          ].map((m) => (
+            <button
+              key={m.id || 'auto'}
+              className={`${styles.customizerItem} ${moodOverride === m.id ? styles.customizerItemActive : (!moodOverride && !m.id ? styles.customizerItemActive : '')}`}
+              onClick={() => setMoodOverride(m.id)}
+              title={m.label}
+            >
+              {m.emoji}
+            </button>
+          ))}
+        </div>
       </div>
       <p className={styles.customizerHint}>All items unlocked — try them on!</p>
       {Object.entries(slots).map(([slot, items]) => (

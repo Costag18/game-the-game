@@ -184,35 +184,67 @@
 
 .cAccessoryTop {
   position: absolute;
-  top: -10px;
+  top: -14px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 1.5rem;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  z-index: 2;
+}
+
+.cAccessoryHelmet {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%) scale(2.2);
+  font-size: 1.5rem;
+  z-index: 3;
+}
+
+.cAccessoryRainbow {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%) scale(1.8);
+  font-size: 1.5rem;
+  z-index: 0;
+  opacity: 0.8;
+}
+
+.cAccessorySparkles {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%) scale(1.4);
+  font-size: 1.3rem;
+  z-index: 2;
 }
 
 .cAccessoryEyes {
   position: absolute;
-  top: 22px;
+  top: 20px;
   left: 50%;
-  transform: translateX(-50%) scale(1.5);
+  transform: translateX(-50%) scale(2);
   font-size: 1.1rem;
+  z-index: 2;
 }
 
 .cAccessoryNeck {
   position: absolute;
   bottom: -2px;
   left: 50%;
-  transform: translateX(-40%) rotate(-12deg);
+  transform: translateX(-50%);
   font-size: 1.2rem;
+  z-index: 2;
 }
 
 .cAccessorySide {
   position: absolute;
-  top: 8px;
-  right: -10px;
+  bottom: -5px;
+  right: -8px;
   font-size: 1.3rem;
   filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  z-index: 2;
 }
 
 .customizerHint {

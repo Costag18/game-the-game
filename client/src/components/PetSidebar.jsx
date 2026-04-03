@@ -43,7 +43,10 @@ export default function PetSidebar() {
       {/* Pet Display */}
       <div className={styles.petDisplay}>
         <div className={styles.petAvatar}>
-          {headItem && <span className={styles.accessoryTop}>{headItem.emoji}</span>}
+          {headItem?.id === 'rainbow' && <span className={styles.accessoryRainbow}>{headItem.emoji}</span>}
+          {headItem?.id === 'sparkles' && <span className={styles.accessorySparkles}>{headItem.emoji}</span>}
+          {headItem?.id === 'helmet' && <span className={styles.accessoryHelmet}>{headItem.emoji}</span>}
+          {headItem && !['rainbow', 'sparkles', 'helmet'].includes(headItem.id) && <span className={styles.accessoryTop}>{headItem.emoji}</span>}
           {eyesItem && <span className={styles.accessoryEyes}>{eyesItem.emoji}</span>}
           <span className={styles.petFace}>{PET_FACES[mood]}</span>
           {neckItem && <span className={styles.accessoryNeck}>{neckItem.emoji}</span>}
