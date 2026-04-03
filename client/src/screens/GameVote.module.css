@@ -325,6 +325,7 @@
   flex: 1;
   min-width: 0;
   border-top: 2px solid var(--gold-dim, #8a7230);
+  overflow: hidden;
 }
 
 @media (min-width: 960px) {
@@ -357,19 +358,19 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 40px;
+  height: 80px;
   pointer-events: none;
   z-index: 5;
 }
 
 .fadeTop {
   top: 0;
-  background: linear-gradient(to bottom, var(--bg-panel, #2a1515) 0%, transparent 100%);
+  background: linear-gradient(to bottom, var(--bg-panel, #2a1515) 0%, var(--bg-panel, #2a1515) 20%, transparent 100%);
 }
 
 .fadeBottom {
   bottom: 0;
-  background: linear-gradient(to top, var(--bg-panel, #2a1515) 0%, transparent 100%);
+  background: linear-gradient(to top, var(--bg-panel, #2a1515) 0%, var(--bg-panel, #2a1515) 20%, transparent 100%);
 }
 
 @media (min-width: 960px) {
