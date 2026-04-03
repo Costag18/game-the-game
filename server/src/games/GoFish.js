@@ -116,7 +116,10 @@ export class GoFish extends BaseGame {
         this.lastAction = { type: 'transfer', playerId, targetPlayer, rank, count: matchingCards.length };
         this._autoDrawIfEmpty(playerId);
         this._checkGameEnd();
-        // Go again (don't advance turn)
+        // Go again only if player still has cards to ask with
+        if (this.state === 'playing' && (this.hands[playerId] || []).length === 0) {
+          this._advanceTurn();
+        }
       } else {
         // Go Fish
         this.lastAction = { type: 'goFish', playerId, rank };
@@ -124,10 +127,13 @@ export class GoFish extends BaseGame {
         if (drawn) {
           this.hands[playerId] = [...this.hands[playerId], drawn];
           if (drawn.rank === rank) {
-            // Lucky draw — go again
+            // Lucky draw — go again only if still have cards
             this._checkAndRemoveSets(playerId);
             this.lastAction = { type: 'luckyFish', playerId, rank };
             this._checkGameEnd();
+            if (this.state === 'playing' && (this.hands[playerId] || []).length === 0) {
+              this._advanceTurn();
+            }
           } else {
             this._checkAndRemoveSets(playerId);
             this._checkGameEnd();
