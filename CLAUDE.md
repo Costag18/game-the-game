@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Browser-based multiplayer mini-game tournament platform. Players join lobbies, vote on mini-games, wager points, and compete across rounds to win tournaments. Includes a standalone free-play casino with side betting games.
+Browser-based multiplayer mini-game tournament platform. Players join lobbies, vote on mini-games, wager points, and compete across rounds to win tournaments. Includes a standalone free-play casino with side betting games, a tamagotchi pet system with its own coin economy, and coin-earning mini-games.
 
 ## Tech Stack
 
@@ -11,6 +11,7 @@ Browser-based multiplayer mini-game tournament platform. Players join lobbies, v
 - **Shared:** Constants, event names, game list — `shared/`
 - **Fonts:** Cinzel (headings), Raleway (body), Pirata One (display) — Google Fonts
 - **Deploy:** Render (server) + static client build served by Express in production
+- **Uptime:** UptimeRobot pings `/health` every 5 min to prevent Render free plan sleep
 
 ## Architecture
 
@@ -30,11 +31,13 @@ cd server && npm install && npm run dev
 ## Project Structure
 
 ```
-client/src/components/       — Shared UI (CasinoSidebar, scoreboard, chat)
+client/src/components/       — CasinoSidebar, PetSidebar, CoinCatchGame, PetMiniGames
+client/src/context/          — SocketContext, PetContext (tamagotchi state)
 client/src/games/            — React component + CSS module per mini-game
 client/src/screens/          — Menu, Lobby, WaitingRoom, GameVote, WagerPhase, Results, CasinoMode
 client/src/hooks/            — useSocket, useTournament
-client/src/assets/           — styles/, images/, gamepreviews/
+client/src/assets/           — styles/, gamepreviews/
+client/public/               — Large static images (logo, votefornext, pharaoh, coins)
 server/src/games/            — FSM game engine per mini-game
 server/src/lobby/            — Room/lobby management
 server/src/tournament/       — Round orchestration, scoring (Scorer.js), voting
@@ -60,6 +63,11 @@ setOnStateChange(callback)     // Register broadcast callback for timer events
 _emitChange()                  // Call the callback to broadcast state
 ```
 
+Optional for player removal during simultaneous games:
+```js
+removePlayer(playerId)         // Override to auto-advance when waiting player leaves
+```
+
 ## Adding a New Game
 
 1. Create `server/src/games/YourGame.js` extending BaseGame
@@ -75,18 +83,18 @@ _emitChange()                  // Call the callback to broadcast state
 
 | Game | Players | Type |
 |------|---------|------|
-| Blackjack | 2-8 | Turn-based, multi-hand |
-| Texas Hold'em Poker | 2-8 | Turn-based, 5 hands |
-| Uno | 2-8 | Turn-based, card game |
+| Blackjack | 2-8 | Turn-based, multi-hand, each player vs dealer |
+| Texas Hold'em Poker | 2-8 | Turn-based, 5 hands, all-in support |
+| Uno | 2-8 | Turn-based, +2/+4 stacking, consecutive plays |
 | Go Fish | 2-6 | Turn-based, card game |
-| Crazy Eights | 2-6 | Turn-based, card game |
-| Rock Paper Scissors | 2 | Simultaneous, best of 5 |
+| Crazy Eights | 2-6 | Turn-based, draw 1 per turn |
+| Rock Paper Scissors | 2-8 | Simultaneous, 5 rounds |
 | Liar's Dice | 2-8 | Turn-based, bluffing (1s are wild) |
 | Memory Match | 2-6 | Turn-based, pairs |
 | Roulette | 2-8 | Simultaneous, 5 rounds |
-| Hangman | 2-8 | Turn-based, word guessing |
+| Hangman | 2-8 | Turn-based, 5 words per game |
 | Spot the Difference | 2-8 | Simultaneous, 3 rounds |
-| Battleship | 2 | Turn-based, setup + firing |
+| Battleship | 2-8 | Turn-based, setup + firing, target selector |
 
 ## Casino Side Games
 
@@ -96,7 +104,18 @@ Available during voting/wagering phases and in standalone Free Play Casino mode.
 - **Slots** — 3-reel emoji, pair 1.5x / triple 3x / 777 5x
 - **Wheel of Fortune** — 20 segments, 0x to 10x
 - **Blackjack Lite** — Quick solo hand vs dealer
-- **Chicken Cross** — Cross lanes for escalating multipliers, cash out or get splat
+- **Chicken Cross** — Cross lanes for escalating multipliers, cash out or get splat. House edge ~8% per lane.
+
+## Pet System (Tamagotchi)
+
+Client-side only, per-session (resets on page reload). Lives in `PetContext`.
+
+- **Stats:** Hunger, Happiness, Energy (decay every 10 seconds)
+- **Actions:** Feed (5 coins), Pet (free, 30s cooldown), Sleep (free, 60s cooldown)
+- **Shop items:** Bow Tie, Hat, Shades, Crown, Diamond, Trophy, Rocket, Rainbow (10-200 coins)
+- **Slot system:** head, neck, eyes, side — multiple items equippable simultaneously
+- **Coin mini-games:** Catch Coins (free), Stop the Clock (3 coins), Color Match (free), Treasure Chest (5 coins)
+- **Layout:** Left sidebar on desktop (fixed during games), below content on mobile
 
 ## Scoring & Wagering
 
@@ -108,6 +127,7 @@ Available during voting/wagering phases and in standalone Free Play Casino mode.
   - 4 players: 1st 2x / 2nd 1.5x / 3rd 0.5x / 4th 0x
   - 6+ players: 1st 3x / 2nd 2x / 3rd 1.5x / 4th 1x / 5th 0.5x / 6th+ 0x
 - Point threshold mode: gambling can trigger tournament win
+- Wager slider auto-clamps when score changes from side gambling
 
 ## Critical Patterns & Lessons Learned
 
@@ -119,6 +139,20 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Guard state transitions: `if (this.state !== 'expectedState') return;` to prevent double-execution
 - Auto-skip broke/eliminated/all-in players (Poker, Roulette, Hangman)
 - Client sends a `ping` action if local timer hits 0 and server hasn't transitioned
+- Round results have 15-second auto-advance if not all players acknowledge
+
+### Player Leave During Games
+- `handlePlayerLeave()` removes player from tournament and active game
+- If 1 player remains, tournament ends with them as winner
+- If waiting for their vote/wager, auto-advances without them
+- **Simultaneous games (RPS, Roulette, SpotTheDifference):** override `removePlayer()` to auto-submit/auto-ack for the leaving player so the game doesn't wait for them
+- Results acknowledgment checks `tm.players` not `lobby.players` (lobby may have mid-round joiners)
+
+### Mid-Tournament Joining
+- Players can join during voting or wagering phases (blocked during active games)
+- Lobby status tracks: waiting → voting → wagering → playing
+- New players get 100 starting points, nickname snapshotted from socket.data
+- Tournament events delayed 200ms after join so client processes join callback first
 
 ### Hidden Information
 - `getStateForPlayer()` must NEVER reveal opponent hidden data (ship positions, hole cards, choices)
@@ -130,6 +164,7 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 
 ### Nicknames
 - Snapshotted at tournament start on TournamentManager constructor
+- Also captured from socket.data.nickname for players who set name before joining lobby
 - Included in every `getState()` call — no stale data
 - Client uses `entry.nickname` from standings, falls back to `displayName()` utility
 
@@ -154,12 +189,6 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - `isTournamentOver()` for fixedRounds checks `roundHistory.length >= winTarget`, NOT `currentRound`
 - `currentRound` is incremented by `startNextRound()` before the round plays, so checking it causes premature tournament end when gambling during voting
 
-### Player Disconnect Mid-Game
-- `handlePlayerLeave()` removes player from tournament and active game
-- If 1 player remains, tournament ends with them as winner
-- If waiting for their vote/wager, auto-advances without them
-- Active game broadcasts updated state and checks completion
-
 ### Poker-Specific Lessons
 - FSM must allow `reveal` transition from ALL betting states (preflop/flop/turn/river), not just showdown — folding triggers `_forceFinish()` → `transition('reveal')` from any state
 - After fold, advance turn using full player list position, not the non-folded list (folded player has indexOf -1)
@@ -175,10 +204,16 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - When draw pile empty: reshuffle discard pile (minus top card) back in
 - If reshuffle impossible (discard has 1 card) and no player can play: stalemate → game ends
 
+### Spot the Difference Shape Rules
+- Symmetric shapes (circle, square, cross, hexagon): no rotation mutations, always rotation 0
+- Star: only [0, 180] rotations (point up vs down)
+- Square/Diamond: only [0, 45] rotations
+- Size differences: 16/28/42px for clear visual distinction
+
 ### Keep-Alive (Render Free Plan)
 - Server-side self-ping does NOT work — Render ignores internal requests
-- Client-side fetch to `/health` every 5 min DOES work — counts as external traffic
-- Keep-alive is in `client/src/context/SocketContext.jsx`
+- Client-side fetch does NOT reliably work — browser throttles background tabs
+- **Use UptimeRobot** (external service, free) to ping `/health` every 5 min
 
 ## Conventions
 
@@ -189,7 +224,10 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Socket.IO rooms for lobby management
 - CSS modules per component, casino theme with varied backgrounds per game
 - Game vote order randomized server-side each round
-- `npm ci` for faster builds, `--omit=dev` on server in production
+- `npm ci --prefer-offline` for faster builds, `--omit=dev` on server in production
+- Large images in `client/public/` (not bundled by Vite) — logo 5.5MB, votefornext 1.5MB
+- Leaderboard names truncated with ellipsis at 150px max-width
+- Delta-time based animations (coin catch game) to be frame-rate independent
 
 ## Visual & UX Preferences
 
@@ -200,7 +238,8 @@ The owner cares about:
 - **No clutter** — text in small spaces should be moved outside (e.g., Chicken Cross labels below lanes)
 - **Smooth transitions** — no screen jerks on re-renders (don't null out state before server responds)
 - **Decorative elements** — pharaoh with gradient fade, coins background with blur+mask, playing card corner decorations on casino cards
-- **Fonts** — each game title uses a unique Google Font matching its theme. Body text uses Raleway, headings use Cinzel, game card names use Pirata One
+- **Responsive layout** — desktop: 3-column (pet | content | casino). Mobile: content full width on top, pet + casino side-by-side below. During games: pet fixed left on desktop, below game on mobile.
+- **Fonts** — each game title uses a unique Google Font matching its theme. Body text uses Raleway, headings use Cinzel, game card names use Pirata One. Only titles get unique fonts — all other text uses default for readability.
 
 ## Fonts Per Game
 
