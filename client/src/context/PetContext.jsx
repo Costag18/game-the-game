@@ -3,14 +3,28 @@ import { createContext, useContext, useEffect, useReducer, useCallback } from 'r
 const PetContext = createContext(null);
 
 const SHOP_ITEMS = [
+  // Neck
   { id: 'bowtie', name: 'Bow Tie', emoji: '🎀', cost: 10, slot: 'neck' },
-  { id: 'hat', name: 'Hat', emoji: '🎩', cost: 20, slot: 'head' },
-  { id: 'sunglasses', name: 'Shades', emoji: '🕶️', cost: 35, slot: 'eyes' },
+  { id: 'necktie', name: 'Necktie', emoji: '👔', cost: 25, slot: 'neck' },
+  { id: 'medal', name: 'Medal', emoji: '🏅', cost: 60, slot: 'neck' },
+  // Head
+  { id: 'hat', name: 'Top Hat', emoji: '🎩', cost: 20, slot: 'head' },
   { id: 'crown', name: 'Crown', emoji: '👑', cost: 50, slot: 'head' },
+  { id: 'halo', name: 'Halo', emoji: '😇', cost: 80, slot: 'head' },
+  { id: 'helmet', name: 'Helmet', emoji: '⛑️', cost: 30, slot: 'head' },
+  { id: 'rainbow', name: 'Rainbow', emoji: '🌈', cost: 200, slot: 'head' },
+  // Eyes
+  { id: 'sunglasses', name: 'Shades', emoji: '🕶️', cost: 35, slot: 'eyes' },
+  { id: 'monocle', name: 'Monocle', emoji: '🧐', cost: 45, slot: 'eyes' },
+  // Side
+  { id: 'star', name: 'Star', emoji: '⭐', cost: 15, slot: 'side' },
+  { id: 'flower', name: 'Flower', emoji: '🌸', cost: 20, slot: 'side' },
   { id: 'diamond', name: 'Diamond', emoji: '💎', cost: 75, slot: 'side' },
   { id: 'trophy', name: 'Trophy', emoji: '🏆', cost: 100, slot: 'side' },
   { id: 'rocket', name: 'Rocket', emoji: '🚀', cost: 150, slot: 'side' },
-  { id: 'rainbow', name: 'Rainbow', emoji: '🌈', cost: 200, slot: 'head' },
+  { id: 'fire', name: 'Fire', emoji: '🔥', cost: 120, slot: 'side' },
+  { id: 'sword', name: 'Sword', emoji: '⚔️', cost: 175, slot: 'side' },
+  { id: 'alien', name: 'UFO', emoji: '🛸', cost: 250, slot: 'side' },
 ];
 
 const INITIAL_STATE = {

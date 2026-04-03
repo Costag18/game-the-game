@@ -51,38 +51,40 @@
 
 .accessoryTop {
   position: absolute;
-  top: -12px;
+  top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 1.3rem;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  font-size: 1.4rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
   z-index: 2;
 }
 
 .accessoryEyes {
   position: absolute;
-  top: 22px;
+  top: 18px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) scale(1.5);
   font-size: 1.1rem;
   z-index: 2;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
 }
 
 .accessoryNeck {
   position: absolute;
-  bottom: -2px;
+  bottom: -4px;
   left: 50%;
-  transform: translateX(-50%) rotate(-15deg);
-  font-size: 1rem;
+  transform: translateX(-40%) rotate(-12deg);
+  font-size: 1.1rem;
   z-index: 2;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
 }
 
 .accessorySide {
   position: absolute;
-  top: 10px;
-  right: -8px;
-  font-size: 1.1rem;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  top: 5px;
+  right: -12px;
+  font-size: 1.2rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
   z-index: 2;
 }
 
