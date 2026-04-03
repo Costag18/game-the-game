@@ -51,6 +51,17 @@ function GameRouter() {
   const [currentLobby, setCurrentLobby] = useState(null);
   const tournament = useTournament();
 
+  // Keep-alive: ping server while in an active game/lobby to prevent Render sleep
+  useEffect(() => {
+    const activeScreens = ['waitingRoom', 'gameVote', 'wagerPhase', 'loadingGame', 'playing', 'roundResults'];
+    if (!activeScreens.includes(screen)) return;
+    const url = import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin;
+    const ping = () => fetch(`${url}/health`).catch(() => {});
+    ping();
+    const interval = setInterval(ping, 2 * 60 * 1000); // every 2 min
+    return () => clearInterval(interval);
+  }, [screen]);
+
   useEffect(() => {
     if (!socket) return;
     socket.on(EVENTS.ROUND_START, () => setScreen('gameVote'));
