@@ -3,6 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { displayName } from '../utils/displayName.js';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
+import PetSidebar from '../components/PetSidebar.jsx';
 import styles from './GameVote.module.css';
 import voteImg from '../assets/images/votefornext.png';
 import pharaohImg from '../assets/images/pharoah.png';
@@ -63,6 +64,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
 
   return (
     <div className={styles.outerLayout}>
+      <PetSidebar />
       {/* Coins background at top */}
       <div className={styles.coinsBackground}>
         <img src={coinsImg} alt="" className={styles.coinsImage} />

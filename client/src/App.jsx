@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SocketProvider, useSocketContext } from './context/SocketContext.jsx';
+import { PetProvider } from './context/PetContext.jsx';
 import { useTournament } from './hooks/useTournament.js';
 import { EVENTS } from '../../shared/events.js';
 import MainMenu from './screens/MainMenu.jsx';
@@ -162,7 +163,9 @@ function GameRouter() {
 function App() {
   return (
     <SocketProvider>
-      <GameRouter />
+      <PetProvider>
+        <GameRouter />
+      </PetProvider>
     </SocketProvider>
   );
 }

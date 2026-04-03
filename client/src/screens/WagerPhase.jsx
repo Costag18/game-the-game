@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { GAMES } from '../../../shared/gameList.js';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
+import PetSidebar from '../components/PetSidebar.jsx';
 import styles from './WagerPhase.module.css';
 
 function Popdown({ title, children }) {
@@ -113,6 +114,7 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
 
   return (
     <div className={styles.outerLayout}>
+      <PetSidebar />
       <div className={styles.container}>
         <div className={styles.panel}>
         <h2 className={styles.title}>Place Your Wager</h2>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { CoinFlipPanel, SlotsPanel, WheelPanel, BJLitePanel, ChickenPanel } from '../components/CasinoSidebar.jsx';
+import PetSidebar from '../components/PetSidebar.jsx';
 import styles from './CasinoMode.module.css';
 
 const CARD_DECORATIONS = [
@@ -73,6 +74,7 @@ export default function CasinoMode({ onBack }) {
           <span className={styles.scoreValue}>{score.toLocaleString()}</span>
         </div>
       </div>
+      <PetSidebar />
       <div className={styles.gamesGrid}>
         {GAMES.map((g) => (
           <GameCard key={g.key} decoration={g.deco}>
