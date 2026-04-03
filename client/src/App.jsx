@@ -128,7 +128,6 @@ function GameRouter() {
         }
         return (
           <>
-            <div className="petFixedSidebar"><PetSidebar /></div>
             <div className="gameMainArea">
               <GameComponent
                 gameState={tournament.gameState?.state}
@@ -136,6 +135,7 @@ function GameRouter() {
                 onAction={tournament.sendAction}
               />
             </div>
+            <div className="petFixedSidebar"><PetSidebar /></div>
           </>
         );
       })()}
