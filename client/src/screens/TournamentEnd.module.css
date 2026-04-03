@@ -1,5 +1,6 @@
 .container {
   min-height: 100vh;
+  width: 100%;
   background-color: var(--mahogany);
   background-image:
     radial-gradient(ellipse at top, #6b1c1c 0%, var(--mahogany) 50%, var(--bg-dark) 100%);
