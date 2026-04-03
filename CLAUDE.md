@@ -281,3 +281,10 @@ The owner cares about:
 | Hangman | Fredericka the Great |
 | Spot the Difference | Special Elite |
 | Battleship | Archivo Black |
+
+## Versioning & Commits
+
+- **Version number** lives in `client/src/screens/MainMenu.jsx` as a `<span className={styles.version}>v1.0.0</span>` at the bottom of the start screen
+- **Every change must**: bump the version (patch for fixes, minor for features), commit, and push to GitHub
+- **Commit messages** must end with `Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>`
+- **Tell the user** the new version number when committing
