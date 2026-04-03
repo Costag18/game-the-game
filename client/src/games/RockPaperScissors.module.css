@@ -285,3 +285,21 @@
   margin: 0;
   letter-spacing: 0.03em;
 }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .arena { padding: 1rem 0.5rem; gap: 1rem; }
+  .title { font-size: 1.5rem; }
+  .scoreboard { gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  .scoreCard { padding: 0.5rem 0.75rem; min-width: 60px; }
+  .playerName { font-size: 0.7rem; }
+  .scoreValue { font-size: 1.4rem; }
+  .choiceButtons { gap: 0.5rem; }
+  .choiceBtn { width: 85px; padding: 0.75rem 0.5rem; }
+  .btnEmoji { font-size: 2rem; }
+  .btnLabel { font-size: 0.7rem; }
+  .statusText { font-size: 1rem; }
+  .revealGrid { gap: 0.5rem; }
+  .revealCard { padding: 0.6rem 0.75rem; min-width: 70px; }
+  .revealEmoji { font-size: 1.8rem; }
+}

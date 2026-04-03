@@ -215,6 +215,27 @@ export class Roulette extends BaseGame {
     };
   }
 
+  removePlayer(playerId) {
+    super.removePlayer(playerId);
+    this.players = this.players.filter((p) => p !== playerId);
+    if (this.players.length <= 1) {
+      this.state = 'finished';
+      return;
+    }
+    // Auto-submit bet if waiting
+    if (this.state === 'betting' && !this.betSubmitted[playerId]) {
+      this.betSubmitted[playerId] = true;
+      this._autoSkipBrokePlayers();
+    }
+    // Auto-ack if in spinning
+    if (this.state === 'spinning') {
+      this.acknowledged.add(playerId);
+      if (this.players.every((p) => this.acknowledged.has(p))) {
+        this._advanceAfterSpin();
+      }
+    }
+  }
+
   isComplete() {
     return this.state === 'finished';
   }

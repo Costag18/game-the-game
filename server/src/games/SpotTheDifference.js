@@ -311,6 +311,22 @@ export class SpotTheDifference extends BaseGame {
     };
   }
 
+  removePlayer(playerId) {
+    super.removePlayer(playerId);
+    this.players = this.players.filter((p) => p !== playerId);
+    if (this.players.length === 0) {
+      this._clearTimers();
+      this.state = 'finished';
+    }
+    // Auto-ack if in roundEnd
+    if (this.state === 'roundEnd') {
+      this.acknowledged.add(playerId);
+      if (this.players.every((p) => this.acknowledged.has(p))) {
+        this._advanceAfterRoundEnd();
+      }
+    }
+  }
+
   isComplete() {
     return this.state === 'finished';
   }

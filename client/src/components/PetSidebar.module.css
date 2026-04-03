@@ -7,6 +7,8 @@
   background: var(--bg-panel, #2a1515);
   border-top: 2px solid var(--gold-dim, #8a7230);
   order: 2;
+  flex: 1;
+  min-width: 0;
 }
 
 @media (min-width: 960px) {

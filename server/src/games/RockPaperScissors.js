@@ -44,6 +44,32 @@ export class RockPaperScissors extends BaseGame {
     this.lastRoundResult = null;
   }
 
+  removePlayer(playerId) {
+    super.removePlayer(playerId);
+    this.players = this.players.filter((p) => p !== playerId);
+    delete this.scores[playerId];
+    delete this.choices[playerId];
+
+    if (this.players.length <= 1) {
+      if (this.state !== 'finished') this.state = 'finished';
+      return;
+    }
+
+    // If we were waiting for this player's choice, check if all remaining have chosen
+    if (this.state === 'round') {
+      const allChosen = this.players.every((p) => this.choices[p] !== undefined);
+      if (allChosen) {
+        this.transition('reveal');
+        this._resolveRound();
+        this.acknowledged = new Set();
+        this._startRevealTimer();
+      }
+    } else if (this.state === 'reveal') {
+      this.acknowledged.add(playerId); // auto-ack
+      this._checkRevealComplete();
+    }
+  }
+
   handleAction(playerId, action) {
     if (!this.players.includes(playerId)) return;
 
