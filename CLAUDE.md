@@ -214,6 +214,29 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Server-side self-ping does NOT work — Render ignores internal requests
 - Client-side fetch does NOT reliably work — browser throttles background tabs
 - **Use UptimeRobot** (external service, free) to ping `/health` every 5 min
+- Client pings `/health` every 2 min ONLY during active game screens (lobby, voting, playing)
+- Cold start on first visit is acceptable (~30-60s), but mid-game disconnects are not
+
+### Solo Host Flow
+- Host can start tournament with 1 player (server allows `players.length >= 1`)
+- Game vote screen shows all games greyed out with "Waiting for players to join..."
+- Games unlock when 2+ players are in the tournament
+- Other players can join mid-tournament during voting/wagering phases
+
+### Round Results Auto-Advance
+- Results acknowledgment checks `tm.players` not `lobby.players` (lobby may have mid-round joiners)
+- 15-second auto-advance timer if not all players acknowledge
+- Prevents permanent deadlock from disconnects or stuck clients
+
+### Casino Animation UX
+- Bet controls use `visibility: hidden` (not `display: none`) during spinning
+- Preserves layout space — no jank from elements appearing/disappearing
+- Controls reappear after result lands
+
+### Custom Rounds/Points
+- Lobby creation allows custom number input for rounds (1-50) and point threshold (100-99999)
+- Preset quick buttons for common values (5/10/15 rounds, 1000/2000/5000 points)
+- Server clamps values to safe ranges
 
 ## Conventions
 
@@ -228,6 +251,7 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Large images in `client/public/` (not bundled by Vite) — logo 5.5MB, votefornext 1.5MB
 - Leaderboard names truncated with ellipsis at 150px max-width
 - Delta-time based animations (coin catch game) to be frame-rate independent
+- Explicitly bind server to `0.0.0.0` for Render port detection
 
 ## Visual & UX Preferences
 
