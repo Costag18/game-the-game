@@ -329,14 +329,14 @@
   flex: 1;
   min-width: 0;
   border-top: 2px solid var(--gold-dim, #8a7230);
-  overflow: visible;
+  overflow: hidden;
 }
 
 @media (min-width: 960px) {
   .sidebarWrapper {
     order: 0;
-    flex: 0 0 300px;
-    max-width: 300px;
+    flex: none;
+    width: 280px;
     height: 100vh;
     border-top: none;
     border-left: 2px solid var(--gold-dim, #8a7230);
@@ -347,17 +347,13 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  overflow-x: hidden;
 }
 
 @media (min-width: 960px) {
   .sidebarArea {
+    width: 280px;
     height: 100vh;
     overflow-y: auto;
-    overflow-x: hidden;
     scrollbar-width: none;
   }
   .sidebarArea::-webkit-scrollbar { display: none; }
