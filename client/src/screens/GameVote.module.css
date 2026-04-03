@@ -356,6 +356,10 @@
   scrollbar-width: none;
 }
 
+.sidebarArea > * {
+  flex-shrink: 0;
+}
+
 .sidebarArea::-webkit-scrollbar { display: none; }
 
 /* Fade overlays — pure CSS via pseudo-elements on the wrapper */
