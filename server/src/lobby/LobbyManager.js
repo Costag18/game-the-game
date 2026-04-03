@@ -28,7 +28,7 @@ export class LobbyManager {
     if (!lobby) throw new Error('Lobby not found');
     if (lobby.players.includes(playerId)) throw new Error('Already in lobby');
     if (lobby.players.length >= lobby.maxPlayers) throw new Error('Lobby is full');
-    if (lobby.status !== 'waiting') throw new Error('Game already in progress');
+    if (lobby.status !== 'waiting' && lobby.status !== 'voting' && lobby.status !== 'wagering') throw new Error('Game in progress');
     if (lobby.isPrivate && code !== lobby.code) throw new Error('Invalid code');
     lobby.players.push(playerId);
     this.playerToLobby.set(playerId, lobbyId);
@@ -52,8 +52,12 @@ export class LobbyManager {
   listPublicLobbies() {
     const list = [];
     for (const lobby of this.lobbies.values()) {
-      if (!lobby.isPrivate && lobby.status === 'waiting') {
-        list.push({ id: lobby.id, name: lobby.name, playerCount: lobby.players.length, maxPlayers: lobby.maxPlayers, hostId: lobby.hostId });
+      const joinable = ['waiting', 'voting', 'wagering'].includes(lobby.status);
+      if (!lobby.isPrivate && joinable && !lobby.id.startsWith('casino_')) {
+        list.push({
+          id: lobby.id, name: lobby.name, playerCount: lobby.players.length,
+          maxPlayers: lobby.maxPlayers, hostId: lobby.hostId, status: lobby.status,
+        });
       }
     }
     return list;

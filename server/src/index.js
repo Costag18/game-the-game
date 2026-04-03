@@ -105,6 +105,32 @@ io.on(EVENTS.CONNECTION, (socket) => {
         lobbyManager.setNickname(socket.id, socket.data.nickname);
       }
       socket.join(lobbyId);
+
+      // If tournament is active (voting/wagering), add player to it
+      const tm = tournaments.get(lobbyId);
+      if (tm && (tm.phase === 'voting' || tm.phase === 'wagering')) {
+        if (!tm.players.includes(socket.id)) {
+          tm.players.push(socket.id);
+          tm.scores[socket.id] = 100; // starting points
+          const nick = socket.data.nickname || socket.id.slice(0, 8);
+          tm.nicknames[socket.id] = nick;
+          // Send them the current tournament state so their client catches up
+          socket.emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+          if (tm.phase === 'voting') {
+            const eligible = shuffle(getEligibleGames(lobby.players.length));
+            socket.emit(EVENTS.ROUND_START, { round: tm.currentRound, eligibleGames: eligible });
+          } else if (tm.phase === 'wagering') {
+            socket.emit(EVENTS.VOTE_RESULT, {
+              selectedGame: tm.selectedGame,
+              playerCount: tm.players.length,
+              wagerReturns: Scorer.getWagerReturnTable(tm.players.length),
+            });
+          }
+          // Broadcast updated state to all
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+        }
+      }
+
       const updated = lobbyManager.getLobby(lobbyId);
       io.to(lobbyId).emit(EVENTS.PLAYER_JOINED, {
         playerId: socket.id,
@@ -184,6 +210,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     tournaments.set(lobbyId, tm);
 
     tm.startNextRound();
+    lobbyManager.setStatus(lobbyId, 'voting');
     const eligible = shuffle(getEligibleGames(lobby.players.length));
     io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
     io.to(lobbyId).emit(EVENTS.ROUND_START, {
@@ -204,6 +231,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     if (Object.keys(tm.votes).length >= lobby.players.length) {
       const selectedGame = tm.tallyVotes();
       tm.startWagerPhase();
+      lobbyManager.setStatus(lobbyId, 'wagering');
       io.to(lobbyId).emit(EVENTS.VOTE_RESULT, {
         selectedGame,
         playerCount: lobby.players.length,
@@ -597,6 +625,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const lobby = lobbyManager.getLobby(lobbyId);
     if (tm.allWagersIn()) {
       tm.startPlaying();
+      lobbyManager.setStatus(lobbyId, 'playing');
       io.to(lobbyId).emit(EVENTS.WAGER_LOCKED, { wagers: { ...tm.wagers } });
 
       if (isGameRegistered(tm.selectedGame)) {
@@ -721,6 +750,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       lobbyManager.setStatus(lobbyId, 'waiting');
     } else {
       tm.startNextRound();
+      lobbyManager.setStatus(lobbyId, 'voting');
       const eligible = getEligibleGames(lobby.players.length);
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
       io.to(lobbyId).emit(EVENTS.ROUND_START, {
