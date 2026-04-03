@@ -6,6 +6,8 @@ const BEATS = {
   paper: 'rock',
 };
 
+const TOTAL_ROUNDS = 5;
+
 export class RockPaperScissors extends BaseGame {
   constructor(players) {
     super(players, {
@@ -21,6 +23,7 @@ export class RockPaperScissors extends BaseGame {
     this.roundNumber = 0;
     this.choices = {};
     this.lastRoundResult = null;
+    this.totalRounds = TOTAL_ROUNDS;
 
     for (const p of players) this.scores[p] = 0;
   }
@@ -70,8 +73,8 @@ export class RockPaperScissors extends BaseGame {
     if (this.state !== 'reveal') return;
     if (!this.players.every((p) => this.acknowledged.has(p))) return;
     if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
-    const [p1, p2] = this.players;
-    if (this.scores[p1] >= 3 || this.scores[p2] >= 3) {
+
+    if (this.roundNumber >= this.totalRounds) {
       this.transition('finish');
     } else {
       this.transition('next');
@@ -83,57 +86,66 @@ export class RockPaperScissors extends BaseGame {
     if (this._revealTimer) clearTimeout(this._revealTimer);
     this._revealTimer = setTimeout(() => {
       if (this.state !== 'reveal') return;
-      // Auto-ack all players who haven't acknowledged
       for (const p of this.players) this.acknowledged.add(p);
       this._checkRevealComplete();
-    }, 10000); // 10 second auto-advance
+    }, 10000);
   }
 
   _resolveRound() {
-    const [p1, p2] = this.players;
-    const c1 = this.choices[p1];
-    const c2 = this.choices[p2];
+    // Count unique choices
+    const uniqueChoices = new Set(Object.values(this.choices));
 
-    let winner = null;
-    if (c1 === c2) {
-      // tie — no point
-      this.lastRoundResult = { winner: null, tie: true };
-    } else if (BEATS[c1] === c2) {
-      winner = p1;
-    } else {
-      winner = p2;
+    // All same or all three present = tie (no points)
+    if (uniqueChoices.size === 1 || uniqueChoices.size === 3) {
+      this.lastRoundResult = {
+        choices: { ...this.choices },
+        winners: [],
+        tie: true,
+      };
+      return;
     }
 
-    if (winner) {
-      this.scores[winner] += 1;
-      this.lastRoundResult = { winner, tie: false };
-    } else {
-      this.lastRoundResult = { winner: null, tie: true };
-    }
-    // Stay in 'reveal' — wait for both players to acknowledge
-  }
+    // Exactly 2 choices: one beats the other
+    const [choiceA, choiceB] = [...uniqueChoices];
+    const winningChoice = BEATS[choiceA] === choiceB ? choiceA : choiceB;
 
-  // Called externally to advance to the next round after reveal
-  advanceToNextRound() {
-    if (this.state !== 'reveal') return;
-    this.transition('next');
-    this._beginRound();
+    const winners = [];
+    for (const [pid, choice] of Object.entries(this.choices)) {
+      if (choice === winningChoice) {
+        this.scores[pid] += 1;
+        winners.push(pid);
+      }
+    }
+
+    this.lastRoundResult = {
+      choices: { ...this.choices },
+      winners,
+      winningChoice,
+      tie: false,
+    };
   }
 
   getStateForPlayer(playerId) {
     const isReveal = this.state === 'reveal' || this.state === 'finished';
-    const opponentId = this.players.find((p) => p !== playerId);
+
+    // Build other players' info
+    const otherPlayers = this.players.filter((p) => p !== playerId).map((p) => ({
+      playerId: p,
+      choice: isReveal ? (this.choices[p] ?? null) : null,
+      hasChosen: this.choices[p] !== undefined,
+      score: this.scores[p] || 0,
+    }));
 
     return {
       phase: this.state,
       roundNumber: this.roundNumber,
+      totalRounds: this.totalRounds,
       scores: { ...this.scores },
       myId: playerId,
-      opponentId,
       myChoice: this.choices[playerId] ?? null,
-      opponentChoice: isReveal ? (this.choices[opponentId] ?? null) : null,
-      lastRoundResult: isReveal ? this.lastRoundResult : null,
       hasChosen: this.choices[playerId] !== undefined,
+      otherPlayers,
+      lastRoundResult: isReveal ? this.lastRoundResult : null,
     };
   }
 
@@ -150,7 +162,12 @@ export class RockPaperScissors extends BaseGame {
       if (i > 0 && this.scores[playerId] < this.scores[sorted[i - 1]]) {
         placement = i + 1;
       }
-      return { playerId, placement, score: this.scores[playerId] };
+      return {
+        playerId,
+        placement,
+        score: this.scores[playerId],
+        handDescription: `${this.scores[playerId]} wins`,
+      };
     });
   }
 }

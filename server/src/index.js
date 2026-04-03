@@ -480,7 +480,9 @@ io.on(EVENTS.CONNECTION, (socket) => {
     // Each lane has an independent chance of crashing. Later lanes are riskier.
     // Player starts at step 0 (safe start lane), first cross goes to step 1.
     // crashStep = 9 means survived all lanes (possible to reach 6x)
-    const LANE_SURVIVE = [0.90, 0.85, 0.80, 0.70, 0.60, 0.50, 0.40, 0.30];
+    // Survival odds per lane — each lane's EV is ~0.92 (house edge ~8%)
+    // Lane 1: 0.77 × 1.2 = 0.92, Lane 2: 0.61 × 1.5 = 0.92, etc.
+    const LANE_SURVIVE = [0.77, 0.61, 0.51, 0.42, 0.33, 0.26, 0.20, 0.15];
     let crashStep = 9;
     for (let i = 0; i < LANE_SURVIVE.length; i++) {
       if (Math.random() > LANE_SURVIVE[i]) {
@@ -915,23 +917,6 @@ if (isProduction) {
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-
-  // Keep-alive self-ping to prevent Render free plan from sleeping
-  if (isProduction) {
-    const KEEP_ALIVE_MS = 10 * 60 * 1000; // every 10 minutes
-    const selfPing = () => {
-      try {
-        fetch(`http://localhost:${PORT}/health`).catch(() => {});
-      } catch {
-        // fetch not available, use http
-        import('http').then((http) => {
-          http.get(`http://localhost:${PORT}/health`, () => {}).on('error', () => {});
-        }).catch(() => {});
-      }
-    };
-    setInterval(selfPing, KEEP_ALIVE_MS);
-    console.log('Keep-alive ping enabled (every 10 min)');
-  }
 });
 
 export { io, app, httpServer, lobbyManager, tournaments };

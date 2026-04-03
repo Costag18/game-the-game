@@ -27,7 +27,7 @@ export const GAMES = {
     tutorial: 'https://www.youtube.com/watch?v=1c4YPQTS35I',
   },
   rps: {
-    id: 'rps', name: 'Rock Paper Scissors', minPlayers: 2, maxPlayers: 2,
+    id: 'rps', name: 'Rock Paper Scissors', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.RPS, description: 'Best of 5. Choose wisely.',
     tutorial: 'https://www.youtube.com/watch?v=2dsHuU10udY',
   },

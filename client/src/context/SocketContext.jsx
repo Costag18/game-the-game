@@ -8,7 +8,6 @@ export function SocketProvider({ children }) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    // Connect to same origin in production, localhost in dev
     const url = import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin;
     const newSocket = io(url, {
       reconnection: true,
@@ -18,23 +17,7 @@ export function SocketProvider({ children }) {
     newSocket.on('connect', () => setConnected(true));
     newSocket.on('disconnect', () => setConnected(false));
     setSocket(newSocket);
-
-    // Keep-alive: ping server every 2 min to prevent Render from sleeping
-    const ping = () => fetch(`${url}/health`).catch(() => {});
-    const keepAlive = setInterval(ping, 2 * 60 * 1000);
-
-    // Also ping when tab becomes visible (browser throttles background intervals)
-    const onVisible = () => { if (document.visibilityState === 'visible') ping(); };
-    document.addEventListener('visibilitychange', onVisible);
-
-    // Ping immediately on load
-    ping();
-
-    return () => {
-      clearInterval(keepAlive);
-      document.removeEventListener('visibilitychange', onVisible);
-      newSocket.disconnect();
-    };
+    return () => { newSocket.disconnect(); };
   }, []);
 
   return (
