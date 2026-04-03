@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd client && npm ci --include=dev && npm run build && cd ../server && npm ci --omit=dev",
+    "build": "cd client && npm ci --prefer-offline --include=dev && npm run build && cd ../server && npm ci --prefer-offline --omit=dev",
     "start": "node server/src/index.js"
   }
 }

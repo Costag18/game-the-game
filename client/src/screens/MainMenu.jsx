@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import styles from './MainMenu.module.css';
-import logoImg from '../assets/images/logo.png';
+const logoImg = '/logo.png';
 
 export default function MainMenu({ onNavigate }) {
   const { socket, connected } = useSocketContext();

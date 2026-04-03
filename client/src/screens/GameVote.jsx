@@ -5,9 +5,9 @@ import { displayName } from '../utils/displayName.js';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
 import PetSidebar from '../components/PetSidebar.jsx';
 import styles from './GameVote.module.css';
-import voteImg from '../assets/images/votefornext.png';
-import pharaohImg from '../assets/images/pharoah.png';
-import coinsImg from '../assets/images/coins.png';
+const voteImg = '/votefornext.png';
+const pharaohImg = '/pharoah.png';
+const coinsImg = '/coins.png';
 
 import previewBlackjack from '../assets/gamepreviews/Blackjack.png';
 import previewPoker from '../assets/gamepreviews/ad064bcefa40-no-limit-texas-holdem.png';
