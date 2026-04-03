@@ -304,8 +304,8 @@ export default function CasinoSidebar({ socket, myScore }) {
       <div className={styles.fadeTop} style={{ height: topH, opacity: fadePct.top > 0.01 ? 1 : 0 }} />
       <div className={styles.sidebarArea} ref={scrollRef}>
         <CoinFlipPanel socket={socket} myScore={myScore} />
-        <SlotsPanel socket={socket} myScore={myScore} />
         <WheelPanel socket={socket} myScore={myScore} />
+        <SlotsPanel socket={socket} myScore={myScore} />
         <BJLitePanel socket={socket} myScore={myScore} />
         <ChickenPanel socket={socket} myScore={myScore} />
       </div>
