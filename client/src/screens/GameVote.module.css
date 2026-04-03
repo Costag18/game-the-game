@@ -329,7 +329,6 @@
   flex: 1;
   min-width: 0;
   border-top: 2px solid var(--gold-dim, #8a7230);
-  overflow: hidden;
 }
 
 @media (min-width: 960px) {
@@ -347,16 +346,17 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
+
+.sidebarArea::-webkit-scrollbar { display: none; }
 
 @media (min-width: 960px) {
   .sidebarArea {
     width: 280px;
     height: 100vh;
-    overflow-y: auto;
-    scrollbar-width: none;
   }
-  .sidebarArea::-webkit-scrollbar { display: none; }
 }
 
 .fadeTop, .fadeBottom {

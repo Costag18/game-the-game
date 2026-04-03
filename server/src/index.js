@@ -122,10 +122,10 @@ io.on(EVENTS.CONNECTION, (socket) => {
           tm.nicknames[socket.id] = nick;
           // Delay tournament events so client processes join callback first
           setTimeout(() => {
-            socket.emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
             if (tm.phase === 'voting') {
               const eligible = shuffle(getEligibleGames(lobby.players.length));
-              socket.emit(EVENTS.ROUND_START, { round: tm.currentRound, eligibleGames: eligible });
+              // Broadcast to ALL players so host also gets updated eligible games
+              io.to(lobbyId).emit(EVENTS.ROUND_START, { round: tm.currentRound, eligibleGames: eligible });
             } else if (tm.phase === 'wagering') {
               socket.emit(EVENTS.VOTE_RESULT, {
                 selectedGame: tm.selectedGame,
