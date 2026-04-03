@@ -741,10 +741,25 @@ io.on(EVENTS.CONNECTION, (socket) => {
     if (!tm.resultsAcknowledged) tm.resultsAcknowledged = new Set();
     tm.resultsAcknowledged.add(socket.id);
 
-    // Wait for all players
-    if (!lobby.players.every((p) => tm.resultsAcknowledged.has(p))) return;
-    tm.resultsAcknowledged = null;
+    // Start auto-advance timer on first ack
+    if (!tm._resultsTimer) {
+      tm._resultsTimer = setTimeout(() => {
+        if (tm.phase !== 'results') return;
+        // Force advance — auto-ack everyone
+        tm.resultsAcknowledged = null;
+        tm._resultsTimer = null;
+        advanceAfterResults(lobbyId, tm, lobby);
+      }, 15000);
+    }
 
+    // Wait for all tournament players
+    if (!tm.players.every((p) => tm.resultsAcknowledged.has(p))) return;
+    if (tm._resultsTimer) { clearTimeout(tm._resultsTimer); tm._resultsTimer = null; }
+    tm.resultsAcknowledged = null;
+    advanceAfterResults(lobbyId, tm, lobby);
+  });
+
+  function advanceAfterResults(lobbyId, tm, lobby) {
     if (tm.isTournamentOver()) {
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
       tournaments.delete(lobbyId);
@@ -752,14 +767,14 @@ io.on(EVENTS.CONNECTION, (socket) => {
     } else {
       tm.startNextRound();
       lobbyManager.setStatus(lobbyId, 'voting');
-      const eligible = getEligibleGames(lobby.players.length);
+      const eligible = shuffle(getEligibleGames(lobby.players.length));
       io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
       io.to(lobbyId).emit(EVENTS.ROUND_START, {
         round: tm.currentRound,
         eligibleGames: eligible,
       });
     }
-  });
+  }
 
   socket.on(EVENTS.GAME_ACTION, (action) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
