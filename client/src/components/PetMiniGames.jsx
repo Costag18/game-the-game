@@ -104,7 +104,8 @@ export function ColorMatch() {
 
   function newRound() {
     const w = COLORS[Math.floor(Math.random() * COLORS.length)];
-    const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+    // 40% chance of matching, 60% mismatch
+    const c = Math.random() < 0.4 ? w : COLORS.filter((x) => x.name !== w.name)[Math.floor(Math.random() * (COLORS.length - 1))];
     setWord(w);
     setColor(c);
     setTimeLeft(TIME_PER_ROUND);
