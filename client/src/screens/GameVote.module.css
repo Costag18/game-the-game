@@ -332,7 +332,7 @@
   .sidebarWrapper {
     order: 0;
     flex: none;
-    width: 260px;
+    width: 300px;
     height: 100vh;
     border-top: none;
     border-left: 2px solid var(--gold-dim, #8a7230);
@@ -343,6 +343,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (min-width: 960px) {
@@ -373,18 +375,6 @@
   background: linear-gradient(to top, var(--bg-panel, #2a1515) 0%, var(--bg-panel, #2a1515) 15%, transparent 100%);
 }
 
-@media (min-width: 960px) {
-  .sidebarArea {
-    width: 340px;
-    height: 100vh;
-    border-top: none;
-    border-left: 2px solid var(--gold-dim, #8a7230);
-    overflow-y: auto;
-    flex-shrink: 0;
-    scrollbar-width: none;
-  }
-  .sidebarArea::-webkit-scrollbar { display: none; }
-}
 
 
 .coinPanel {
@@ -394,6 +384,8 @@
   gap: 0.75rem;
   padding: 1.5rem;
   background: var(--bg-panel, #2a1515);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .coinTitle {
@@ -700,6 +692,9 @@
   padding: 1.25rem;
   background: var(--bg-panel, #2a1515);
   border-top: 1px solid var(--gold-dim, #8a7230);
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .miniTitle {
@@ -708,6 +703,9 @@
   font-size: 1.1rem;
   margin: 0;
   text-shadow: 0 2px 6px rgba(212, 168, 67, 0.3);
+  max-width: 100%;
+  text-align: center;
+  word-wrap: break-word;
 }
 
 /* ===================== Plinko ===================== */
