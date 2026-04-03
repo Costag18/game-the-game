@@ -12,3 +12,17 @@ body {
   justify-content: center;
   min-height: 100vh;
 }
+
+.gameWithPet {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+@media (min-width: 960px) {
+  .gameWithPet {
+    flex-direction: row;
+    height: 100vh;
+    overflow: hidden;
+  }
+}

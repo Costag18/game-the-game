@@ -119,8 +119,7 @@ export default function CoinCatchGame() {
                 key={c.id}
                 className={styles.catchCoin}
                 style={{ left: c.x - 10, top: c.y - 10 }}
-                onClick={() => handleCoinClick(c.id)}
-                onTouchStart={(e) => { e.preventDefault(); handleCoinClick(c.id); }}
+                onPointerDown={(e) => { e.preventDefault(); handleCoinClick(c.id); }}
               >
                 🪙
               </div>

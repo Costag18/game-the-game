@@ -111,23 +111,24 @@ io.on(EVENTS.CONNECTION, (socket) => {
       if (tm && (tm.phase === 'voting' || tm.phase === 'wagering')) {
         if (!tm.players.includes(socket.id)) {
           tm.players.push(socket.id);
-          tm.scores[socket.id] = 100; // starting points
+          tm.scores[socket.id] = 100;
           const nick = socket.data.nickname || socket.id.slice(0, 8);
           tm.nicknames[socket.id] = nick;
-          // Send them the current tournament state so their client catches up
-          socket.emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
-          if (tm.phase === 'voting') {
-            const eligible = shuffle(getEligibleGames(lobby.players.length));
-            socket.emit(EVENTS.ROUND_START, { round: tm.currentRound, eligibleGames: eligible });
-          } else if (tm.phase === 'wagering') {
-            socket.emit(EVENTS.VOTE_RESULT, {
-              selectedGame: tm.selectedGame,
-              playerCount: tm.players.length,
-              wagerReturns: Scorer.getWagerReturnTable(tm.players.length),
-            });
-          }
-          // Broadcast updated state to all
-          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+          // Delay tournament events so client processes join callback first
+          setTimeout(() => {
+            socket.emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+            if (tm.phase === 'voting') {
+              const eligible = shuffle(getEligibleGames(lobby.players.length));
+              socket.emit(EVENTS.ROUND_START, { round: tm.currentRound, eligibleGames: eligible });
+            } else if (tm.phase === 'wagering') {
+              socket.emit(EVENTS.VOTE_RESULT, {
+                selectedGame: tm.selectedGame,
+                playerCount: tm.players.length,
+                wagerReturns: Scorer.getWagerReturnTable(tm.players.length),
+              });
+            }
+            io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+          }, 200);
         }
       }
 

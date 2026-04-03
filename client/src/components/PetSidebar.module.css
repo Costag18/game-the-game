@@ -11,12 +11,7 @@
 
 @media (min-width: 960px) {
   .petSidebar {
-    order: 0; /* On desktop: natural order (left side) */
-  }
-}
-
-@media (min-width: 960px) {
-  .petSidebar {
+    order: 0;
     width: 260px;
     height: 100vh;
     border-top: none;
@@ -51,13 +46,41 @@
   font-size: 2.5rem;
 }
 
-.petAccessory {
+.accessoryTop {
   position: absolute;
-  top: -10px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  z-index: 2;
+}
+
+.accessoryEyes {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.1rem;
+  z-index: 2;
+}
+
+.accessoryNeck {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-15deg);
+  font-size: 1rem;
+  z-index: 2;
+}
+
+.accessorySide {
+  position: absolute;
+  top: 10px;
+  right: -8px;
+  font-size: 1.1rem;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+  z-index: 2;
 }
 
 .petName {

@@ -127,9 +127,9 @@ function GameRouter() {
           );
         }
         return (
-          <div style={{ display: 'flex', minHeight: '100vh' }}>
+          <div className="gameWithPet">
             <PetSidebar />
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <GameComponent
                 gameState={tournament.gameState?.state}
                 nicknames={tournament.gameState?.nicknames || {}}
