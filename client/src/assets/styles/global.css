@@ -64,21 +64,45 @@ html.screen-shake-light { animation: shakeLight 0.25s ease-out; }
 html.screen-shake-medium { animation: shakeMedium 0.35s ease-out; }
 html.screen-shake-heavy { animation: shakeHeavy 0.4s ease-out; }
 
+/* Live stream box — pinned at top of sidebar */
+.liveStreamBox {
+  display: none;
+}
+
+.liveStreamFrame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  border-bottom: 1px solid var(--gold-dim, #8a7230);
+}
+
 @media (min-width: 960px) {
   .petFixedSidebar {
-    display: block;
+    display: flex;
+    flex-direction: column;
     position: fixed;
     top: 0;
     left: 0;
-    width: 220px;
+    width: 280px;
     height: 100vh;
     z-index: 50;
+    scrollbar-width: none;
+    overflow: hidden;
+  }
+  .petFixedSidebar::-webkit-scrollbar { display: none; }
+  .liveStreamBox {
+    display: block;
+    flex-shrink: 0;
+  }
+  /* Buddy scrolls below the fixed stream */
+  .petFixedSidebar > :last-child {
+    flex: 1;
     overflow-y: auto;
     scrollbar-width: none;
   }
-  .petFixedSidebar::-webkit-scrollbar { display: none; }
+  .petFixedSidebar > :last-child::-webkit-scrollbar { display: none; }
   .gameMainArea {
-    margin-left: 220px;
-    width: calc(100% - 220px);
+    margin-left: 280px;
+    width: calc(100% - 280px);
   }
 }

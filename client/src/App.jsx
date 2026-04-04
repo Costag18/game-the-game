@@ -174,7 +174,18 @@ function GameRouter() {
                 onAction={tournament.sendAction}
               />
             </div>
-            <div className="petFixedSidebar"><PetSidebar /></div>
+            <div className="petFixedSidebar">
+              <div className="liveStreamBox">
+                <iframe
+                  src="https://www.youtube.com/embed/5vfaDsMhCF4?autoplay=1&mute=1&controls=1&modestbranding=1"
+                  title="CBC News Live"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  className="liveStreamFrame"
+                />
+              </div>
+              <PetSidebar />
+            </div>
           </>
         );
       })()}
