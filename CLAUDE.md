@@ -191,6 +191,19 @@ Players type a prompt, server generates an image via Hugging Face Spaces (FLUX.1
 - **Components:** `AiImageOverlay.jsx` + `AiImageOverlay.module.css` — rendered inside `EmoteOverlay`
 - **Env var:** `HF_TOKEN` (optional) — free HF API token for better rate-limit priority. Local: `server/.env`, Production: Render env vars
 - **Image size:** 512x512, 4 inference steps for speed
+- **Shared helper:** `generateFluxImage(prompt)` in `server/src/index.js` — reusable for both flying images and avatar generation
+
+## Profile Photos (AI-Generated Avatars)
+
+Players generate AI profile photos from text prompts in the SettingsGear panel. Photos appear as circles before player names everywhere.
+
+- **Generation:** Same FLUX.1-schnell API via `generateFluxImage()` helper. Prompt max 100 chars, 30s cooldown
+- **Socket events:** `SET_AVATAR` (client → server with prompt, uses callback) → `AVATAR_UPDATE` (server → lobby broadcast)
+- **Storage:** Server: `socket.data.avatar` + `lobby.avatars[playerId]` + `tm.avatars[playerId]`. Client: `localStorage` key `gtg_avatar`
+- **Data flow:** `avatars` map flows alongside `nicknames` through `TournamentManager.getState()`, all `GAME_STATE` emissions, `ROUND_RESULTS` standings, and `buildTournamentEndPayload()`
+- **Display:** `PlayerName` component (`client/src/components/PlayerName.jsx`) renders avatar circle + name. Used in all 5 screen components and all 12 game components
+- **Fallback:** No avatar → gradient circle with first letter of name
+- **UI:** SettingsGear panel → "Profile Photo" section with 48px preview circle, prompt input, generate button with cooldown
 
 ## Pet System (Tamagotchi)
 
