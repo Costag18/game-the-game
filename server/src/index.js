@@ -25,79 +25,18 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
-// --- Image generation: Pollinations.ai (primary) + HF Spaces (fallback) ---
-// Multiple users can generate concurrently — Pollinations handles it fine
-function generateImage(prompt) {
-  return _generateImageInner(prompt);
-}
-
-async function _generateImageInner(prompt) {
-  // Try Pollinations.ai first — free, no auth, simple GET, highly reliable
-  try {
-    console.log('[ImageGen] Trying Pollinations.ai...');
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 45000);
-    const resp = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!resp.ok) throw new Error(`Pollinations HTTP ${resp.status}`);
-    const arrayBuf = await resp.arrayBuffer();
-    if (arrayBuf.byteLength < 1000) throw new Error('Response too small');
-    const base64 = Buffer.from(arrayBuf).toString('base64');
-    console.log('[ImageGen] Pollinations.ai success');
-    return `data:image/jpeg;base64,${base64}`;
-  } catch (err) {
-    console.error('[ImageGen] Pollinations.ai failed:', err.message);
-  }
-
-  // Fallback: HF Spaces FLUX.1-schnell
-  console.log('[ImageGen] Falling back to HF Spaces...');
-  return _callFluxSpace(prompt);
-}
-
-async function _callFluxSpace(prompt) {
-  const hfToken = process.env.HF_TOKEN || '';
-  const headers = { 'Content-Type': 'application/json' };
-  if (hfToken) headers['Authorization'] = `Bearer ${hfToken}`;
-
-  const enqueueResp = await fetch('https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ data: [prompt, 0, true, 512, 512, 4] }),
-  });
-  if (!enqueueResp.ok) throw new Error('HF Space unavailable');
-
-  const { event_id } = await enqueueResp.json();
-  if (!event_id) throw new Error('Failed to queue HF generation');
-
+// --- Image generation via Pollinations.ai (free, no auth) ---
+async function generateImage(prompt) {
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
-  const resultResp = await fetch(
-    `https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer/${event_id}`,
-    { headers, signal: controller.signal }
-  );
+  const timeout = setTimeout(() => controller.abort(), 45000);
+  const resp = await fetch(url, { signal: controller.signal });
   clearTimeout(timeout);
-
-  const text = await resultResp.text();
-  const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith('event: complete')) {
-      const dataLine = lines[i + 1];
-      if (dataLine && dataLine.startsWith('data: ')) {
-        const resultData = JSON.parse(dataLine.slice(6));
-        if (!resultData?.[0]?.url) throw new Error('No image in HF response');
-        const imgResp = await fetch(resultData[0].url);
-        if (!imgResp.ok) throw new Error('Failed to retrieve HF image');
-        const arrayBuf = await imgResp.arrayBuffer();
-        const base64 = Buffer.from(arrayBuf).toString('base64');
-        return `data:image/webp;base64,${base64}`;
-      }
-    }
-    if (lines[i].startsWith('event: error')) {
-      throw new Error('HF Space generation error');
-    }
-  }
-  throw new Error('No image in HF response');
+  if (!resp.ok) throw new Error(`Image generation failed (HTTP ${resp.status})`);
+  const arrayBuf = await resp.arrayBuffer();
+  if (arrayBuf.byteLength < 1000) throw new Error('Image generation returned empty result');
+  const base64 = Buffer.from(arrayBuf).toString('base64');
+  return `data:image/jpeg;base64,${base64}`;
 }
 
 const __filename = fileURLToPath(import.meta.url);
