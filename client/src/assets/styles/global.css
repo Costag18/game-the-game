@@ -39,5 +39,6 @@ body {
   .petFixedSidebar::-webkit-scrollbar { display: none; }
   .gameMainArea {
     margin-left: 220px;
+    width: calc(100% - 220px);
   }
 }
