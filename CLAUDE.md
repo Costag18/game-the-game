@@ -114,11 +114,22 @@ Synthesized audio using Web Audio API — no external sound files needed.
 
 - **Engine:** `client/src/audio/SoundEngine.js` — all sounds are functions generating oscillator/noise tones
 - **Context:** `SoundContext` provides `playSound(name)` and `muted`/`toggleMute` to all components
-- **Mute button:** Fixed top-left on ALL screens, 44px gold circle matching emote/GIF button style
+- **Mute toggle:** Inside SettingsGear panel (top-left), accessible from all screens
 - **Persistence:** Mute state saved to `localStorage` key `gtg_muted`, survives reload
 - **Volume:** Master gain ~12-15%, subtle and non-intrusive
 - **Categories:** UI (click, menu), Tournament (round start, vote, wager), Game (cards, dice, coins), Social (emotes, GIFs, join/leave), Outcomes (win/lose round, casino, tournament), Pet (feed, pet, buy, collect)
 - **Integration:** Sounds triggered via `useSound()` hook in components and via socket event listeners in `App.jsx`
+
+## Theme System
+
+6 preset color themes selectable from the SettingsGear panel.
+
+- **Context:** `ThemeContext` provides `{ theme, setTheme }`, persists to `localStorage` key `gtg_theme`
+- **CSS approach:** `[data-theme="..."]` attribute on `<html>` overrides `:root` CSS variables
+- **Themes:** Classic Burgundy (default), Royal Blue, Emerald Table, Midnight Purple, Vegas Noir, Ivory Light
+- **Variables overridden:** `--gold`, `--gold-dim`, `--gold-light`, `--bg-dark`, `--bg-panel`, `--mahogany`, `--burgundy`, `--text-primary`, `--text-secondary`, `--wood-brown`, `--wood-dark`
+- **Scope:** Affects all screens, panels, buttons, text. Game-specific backgrounds (felt, ocean, etc.) are NOT changed — each game keeps its unique visual identity
+- **SettingsGear:** Replaces the old standalone MuteButton. 44px gear icon (⚙️) top-left, click to roll out panel with sound toggle + theme swatches. Click-outside-to-close. Gear rotates on hover and when open.
 
 ## Confetti Effect
 

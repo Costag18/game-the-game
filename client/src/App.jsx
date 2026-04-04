@@ -15,8 +15,9 @@ import TournamentEnd from './screens/TournamentEnd.jsx';
 import CasinoMode from './screens/CasinoMode.jsx';
 import PetSidebar from './components/PetSidebar.jsx';
 import EmoteOverlay from './components/EmoteOverlay.jsx';
-import MuteButton from './components/MuteButton.jsx';
+import SettingsGear from './components/SettingsGear.jsx';
 import ConfettiOverlay from './components/ConfettiOverlay.jsx';
+import { ThemeProvider } from './context/ThemeContext.jsx';
 import BlackjackGame from './games/Blackjack.jsx';
 import PokerGame from './games/Poker.jsx';
 import UnoGame from './games/Uno.jsx';
@@ -197,7 +198,7 @@ function GameRouter() {
         />
       )}
       {['gameVote', 'wagerPhase', 'playing'].includes(screen) && <EmoteOverlay />}
-      <MuteButton />
+      <SettingsGear />
       {showConfetti && <ConfettiOverlay />}
     </>
   );
@@ -207,9 +208,11 @@ function App() {
   return (
     <SocketProvider>
       <SoundProvider>
-        <PetProvider>
-          <GameRouter />
-        </PetProvider>
+        <ThemeProvider>
+          <PetProvider>
+            <GameRouter />
+          </PetProvider>
+        </ThemeProvider>
       </SoundProvider>
     </SocketProvider>
   );

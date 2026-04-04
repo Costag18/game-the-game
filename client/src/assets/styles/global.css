@@ -1,8 +1,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   font-family: var(--font-body, 'Raleway', sans-serif);
-  background-color: #1a0a0a;
-  color: #f0e6d3;
+  background-color: var(--bg-dark, #1a0a0a);
+  color: var(--text-primary, #f0e6d3);
   min-height: 100vh;
 }
 .app {

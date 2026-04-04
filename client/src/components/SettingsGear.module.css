@@ -1,0 +1,144 @@
+/* ─── Gear Button ─── */
+.gearBtn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim, #8a7230);
+  background: var(--bg-panel, #2a1515);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
+
+.gearBtn:hover {
+  transform: rotate(90deg) scale(1.1);
+  border-color: var(--gold, #d4a843);
+  box-shadow: 0 2px 16px rgba(212, 168, 67, 0.3);
+}
+
+.gearOpen {
+  transform: rotate(180deg);
+  border-color: var(--gold, #d4a843);
+  box-shadow: 0 2px 16px rgba(212, 168, 67, 0.4);
+}
+
+/* ─── Settings Panel ─── */
+.panel {
+  position: fixed;
+  top: 0.6rem;
+  left: 3.8rem;
+  width: 200px;
+  background: var(--bg-panel, #2a1515);
+  border: 1px solid var(--gold-dim, #8a7230);
+  border-radius: var(--radius-md, 8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  padding: 0 0.8rem;
+  pointer-events: none;
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+}
+
+.panelOpen {
+  max-height: 200px;
+  opacity: 1;
+  padding: 0.8rem;
+  pointer-events: auto;
+}
+
+/* ─── Section ─── */
+.section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+}
+
+.section + .section {
+  border-top: 1px solid rgba(138, 114, 48, 0.25);
+  padding-top: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.label {
+  font-family: var(--font-body, sans-serif);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary, #b8a88a);
+  flex-shrink: 0;
+  width: 46px;
+}
+
+/* ─── Mute Toggle ─── */
+.muteToggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim, #8a7230);
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, border-color 0.15s, opacity 0.15s;
+}
+
+.muteToggle:hover {
+  transform: scale(1.15);
+  border-color: var(--gold, #d4a843);
+}
+
+.muteToggle.muted {
+  opacity: 0.5;
+  border-color: var(--text-secondary, #b8a88a);
+}
+
+/* ─── Theme Swatches ─── */
+.swatches {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  padding: 0;
+}
+
+.swatch:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.swatchActive {
+  border-color: var(--gold, #d4a843);
+  transform: scale(1.15);
+  box-shadow: 0 0 8px rgba(212, 168, 67, 0.4);
+}
+
+.themeName {
+  width: 100%;
+  font-size: 0.65rem;
+  color: var(--text-secondary, #b8a88a);
+  font-family: var(--font-body, sans-serif);
+  margin-top: -0.15rem;
+  padding-left: 46px;
+}
