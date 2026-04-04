@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
+import { useSound } from '../context/SoundContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import GifOverlay from './GifOverlay.jsx';
 import styles from './EmoteOverlay.module.css';
@@ -11,6 +12,7 @@ let idCounter = 0;
 
 export default function EmoteOverlay() {
   const { socket } = useSocketContext();
+  const { playSound } = useSound();
   const [menuOpen, setMenuOpen] = useState(false);
   const [gifOpen, setGifOpen] = useState(false);
   const [floaters, setFloaters] = useState([]);
@@ -51,11 +53,13 @@ export default function EmoteOverlay() {
   function toggleEmoteMenu() {
     setMenuOpen((o) => !o);
     setGifOpen(false);
+    playSound('menuOpen');
   }
 
   function toggleGifPanel() {
     setGifOpen((o) => !o);
     setMenuOpen(false);
+    playSound('menuOpen');
   }
 
   return (

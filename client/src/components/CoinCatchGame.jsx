@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePet } from '../context/PetContext.jsx';
+import { useSound } from '../context/SoundContext.jsx';
 import styles from './PetSidebar.module.css';
 
 const GAME_DURATION = 15000;
@@ -9,6 +10,7 @@ const COIN_SIZE = 28;
 
 export default function CoinCatchGame() {
   const { addCoins } = usePet();
+  const { playSound } = useSound();
   const [playing, setPlaying] = useState(false);
   const [score, setScore] = useState(0);
   const [lastScore, setLastScore] = useState(null);
@@ -91,6 +93,7 @@ export default function CoinCatchGame() {
       coin.caught = true;
       scoreRef.current += 1;
       setScore(scoreRef.current);
+      playSound('coinCollect');
     }
   }
 

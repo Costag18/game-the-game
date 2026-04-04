@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { SocketProvider, useSocketContext } from './context/SocketContext.jsx';
 import { PetProvider } from './context/PetContext.jsx';
+import { SoundProvider, useSound } from './context/SoundContext.jsx';
 import { useTournament } from './hooks/useTournament.js';
 import { EVENTS } from '../../shared/events.js';
 import MainMenu from './screens/MainMenu.jsx';
@@ -14,6 +15,8 @@ import TournamentEnd from './screens/TournamentEnd.jsx';
 import CasinoMode from './screens/CasinoMode.jsx';
 import PetSidebar from './components/PetSidebar.jsx';
 import EmoteOverlay from './components/EmoteOverlay.jsx';
+import MuteButton from './components/MuteButton.jsx';
+import ConfettiOverlay from './components/ConfettiOverlay.jsx';
 import BlackjackGame from './games/Blackjack.jsx';
 import PokerGame from './games/Poker.jsx';
 import UnoGame from './games/Uno.jsx';
@@ -48,8 +51,10 @@ const GAME_COMPONENTS = {
 
 function GameRouter() {
   const { socket } = useSocketContext();
+  const { playSound } = useSound();
   const [screen, setScreen] = useState('menu');
   const [currentLobby, setCurrentLobby] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const tournament = useTournament();
 
   // Keep-alive: ping server while in an active game/lobby to prevent Render sleep
@@ -65,12 +70,26 @@ function GameRouter() {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on(EVENTS.ROUND_START, () => setScreen('gameVote'));
-    socket.on(EVENTS.VOTE_RESULT, () => setScreen('wagerPhase'));
-    socket.on(EVENTS.WAGER_LOCKED, () => setScreen('loadingGame'));
+    socket.on(EVENTS.ROUND_START, () => { setScreen('gameVote'); playSound('roundStart'); });
+    socket.on(EVENTS.VOTE_RESULT, () => { setScreen('wagerPhase'); });
+    socket.on(EVENTS.WAGER_LOCKED, () => { setScreen('loadingGame'); playSound('wagerLock'); });
     socket.on(EVENTS.GAME_STATE, () => setScreen((prev) => prev === 'loadingGame' ? 'playing' : prev));
     socket.on(EVENTS.ROUND_RESULTS, () => setScreen('roundResults'));
-    socket.on(EVENTS.TOURNAMENT_END, () => setScreen('tournamentEnd'));
+    socket.on(EVENTS.TOURNAMENT_END, (data) => {
+      setScreen('tournamentEnd');
+      const winnerId = data?.winner?.playerId || data?.winner;
+      if (winnerId === socket.id) {
+        playSound('tournamentWin');
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 4500);
+      } else {
+        playSound('tournamentLoss');
+      }
+    });
+    // Social sounds
+    socket.on(EVENTS.LOBBY_STATE, () => playSound('playerJoin'));
+    socket.on(EVENTS.EMOTE_BROADCAST, () => playSound('emoteSend'));
+    socket.on(EVENTS.GIF_BROADCAST, () => playSound('gifSend'));
     return () => {
       socket.off(EVENTS.ROUND_START);
       socket.off(EVENTS.VOTE_RESULT);
@@ -78,8 +97,11 @@ function GameRouter() {
       socket.off(EVENTS.GAME_STATE);
       socket.off(EVENTS.ROUND_RESULTS);
       socket.off(EVENTS.TOURNAMENT_END);
+      socket.off(EVENTS.LOBBY_STATE);
+      socket.off(EVENTS.EMOTE_BROADCAST);
+      socket.off(EVENTS.GIF_BROADCAST);
     };
-  }, [socket]);
+  }, [socket, playSound]);
 
   function handleJoinLobby(lobby) {
     setCurrentLobby(lobby);
@@ -175,6 +197,8 @@ function GameRouter() {
         />
       )}
       {['gameVote', 'wagerPhase', 'playing'].includes(screen) && <EmoteOverlay />}
+      <MuteButton />
+      {showConfetti && <ConfettiOverlay />}
     </>
   );
 }
@@ -182,9 +206,11 @@ function GameRouter() {
 function App() {
   return (
     <SocketProvider>
-      <PetProvider>
-        <GameRouter />
-      </PetProvider>
+      <SoundProvider>
+        <PetProvider>
+          <GameRouter />
+        </PetProvider>
+      </SoundProvider>
     </SocketProvider>
   );
 }

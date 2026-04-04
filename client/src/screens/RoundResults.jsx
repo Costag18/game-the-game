@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSocketContext } from '../context/SocketContext.jsx';
+import { useSound } from '../context/SoundContext.jsx';
 import styles from './RoundResults.module.css';
 
 function getGameDetail(gameResult, gameId) {
@@ -17,7 +19,18 @@ function getGameDetail(gameResult, gameId) {
 }
 
 export default function RoundResults({ roundResults, onContinue }) {
+  const { socket } = useSocketContext();
+  const { playSound } = useSound();
   const [acked, setAcked] = useState(false);
+
+  // Play win/lose sound when results arrive
+  useEffect(() => {
+    if (!roundResults?.standings?.length || !socket) return;
+    const myIdx = roundResults.standings.findIndex((e) => e.playerId === socket.id);
+    if (myIdx === 0) playSound('winRound');
+    else if (myIdx > 0) playSound('loseRound');
+  }, [roundResults, socket, playSound]);
+
   if (!roundResults) {
     return (
       <div className={styles.container}>

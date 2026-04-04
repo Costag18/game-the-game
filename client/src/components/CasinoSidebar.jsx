@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { EVENTS } from '../../../shared/events.js';
+import { useSound } from '../context/SoundContext.jsx';
 import styles from '../screens/GameVote.module.css';
 
 const SLOT_ICONS = {
@@ -8,6 +9,7 @@ const SLOT_ICONS = {
 };
 
 function CoinFlipPanel({ socket, myScore }) {
+  const { playSound } = useSound();
   const [wager, setWager] = useState(10);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
@@ -23,13 +25,15 @@ function CoinFlipPanel({ socket, myScore }) {
     if (!socket) return;
     function onResult(data) {
       if (data.newScore != null) setLocalScore(data.newScore);
-      // Use the correct spin class so it lands on the right face without snapping
       setAnimClass(data.result === 'heads' ? styles.coinSpinHeads : styles.coinSpinTails);
-      setTimeout(() => { setResult(data); setSpinning(false); }, 1500);
+      setTimeout(() => {
+        setResult(data); setSpinning(false);
+        playSound(data.won ? 'casinoWin' : 'casinoLoss');
+      }, 1500);
     }
     socket.on(EVENTS.COIN_FLIP_RESULT, onResult);
     return () => socket.off(EVENTS.COIN_FLIP_RESULT, onResult);
-  }, [socket]);
+  }, [socket, playSound]);
   useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
 
   function handleFlip(choice) {
@@ -71,6 +75,7 @@ function CoinFlipPanel({ socket, myScore }) {
 }
 
 function SlotsPanel({ socket, myScore }) {
+  const { playSound } = useSound();
   const [wager, setWager] = useState(10);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
@@ -82,11 +87,14 @@ function SlotsPanel({ socket, myScore }) {
     function onResult(data) {
       setTimeout(() => setDisplayReels((prev) => [data.reels[0], prev[1], prev[2]]), 800);
       setTimeout(() => setDisplayReels((prev) => [prev[0], data.reels[1], prev[2]]), 1200);
-      setTimeout(() => { setDisplayReels(data.reels); setResult(data); setSpinning(false); }, 1600);
+      setTimeout(() => {
+        setDisplayReels(data.reels); setResult(data); setSpinning(false);
+        playSound(data.net >= 0 ? 'casinoWin' : 'casinoLoss');
+      }, 1600);
     }
     socket.on(EVENTS.SLOTS_RESULT, onResult);
     return () => socket.off(EVENTS.SLOTS_RESULT, onResult);
-  }, [socket]);
+  }, [socket, playSound]);
   useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
 
   function handleSpin() { if (spinning || maxWager <= 0) return; setSpinning(true); setResult(null); socket.emit(EVENTS.SLOTS_SPIN, { amount: wager }); }
@@ -121,6 +129,7 @@ const WHEEL_SEGMENTS = [0, 0.5, 1, 0.5, 2, 0.5, 1, 0.5, 3, 0.5, 1, 0.5, 5, 0.5, 
 const WHEEL_COLORS = WHEEL_SEGMENTS.map((m) => m >= 10 ? '#e53935' : m >= 5 ? '#8e24aa' : m >= 3 ? '#1e88e5' : m >= 2 ? '#43a047' : m >= 1 ? '#d4a843' : '#555');
 
 function WheelPanel({ socket, myScore }) {
+  const { playSound } = useSound();
   const [wager, setWager] = useState(10);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
@@ -135,11 +144,14 @@ function WheelPanel({ socket, myScore }) {
       const segCenter = data.segmentIndex * sa + sa / 2;
       const targetAngle = -(segCenter + 90);
       setRotation((prev) => { const base = Math.ceil(prev / 360) * 360; return base + 5 * 360 + targetAngle; });
-      setTimeout(() => { setResult(data); setSpinning(false); }, 3000);
+      setTimeout(() => {
+        setResult(data); setSpinning(false);
+        playSound(data.net >= 0 ? 'casinoWin' : 'casinoLoss');
+      }, 3000);
     }
     socket.on(EVENTS.WHEEL_RESULT, onResult);
     return () => socket.off(EVENTS.WHEEL_RESULT, onResult);
-  }, [socket]);
+  }, [socket, playSound]);
   useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
 
   function handleSpin() { if (spinning || maxWager <= 0) return; setSpinning(true); setResult(null); socket.emit(EVENTS.WHEEL_SPIN, { amount: wager }); }
@@ -177,11 +189,21 @@ function WheelPanel({ socket, myScore }) {
 }
 
 function BJLitePanel({ socket, myScore }) {
+  const { playSound } = useSound();
   const [wager, setWager] = useState(10);
   const [gameState, setGameState] = useState(null);
   const maxWager = Math.floor((myScore || 0) * 0.5);
 
-  useEffect(() => { if (!socket) return; const h = (d) => setGameState(d); socket.on(EVENTS.BJ_LITE_RESULT, h); return () => socket.off(EVENTS.BJ_LITE_RESULT, h); }, [socket]);
+  useEffect(() => {
+    if (!socket) return;
+    const h = (d) => {
+      setGameState(d);
+      if (d.phase === 'finished') playSound(d.net >= 0 ? 'casinoWin' : 'casinoLoss');
+      if (d.phase === 'playing') playSound('cardDeal');
+    };
+    socket.on(EVENTS.BJ_LITE_RESULT, h);
+    return () => socket.off(EVENTS.BJ_LITE_RESULT, h);
+  }, [socket, playSound]);
   useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
 
   function handleDeal() { if (maxWager <= 0) return; socket.emit(EVENTS.BJ_LITE_START, { amount: wager }); }
@@ -213,11 +235,20 @@ const CHICKEN_MULTS = [1.0, 1.2, 1.5, 1.8, 2.2, 2.8, 3.5, 4.5, 6.0];
 const ROAD_LANES = 8;
 
 function ChickenPanel({ socket, myScore }) {
+  const { playSound } = useSound();
   const [wager, setWager] = useState(10);
   const [gameState, setGameState] = useState(null);
   const maxWager = Math.floor((myScore || 0) * 0.5);
 
-  useEffect(() => { if (!socket) return; const h = (d) => setGameState(d); socket.on(EVENTS.CHICKEN_RESULT, h); return () => socket.off(EVENTS.CHICKEN_RESULT, h); }, [socket]);
+  useEffect(() => {
+    if (!socket) return;
+    const h = (d) => {
+      setGameState(d);
+      if (d.phase === 'finished') playSound(d.net >= 0 ? 'casinoWin' : 'casinoLoss');
+    };
+    socket.on(EVENTS.CHICKEN_RESULT, h);
+    return () => socket.off(EVENTS.CHICKEN_RESULT, h);
+  }, [socket, playSound]);
   useEffect(() => { if (wager > maxWager) setWager(Math.max(1, maxWager)); }, [maxWager]);
 
   const isBroke = maxWager <= 0, isPlaying = gameState?.phase === 'playing', isFinished = gameState?.phase === 'finished';

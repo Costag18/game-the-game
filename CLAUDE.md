@@ -108,6 +108,28 @@ Available during voting/wagering phases and in standalone Free Play Casino mode.
 - **Blackjack Lite** — Quick solo hand vs dealer
 - **Chicken Cross** — Cross lanes for escalating multipliers, cash out or get splat. House edge ~8% per lane.
 
+## Sound Effects System
+
+Synthesized audio using Web Audio API — no external sound files needed.
+
+- **Engine:** `client/src/audio/SoundEngine.js` — all sounds are functions generating oscillator/noise tones
+- **Context:** `SoundContext` provides `playSound(name)` and `muted`/`toggleMute` to all components
+- **Mute button:** Fixed top-left on ALL screens, 44px gold circle matching emote/GIF button style
+- **Persistence:** Mute state saved to `localStorage` key `gtg_muted`, survives reload
+- **Volume:** Master gain ~12-15%, subtle and non-intrusive
+- **Categories:** UI (click, menu), Tournament (round start, vote, wager), Game (cards, dice, coins), Social (emotes, GIFs, join/leave), Outcomes (win/lose round, casino, tournament), Pet (feed, pet, buy, collect)
+- **Integration:** Sounds triggered via `useSound()` hook in components and via socket event listeners in `App.jsx`
+
+## Confetti Effect
+
+Canvas-based particle animation on tournament win.
+
+- **Component:** `ConfettiOverlay.jsx` — full-viewport `<canvas>`, `pointer-events: none`
+- **Trigger:** Tournament win for the winning player only (detected via `socket.id === winner.playerId`)
+- **Duration:** 4 seconds with fade-out in final 30%
+- **Particles:** 150 colored rectangles (gold, red, blue, green, yellow, white, orange) with gravity and rotation
+- **Cleanup:** Auto-removes from DOM after 4.5 seconds via state in `App.jsx`
+
 ## GIF Reactions
 
 Discord-style GIF picker — players search for GIFs and send them flying across everyone's screen.

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
+import { useSound } from '../context/SoundContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { displayName } from '../utils/displayName.js';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
@@ -39,6 +40,7 @@ const GAME_PREVIEWS = {
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
   const { socket } = useSocketContext();
+  const { playSound } = useSound();
   const [voted, setVoted] = useState(false);
   const [voteCounts, setVoteCounts] = useState({});
 
@@ -51,7 +53,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
     return () => socket.off(EVENTS.VOTE_UPDATE, onVoteUpdate);
   }, [socket]);
 
-  function handleVote(gameId) { if (voted) return; setVoted(true); onVote(gameId); }
+  function handleVote(gameId) { if (voted) return; setVoted(true); playSound('voteCast'); onVote(gameId); }
 
   const round = tournamentState?.currentRound ?? '?';
   const winCondition = tournamentState?.winCondition;

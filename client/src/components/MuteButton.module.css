@@ -1,0 +1,30 @@
+.muteBtn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim, #8a7230);
+  background: rgba(42, 21, 21, 0.85);
+  color: var(--gold, #d4a843);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
+
+.muteBtn:hover {
+  transform: scale(1.1);
+  border-color: var(--gold, #d4a843);
+  box-shadow: 0 2px 16px rgba(212, 168, 67, 0.3);
+}
+
+.muted {
+  opacity: 0.55;
+  border-color: #5a4a2a;
+}

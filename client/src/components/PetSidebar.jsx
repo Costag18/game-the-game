@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { usePet } from '../context/PetContext.jsx';
+import { useSound } from '../context/SoundContext.jsx';
 import CoinCatchGame from './CoinCatchGame.jsx';
 import { StopTheClock, ColorMatch, TreasureChest } from './PetMiniGames.jsx';
 import styles from './PetSidebar.module.css';
@@ -29,8 +30,13 @@ export default function PetSidebar() {
     feed, pet, sleep, buyItem, equip,
     petCooldown, sleepCooldown,
   } = usePet();
+  const { playSound } = useSound();
 
   const [shopOpen, setShopOpen] = useState(false);
+
+  const feedWithSound = useCallback(() => { feed(); playSound('petFeed'); }, [feed, playSound]);
+  const petWithSound = useCallback(() => { pet(); playSound('petStroke'); }, [pet, playSound]);
+  const buyWithSound = useCallback((id) => { buyItem(id); playSound('petBuy'); }, [buyItem, playSound]);
 
   // Get equipped items by slot
   const headItem = shopItems.find((i) => i.id === equipped?.head);
@@ -65,10 +71,10 @@ export default function PetSidebar() {
 
       {/* Actions */}
       <div className={styles.actions}>
-        <button className={styles.actionBtn} onClick={feed} disabled={coins < 5}>
+        <button className={styles.actionBtn} onClick={feedWithSound} disabled={coins < 5}>
           Feed (5🪙)
         </button>
-        <button className={styles.actionBtn} onClick={pet} disabled={petCooldown > 0}>
+        <button className={styles.actionBtn} onClick={petWithSound} disabled={petCooldown > 0}>
           {petCooldown > 0 ? `Pet (${petCooldown})` : 'Pet 🤗'}
         </button>
         <button className={styles.actionBtn} onClick={sleep} disabled={sleepCooldown > 0}>
@@ -117,7 +123,7 @@ export default function PetSidebar() {
                   ) : (
                     <button
                       className={styles.shopBuyBtn}
-                      onClick={() => buyItem(item.id)}
+                      onClick={() => buyWithSound(item.id)}
                       disabled={coins < item.cost}
                     >
                       {item.cost}🪙

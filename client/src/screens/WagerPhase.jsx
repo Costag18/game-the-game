@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
+import { useSound } from '../context/SoundContext.jsx';
 import { GAMES } from '../../../shared/gameList.js';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
 import PetSidebar from '../components/PetSidebar.jsx';
@@ -81,6 +82,7 @@ function WagerTable({ wagerReturns, wager }) {
 
 export default function WagerPhase({ tournamentState, voteResult, onSubmitWager }) {
   const { socket } = useSocketContext();
+  const { playSound } = useSound();
   const [wagerLocked, setWagerLocked] = useState(false);
 
   const myId = socket?.id;
@@ -109,6 +111,7 @@ export default function WagerPhase({ tournamentState, voteResult, onSubmitWager 
   function handleLockIn() {
     if (wagerLocked) return;
     setWagerLocked(true);
+    playSound('wagerLock');
     onSubmitWager(wager);
   }
 
