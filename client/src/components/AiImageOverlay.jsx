@@ -136,7 +136,7 @@ export default function AiImageOverlay({ isOpen, onToggle, onRequestClose }) {
               </button>
             )}
           </div>
-          <div className={styles.aiAttribution}>Powered by FLUX</div>
+          <div className={styles.aiAttribution}>Powered by Pollinations AI</div>
         </div>
       )}
 

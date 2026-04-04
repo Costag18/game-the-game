@@ -197,7 +197,7 @@ function ImageGenerator({ socket }) {
           {cooldown > 0 ? cooldown : 'Generate'}
         </button>
       </div>
-      <p className={styles.imageGenAttribution}>Powered by FLUX</p>
+      <p className={styles.imageGenAttribution}>Powered by Pollinations AI</p>
     </div>
   );
 }

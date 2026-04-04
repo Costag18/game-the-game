@@ -28,9 +28,16 @@ function adjustScore(tm, playerId, delta) {
 // --- Image generation: Pollinations.ai (primary) + HF Spaces (fallback) ---
 // Queue ensures only one generation at a time
 let _genQueue = Promise.resolve();
+let _genBusy = false;
 
 function generateImage(prompt) {
-  const job = _genQueue.then(() => _generateImageInner(prompt)).catch((err) => { throw err; });
+  if (_genBusy) {
+    return Promise.reject(new Error('Another image is being generated — please wait'));
+  }
+  _genBusy = true;
+  const job = _genQueue
+    .then(() => _generateImageInner(prompt))
+    .finally(() => { _genBusy = false; });
   _genQueue = job.catch(() => {});
   return job;
 }
