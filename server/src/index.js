@@ -570,8 +570,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     // crashStep = 9 means survived all lanes (possible to reach 6x)
     // Exponential risk/reward — early lanes safe, late lanes dangerous.
     // Each lane's conditional EV ≈ 0.92 (house edge ~8%).
-    // LANE_SURVIVE[i] = 0.92 * MULT[i] / MULT[i+1]
-    const LANE_SURVIVE = [0.876, 0.840, 0.814, 0.772, 0.713, 0.657, 0.613, 0.552, 0.495, 0.478];
+    const LANE_SURVIVE = [0.84, 0.84, 0.79, 0.76, 0.78, 0.66, 0.64, 0.53, 0.50, 0.48];
     let crashStep = 11;
     for (let i = 0; i < LANE_SURVIVE.length; i++) {
       if (Math.random() > LANE_SURVIVE[i]) {
@@ -597,8 +596,8 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const game = tm._chickenGames[socket.id];
     if (!game.alive) return;
 
-    // Exponential multipliers: safe early (1.05x), huge late (25x)
-    const MULTIPLIERS = [1.0, 1.05, 1.15, 1.3, 1.55, 2.0, 2.8, 4.2, 7.0, 13.0, 25.0];
+    // Exponential multipliers: safe early (1.1x), huge late (25x)
+    const MULTIPLIERS = [1.0, 1.1, 1.2, 1.4, 1.7, 2.0, 2.8, 4.0, 7.0, 13, 25];
 
     if (action === 'cross') {
       game.step++;
