@@ -1,0 +1,32 @@
+.playerName {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--gold-dim, #8a7230);
+  flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5a3a2a, #8a7230);
+  color: var(--text-primary, #f0e6d3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading, Georgia);
+  font-weight: 700;
+  border: 1.5px solid var(--gold-dim, #8a7230);
+  flex-shrink: 0;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
