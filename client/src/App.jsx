@@ -134,13 +134,14 @@ function GameRouter() {
         <CreateLobby onNavigate={setScreen} onJoinLobby={handleJoinLobby} />
       )}
       {screen === 'waitingRoom' && currentLobby && (
-        <WaitingRoom lobby={currentLobby} onNavigate={setScreen} />
+        <WaitingRoom lobby={currentLobby} onNavigate={setScreen} avatars={currentLobby?.avatars || {}} />
       )}
       {screen === 'gameVote' && (
         <GameVote
           eligibleGames={tournament.eligibleGames}
           tournamentState={tournament.tournamentState}
           nicknames={tournament.tournamentState?.nicknames || currentLobby?.nicknames || tournament.gameState?.nicknames || {}}
+          avatars={tournament.tournamentState?.avatars || currentLobby?.avatars || {}}
           onVote={tournament.vote}
         />
       )}
@@ -148,6 +149,7 @@ function GameRouter() {
         <WagerPhase
           tournamentState={tournament.tournamentState}
           voteResult={tournament.voteResult}
+          avatars={tournament.tournamentState?.avatars || {}}
           onSubmitWager={tournament.submitWager}
         />
       )}
@@ -168,6 +170,7 @@ function GameRouter() {
               <GameComponent
                 gameState={tournament.gameState?.state}
                 nicknames={tournament.gameState?.nicknames || {}}
+                avatars={tournament.gameState?.avatars || {}}
                 onAction={tournament.sendAction}
               />
             </div>
