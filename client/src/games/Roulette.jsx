@@ -17,7 +17,7 @@ function getWheelIndexForNumber(n) {
   return WHEEL_ORDER.indexOf(n);
 }
 
-function SpinningWheel({ isSpinning, spinResult }) {
+function SpinningWheel({ isSpinning, spinResult, hideResult }) {
   const wheelRef = useRef(null);
   const prevResultRef = useRef(null);
   const baseRotationRef = useRef(0);
@@ -101,8 +101,8 @@ function SpinningWheel({ isSpinning, spinResult }) {
           <circle cx={cx} cy={cy} r="8" fill="#ffd700" />
         </svg>
       </div>
-      {/* Winning number overlay */}
-      {!isSpinning && spinResult !== null && spinResult !== undefined && (
+      {/* Winning number overlay — hidden during wheel animation */}
+      {!hideResult && !isSpinning && spinResult !== null && spinResult !== undefined && (
         <div className={`${styles.wheelResult} ${styles[`spin_${getNumberColor(spinResult)}`]}`}>
           <span className={styles.wheelResultNumber}>{spinResult}</span>
           <span className={styles.wheelResultColor}>{getNumberColor(spinResult).toUpperCase()}</span>
@@ -235,7 +235,7 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
 
       {/* Spinning wheel — shown during spinning phase or when there's a result */}
       {(isSpinning || (spinResult !== null && spinResult !== undefined)) && (
-        <SpinningWheel isSpinning={false} spinResult={spinResult} />
+        <SpinningWheel isSpinning={false} spinResult={spinResult} hideResult={isSpinning && !wheelDone} />
       )}
 
       {/* Spin result + continue button — only after wheel animation finishes */}
@@ -266,8 +266,8 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
         </div>
       )}
 
-      {/* Chip counts */}
-      <section className={styles.chipsSection}>
+      {/* Chip counts — hidden while wheel is animating */}
+      <section className={styles.chipsSection} style={isSpinning && !wheelDone ? { visibility: 'hidden' } : undefined}>
         <div className={styles.myChips}>
           <span className={styles.chipsLabel}>Your chips:</span>
           <span className={styles.chipsValue}>{myChips}</span>
