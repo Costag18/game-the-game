@@ -86,10 +86,12 @@
 
 /* --- Thumbnail Grid --- */
 .gifGrid {
-  column-count: 2;
-  column-gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
   padding: 4px;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 340px;
   scrollbar-width: thin;
   scrollbar-color: var(--gold-dim, #8a7230) transparent;
@@ -121,10 +123,8 @@
   border-radius: 6px;
   overflow: hidden;
   transition: border-color 0.15s, transform 0.15s;
-  break-inside: avoid;
-  margin-bottom: 4px;
-  display: inline-block;
-  width: 100%;
+  width: calc(50% - 2px);
+  flex-shrink: 0;
 }
 
 .gifThumbBtn:hover:not(:disabled) {
