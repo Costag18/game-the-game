@@ -8,8 +8,10 @@ Browser-based multiplayer mini-game tournament platform. Players join lobbies, v
 
 - **Frontend:** React 19 (Vite) — `client/`
 - **Backend:** Node.js + Express + Socket.IO — `server/`
-- **Shared:** Constants, event names, game list — `shared/`
+- **Shared:** Constants, event names, game list, version — `shared/`
 - **Fonts:** Cinzel (headings), Raleway (body), Pirata One (display) — Google Fonts
+- **APIs:** Klipy (GIF search, free tier) — server-side proxy, key in env var
+- **Env:** dotenv for server `.env` loading (gitignored)
 - **Deploy:** Render (server) + static client build served by Express in production
 - **Uptime:** UptimeRobot pings `/health` every 5 min to prevent Render free plan sleep
 
@@ -31,7 +33,7 @@ cd server && npm install && npm run dev
 ## Project Structure
 
 ```
-client/src/components/       — CasinoSidebar, PetSidebar, CoinCatchGame, PetMiniGames
+client/src/components/       — CasinoSidebar, PetSidebar, EmoteOverlay, GifOverlay, CoinCatchGame, PetMiniGames
 client/src/context/          — SocketContext, PetContext (tamagotchi state)
 client/src/games/            — React component + CSS module per mini-game
 client/src/screens/          — Menu, Lobby, WaitingRoom, GameVote, WagerPhase, Results, CasinoMode
@@ -42,7 +44,7 @@ server/src/games/            — FSM game engine per mini-game
 server/src/lobby/            — Room/lobby management
 server/src/tournament/       — Round orchestration, scoring (Scorer.js), voting
 server/src/utils/            — Deck, dice, timer, shuffle, words helpers
-shared/                      — events.js, constants.js, gameList.js
+shared/                      — events.js, constants.js, gameList.js, version.js
 ```
 
 ## Game Engine Interface
@@ -105,6 +107,22 @@ Available during voting/wagering phases and in standalone Free Play Casino mode.
 - **Wheel of Fortune** — 20 segments, 0x to 10x
 - **Blackjack Lite** — Quick solo hand vs dealer
 - **Chicken Cross** — Cross lanes for escalating multipliers, cash out or get splat. House edge ~8% per lane.
+
+## GIF Reactions
+
+Discord-style GIF picker — players search for GIFs and send them flying across everyone's screen.
+
+- **API:** Klipy (free, Tenor/GIPHY alternative). Key stored server-side as `KLIPY_APP_KEY` env var
+- **Proxy:** `GET /api/gif-search?q=<query>` — Express route proxies to Klipy, keeps API key secret
+- **Socket events:** `GIF_SEND` (client → server with URL) → `GIF_BROADCAST` (server → all in lobby)
+- **Security:** Server validates URLs start with `https://static.klipy.com/` or `https://media.klipy.com/`
+- **Rate limit:** 12-second server-enforced cooldown per player (`socket.data._lastGif`)
+- **UI:** GIF button (bottom-right), opens search panel with 2-column flex grid, thumbnails use `xs` size
+- **Animation:** Flying GIF slides horizontally across screen (LTR or RTL randomly), 3.5s, slight arc
+- **Panel coordination:** Opening GIF panel closes emote menu and vice versa
+- **Components:** `GifOverlay.jsx` + `GifOverlay.module.css` — rendered inside `EmoteOverlay`
+- **Default results:** Panel loads "reactions" query on open for instant one-tap sending
+- **Env setup:** Local dev uses `server/.env` with dotenv. Production uses Render environment variables
 
 ## Pet System (Tamagotchi)
 
@@ -217,6 +235,12 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Client pings `/health` every 2 min ONLY during active game screens (lobby, voting, playing)
 - Cold start on first visit is acceptable (~30-60s), but mid-game disconnects are not
 
+### Game Layout & Sidebar Sizing
+- During gameplay, `.gameMainArea` has `margin-left: 220px` (pet sidebar) and `width: calc(100% - 220px)` on desktop
+- Without `calc`, `width: 100%` + `margin-left` causes overflow off the right edge
+- Casino sidebar is 280px fixed on desktop during voting/wagering screens
+- Always account for fixed sidebars when calculating main content width
+
 ### Solo Host Flow
 - Host can start tournament with 1 player (server allows `players.length >= 1`)
 - Game vote screen shows all games greyed out with "Waiting for players to join..."
@@ -227,6 +251,21 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - Results acknowledgment checks `tm.players` not `lobby.players` (lobby may have mid-round joiners)
 - 15-second auto-advance timer if not all players acknowledge
 - Prevents permanent deadlock from disconnects or stuck clients
+
+### Emote & GIF Overlay Architecture
+- `EmoteOverlay` is `position: fixed; inset: 0; overflow: hidden; pointer-events: none` — covers full viewport
+- Child buttons/panels use `position: absolute` with `pointer-events: auto`
+- `GifOverlay` renders inside `EmoteOverlay` as a sibling component
+- Both share coordinated open/close state — only one panel open at a time
+- Flying animations (emojis float up, GIFs fly across) use CSS keyframes with `onAnimationEnd` cleanup
+- Emote overlay renders on screens: `gameVote`, `wagerPhase`, `playing`
+
+### Environment Variables & API Keys
+- API keys (like `KLIPY_APP_KEY`) must NEVER be in client code or committed to git
+- Server proxies external API calls to keep keys secret
+- Local dev: `server/.env` file (gitignored) loaded via `dotenv/config`
+- Production: Render dashboard → Environment Variables
+- Server validates all user-submitted URLs against allowlisted CDN domains
 
 ### Casino Animation UX
 - Bet controls use `visibility: hidden` (not `display: none`) during spinning
@@ -284,7 +323,21 @@ The owner cares about:
 
 ## Versioning & Commits
 
-- **Version number** lives in `client/src/screens/MainMenu.jsx` as a `<span className={styles.version}>v1.0.0</span>` at the bottom of the start screen
-- **Every change must**: bump the version (patch for fixes, minor for features), commit, and push to GitHub
+- **Version source of truth:** `shared/version.js` exports `VERSION` string (e.g., `'1.2.1'`)
+- **Display:** `MainMenu.jsx` imports `VERSION` and renders `v{VERSION}` in the top-right corner
+- **Bump dynamically:** Always update `shared/version.js` — patch for fixes, minor for features, major for breaking changes. Never hardcode version strings elsewhere.
+- **Every change must**: bump the version in `shared/version.js`, commit, and push to GitHub
 - **Commit messages** must end with `Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>`
 - **Tell the user** the new version number when committing
+
+## CLAUDE.md Self-Maintenance
+
+This file must be kept up to date. **Update CLAUDE.md when:**
+- A new game, feature, or system is added (add section + update structure/tables)
+- A critical bug fix reveals a new pattern or lesson learned (add to Critical Patterns)
+- Project structure changes (new directories, moved files, new shared modules)
+- New environment variables or deployment requirements are added
+- Conventions or architectural patterns change
+- New fonts, dependencies, or third-party APIs are integrated
+
+When updating, preserve existing sections and append — don't remove lessons learned even if they seem obvious now. Future sessions rely on this file for context.

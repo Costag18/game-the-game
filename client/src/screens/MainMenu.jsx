@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
+import { VERSION } from '../../../shared/version.js';
 import styles from './MainMenu.module.css';
 const logoImg = '/logo.png';
 
@@ -85,7 +86,7 @@ export default function MainMenu({ onNavigate }) {
           </button>
         </div>
       </div>
-      <span className={styles.version}>v1.2.0</span>
+      <span className={styles.version}>v{VERSION}</span>
     </div>
   );
 }
