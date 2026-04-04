@@ -268,6 +268,8 @@ io.on(EVENTS.CONNECTION, (socket) => {
       });
 
       if (!enqueueResp.ok) {
+        const errBody = await enqueueResp.text().catch(() => '');
+        console.error('[AI Image] Enqueue failed:', enqueueResp.status, errBody);
         socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Image generation service unavailable' });
         socket.data._lastAiImage = 0; // Reset cooldown on failure
         return;
@@ -304,8 +306,13 @@ io.on(EVENTS.CONNECTION, (socket) => {
           break;
         }
         if (lines[i].startsWith('event: error')) {
+          let errMsg = 'Generation failed';
           const dataLine = lines[i + 1];
-          socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Generation failed' });
+          if (dataLine && dataLine.startsWith('data: ')) {
+            try { errMsg = JSON.parse(dataLine.slice(6)) || errMsg; } catch {}
+          }
+          console.error('[AI Image] HF Space error:', errMsg);
+          socket.emit(EVENTS.AI_IMAGE_ERROR, { error: typeof errMsg === 'string' ? errMsg : 'Generation failed' });
           socket.data._lastAiImage = 0;
           return;
         }
@@ -335,6 +342,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
         nickname: socket.data.nickname || socket.id,
       });
     } catch (err) {
+      console.error('[AI Image] Error:', err.message || err);
       socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Image generation timed out or failed' });
       socket.data._lastAiImage = 0;
     }
