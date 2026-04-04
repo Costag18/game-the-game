@@ -25,8 +25,23 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
-// --- Shared FLUX image generation helper ---
-async function generateFluxImage(prompt) {
+// --- Shared FLUX image generation helper (with retry) ---
+async function generateFluxImage(prompt, retries = 2) {
+  let lastError;
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      if (attempt > 0) await new Promise((r) => setTimeout(r, 2000)); // wait 2s before retry
+      const result = await _callFluxSpace(prompt);
+      return result;
+    } catch (err) {
+      lastError = err;
+      console.error(`[FLUX] Attempt ${attempt + 1}/${retries} failed:`, err.message);
+    }
+  }
+  throw lastError;
+}
+
+async function _callFluxSpace(prompt) {
   const hfToken = process.env.HF_TOKEN || '';
   const headers = { 'Content-Type': 'application/json' };
   if (hfToken) headers['Authorization'] = `Bearer ${hfToken}`;
@@ -74,7 +89,6 @@ async function generateFluxImage(prompt) {
       if (dataLine?.startsWith('data: ')) {
         try { errMsg = JSON.parse(dataLine.slice(6)) || errMsg; } catch {}
       }
-      console.error('[FLUX] HF Space error:', errMsg);
       throw new Error(typeof errMsg === 'string' ? errMsg : 'Generation failed');
     }
   }
