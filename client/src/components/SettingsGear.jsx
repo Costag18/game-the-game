@@ -14,11 +14,19 @@ export default function SettingsGear() {
 
   const { socket } = useSocketContext();
   const [avatar, setAvatar] = useState(() => localStorage.getItem('gtg_avatar') || '');
+  const [avatarTab, setAvatarTab] = useState('ai');
+
+  // AI tab state
   const [avatarPrompt, setAvatarPrompt] = useState('');
   const [avatarGenerating, setAvatarGenerating] = useState(false);
   const [avatarError, setAvatarError] = useState('');
-  const [avatarCooldown, setAvatarCooldown] = useState(0);
-  const cooldownRef = useRef(null);
+
+  // Search tab state
+  const [avatarSearchQuery, setAvatarSearchQuery] = useState('');
+  const [avatarSearchResults, setAvatarSearchResults] = useState([]);
+  const [avatarSearchLoading, setAvatarSearchLoading] = useState(false);
+
+  const searchDebounceRef = useRef(null);
 
   // Listen for avatar updates (from other sessions or reconnects)
   useEffect(() => {
@@ -33,41 +41,68 @@ export default function SettingsGear() {
     return () => socket.off(EVENTS.AVATAR_UPDATE, onAvatarUpdate);
   }, [socket]);
 
-  // Cooldown timer
+  // Debounced image search
   useEffect(() => {
-    if (avatarCooldown <= 0) { clearInterval(cooldownRef.current); return; }
-    cooldownRef.current = setInterval(() => {
-      setAvatarCooldown((c) => Math.max(0, c - 1));
-    }, 1000);
-    return () => clearInterval(cooldownRef.current);
-  }, [avatarCooldown > 0]);
+    if (avatarTab !== 'search') return;
+    clearTimeout(searchDebounceRef.current);
+    if (!avatarSearchQuery.trim()) {
+      setAvatarSearchResults([]);
+      return;
+    }
+    searchDebounceRef.current = setTimeout(async () => {
+      setAvatarSearchLoading(true);
+      try {
+        const res = await fetch(`/api/image-search?q=${encodeURIComponent(avatarSearchQuery.trim())}`);
+        const data = await res.json();
+        setAvatarSearchResults(data.results || []);
+      } catch {
+        setAvatarSearchResults([]);
+      }
+      setAvatarSearchLoading(false);
+    }, 500);
+    return () => clearTimeout(searchDebounceRef.current);
+  }, [avatarSearchQuery, avatarTab]);
 
-  const genTimeoutRef = useRef(null);
-
-  function handleGenerateAvatar() {
-    if (avatarGenerating || avatarCooldown > 0 || !avatarPrompt.trim() || !socket) return;
+  async function handleGenerateAvatar() {
+    if (avatarGenerating || !avatarPrompt.trim() || !socket) return;
     setAvatarGenerating(true);
     setAvatarError('');
-    setAvatarCooldown(30);
-    // Safety timeout — if callback never fires, reset after 70s
-    // (server max: 3 retries × 30s timeout + 3s delays = ~39s, plus network overhead)
-    clearTimeout(genTimeoutRef.current);
-    genTimeoutRef.current = setTimeout(() => {
-      setAvatarGenerating(false);
-      setAvatarError('Generation timed out — try again');
-      setAvatarCooldown(0);
-    }, 70000);
-    socket.emit(EVENTS.SET_AVATAR, { prompt: avatarPrompt.trim() }, (response) => {
-      clearTimeout(genTimeoutRef.current);
-      setAvatarGenerating(false);
-      if (response?.error) {
-        setAvatarError(response.error);
-        setAvatarCooldown(0);
-      } else if (response?.avatar) {
-        setAvatar(response.avatar);
-        localStorage.setItem('gtg_avatar', response.avatar);
-        setAvatarPrompt('');
-        setAvatarError(''); // Clear any stale timeout error
+    try {
+      const result = await window.puter?.ai?.txt2img?.(avatarPrompt.trim());
+      let dataUrl;
+      if (result instanceof Blob) {
+        dataUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(result);
+        });
+      } else if (typeof result === 'string') {
+        dataUrl = result.startsWith('data:') ? result : `data:image/png;base64,${result}`;
+      } else {
+        throw new Error('Unexpected result from Puter AI');
+      }
+      socket.emit(EVENTS.SET_AVATAR, { avatar: dataUrl }, (response) => {
+        if (response?.success) {
+          setAvatar(dataUrl);
+          localStorage.setItem('gtg_avatar', dataUrl);
+          setAvatarPrompt('');
+        } else {
+          setAvatarError(response?.error || 'Failed to save avatar');
+        }
+      });
+    } catch (err) {
+      setAvatarError(err.message || 'Generation failed');
+    }
+    setAvatarGenerating(false);
+  }
+
+  function handleSearchAvatar(img) {
+    if (!socket) return;
+    const url = img.url;
+    socket.emit(EVENTS.SET_AVATAR, { avatar: url }, (response) => {
+      if (response?.success) {
+        setAvatar(url);
+        localStorage.setItem('gtg_avatar', url);
       }
     });
   }
@@ -144,9 +179,26 @@ export default function SettingsGear() {
           <span className={styles.themeName}>{currentName}</span>
         </div>
 
-        {/* Avatar generation */}
+        {/* Avatar section */}
         <div className={styles.avatarSection}>
-          <span className={styles.label}>Profile Photo</span>
+          <div className={styles.avatarHeader}>
+            <span className={styles.label}>Avatar</span>
+            <div className={styles.avatarTabs}>
+              <button
+                className={`${styles.avatarTab} ${avatarTab === 'ai' ? styles.avatarTabActive : ''}`}
+                onClick={() => { setAvatarTab('ai'); setAvatarError(''); }}
+              >
+                AI
+              </button>
+              <button
+                className={`${styles.avatarTab} ${avatarTab === 'search' ? styles.avatarTabActive : ''}`}
+                onClick={() => setAvatarTab('search')}
+              >
+                Search
+              </button>
+            </div>
+          </div>
+
           <div className={styles.avatarPreview}>
             {avatar ? (
               <img src={avatar} alt="Avatar" className={styles.avatarImg} />
@@ -154,31 +206,68 @@ export default function SettingsGear() {
               <span className={styles.avatarPlaceholder}>?</span>
             )}
           </div>
-          <div className={styles.avatarForm}>
-            <input
-              className={styles.avatarInput}
-              type="text"
-              placeholder="Describe your avatar..."
-              value={avatarPrompt}
-              onChange={(e) => setAvatarPrompt(e.target.value.slice(0, 100))}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleGenerateAvatar(); }}
-              maxLength={100}
-              disabled={avatarGenerating}
-            />
-            {avatarGenerating ? (
-              <span className={styles.avatarSpinner}>⏳</span>
-            ) : (
-              <button
-                className={styles.avatarGenBtn}
-                onClick={handleGenerateAvatar}
-                disabled={!avatarPrompt.trim() || avatarCooldown > 0}
-                title={avatarCooldown > 0 ? `Wait ${avatarCooldown}s` : 'Generate'}
-              >
-                {avatarCooldown > 0 ? avatarCooldown : '🎨'}
-              </button>
-            )}
-          </div>
-          {avatarError && <span className={styles.avatarError}>{avatarError}</span>}
+
+          {avatarTab === 'ai' && (
+            <>
+              <div className={styles.avatarForm}>
+                <input
+                  className={styles.avatarInput}
+                  type="text"
+                  placeholder="Describe your avatar..."
+                  value={avatarPrompt}
+                  onChange={(e) => setAvatarPrompt(e.target.value.slice(0, 100))}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleGenerateAvatar(); }}
+                  maxLength={100}
+                  disabled={avatarGenerating}
+                />
+                {avatarGenerating ? (
+                  <span className={styles.avatarSpinner}>⏳</span>
+                ) : (
+                  <button
+                    className={styles.avatarGenBtn}
+                    onClick={handleGenerateAvatar}
+                    disabled={!avatarPrompt.trim()}
+                    title="Generate"
+                  >
+                    🎨
+                  </button>
+                )}
+              </div>
+              {avatarError && <span className={styles.avatarError}>{avatarError}</span>}
+              <span className={styles.avatarAttrib}>Powered by Puter AI</span>
+            </>
+          )}
+
+          {avatarTab === 'search' && (
+            <>
+              <div className={styles.avatarForm}>
+                <input
+                  className={styles.avatarInput}
+                  type="text"
+                  placeholder="Search photos..."
+                  value={avatarSearchQuery}
+                  onChange={(e) => setAvatarSearchQuery(e.target.value)}
+                  maxLength={80}
+                />
+                {avatarSearchLoading && <span className={styles.avatarSpinner}>⏳</span>}
+              </div>
+              {avatarSearchResults.length > 0 && (
+                <div className={styles.searchGrid}>
+                  {avatarSearchResults.map((img) => (
+                    <button
+                      key={img.id}
+                      className={styles.searchThumb}
+                      onClick={() => handleSearchAvatar(img)}
+                      title={img.alt || 'Select'}
+                    >
+                      <img src={img.thumb} alt={img.alt || ''} />
+                    </button>
+                  ))}
+                </div>
+              )}
+              <span className={styles.avatarAttrib}>Photos by Pexels</span>
+            </>
+          )}
         </div>
       </div>
     </>
