@@ -15,6 +15,7 @@ export default function AiImageOverlay({ isOpen, onToggle, onRequestClose }) {
   const [flyingImages, setFlyingImages] = useState([]);
   const cooldownRef = useRef(null);
   const errorTimeoutRef = useRef(null);
+  const genTimeoutRef = useRef(null);
 
   // Cooldown timer
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function AiImageOverlay({ isOpen, onToggle, onRequestClose }) {
         direction,
         top,
       }]);
-      // If we were the one generating, clear the generating state
+      clearTimeout(genTimeoutRef.current);
       setGenerating(false);
     }
     socket.on(EVENTS.AI_IMAGE_BROADCAST, onAiBroadcast);
@@ -49,6 +50,7 @@ export default function AiImageOverlay({ isOpen, onToggle, onRequestClose }) {
   useEffect(() => {
     if (!socket) return;
     function onAiError(data) {
+      clearTimeout(genTimeoutRef.current);
       setGenerating(false);
       setError(data?.error || 'Generation failed');
       setCooldown(0); // Allow retry on failure
@@ -72,6 +74,13 @@ export default function AiImageOverlay({ isOpen, onToggle, onRequestClose }) {
     setGenerating(true);
     setError('');
     setCooldown(AI_COOLDOWN);
+    // Safety timeout — if no broadcast or error arrives, reset after 90s
+    clearTimeout(genTimeoutRef.current);
+    genTimeoutRef.current = setTimeout(() => {
+      setGenerating(false);
+      setError('Generation timed out');
+      setCooldown(0);
+    }, 90000);
   }
 
   function handleKeyDown(e) {

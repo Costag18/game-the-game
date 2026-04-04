@@ -42,12 +42,22 @@ export default function SettingsGear() {
     return () => clearInterval(cooldownRef.current);
   }, [avatarCooldown > 0]);
 
+  const genTimeoutRef = useRef(null);
+
   function handleGenerateAvatar() {
     if (avatarGenerating || avatarCooldown > 0 || !avatarPrompt.trim() || !socket) return;
     setAvatarGenerating(true);
     setAvatarError('');
     setAvatarCooldown(30);
+    // Safety timeout — if callback never fires, reset after 90s
+    clearTimeout(genTimeoutRef.current);
+    genTimeoutRef.current = setTimeout(() => {
+      setAvatarGenerating(false);
+      setAvatarError('Generation timed out');
+      setAvatarCooldown(0);
+    }, 90000);
     socket.emit(EVENTS.SET_AVATAR, { prompt: avatarPrompt.trim() }, (response) => {
+      clearTimeout(genTimeoutRef.current);
       setAvatarGenerating(false);
       if (response?.error) {
         setAvatarError(response.error);
