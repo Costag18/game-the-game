@@ -158,7 +158,7 @@ function GameRouter() {
         const GameComponent = GAME_COMPONENTS[gameId];
         if (!GameComponent) {
           return (
-            <div style={{ color: 'white', textAlign: 'center', paddingTop: '4rem', background: '#0f3d1a', minHeight: '100vh' }}>
+            <div style={{ color: 'var(--text-primary)', textAlign: 'center', paddingTop: '4rem', background: 'var(--felt-dark, #0f3d1a)', minHeight: '100vh' }}>
               <h2 style={{ fontFamily: 'Georgia', color: '#d4a843' }}>Playing: {gameId}</h2>
               <p style={{ marginTop: '1rem', color: '#b8a88a' }}>Game not yet implemented.</p>
             </div>

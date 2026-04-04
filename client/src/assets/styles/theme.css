@@ -41,6 +41,8 @@
   --text-secondary: #8a9ab8;
   --wood-brown: #2a3a5c;
   --wood-dark: #1a2a4a;
+  --felt-green: #1a3a6b;
+  --felt-dark: #0d1a3a;
 }
 
 [data-theme="emerald"] {
@@ -55,6 +57,8 @@
   --text-secondary: #8ab8a0;
   --wood-brown: #2a5c3a;
   --wood-dark: #1a4a2a;
+  --felt-green: #1a5c2a;
+  --felt-dark: #0f3d1a;
 }
 
 [data-theme="midnight"] {
@@ -69,6 +73,8 @@
   --text-secondary: #a08ab8;
   --wood-brown: #4a2a5c;
   --wood-dark: #3a1a4a;
+  --felt-green: #3a1a5c;
+  --felt-dark: #1a0d3a;
 }
 
 [data-theme="noir"] {
@@ -83,6 +89,8 @@
   --text-secondary: #aaaaaa;
   --wood-brown: #444444;
   --wood-dark: #333333;
+  --felt-green: #2a2a2a;
+  --felt-dark: #141414;
 }
 
 [data-theme="ivory"] {
@@ -100,4 +108,6 @@
   --card-white: #ffffff;
   --danger: #a02020;
   --success: #1a7a3a;
+  --felt-green: #d4c8a8;
+  --felt-dark: #e8e0d0;
 }
