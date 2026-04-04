@@ -3,6 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import GifOverlay from './GifOverlay.jsx';
+import AiImageOverlay from './AiImageOverlay.jsx';
 import styles from './EmoteOverlay.module.css';
 
 const EMOTES = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉'];
@@ -15,6 +16,7 @@ export default function EmoteOverlay() {
   const { playSound } = useSound();
   const [menuOpen, setMenuOpen] = useState(false);
   const [gifOpen, setGifOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [floaters, setFloaters] = useState([]);
 
   // Listen for incoming emote broadcasts
@@ -53,12 +55,21 @@ export default function EmoteOverlay() {
   function toggleEmoteMenu() {
     setMenuOpen((o) => !o);
     setGifOpen(false);
+    setAiOpen(false);
     playSound('menuOpen');
   }
 
   function toggleGifPanel() {
     setGifOpen((o) => !o);
     setMenuOpen(false);
+    setAiOpen(false);
+    playSound('menuOpen');
+  }
+
+  function toggleAiPanel() {
+    setAiOpen((o) => !o);
+    setMenuOpen(false);
+    setGifOpen(false);
     playSound('menuOpen');
   }
 
@@ -93,6 +104,13 @@ export default function EmoteOverlay() {
         isOpen={gifOpen}
         onToggle={toggleGifPanel}
         onRequestClose={() => setGifOpen(false)}
+      />
+
+      {/* AI Image overlay (button + panel + flying images) */}
+      <AiImageOverlay
+        isOpen={aiOpen}
+        onToggle={toggleAiPanel}
+        onRequestClose={() => setAiOpen(false)}
       />
 
       {/* Floating emojis */}
