@@ -13,10 +13,9 @@ body {
   min-height: 100vh;
 }
 
-/* Pet sidebar during games — fixed on desktop, below on mobile */
+/* Pet sidebar during games — hidden on mobile/portrait, fixed on desktop landscape */
 .petFixedSidebar {
-  display: block;
-  width: 100%;
+  display: none;
 }
 
 .gameMainArea {
@@ -64,19 +63,19 @@ html.screen-shake-light { animation: shakeLight 0.25s ease-out; }
 html.screen-shake-medium { animation: shakeMedium 0.35s ease-out; }
 html.screen-shake-heavy { animation: shakeHeavy 0.4s ease-out; }
 
-@media (min-width: 960px) {
+@media (min-width: 960px) and (orientation: landscape) {
   .petFixedSidebar {
     display: block;
     position: fixed;
     top: 0;
     left: 0;
-    width: 280px;
+    width: 340px;
     height: 100vh;
     z-index: 50;
     overflow: hidden;
   }
   .gameMainArea {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+    margin-left: 340px;
+    width: calc(100% - 340px);
   }
 }

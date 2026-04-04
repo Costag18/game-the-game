@@ -1,5 +1,5 @@
 .wrapper {
-  display: flex;
+  display: none;
   flex-direction: column;
   height: 100%;
 }
@@ -40,7 +40,10 @@
   padding: 0.5rem;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 960px) and (orientation: landscape) {
+  .wrapper {
+    display: flex;
+  }
   .streamBox {
     display: block;
     flex-shrink: 0;
