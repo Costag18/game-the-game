@@ -340,10 +340,20 @@ io.on(EVENTS.CONNECTION, (socket) => {
       const dataUrl = await generateFluxImage(sanitized);
       socket.data.avatar = dataUrl;
       lobbyManager.setAvatar(socket.id, dataUrl);
-      // Broadcast to lobby so others see the new avatar
+      // Update tournament avatars if in an active tournament
       const lobbyId = lobbyManager.getPlayerLobby(socket.id);
       if (lobbyId) {
+        const tm = tournaments.get(lobbyId);
+        if (tm) {
+          tm.avatars = tm.avatars || {};
+          tm.avatars[socket.id] = dataUrl;
+          // Re-broadcast tournament state so leaderboard updates
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+        }
         io.to(lobbyId).emit(EVENTS.AVATAR_UPDATE, { playerId: socket.id, avatar: dataUrl });
+        // Also refresh lobby state so WaitingRoom picks up the avatar
+        const lobby = lobbyManager.getLobby(lobbyId);
+        if (lobby) io.to(lobbyId).emit(EVENTS.LOBBY_STATE, lobby);
       }
       if (callback) callback({ success: true, avatar: dataUrl });
     } catch (err) {
