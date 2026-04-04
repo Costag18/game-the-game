@@ -1,0 +1,260 @@
+/* --- AI Image Trigger Button --- */
+.aiTrigger {
+  position: absolute;
+  bottom: calc(1rem + 52px);
+  right: 1rem;
+  z-index: 102;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-dim, #8a7230);
+  background: var(--bg-panel, #2a1515);
+  color: var(--gold, #d4a843);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  pointer-events: auto;
+}
+
+.aiTrigger:hover {
+  background: #3a2020;
+  border-color: var(--gold, #d4a843);
+  transform: scale(1.05);
+}
+
+.aiTriggerOpen {
+  background: #3a2020;
+  border-color: var(--gold, #d4a843);
+}
+
+.cooldownText {
+  font-size: 0.85rem;
+  color: #e53935;
+  font-weight: 700;
+}
+
+/* --- Prompt Panel --- */
+.aiPanel {
+  position: absolute;
+  bottom: calc(1rem + 104px);
+  right: 1rem;
+  z-index: 103;
+  width: 300px;
+  background: var(--bg-panel, #2a1515);
+  border: 2px solid var(--gold-dim, #8a7230);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+}
+
+.aiPromptInput {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: none;
+  border-bottom: 1px solid var(--gold-dim, #8a7230);
+  background: #1a0e0e;
+  color: var(--text-primary, #f0e6d3);
+  font-family: var(--font-body, 'Raleway', sans-serif);
+  font-size: 0.85rem;
+  outline: none;
+  box-sizing: border-box;
+  resize: none;
+  min-height: 60px;
+}
+
+.aiPromptInput::placeholder {
+  color: var(--text-secondary, #b8a88a);
+  opacity: 0.6;
+}
+
+.aiPromptInput:focus {
+  background: #231414;
+}
+
+.aiActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.6rem;
+}
+
+.generateBtn {
+  background: linear-gradient(135deg, var(--gold-dim, #8a7230), var(--gold, #d4a843));
+  color: #1a0e0e;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  font-family: var(--font-body, 'Raleway', sans-serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.generateBtn:hover:not(:disabled) {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.generateBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.generating {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--gold, #d4a843);
+  font-size: 0.75rem;
+  font-family: var(--font-body, 'Raleway', sans-serif);
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--gold-dim, #8a7230);
+  border-top-color: var(--gold, #d4a843);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.aiAttribution {
+  text-align: center;
+  padding: 0.3rem;
+  font-size: 0.6rem;
+  color: var(--text-secondary, #b8a88a);
+  opacity: 0.5;
+  border-top: 1px solid var(--gold-dim, #8a7230);
+}
+
+.errorText {
+  color: #e53935;
+  font-size: 0.7rem;
+  font-family: var(--font-body, 'Raleway', sans-serif);
+  padding: 0 0.6rem 0.4rem;
+}
+
+.charCount {
+  font-size: 0.65rem;
+  color: var(--text-secondary, #b8a88a);
+  opacity: 0.6;
+}
+
+/* --- Flying AI Image Animation --- */
+.flyingAiImage {
+  position: fixed;
+  z-index: 200;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform, opacity;
+}
+
+.flyingAiImg {
+  max-height: 180px;
+  max-width: 240px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--gold-dim, #8a7230);
+}
+
+.flyingAiName {
+  margin-top: 4px;
+  font-size: 0.7rem;
+  font-family: var(--font-body, 'Raleway', sans-serif);
+  color: var(--gold, #d4a843);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 1px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* Left-to-Right fly */
+.flyLTR {
+  animation: aiFlyLTR 3.5s ease-in-out forwards;
+}
+
+@keyframes aiFlyLTR {
+  0% {
+    transform: translateX(-280px) translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(5vw) translateY(-10px) scale(1);
+  }
+  50% {
+    transform: translateX(45vw) translateY(-30px) scale(1);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(85vw) translateY(-10px) scale(1);
+  }
+  100% {
+    transform: translateX(calc(100vw + 280px)) translateY(0) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* Right-to-Left fly */
+.flyRTL {
+  animation: aiFlyRTL 3.5s ease-in-out forwards;
+}
+
+@keyframes aiFlyRTL {
+  0% {
+    transform: translateX(calc(100vw + 280px)) translateY(0) scale(0.6);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(85vw) translateY(-10px) scale(1);
+  }
+  50% {
+    transform: translateX(45vw) translateY(-30px) scale(1);
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+    transform: translateX(5vw) translateY(-10px) scale(1);
+  }
+  100% {
+    transform: translateX(-280px) translateY(0) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* --- Mobile --- */
+@media (max-width: 600px) {
+  .aiPanel {
+    right: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    bottom: calc(1rem + 96px);
+  }
+
+  .aiTrigger {
+    right: 0.5rem;
+    bottom: calc(0.5rem + 48px);
+    width: 40px;
+    height: 40px;
+  }
+
+  .flyingAiImg {
+    max-height: 120px;
+    max-width: 160px;
+  }
+}
