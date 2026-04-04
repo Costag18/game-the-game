@@ -201,7 +201,7 @@ function GameRouter() {
         />
       )}
       {['gameVote', 'wagerPhase', 'playing'].includes(screen) && <EmoteOverlay />}
-      <SettingsGear />
+      {screen !== 'menu' && <SettingsGear />}
       {showConfetti && <ConfettiOverlay />}
     </>
   );
