@@ -25,35 +25,6 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
-// --- Image generation via Pollinations.ai (free, no auth, retry on 429) ---
-async function generateImage(prompt) {
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
-  let lastError;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    if (attempt > 0) await new Promise((r) => setTimeout(r, 5000 * attempt)); // 5s, 10s backoff
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 45000);
-      const resp = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeout);
-      if (resp.status === 429) {
-        lastError = new Error('Rate limited — too many requests, please wait');
-        console.log(`[ImageGen] 429 rate limited, attempt ${attempt + 1}/3`);
-        continue;
-      }
-      if (!resp.ok) throw new Error(`Image generation failed (HTTP ${resp.status})`);
-      const arrayBuf = await resp.arrayBuffer();
-      if (arrayBuf.byteLength < 1000) throw new Error('Image generation returned empty result');
-      const base64 = Buffer.from(arrayBuf).toString('base64');
-      return `data:image/jpeg;base64,${base64}`;
-    } catch (err) {
-      lastError = err;
-      if (err.message?.includes('abort')) throw err; // don't retry timeouts
-    }
-  }
-  throw lastError;
-}
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -93,6 +64,30 @@ app.get('/api/gif-search', async (req, res) => {
   } catch (err) {
     console.error('Klipy proxy error:', err.message);
     res.json({ result: false, data: { data: [] } });
+  }
+});
+
+// --- Pexels image search proxy (keeps API key server-side) ---
+const PEXELS_API_KEY = process.env.PEXELS_API_KEY || '';
+app.get('/api/image-search', async (req, res) => {
+  const q = (req.query.q || '').slice(0, 100);
+  if (!q) return res.json({ results: [] });
+  if (!PEXELS_API_KEY) return res.json({ results: [], error: 'Image search not configured' });
+  try {
+    const resp = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=20`, {
+      headers: { Authorization: PEXELS_API_KEY },
+    });
+    const json = await resp.json();
+    const results = (json.photos || []).map((p) => ({
+      id: p.id,
+      url: p.src?.medium || p.src?.small,
+      thumb: p.src?.tiny || p.src?.small,
+      alt: p.alt || q,
+    }));
+    res.json({ results });
+  } catch (err) {
+    console.error('Pexels proxy error:', err.message);
+    res.json({ results: [] });
   }
 });
 
@@ -270,70 +265,45 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
-  // --- AI Image Generation ---
-  socket.on(EVENTS.AI_IMAGE_SEND, async (data) => {
+  // --- Image Broadcast (client generates/picks, server validates & broadcasts) ---
+  socket.on(EVENTS.AI_IMAGE_SEND, (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (!lobbyId) return;
-    const prompt = data?.prompt;
-    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) return;
-    const sanitized = prompt.trim().slice(0, 200);
+    const imageUrl = data?.imageUrl;
+    if (!imageUrl || typeof imageUrl !== 'string') return;
+    // Rate-limit: 10 seconds between image broadcasts per player
     const now = Date.now();
-    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 20000) return;
+    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 10000) return;
     socket.data._lastAiImage = now;
-
-    try {
-      const dataUrl = await generateImage(sanitized);
-      io.to(lobbyId).emit(EVENTS.AI_IMAGE_BROADCAST, {
-        imageUrl: dataUrl,
-        nickname: socket.data.nickname || socket.id,
-      });
-    } catch (err) {
-      console.error('[AI Image] Error:', err.message || err);
-      socket.emit(EVENTS.AI_IMAGE_ERROR, { error: err.message || 'Image generation failed' });
-      socket.data._lastAiImage = 0;
-    }
+    io.to(lobbyId).emit(EVENTS.AI_IMAGE_BROADCAST, {
+      imageUrl,
+      nickname: socket.data.nickname || socket.id,
+    });
   });
 
-  // --- Avatar Generation ---
-  socket.on(EVENTS.SET_AVATAR, async (data, callback) => {
-    const prompt = data?.prompt;
-    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-      if (callback) callback({ error: 'Prompt is required' });
+  // --- Avatar Set (client generates/picks, server stores & broadcasts) ---
+  socket.on(EVENTS.SET_AVATAR, (data, callback) => {
+    const avatar = data?.avatar;
+    if (!avatar || typeof avatar !== 'string') {
+      if (callback) callback({ error: 'Avatar image is required' });
       return;
     }
-    const sanitized = prompt.trim().slice(0, 100);
-    const now = Date.now();
-    if (socket.data._lastAvatar && now - socket.data._lastAvatar < 30000) {
-      if (callback) callback({ error: 'Please wait before generating again' });
-      return;
-    }
-    socket.data._lastAvatar = now;
-
-    try {
-      const dataUrl = await generateImage(sanitized);
-      socket.data.avatar = dataUrl;
-      lobbyManager.setAvatar(socket.id, dataUrl);
-      // Update tournament avatars if in an active tournament
-      const lobbyId = lobbyManager.getPlayerLobby(socket.id);
-      if (lobbyId) {
-        const tm = tournaments.get(lobbyId);
-        if (tm) {
-          tm.avatars = tm.avatars || {};
-          tm.avatars[socket.id] = dataUrl;
-          // Re-broadcast tournament state so leaderboard updates
-          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
-        }
-        io.to(lobbyId).emit(EVENTS.AVATAR_UPDATE, { playerId: socket.id, avatar: dataUrl });
-        // Also refresh lobby state so WaitingRoom picks up the avatar
-        const lobby = lobbyManager.getLobby(lobbyId);
-        if (lobby) io.to(lobbyId).emit(EVENTS.LOBBY_STATE, lobby);
+    socket.data.avatar = avatar;
+    lobbyManager.setAvatar(socket.id, avatar);
+    // Update tournament avatars if in an active tournament
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (lobbyId) {
+      const tm = tournaments.get(lobbyId);
+      if (tm) {
+        tm.avatars = tm.avatars || {};
+        tm.avatars[socket.id] = avatar;
+        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
       }
-      if (callback) callback({ success: true, avatar: dataUrl });
-    } catch (err) {
-      console.error('[Avatar] Error:', err.message || err);
-      socket.data._lastAvatar = 0;
-      if (callback) callback({ error: err.message || 'Avatar generation failed' });
+      io.to(lobbyId).emit(EVENTS.AVATAR_UPDATE, { playerId: socket.id, avatar });
+      const lobby = lobbyManager.getLobby(lobbyId);
+      if (lobby) io.to(lobbyId).emit(EVENTS.LOBBY_STATE, lobby);
     }
+    if (callback) callback({ success: true, avatar });
   });
 
   // --- Tournament Events ---
