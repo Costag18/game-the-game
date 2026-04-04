@@ -3,7 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import styles from './AiImageOverlay.module.css';
 
-const AI_COOLDOWN = 20; // seconds — matches server rate limit
+const AI_COOLDOWN = 30; // seconds — prevents Pollinations rate limiting
 let flyIdCounter = 0;
 
 export default function AiImageOverlay({ isOpen, onToggle, onRequestClose }) {

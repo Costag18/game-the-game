@@ -25,18 +25,33 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
-// --- Image generation via Pollinations.ai (free, no auth) ---
+// --- Image generation via Pollinations.ai (free, no auth, retry on 429) ---
 async function generateImage(prompt) {
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 45000);
-  const resp = await fetch(url, { signal: controller.signal });
-  clearTimeout(timeout);
-  if (!resp.ok) throw new Error(`Image generation failed (HTTP ${resp.status})`);
-  const arrayBuf = await resp.arrayBuffer();
-  if (arrayBuf.byteLength < 1000) throw new Error('Image generation returned empty result');
-  const base64 = Buffer.from(arrayBuf).toString('base64');
-  return `data:image/jpeg;base64,${base64}`;
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt > 0) await new Promise((r) => setTimeout(r, 5000 * attempt)); // 5s, 10s backoff
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 45000);
+      const resp = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (resp.status === 429) {
+        lastError = new Error('Rate limited — too many requests, please wait');
+        console.log(`[ImageGen] 429 rate limited, attempt ${attempt + 1}/3`);
+        continue;
+      }
+      if (!resp.ok) throw new Error(`Image generation failed (HTTP ${resp.status})`);
+      const arrayBuf = await resp.arrayBuffer();
+      if (arrayBuf.byteLength < 1000) throw new Error('Image generation returned empty result');
+      const base64 = Buffer.from(arrayBuf).toString('base64');
+      return `data:image/jpeg;base64,${base64}`;
+    } catch (err) {
+      lastError = err;
+      if (err.message?.includes('abort')) throw err; // don't retry timeouts
+    }
+  }
+  throw lastError;
 }
 
 const __filename = fileURLToPath(import.meta.url);
