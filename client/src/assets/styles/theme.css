@@ -94,20 +94,20 @@
 }
 
 [data-theme="ivory"] {
-  --gold: #8b6914;
-  --gold-dim: #6b5010;
-  --gold-light: #c4a035;
+  --gold: #7a5a0a;
+  --gold-dim: #8a7030;
+  --gold-light: #b89020;
   --bg-dark: #f5f0e8;
-  --bg-panel: #ece5d5;
-  --mahogany: #d4c8a8;
-  --burgundy: #c0b090;
-  --text-primary: #2a1f10;
-  --text-secondary: #5a4a30;
-  --wood-brown: #a08050;
-  --wood-dark: #8a6a40;
+  --bg-panel: #e8e0d0;
+  --mahogany: #c8b898;
+  --burgundy: #b8a880;
+  --text-primary: #1a1208;
+  --text-secondary: #4a3a20;
+  --wood-brown: #8a6a40;
+  --wood-dark: #6a5030;
   --card-white: #ffffff;
-  --danger: #a02020;
-  --success: #1a7a3a;
-  --felt-green: #d4c8a8;
-  --felt-dark: #e8e0d0;
+  --danger: #8a1818;
+  --success: #146830;
+  --felt-green: #c8b898;
+  --felt-dark: #ddd5c0;
 }
