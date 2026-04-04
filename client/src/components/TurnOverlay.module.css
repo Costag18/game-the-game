@@ -1,0 +1,63 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: overlayFade 1.8s ease-out forwards;
+}
+
+@keyframes overlayFade {
+  0% { background: rgba(0, 0, 0, 0); }
+  10% { background: rgba(0, 0, 0, 0.45); }
+  60% { background: rgba(0, 0, 0, 0.45); }
+  100% { background: rgba(0, 0, 0, 0); }
+}
+
+.banner {
+  animation: bannerSlide 1.8s ease-out forwards;
+}
+
+@keyframes bannerSlide {
+  0% {
+    transform: translateX(-120%) scale(0.8);
+    opacity: 0;
+  }
+  12% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(0) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(120%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.text {
+  font-family: var(--font-heading, 'Cinzel', serif);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--gold, #d4a843);
+  text-shadow:
+    0 0 20px rgba(212, 168, 67, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .text {
+    font-size: 2rem;
+  }
+}

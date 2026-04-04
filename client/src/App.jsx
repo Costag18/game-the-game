@@ -17,6 +17,7 @@ import PetSidebar from './components/PetSidebar.jsx';
 import EmoteOverlay from './components/EmoteOverlay.jsx';
 import SettingsGear from './components/SettingsGear.jsx';
 import ConfettiOverlay from './components/ConfettiOverlay.jsx';
+import TurnOverlay from './components/TurnOverlay.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import BlackjackGame from './games/Blackjack.jsx';
 import PokerGame from './games/Poker.jsx';
@@ -199,6 +200,7 @@ function GameRouter() {
       )}
       {['gameVote', 'wagerPhase', 'playing'].includes(screen) && <EmoteOverlay />}
       {screen !== 'menu' && <SettingsGear />}
+      {screen === 'playing' && <TurnOverlay isMyTurn={tournament.gameState?.state?.isMyTurn} />}
       {showConfetti && <ConfettiOverlay />}
     </>
   );
