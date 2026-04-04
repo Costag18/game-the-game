@@ -6,6 +6,7 @@
 
 .streamBox {
   display: none;
+  position: relative;
 }
 
 .streamFrame {
@@ -13,6 +14,14 @@
   aspect-ratio: 16 / 9;
   border: none;
   border-bottom: 1px solid var(--gold-dim, #8a7230);
+  display: block;
+}
+
+.streamOverlay {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .petScroll {
