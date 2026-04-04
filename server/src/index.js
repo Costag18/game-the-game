@@ -250,7 +250,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const sanitized = prompt.trim().slice(0, 200);
     // Rate-limit: 30 seconds between AI image requests per player
     const now = Date.now();
-    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 30000) return;
+    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 20000) return;
     socket.data._lastAiImage = now;
 
     try {
@@ -259,7 +259,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       const headers = { 'Content-Type': 'application/json' };
       if (hfToken) headers['Authorization'] = `Bearer ${hfToken}`;
 
-      const enqueueResp = await fetch('https://evalstate-flux1-schnell.hf.space/call/flux1_schnell_infer', {
+      const enqueueResp = await fetch('https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer', {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -285,7 +285,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
       const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
       const resultResp = await fetch(
-        `https://evalstate-flux1-schnell.hf.space/call/flux1_schnell_infer/${event_id}`,
+        `https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer/${event_id}`,
         { headers, signal: controller.signal }
       );
       clearTimeout(timeout);
