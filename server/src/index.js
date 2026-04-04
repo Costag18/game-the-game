@@ -568,10 +568,11 @@ io.on(EVENTS.CONNECTION, (socket) => {
     // Each lane has an independent chance of crashing. Later lanes are riskier.
     // Player starts at step 0 (safe start lane), first cross goes to step 1.
     // crashStep = 9 means survived all lanes (possible to reach 6x)
-    // Survival odds per lane — each lane's EV is ~0.92 (house edge ~8%)
-    // Lane 1: 0.77 × 1.2 = 0.92, Lane 2: 0.61 × 1.5 = 0.92, etc.
-    const LANE_SURVIVE = [0.77, 0.61, 0.51, 0.42, 0.33, 0.26, 0.20, 0.15];
-    let crashStep = 9;
+    // Exponential risk/reward — early lanes safe, late lanes dangerous.
+    // Each lane's conditional EV ≈ 0.92 (house edge ~8%).
+    // LANE_SURVIVE[i] = 0.92 * MULT[i] / MULT[i+1]
+    const LANE_SURVIVE = [0.876, 0.840, 0.814, 0.772, 0.713, 0.657, 0.613, 0.552, 0.495, 0.478];
+    let crashStep = 11;
     for (let i = 0; i < LANE_SURVIVE.length; i++) {
       if (Math.random() > LANE_SURVIVE[i]) {
         crashStep = i + 1; // crash on lane 1-8
@@ -596,8 +597,8 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const game = tm._chickenGames[socket.id];
     if (!game.alive) return;
 
-    // Multiplier per step: 1.2x, 1.5x, 1.8x, 2.2x, 2.8x, 3.5x, 4.5x, 6x
-    const MULTIPLIERS = [1.0, 1.2, 1.5, 1.8, 2.2, 2.8, 3.5, 4.5, 6.0];
+    // Exponential multipliers: safe early (1.05x), huge late (25x)
+    const MULTIPLIERS = [1.0, 1.05, 1.15, 1.3, 1.55, 2.0, 2.8, 4.2, 7.0, 13.0, 25.0];
 
     if (action === 'cross') {
       game.step++;

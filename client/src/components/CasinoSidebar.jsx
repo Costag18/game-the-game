@@ -241,8 +241,8 @@ function BJLitePanel({ socket, myScore }) {
   );
 }
 
-const CHICKEN_MULTS = [1.0, 1.2, 1.5, 1.8, 2.2, 2.8, 3.5, 4.5, 6.0];
-const ROAD_LANES = 8;
+const CHICKEN_MULTS = [1.0, 1.05, 1.15, 1.3, 1.55, 2.0, 2.8, 4.2, 7.0, 13.0, 25.0];
+const ROAD_LANES = 10;
 
 function ChickenPanel({ socket, myScore }) {
   const { playSound } = useSound();
