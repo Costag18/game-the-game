@@ -25,8 +25,20 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
-// --- Shared FLUX image generation helper (with retry) ---
-async function generateFluxImage(prompt, retries = 3) {
+// --- Shared FLUX image generation helper (with retry + queue) ---
+// Only one generation at a time to avoid HF rate limits on concurrent requests
+let _fluxQueue = Promise.resolve();
+
+function generateFluxImage(prompt, retries = 3) {
+  const job = _fluxQueue.then(() => _generateFluxImageInner(prompt, retries)).catch((err) => {
+    throw err;
+  });
+  // Chain the next job after this one (whether it succeeds or fails)
+  _fluxQueue = job.catch(() => {});
+  return job;
+}
+
+async function _generateFluxImageInner(prompt, retries) {
   let lastError;
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
