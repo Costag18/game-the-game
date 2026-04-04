@@ -4,7 +4,7 @@ import { useSound } from '../context/SoundContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import PlayerName from '../components/PlayerName.jsx';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
-import PetSidebar from '../components/PetSidebar.jsx';
+import PetWithStream from '../components/PetWithStream.jsx';
 import styles from './GameVote.module.css';
 const voteImg = '/votefornext.png';
 const pharaohImg = '/pharoah.png';
@@ -68,7 +68,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, av
 
   return (
     <div className={styles.outerLayout}>
-      <PetSidebar />
+      <PetWithStream />
       {/* Coins background at top */}
       <div className={styles.coinsBackground}>
         <img src={coinsImg} alt="" className={styles.coinsImage} />

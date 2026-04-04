@@ -13,7 +13,7 @@ import WagerPhase from './screens/WagerPhase.jsx';
 import RoundResults from './screens/RoundResults.jsx';
 import TournamentEnd from './screens/TournamentEnd.jsx';
 import CasinoMode from './screens/CasinoMode.jsx';
-import PetSidebar from './components/PetSidebar.jsx';
+import PetWithStream from './components/PetWithStream.jsx';
 import EmoteOverlay from './components/EmoteOverlay.jsx';
 import SettingsGear from './components/SettingsGear.jsx';
 import ConfettiOverlay from './components/ConfettiOverlay.jsx';
@@ -174,18 +174,7 @@ function GameRouter() {
                 onAction={tournament.sendAction}
               />
             </div>
-            <div className="petFixedSidebar">
-              <div className="liveStreamBox">
-                <iframe
-                  src="https://www.youtube.com/embed/5vfaDsMhCF4?autoplay=1&mute=1&controls=1&modestbranding=1"
-                  title="CBC News Live"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  className="liveStreamFrame"
-                />
-              </div>
-              <PetSidebar />
-            </div>
+            <div className="petFixedSidebar"><PetWithStream /></div>
           </>
         );
       })()}

@@ -1,0 +1,33 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.streamBox {
+  display: none;
+}
+
+.streamFrame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: none;
+  border-bottom: 1px solid var(--gold-dim, #8a7230);
+}
+
+.petScroll {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.petScroll::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .streamBox {
+    display: block;
+    flex-shrink: 0;
+  }
+}

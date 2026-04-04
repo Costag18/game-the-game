@@ -4,7 +4,7 @@ import { useSound } from '../context/SoundContext.jsx';
 import { GAMES } from '../../../shared/gameList.js';
 import PlayerName from '../components/PlayerName.jsx';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
-import PetSidebar from '../components/PetSidebar.jsx';
+import PetWithStream from '../components/PetWithStream.jsx';
 import styles from './WagerPhase.module.css';
 
 function Popdown({ title, children }) {
@@ -118,7 +118,7 @@ export default function WagerPhase({ tournamentState, voteResult, avatars, onSub
 
   return (
     <div className={styles.outerLayout}>
-      <PetSidebar />
+      <PetWithStream />
       <div className={styles.container}>
         <div className={styles.panel}>
         <h2 className={styles.title}>Place Your Wager</h2>
