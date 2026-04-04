@@ -30,3 +30,60 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* --- Expanded Avatar Overlay --- */
+.expandedOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.expandedCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--bg-panel, #2a1515);
+  border: 2px solid var(--gold-dim, #8a7230);
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.8);
+}
+
+.expandedImg {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold, #d4a843);
+  box-shadow: 0 4px 24px rgba(212, 168, 67, 0.3);
+}
+
+.expandedName {
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.expandedClose {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary, #b8a88a);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.expandedClose:hover {
+  color: var(--gold, #d4a843);
+}

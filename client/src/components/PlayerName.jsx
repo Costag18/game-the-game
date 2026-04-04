@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { displayName } from '../utils/displayName.js';
 import styles from './PlayerName.module.css';
 
 export default function PlayerName({ playerId, nicknames, avatars, size = 20 }) {
+  const [expanded, setExpanded] = useState(false);
   const name = displayName(playerId, nicknames);
   const avatar = avatars?.[playerId] || null;
   const initial = name?.[0]?.toUpperCase() || '?';
@@ -13,7 +15,8 @@ export default function PlayerName({ playerId, nicknames, avatars, size = 20 }) 
           src={avatar}
           alt=""
           className={styles.avatar}
-          style={{ width: size, height: size }}
+          style={{ width: size, height: size, cursor: 'pointer' }}
+          onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
         />
       ) : (
         <span
@@ -24,6 +27,15 @@ export default function PlayerName({ playerId, nicknames, avatars, size = 20 }) 
         </span>
       )}
       <span className={styles.name}>{name}</span>
+      {expanded && avatar && (
+        <div className={styles.expandedOverlay} onClick={() => setExpanded(false)}>
+          <div className={styles.expandedCard} onClick={(e) => e.stopPropagation()}>
+            <img src={avatar} alt="" className={styles.expandedImg} />
+            <span className={styles.expandedName}>{name}</span>
+            <button className={styles.expandedClose} onClick={() => setExpanded(false)}>✕</button>
+          </div>
+        </div>
+      )}
     </span>
   );
 }

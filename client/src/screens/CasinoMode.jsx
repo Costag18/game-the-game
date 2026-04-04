@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { CoinFlipPanel, SlotsPanel, WheelPanel, BJLitePanel, ChickenPanel } from '../components/CasinoSidebar.jsx';
@@ -12,6 +12,7 @@ const CARD_DECORATIONS = [
   { tl: 'A♥', br: 'A♥' },
   { tl: 'K♣', br: 'K♣' },
   { tl: 'J♦', br: 'J♦' },
+  { tl: '10♥', br: '10♥' },
 ];
 
 const GAMES = [
@@ -116,6 +117,91 @@ function BuddyCustomizer() {
   );
 }
 
+const AI_COOLDOWN = 20;
+
+function ImageGenerator({ socket }) {
+  const [prompt, setPrompt] = useState('');
+  const [generating, setGenerating] = useState(false);
+  const [image, setImage] = useState(null);
+  const [error, setError] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+  const cooldownRef = useRef(null);
+
+  useEffect(() => {
+    if (cooldown <= 0) { clearInterval(cooldownRef.current); return; }
+    cooldownRef.current = setInterval(() => {
+      setCooldown((c) => Math.max(0, c - 1));
+    }, 1000);
+    return () => clearInterval(cooldownRef.current);
+  }, [cooldown > 0]);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onBroadcast(data) {
+      if (data.imageUrl) {
+        setImage(data.imageUrl);
+        setGenerating(false);
+      }
+    }
+    function onError(data) {
+      setError(data?.error || 'Generation failed');
+      setGenerating(false);
+      setCooldown(0);
+    }
+    socket.on(EVENTS.AI_IMAGE_BROADCAST, onBroadcast);
+    socket.on(EVENTS.AI_IMAGE_ERROR, onError);
+    return () => {
+      socket.off(EVENTS.AI_IMAGE_BROADCAST, onBroadcast);
+      socket.off(EVENTS.AI_IMAGE_ERROR, onError);
+    };
+  }, [socket]);
+
+  function handleGenerate() {
+    if (generating || cooldown > 0 || !prompt.trim()) return;
+    socket?.emit(EVENTS.AI_IMAGE_SEND, { prompt: prompt.trim() });
+    setGenerating(true);
+    setError('');
+    setImage(null);
+    setCooldown(AI_COOLDOWN);
+  }
+
+  return (
+    <div className={styles.imageGen}>
+      <h3 className={styles.imageGenTitle}>AI Image Generator</h3>
+      <div className={styles.imageGenPreview}>
+        {generating ? (
+          <div className={styles.imageGenSpinner}>Generating...</div>
+        ) : image ? (
+          <img src={image} alt="Generated" className={styles.imageGenImg} />
+        ) : (
+          <div className={styles.imageGenPlaceholder}>🎨</div>
+        )}
+      </div>
+      {error && <p className={styles.imageGenError}>{error}</p>}
+      <div className={styles.imageGenForm}>
+        <input
+          className={styles.imageGenInput}
+          type="text"
+          placeholder="Describe an image..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value.slice(0, 200))}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleGenerate(); }}
+          maxLength={200}
+          disabled={generating}
+        />
+        <button
+          className={styles.imageGenBtn}
+          onClick={handleGenerate}
+          disabled={!prompt.trim() || generating || cooldown > 0}
+        >
+          {cooldown > 0 ? cooldown : 'Generate'}
+        </button>
+      </div>
+      <p className={styles.imageGenAttribution}>Powered by FLUX</p>
+    </div>
+  );
+}
+
 export default function CasinoMode({ onBack }) {
   const { socket } = useSocketContext();
   const [score, setScore] = useState(null);
@@ -157,6 +243,9 @@ export default function CasinoMode({ onBack }) {
       <div className={styles.gamesGrid}>
         <GameCard decoration={0}>
           <BuddyCustomizer />
+        </GameCard>
+        <GameCard decoration={5}>
+          <ImageGenerator socket={socket} />
         </GameCard>
         {GAMES.map((g) => (
           <GameCard key={g.key} decoration={g.deco}>
