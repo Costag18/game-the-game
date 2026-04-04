@@ -50,7 +50,7 @@
 }
 
 .panelOpen {
-  max-height: 200px;
+  max-height: 380px;
   opacity: 1;
   padding: 0.8rem;
   pointer-events: auto;
@@ -141,4 +141,107 @@
   font-family: var(--font-body, sans-serif);
   margin-top: -0.15rem;
   padding-left: 46px;
+}
+
+/* --- Avatar Section --- */
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.3rem 0;
+}
+
+.avatarSection + .section,
+.section + .avatarSection {
+  border-top: 1px solid rgba(138, 114, 48, 0.25);
+  padding-top: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.avatarPreview {
+  display: flex;
+  justify-content: center;
+  margin: 0.4rem 0;
+}
+
+.avatarImg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold-dim, #8a7230);
+}
+
+.avatarPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5a3a2a, #8a7230);
+  color: var(--text-primary, #f0e6d3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: 2px solid var(--gold-dim, #8a7230);
+}
+
+.avatarForm {
+  display: flex;
+  gap: 4px;
+  margin-top: 0.3rem;
+}
+
+.avatarInput {
+  flex: 1;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--gold-dim, #8a7230);
+  border-radius: 6px;
+  background: #1a0e0e;
+  color: var(--text-primary, #f0e6d3);
+  font-size: 0.7rem;
+  font-family: var(--font-body, 'Raleway', sans-serif);
+  outline: none;
+  min-width: 0;
+}
+
+.avatarInput::placeholder {
+  color: var(--text-secondary, #b8a88a);
+  opacity: 0.6;
+}
+
+.avatarGenBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid var(--gold-dim, #8a7230);
+  background: var(--bg-panel, #2a1515);
+  color: var(--gold, #d4a843);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatarGenBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.avatarSpinner {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.avatarError {
+  color: #e53935;
+  font-size: 0.6rem;
+  margin-top: 0.2rem;
+  display: block;
 }
