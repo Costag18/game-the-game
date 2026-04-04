@@ -175,6 +175,23 @@ Discord-style GIF picker — players search for GIFs and send them flying across
 - **Default results:** Panel loads "reactions" query on open for instant one-tap sending
 - **Env setup:** Local dev uses `server/.env` with dotenv. Production uses Render environment variables
 
+## AI Image Generation
+
+Players type a prompt, server generates an image via Hugging Face Spaces (FLUX.1-schnell), and it flies across everyone's screen — same animation as GIF reactions.
+
+- **API:** HF Spaces Gradio API (evalstate/flux1_schnell) — free, no monthly credit cap, best-effort
+- **Proxy:** Server-side only. Client sends prompt via socket, server calls HF API, converts to base64, broadcasts
+- **Socket events:** `AI_IMAGE_SEND` (client → server with prompt) → `AI_IMAGE_BROADCAST` (server → all with base64 data URL) / `AI_IMAGE_ERROR` (server → requester)
+- **Rate limit:** 30-second server-enforced cooldown per player (`socket.data._lastAiImage`)
+- **Prompt:** Max 200 characters, sanitized server-side
+- **UI:** 🎨 paintbrush button above GIF button (bottom-right), opens prompt panel with textarea + Generate button
+- **Generation state:** Spinner shows while generating. User can close panel and reopen — spinner persists. On error, message shows in panel (clears after 10s)
+- **Flying animation:** Same LTR/RTL animation as GIFs (3.5s, random direction, 15-65% vertical position)
+- **Mutual exclusivity:** Opening AI panel closes GIF panel and emote menu, and vice versa
+- **Components:** `AiImageOverlay.jsx` + `AiImageOverlay.module.css` — rendered inside `EmoteOverlay`
+- **Env var:** `HF_TOKEN` (optional) — free HF API token for better rate-limit priority. Local: `server/.env`, Production: Render env vars
+- **Image size:** 512x512, 4 inference steps for speed
+
 ## Pet System (Tamagotchi)
 
 Client-side only, per-session (resets on page reload). Lives in `PetContext`.
