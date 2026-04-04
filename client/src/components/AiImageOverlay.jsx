@@ -74,13 +74,13 @@ export default function AiImageOverlay({ isOpen, onToggle, onRequestClose }) {
     setGenerating(true);
     setError('');
     setCooldown(AI_COOLDOWN);
-    // Safety timeout — if no broadcast or error arrives, reset after 90s
+    // Safety timeout — if no broadcast or error arrives, reset after 70s
     clearTimeout(genTimeoutRef.current);
     genTimeoutRef.current = setTimeout(() => {
       setGenerating(false);
-      setError('Generation timed out');
+      setError('Generation timed out — try again');
       setCooldown(0);
-    }, 90000);
+    }, 70000);
   }
 
   function handleKeyDown(e) {

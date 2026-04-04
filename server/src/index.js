@@ -26,11 +26,11 @@ function adjustScore(tm, playerId, delta) {
 }
 
 // --- Shared FLUX image generation helper (with retry) ---
-async function generateFluxImage(prompt, retries = 2) {
+async function generateFluxImage(prompt, retries = 3) {
   let lastError;
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
-      if (attempt > 0) await new Promise((r) => setTimeout(r, 2000)); // wait 2s before retry
+      if (attempt > 0) await new Promise((r) => setTimeout(r, 3000)); // wait 3s before retry
       const result = await _callFluxSpace(prompt);
       return result;
     } catch (err) {
@@ -61,7 +61,7 @@ async function _callFluxSpace(prompt) {
   if (!event_id) throw new Error('Failed to queue image generation');
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 60000);
+  const timeout = setTimeout(() => controller.abort(), 30000);
   const resultResp = await fetch(
     `https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer/${event_id}`,
     { headers, signal: controller.signal }

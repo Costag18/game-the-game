@@ -49,13 +49,14 @@ export default function SettingsGear() {
     setAvatarGenerating(true);
     setAvatarError('');
     setAvatarCooldown(30);
-    // Safety timeout — if callback never fires, reset after 90s
+    // Safety timeout — if callback never fires, reset after 70s
+    // (server max: 3 retries × 30s timeout + 3s delays = ~39s, plus network overhead)
     clearTimeout(genTimeoutRef.current);
     genTimeoutRef.current = setTimeout(() => {
       setAvatarGenerating(false);
-      setAvatarError('Generation timed out');
+      setAvatarError('Generation timed out — try again');
       setAvatarCooldown(0);
-    }, 90000);
+    }, 70000);
     socket.emit(EVENTS.SET_AVATAR, { prompt: avatarPrompt.trim() }, (response) => {
       clearTimeout(genTimeoutRef.current);
       setAvatarGenerating(false);
@@ -66,6 +67,7 @@ export default function SettingsGear() {
         setAvatar(response.avatar);
         localStorage.setItem('gtg_avatar', response.avatar);
         setAvatarPrompt('');
+        setAvatarError(''); // Clear any stale timeout error
       }
     });
   }
