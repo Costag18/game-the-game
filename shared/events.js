@@ -49,4 +49,6 @@ export const EVENTS = {
   CASINO_STATE: 'casino:state',
   EMOTE_SEND: 'emote:send',
   EMOTE_BROADCAST: 'emote:broadcast',
+  GIF_SEND: 'gif:send',
+  GIF_BROADCAST: 'gif:broadcast',
 };

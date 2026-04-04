@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
+import GifOverlay from './GifOverlay.jsx';
 import styles from './EmoteOverlay.module.css';
 
 const EMOTES = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉'];
@@ -11,6 +12,7 @@ let idCounter = 0;
 export default function EmoteOverlay() {
   const { socket } = useSocketContext();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [gifOpen, setGifOpen] = useState(false);
   const [floaters, setFloaters] = useState([]);
 
   // Listen for incoming emote broadcasts
@@ -46,12 +48,22 @@ export default function EmoteOverlay() {
     setMenuOpen(false);
   }
 
+  function toggleEmoteMenu() {
+    setMenuOpen((o) => !o);
+    setGifOpen(false);
+  }
+
+  function toggleGifPanel() {
+    setGifOpen((o) => !o);
+    setMenuOpen(false);
+  }
+
   return (
     <div className={styles.emoteOverlay}>
-      {/* Trigger bubble */}
+      {/* Emote trigger bubble */}
       <button
         className={`${styles.emoteTrigger} ${menuOpen ? styles.emoteTriggerOpen : ''}`}
-        onClick={() => setMenuOpen((o) => !o)}
+        onClick={toggleEmoteMenu}
         title="Send an emote"
       >
         😄
@@ -71,6 +83,13 @@ export default function EmoteOverlay() {
           ))}
         </div>
       )}
+
+      {/* GIF overlay (button + panel + flying GIFs) */}
+      <GifOverlay
+        isOpen={gifOpen}
+        onToggle={toggleGifPanel}
+        onRequestClose={() => setGifOpen(false)}
+      />
 
       {/* Floating emojis */}
       {floaters.map((f) => (

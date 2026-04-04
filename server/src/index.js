@@ -50,6 +50,22 @@ if (isProduction) {
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+// --- Klipy GIF search proxy (keeps API key server-side) ---
+const KLIPY_APP_KEY = process.env.KLIPY_APP_KEY || '';
+app.get('/api/gif-search', async (req, res) => {
+  const q = (req.query.q || 'reactions').slice(0, 100);
+  if (!KLIPY_APP_KEY) return res.json({ result: true, data: { data: [] } });
+  try {
+    const url = `https://api.klipy.com/api/v1/${KLIPY_APP_KEY}/gifs/search?q=${encodeURIComponent(q)}&per_page=24&content_filter=high&customer_id=server`;
+    const resp = await fetch(url);
+    const json = await resp.json();
+    res.json(json);
+  } catch (err) {
+    console.error('Klipy proxy error:', err.message);
+    res.json({ result: false, data: { data: [] } });
+  }
+});
+
 function cleanupCasinoSession(playerId) {
   const casinoId = `casino_${playerId}`;
   tournaments.delete(casinoId);
@@ -200,6 +216,25 @@ io.on(EVENTS.CONNECTION, (socket) => {
     socket.data._lastEmote = now;
     io.to(lobbyId).emit(EVENTS.EMOTE_BROADCAST, {
       emoji,
+      playerId: socket.id,
+      nickname: socket.data.nickname || socket.id,
+    });
+  });
+
+  // --- GIF Reactions ---
+  socket.on(EVENTS.GIF_SEND, (data) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    const url = data?.url;
+    if (!url || typeof url !== 'string') return;
+    // Only allow Klipy CDN URLs
+    if (!url.startsWith('https://media.klipy.com/') && !url.startsWith('https://static.klipy.com/')) return;
+    // Rate-limit: 12 seconds between GIFs per player
+    const now = Date.now();
+    if (socket.data._lastGif && now - socket.data._lastGif < 12000) return;
+    socket.data._lastGif = now;
+    io.to(lobbyId).emit(EVENTS.GIF_BROADCAST, {
+      url,
       playerId: socket.id,
       nickname: socket.data.nickname || socket.id,
     });
