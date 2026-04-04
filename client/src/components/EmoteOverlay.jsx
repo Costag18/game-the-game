@@ -3,7 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import GifOverlay from './GifOverlay.jsx';
-import AiImageOverlay from './AiImageOverlay.jsx';
+import ImageOverlay from './ImageOverlay.jsx';
 import styles from './EmoteOverlay.module.css';
 
 const EMOTES = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉'];
@@ -107,7 +107,7 @@ export default function EmoteOverlay() {
       />
 
       {/* AI Image overlay (button + panel + flying images) */}
-      <AiImageOverlay
+      <ImageOverlay
         isOpen={aiOpen}
         onToggle={toggleAiPanel}
         onRequestClose={() => setAiOpen(false)}

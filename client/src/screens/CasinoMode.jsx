@@ -118,14 +118,24 @@ function BuddyCustomizer() {
 }
 
 const AI_COOLDOWN = 20;
+const SEARCH_DEBOUNCE = 500;
 
 function ImageGenerator({ socket }) {
+  const [tab, setTab] = useState('ai'); // 'ai' | 'search'
+
+  // AI tab state
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef(null);
+
+  // Search tab state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const debounceRef = useRef(null);
 
   useEffect(() => {
     if (cooldown <= 0) { clearInterval(cooldownRef.current); return; }
@@ -143,61 +153,146 @@ function ImageGenerator({ socket }) {
         setGenerating(false);
       }
     }
-    function onError(data) {
-      setError(data?.error || 'Generation failed');
-      setGenerating(false);
-      setCooldown(0);
-    }
     socket.on(EVENTS.AI_IMAGE_BROADCAST, onBroadcast);
-    socket.on(EVENTS.AI_IMAGE_ERROR, onError);
     return () => {
       socket.off(EVENTS.AI_IMAGE_BROADCAST, onBroadcast);
-      socket.off(EVENTS.AI_IMAGE_ERROR, onError);
     };
   }, [socket]);
 
-  function handleGenerate() {
+  async function handleGenerate() {
     if (generating || cooldown > 0 || !prompt.trim()) return;
-    socket?.emit(EVENTS.AI_IMAGE_SEND, { prompt: prompt.trim() });
     setGenerating(true);
     setError('');
     setImage(null);
     setCooldown(AI_COOLDOWN);
+    try {
+      const result = await window.puter.ai.txt2img(prompt.trim());
+      const dataUrl = result?.src || (result instanceof HTMLImageElement ? result.src : null);
+      if (!dataUrl) throw new Error('No image returned');
+      setImage(dataUrl);
+      socket?.emit(EVENTS.AI_IMAGE_SEND, { imageUrl: dataUrl });
+    } catch (err) {
+      setError(err?.message || 'Generation failed');
+      setCooldown(0);
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function handleSearchChange(e) {
+    const q = e.target.value;
+    setSearchQuery(q);
+    clearTimeout(debounceRef.current);
+    if (!q.trim()) { setSearchResults([]); return; }
+    debounceRef.current = setTimeout(() => {
+      runSearch(q.trim());
+    }, SEARCH_DEBOUNCE);
+  }
+
+  async function runSearch(q) {
+    setSearching(true);
+    setSearchResults([]);
+    try {
+      const res = await fetch(`/api/image-search?q=${encodeURIComponent(q)}`);
+      if (!res.ok) throw new Error('Search failed');
+      const data = await res.json();
+      setSearchResults(data.photos || []);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  }
+
+  function handleSendPhoto(url) {
+    socket?.emit(EVENTS.AI_IMAGE_SEND, { imageUrl: url });
   }
 
   return (
     <div className={styles.imageGen}>
-      <h3 className={styles.imageGenTitle}>AI Image Generator</h3>
-      <div className={styles.imageGenPreview}>
-        {generating ? (
-          <div className={styles.imageGenSpinner}>Generating...</div>
-        ) : image ? (
-          <img src={image} alt="Generated" className={styles.imageGenImg} />
-        ) : (
-          <div className={styles.imageGenPlaceholder}>🎨</div>
-        )}
-      </div>
-      {error && <p className={styles.imageGenError}>{error}</p>}
-      <div className={styles.imageGenForm}>
-        <input
-          className={styles.imageGenInput}
-          type="text"
-          placeholder="Describe an image..."
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value.slice(0, 200))}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleGenerate(); }}
-          maxLength={200}
-          disabled={generating}
-        />
+      <h3 className={styles.imageGenTitle}>Image Broadcast</h3>
+
+      {/* Tab buttons */}
+      <div className={styles.imageGenTabs}>
         <button
-          className={styles.imageGenBtn}
-          onClick={handleGenerate}
-          disabled={!prompt.trim() || generating || cooldown > 0}
+          className={`${styles.imageGenTab} ${tab === 'ai' ? styles.imageGenTabActive : ''}`}
+          onClick={() => setTab('ai')}
         >
-          {cooldown > 0 ? cooldown : 'Generate'}
+          AI Generate
+        </button>
+        <button
+          className={`${styles.imageGenTab} ${tab === 'search' ? styles.imageGenTabActive : ''}`}
+          onClick={() => setTab('search')}
+        >
+          Search Photos
         </button>
       </div>
-      <p className={styles.imageGenAttribution}>Powered by Pollinations AI</p>
+
+      {tab === 'ai' && (
+        <>
+          <div className={styles.imageGenPreview}>
+            {generating ? (
+              <div className={styles.imageGenSpinner}>Generating...</div>
+            ) : image ? (
+              <img src={image} alt="Generated" className={styles.imageGenImg} />
+            ) : (
+              <div className={styles.imageGenPlaceholder}>🎨</div>
+            )}
+          </div>
+          {error && <p className={styles.imageGenError}>{error}</p>}
+          <div className={styles.imageGenForm}>
+            <input
+              className={styles.imageGenInput}
+              type="text"
+              placeholder="Describe an image..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value.slice(0, 200))}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleGenerate(); }}
+              maxLength={200}
+              disabled={generating}
+            />
+            <button
+              className={styles.imageGenBtn}
+              onClick={handleGenerate}
+              disabled={!prompt.trim() || generating || cooldown > 0}
+            >
+              {cooldown > 0 ? cooldown : 'Generate'}
+            </button>
+          </div>
+          <p className={styles.imageGenAttribution}>Powered by Puter AI</p>
+        </>
+      )}
+
+      {tab === 'search' && (
+        <>
+          <div className={styles.imageGenForm}>
+            <input
+              className={styles.imageGenInput}
+              type="text"
+              placeholder="Search photos..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </div>
+          <div className={styles.imageGenGrid}>
+            {searching && <p className={styles.imageGenSpinner}>Searching...</p>}
+            {!searching && searchResults.length === 0 && searchQuery && (
+              <p className={styles.imageGenError}>No results found.</p>
+            )}
+            {searchResults.map((photo) => (
+              <button
+                key={photo.id}
+                className={styles.imageGenThumb}
+                onClick={() => handleSendPhoto(photo.src?.medium || photo.src?.original)}
+                title={photo.photographer}
+              >
+                <img src={photo.src?.tiny} alt={photo.alt || ''} />
+              </button>
+            ))}
+          </div>
+          <p className={styles.imageGenAttribution}>Photos by Pexels</p>
+        </>
+      )}
     </div>
   );
 }
