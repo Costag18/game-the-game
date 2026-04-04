@@ -51,4 +51,7 @@ export const EVENTS = {
   EMOTE_BROADCAST: 'emote:broadcast',
   GIF_SEND: 'gif:send',
   GIF_BROADCAST: 'gif:broadcast',
+  AI_IMAGE_SEND: 'ai-image:send',
+  AI_IMAGE_BROADCAST: 'ai-image:broadcast',
+  AI_IMAGE_ERROR: 'ai-image:error',
 };
