@@ -12,7 +12,7 @@ export default function TurnOverlay({ isMyTurn }) {
     if (isMyTurn && !prevTurn.current) {
       setVisible(true);
       playSound('yourTurn');
-      const timer = setTimeout(() => setVisible(false), 1800);
+      const timer = setTimeout(() => setVisible(false), 1200);
       return () => clearTimeout(timer);
     }
     prevTurn.current = isMyTurn;

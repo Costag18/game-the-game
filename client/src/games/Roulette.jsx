@@ -145,6 +145,8 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
   const [betAmount, setBetAmount] = useState(10);
   const [acknowledged, setAcknowledged] = useState(false);
   const [lastAckedRound, setLastAckedRound] = useState(0);
+  const [wheelDone, setWheelDone] = useState(false);
+  const wheelTimerRef = useRef(null);
 
   if (!gameState) {
     return (
@@ -169,6 +171,19 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
   const isFinished = phase === 'finished';
   const isBetting = phase === 'betting';
   const isSpinning = phase === 'spinning';
+
+  // When spinResult arrives during spinning, delay reveal until wheel stops (3.5s)
+  useEffect(() => {
+    if (isSpinning && spinResult !== null && spinResult !== undefined && !wheelDone) {
+      wheelTimerRef.current = setTimeout(() => setWheelDone(true), 3600);
+      return () => clearTimeout(wheelTimerRef.current);
+    }
+  }, [isSpinning, spinResult, wheelDone]);
+
+  // Reset wheelDone when entering betting phase (new round)
+  useEffect(() => {
+    if (isBetting) setWheelDone(false);
+  }, [isBetting]);
 
   // Reset acknowledged state when round advances
   if (round !== lastAckedRound && isBetting) {
@@ -223,8 +238,8 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
         <SpinningWheel isSpinning={false} spinResult={spinResult} />
       )}
 
-      {/* Spin result + continue button */}
-      {isSpinning && spinResult !== null && spinResult !== undefined && (
+      {/* Spin result + continue button — only after wheel animation finishes */}
+      {isSpinning && wheelDone && spinResult !== null && spinResult !== undefined && (
         <>
           <div className={`${styles.spinResult} ${styles[`spin_${getNumberColor(spinResult)}`]}`}>
             <span className={styles.spinLabel}>Result:</span>

@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: overlayFade 1.8s ease-out forwards;
+  animation: overlayFade 1.2s ease-out forwards;
 }
 
 @keyframes overlayFade {
@@ -17,7 +17,7 @@
 }
 
 .banner {
-  animation: bannerSlide 1.8s ease-out forwards;
+  animation: bannerSlide 1.2s ease-out forwards;
 }
 
 @keyframes bannerSlide {
