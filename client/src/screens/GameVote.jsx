@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
-import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
 import PetSidebar from '../components/PetSidebar.jsx';
 import styles from './GameVote.module.css';
@@ -38,7 +38,7 @@ const GAME_PREVIEWS = {
   battleship: previewBattleship,
 };
 
-export default function GameVote({ eligibleGames, tournamentState, nicknames, onVote }) {
+export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {
   const { socket } = useSocketContext();
   const { playSound } = useSound();
   const [voted, setVoted] = useState(false);
@@ -91,7 +91,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, on
                 {standings.map((entry, i) => (
                   <div key={entry.playerId} className={styles.standingRow}>
                     <span className={styles.standingRank}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}</span>
-                    <span className={styles.standingName}>{entry.nickname || displayName(entry.playerId, nicknames)}</span>
+                    <span className={styles.standingName}><PlayerName playerId={entry.playerId} nicknames={nicknames} avatars={avatars} /></span>
                     <span className={styles.standingScore}>{entry.score} pts</span>
                   </div>
                 ))}

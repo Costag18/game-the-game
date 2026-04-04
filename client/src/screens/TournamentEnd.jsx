@@ -1,9 +1,14 @@
+import PlayerName from '../components/PlayerName.jsx';
 import styles from './TournamentEnd.module.css';
 
 export default function TournamentEnd({ data, onRematch, onLeave }) {
   if (!data) return null;
 
-  const { winner, standings = [] } = data;
+  const { winner, standings = [], avatars: avatarsMap = {} } = data;
+  const avatars = Object.keys(avatarsMap).length > 0
+    ? avatarsMap
+    : Object.fromEntries(standings.map(s => [s.playerId, s.avatar]));
+  const nicknames = Object.fromEntries(standings.map(s => [s.playerId, s.nickname]));
 
   return (
     <div className={styles.container}>
@@ -16,7 +21,9 @@ export default function TournamentEnd({ data, onRematch, onLeave }) {
             <div>
               <span className={styles.winnerLabel}>Winner</span>
               <p className={styles.winnerName}>
-                {typeof winner === 'string' ? winner : (winner.nickname ?? winner.playerId?.slice(0, 8))}
+                {typeof winner === 'string'
+                  ? winner
+                  : <PlayerName playerId={winner.playerId} nicknames={nicknames} avatars={avatars} />}
               </p>
             </div>
           </div>
@@ -34,13 +41,12 @@ export default function TournamentEnd({ data, onRematch, onLeave }) {
           </thead>
           <tbody>
             {standings.map((entry, index) => {
-              const playerLabel = entry.nickname ?? entry.playerId?.slice(0, 8);
               return (
                 <tr key={entry.playerId} className={styles.row}>
                   <td className={styles.rank}>
                     {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                   </td>
-                  <td className={styles.playerName}>{playerLabel}</td>
+                  <td className={styles.playerName}><PlayerName playerId={entry.playerId} nicknames={nicknames} avatars={avatars} /></td>
                   <td className={styles.score}>{entry.score.toLocaleString()}</td>
                 </tr>
               );

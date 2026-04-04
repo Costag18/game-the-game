@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 import { GAMES } from '../../../shared/gameList.js';
+import PlayerName from '../components/PlayerName.jsx';
 import CasinoSidebar from '../components/CasinoSidebar.jsx';
 import PetSidebar from '../components/PetSidebar.jsx';
 import styles from './WagerPhase.module.css';
@@ -80,7 +81,7 @@ function WagerTable({ wagerReturns, wager }) {
   );
 }
 
-export default function WagerPhase({ tournamentState, voteResult, onSubmitWager }) {
+export default function WagerPhase({ tournamentState, voteResult, avatars, onSubmitWager }) {
   const { socket } = useSocketContext();
   const { playSound } = useSound();
   const [wagerLocked, setWagerLocked] = useState(false);

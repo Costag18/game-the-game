@@ -3,9 +3,10 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import { LOBBY } from '../../../shared/constants.js';
 import Chat from '../components/Chat.jsx';
+import PlayerName from '../components/PlayerName.jsx';
 import styles from './WaitingRoom.module.css';
 
-export default function WaitingRoom({ lobby: initialLobby, onNavigate }) {
+export default function WaitingRoom({ lobby: initialLobby, avatars, onNavigate }) {
   const { socket } = useSocketContext();
   const [lobby, setLobby] = useState(initialLobby);
   const [starting, setStarting] = useState(false);
@@ -85,12 +86,11 @@ export default function WaitingRoom({ lobby: initialLobby, onNavigate }) {
             <ul className={styles.playerList}>
               {players.map((p) => {
                 const pid = typeof p === 'string' ? p : (p.id ?? p.socketId);
-                const name = typeof p === 'string'
-                  ? (lobby.nicknames?.[p] || pid.slice(0, 8))
-                  : (p.nickname || pid.slice(0, 8));
                 return (
                   <li key={pid} className={styles.playerRow}>
-                    <span className={styles.playerName}>{name}</span>
+                    <span className={styles.playerName}>
+                      <PlayerName playerId={pid} nicknames={lobby.nicknames || {}} avatars={avatars} />
+                    </span>
                     {pid === hostId && (
                       <span className={styles.hostBadge}>HOST</span>
                     )}

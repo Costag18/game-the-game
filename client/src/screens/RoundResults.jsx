@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { useSound } from '../context/SoundContext.jsx';
+import PlayerName from '../components/PlayerName.jsx';
 import styles from './RoundResults.module.css';
 
 function getGameDetail(gameResult, gameId) {
@@ -43,6 +44,9 @@ export default function RoundResults({ roundResults, onContinue }) {
 
   const { standings = [], scores = {}, gameResults = null, gameId = null } = roundResults;
 
+  const avatars = Object.fromEntries(standings.map(s => [s.playerId, s.avatar]));
+  const nicknames = Object.fromEntries(standings.map(s => [s.playerId, s.nickname]));
+
   const gameResultMap = {};
   if (gameResults && Array.isArray(gameResults)) {
     for (const r of gameResults) {
@@ -55,7 +59,6 @@ export default function RoundResults({ roundResults, onContinue }) {
 
   // Winner is first in standings
   const winner = standings[0];
-  const winnerLabel = winner?.nickname || winner?.playerId?.slice(0, 8);
   const winnerDelta = scores?.[winner?.playerId]?.total ?? 0;
 
   return (
@@ -68,7 +71,7 @@ export default function RoundResults({ roundResults, onContinue }) {
           <div className={styles.winnerBanner}>
             <span className={styles.winnerTrophy}>🏆</span>
             <div className={styles.winnerInfo}>
-              <span className={styles.winnerName}>{winnerLabel}</span>
+              <span className={styles.winnerName}><PlayerName playerId={winner.playerId} nicknames={nicknames} avatars={avatars} /></span>
               <span className={styles.winnerDetail}>
                 {getGameDetail(gameResultMap[winner.playerId], gameId)}
                 {winnerDelta > 0 ? ` — +${winnerDelta} pts` : ''}
@@ -92,7 +95,6 @@ export default function RoundResults({ roundResults, onContinue }) {
               const roundScore = scores?.[entry.playerId];
               const delta = roundScore?.total ?? 0;
               const wagerNet = roundScore?.wagerNet ?? 0;
-              const playerLabel = entry.nickname || entry.playerId?.slice(0, 8);
               const gameResult = gameResultMap[entry.playerId];
               const detail = getGameDetail(gameResult, gameId);
 
@@ -101,7 +103,7 @@ export default function RoundResults({ roundResults, onContinue }) {
                   <td className={styles.rank}>
                     {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                   </td>
-                  <td className={styles.playerName}>{playerLabel}</td>
+                  <td className={styles.playerName}><PlayerName playerId={entry.playerId} nicknames={nicknames} avatars={avatars} /></td>
                   {hasDetails && <td className={styles.detail}>{detail}</td>}
                   <td className={styles.score}>{entry.score.toLocaleString()}</td>
                   <td className={`${styles.delta} ${delta >= 0 ? styles.positive : styles.negative}`}>
