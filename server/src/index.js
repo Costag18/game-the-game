@@ -25,32 +25,38 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
-// --- Shared FLUX image generation helper (with retry + queue) ---
-// Only one generation at a time to avoid HF rate limits on concurrent requests
-let _fluxQueue = Promise.resolve();
+// --- Image generation: Pollinations.ai (primary) + HF Spaces (fallback) ---
+// Queue ensures only one generation at a time
+let _genQueue = Promise.resolve();
 
-function generateFluxImage(prompt, retries = 3) {
-  const job = _fluxQueue.then(() => _generateFluxImageInner(prompt, retries)).catch((err) => {
-    throw err;
-  });
-  // Chain the next job after this one (whether it succeeds or fails)
-  _fluxQueue = job.catch(() => {});
+function generateImage(prompt) {
+  const job = _genQueue.then(() => _generateImageInner(prompt)).catch((err) => { throw err; });
+  _genQueue = job.catch(() => {});
   return job;
 }
 
-async function _generateFluxImageInner(prompt, retries) {
-  let lastError;
-  for (let attempt = 0; attempt < retries; attempt++) {
-    try {
-      if (attempt > 0) await new Promise((r) => setTimeout(r, 3000)); // wait 3s before retry
-      const result = await _callFluxSpace(prompt);
-      return result;
-    } catch (err) {
-      lastError = err;
-      console.error(`[FLUX] Attempt ${attempt + 1}/${retries} failed:`, err.message);
-    }
+async function _generateImageInner(prompt) {
+  // Try Pollinations.ai first — free, no auth, simple GET, highly reliable
+  try {
+    console.log('[ImageGen] Trying Pollinations.ai...');
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 45000);
+    const resp = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeout);
+    if (!resp.ok) throw new Error(`Pollinations HTTP ${resp.status}`);
+    const arrayBuf = await resp.arrayBuffer();
+    if (arrayBuf.byteLength < 1000) throw new Error('Response too small');
+    const base64 = Buffer.from(arrayBuf).toString('base64');
+    console.log('[ImageGen] Pollinations.ai success');
+    return `data:image/jpeg;base64,${base64}`;
+  } catch (err) {
+    console.error('[ImageGen] Pollinations.ai failed:', err.message);
   }
-  throw lastError;
+
+  // Fallback: HF Spaces FLUX.1-schnell
+  console.log('[ImageGen] Falling back to HF Spaces...');
+  return _callFluxSpace(prompt);
 }
 
 async function _callFluxSpace(prompt) {
@@ -63,14 +69,10 @@ async function _callFluxSpace(prompt) {
     headers,
     body: JSON.stringify({ data: [prompt, 0, true, 512, 512, 4] }),
   });
-  if (!enqueueResp.ok) {
-    const errBody = await enqueueResp.text().catch(() => '');
-    console.error('[FLUX] Enqueue failed:', enqueueResp.status, errBody);
-    throw new Error('Image generation service unavailable');
-  }
+  if (!enqueueResp.ok) throw new Error('HF Space unavailable');
 
   const { event_id } = await enqueueResp.json();
-  if (!event_id) throw new Error('Failed to queue image generation');
+  if (!event_id) throw new Error('Failed to queue HF generation');
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 30000);
@@ -87,24 +89,19 @@ async function _callFluxSpace(prompt) {
       const dataLine = lines[i + 1];
       if (dataLine && dataLine.startsWith('data: ')) {
         const resultData = JSON.parse(dataLine.slice(6));
-        if (!resultData?.[0]?.url) throw new Error('No image in response');
+        if (!resultData?.[0]?.url) throw new Error('No image in HF response');
         const imgResp = await fetch(resultData[0].url);
-        if (!imgResp.ok) throw new Error('Failed to retrieve generated image');
+        if (!imgResp.ok) throw new Error('Failed to retrieve HF image');
         const arrayBuf = await imgResp.arrayBuffer();
         const base64 = Buffer.from(arrayBuf).toString('base64');
         return `data:image/webp;base64,${base64}`;
       }
     }
     if (lines[i].startsWith('event: error')) {
-      let errMsg = 'Generation failed';
-      const dataLine = lines[i + 1];
-      if (dataLine?.startsWith('data: ')) {
-        try { errMsg = JSON.parse(dataLine.slice(6)) || errMsg; } catch {}
-      }
-      throw new Error(typeof errMsg === 'string' ? errMsg : 'Generation failed');
+      throw new Error('HF Space generation error');
     }
   }
-  throw new Error('No image in response');
+  throw new Error('No image in HF response');
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -335,7 +332,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     socket.data._lastAiImage = now;
 
     try {
-      const dataUrl = await generateFluxImage(sanitized);
+      const dataUrl = await generateImage(sanitized);
       io.to(lobbyId).emit(EVENTS.AI_IMAGE_BROADCAST, {
         imageUrl: dataUrl,
         nickname: socket.data.nickname || socket.id,
@@ -363,7 +360,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     socket.data._lastAvatar = now;
 
     try {
-      const dataUrl = await generateFluxImage(sanitized);
+      const dataUrl = await generateImage(sanitized);
       socket.data.avatar = dataUrl;
       lobbyManager.setAvatar(socket.id, dataUrl);
       // Update tournament avatars if in an active tournament
