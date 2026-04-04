@@ -241,6 +241,105 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
+  // --- AI Image Generation ---
+  socket.on(EVENTS.AI_IMAGE_SEND, async (data) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    const prompt = data?.prompt;
+    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) return;
+    const sanitized = prompt.trim().slice(0, 200);
+    // Rate-limit: 30 seconds between AI image requests per player
+    const now = Date.now();
+    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 30000) return;
+    socket.data._lastAiImage = now;
+
+    try {
+      // Step 1: Enqueue the generation request
+      const hfToken = process.env.HF_TOKEN || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (hfToken) headers['Authorization'] = `Bearer ${hfToken}`;
+
+      const enqueueResp = await fetch('https://evalstate-flux1-schnell.hf.space/call/flux1_schnell_infer', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          data: [sanitized, 0, true, 512, 512, 4],
+        }),
+      });
+
+      if (!enqueueResp.ok) {
+        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Image generation service unavailable' });
+        socket.data._lastAiImage = 0; // Reset cooldown on failure
+        return;
+      }
+
+      const { event_id } = await enqueueResp.json();
+      if (!event_id) {
+        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Failed to queue image generation' });
+        socket.data._lastAiImage = 0;
+        return;
+      }
+
+      // Step 2: Poll for result via SSE endpoint
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+      const resultResp = await fetch(
+        `https://evalstate-flux1-schnell.hf.space/call/flux1_schnell_infer/${event_id}`,
+        { headers, signal: controller.signal }
+      );
+      clearTimeout(timeout);
+
+      const text = await resultResp.text();
+      // Parse SSE — find the "complete" event's data line
+      const lines = text.split('\n');
+      let resultData = null;
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].startsWith('event: complete')) {
+          // Next line is "data: ..."
+          const dataLine = lines[i + 1];
+          if (dataLine && dataLine.startsWith('data: ')) {
+            resultData = JSON.parse(dataLine.slice(6));
+          }
+          break;
+        }
+        if (lines[i].startsWith('event: error')) {
+          const dataLine = lines[i + 1];
+          socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Generation failed' });
+          socket.data._lastAiImage = 0;
+          return;
+        }
+      }
+
+      if (!resultData || !resultData[0]?.url) {
+        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'No image in response' });
+        socket.data._lastAiImage = 0;
+        return;
+      }
+
+      // Step 3: Fetch the generated image file and convert to base64
+      const imageUrl = resultData[0].url;
+      const imgResp = await fetch(imageUrl);
+      if (!imgResp.ok) {
+        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Failed to retrieve generated image' });
+        socket.data._lastAiImage = 0;
+        return;
+      }
+      const arrayBuf = await imgResp.arrayBuffer();
+      const base64 = Buffer.from(arrayBuf).toString('base64');
+      const dataUrl = `data:image/webp;base64,${base64}`;
+
+      // Step 4: Broadcast to everyone in the lobby
+      io.to(lobbyId).emit(EVENTS.AI_IMAGE_BROADCAST, {
+        imageUrl: dataUrl,
+        nickname: socket.data.nickname || socket.id,
+      });
+    } catch (err) {
+      socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Image generation timed out or failed' });
+      socket.data._lastAiImage = 0;
+    }
+  });
+
   // --- Tournament Events ---
 
   socket.on(EVENTS.START_TOURNAMENT, () => {
