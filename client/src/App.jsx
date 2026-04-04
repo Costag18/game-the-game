@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { SocketProvider, useSocketContext } from './context/SocketContext.jsx';
 import { PetProvider } from './context/PetContext.jsx';
 import { SoundProvider, useSound } from './context/SoundContext.jsx';
+import { useScreenShake } from './hooks/useScreenShake.js';
 import { useTournament } from './hooks/useTournament.js';
 import { EVENTS } from '../../shared/events.js';
 import MainMenu from './screens/MainMenu.jsx';
@@ -53,6 +54,7 @@ const GAME_COMPONENTS = {
 function GameRouter() {
   const { socket } = useSocketContext();
   const { playSound } = useSound();
+  const shake = useScreenShake();
   const [screen, setScreen] = useState('menu');
   const [currentLobby, setCurrentLobby] = useState(null);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -81,6 +83,7 @@ function GameRouter() {
       const winnerId = data?.winner?.playerId || data?.winner;
       if (winnerId === socket.id) {
         playSound('tournamentWin');
+        shake('heavy');
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 4500);
       } else {

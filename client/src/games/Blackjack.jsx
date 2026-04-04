@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './Blackjack.module.css';
 import { displayName } from '../utils/displayName.js';
+import { useScreenShake } from '../hooks/useScreenShake.js';
+import { useSound } from '../context/SoundContext.jsx';
 
 const RANK_NAMES = {
   1: 'A',
@@ -20,26 +22,29 @@ function getRankName(rank) {
   return RANK_NAMES[rank] ?? String(rank);
 }
 
-function Card({ card, hidden = false }) {
+function Card({ card, hidden = false, dealIndex }) {
   if (hidden) {
     return <div className={`${styles.card} ${styles.cardHidden}`}>?</div>;
   }
   const isRed = card.suit === 'hearts' || card.suit === 'diamonds';
   return (
-    <div className={`${styles.card} ${isRed ? styles.cardRed : styles.cardBlack}`}>
+    <div
+      className={`${styles.card} ${isRed ? styles.cardRed : styles.cardBlack} ${dealIndex != null ? styles.cardDeal : ''}`}
+      style={dealIndex != null ? { animationDelay: `${dealIndex * 120}ms` } : undefined}
+    >
       <span className={styles.cardRank}>{getRankName(card.rank)}</span>
       <span className={styles.cardSuit}>{SUIT_SYMBOLS[card.suit]}</span>
     </div>
   );
 }
 
-function Hand({ cards, label, total, showHoleCard = true }) {
+function Hand({ cards, label, total, showHoleCard = true, animateFrom = 0 }) {
   return (
     <div className={styles.handSection}>
       <h3 className={styles.handLabel}>{label}</h3>
       <div className={styles.cardRow}>
         {cards.map((card, i) => (
-          <Card key={i} card={card} hidden={!showHoleCard && i === 1} />
+          <Card key={i} card={card} hidden={!showHoleCard && i === 1} dealIndex={i >= animateFrom ? i - animateFrom : undefined} />
         ))}
       </div>
       {total !== null && total !== undefined && (
@@ -50,6 +55,10 @@ function Hand({ cards, label, total, showHoleCard = true }) {
 }
 
 export default function Blackjack({ gameState, onAction, nicknames }) {
+  const shake = useScreenShake();
+  const { playSound } = useSound();
+  const prevCardCount = useRef(0);
+
   if (!gameState) {
     return <div className={styles.table}><p className={styles.waiting}>Waiting for game to start...</p></div>;
   }
@@ -74,6 +83,19 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
   const isReveal = phase === 'reveal';
   const [acked, setAcked] = useState(false);
   const [lastAckedHand, setLastAckedHand] = useState(0);
+
+  // Track card count for deal animation
+  const cardCount = (myHand || []).length;
+  const animateFrom = prevCardCount.current;
+  useEffect(() => { prevCardCount.current = cardCount; }, [cardCount]);
+
+  // Shake on bust or blackjack
+  useEffect(() => {
+    if (busted) { shake('medium'); playSound('wrong'); }
+  }, [busted]);
+  useEffect(() => {
+    if (myTotal === 21 && cardCount === 2 && phase === 'playing') { shake('heavy'); playSound('correct'); }
+  }, [myTotal, cardCount, phase]);
 
   // Reset ack when hand advances
   if (handNumber !== lastAckedHand && phase === 'playing') {
@@ -168,7 +190,7 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
 
       {/* Player's own hand */}
       <section className={styles.playerSection}>
-        <Hand cards={myHand || []} label="Your Hand" total={myTotal} showHoleCard />
+        <Hand cards={myHand || []} label="Your Hand" total={myTotal} showHoleCard animateFrom={animateFrom} />
         <p className={styles.statusText}>{getStatusText()}</p>
 
         {isMyTurn && !busted && !stood && (

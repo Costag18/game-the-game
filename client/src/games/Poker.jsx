@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './Poker.module.css';
 import { displayName } from '../utils/displayName.js';
+import { useScreenShake } from '../hooks/useScreenShake.js';
+import { useSound } from '../context/SoundContext.jsx';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -38,22 +40,23 @@ const PHASE_LABELS = {
 // Card component
 // ---------------------------------------------------------------------------
 
-function Card({ card, hidden = false, small = false }) {
+function Card({ card, hidden = false, small = false, dealIndex }) {
   const cls = [
     styles.card,
     hidden ? styles.cardHidden : '',
     small ? styles.cardSmall : '',
+    dealIndex != null ? styles.cardDeal : '',
   ]
     .filter(Boolean)
     .join(' ');
 
   if (hidden) {
-    return <div className={cls}>🂠</div>;
+    return <div className={cls} style={dealIndex != null ? { animationDelay: `${dealIndex * 120}ms` } : undefined}>🂠</div>;
   }
 
   const isRed = card.suit === 'hearts' || card.suit === 'diamonds';
   return (
-    <div className={`${cls} ${isRed ? styles.cardRed : styles.cardBlack}`}>
+    <div className={`${cls} ${isRed ? styles.cardRed : styles.cardBlack}`} style={dealIndex != null ? { animationDelay: `${dealIndex * 120}ms` } : undefined}>
       <span className={styles.cardRank}>{getRankName(card.rank)}</span>
       <span className={styles.cardSuit}>{SUIT_SYMBOLS[card.suit]}</span>
     </div>
@@ -65,7 +68,11 @@ function Card({ card, hidden = false, small = false }) {
 // ---------------------------------------------------------------------------
 
 export default function Poker({ gameState, onAction, playerId, nicknames }) {
+  const shake = useScreenShake();
+  const { playSound } = useSound();
   const [raiseAmount, setRaiseAmount] = useState('');
+  const prevCommunityCount = useRef(0);
+  const prevHoleCount = useRef(0);
 
   if (!gameState) {
     return (
@@ -95,6 +102,19 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
 
   const iAmFolded = folded && folded.includes(playerId);
   const isActive = ['preflop', 'flop', 'turn', 'river'].includes(phase);
+
+  // Track card counts for deal animation
+  const communityCount = (communityCards || []).length;
+  const holeCount = (myHoleCards || []).length;
+  const communityAnimFrom = prevCommunityCount.current;
+  const holeAnimFrom = prevHoleCount.current;
+  useEffect(() => { prevCommunityCount.current = communityCount; }, [communityCount]);
+  useEffect(() => { prevHoleCount.current = holeCount; }, [holeCount]);
+
+  // Shake on showdown reveal
+  useEffect(() => {
+    if (phase === 'reveal' && lastHandWinner) shake('medium');
+  }, [phase, lastHandWinner]);
   const isReveal = phase === 'reveal';
   const isFinished = phase === 'finished' || phase === 'showdown' || phase === 'reveal';
 
@@ -122,6 +142,8 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
   }
   function handleAllIn() {
     onAction({ type: 'allin' });
+    shake('heavy');
+    playSound('coinFlip');
   }
 
   function getStatusText() {
@@ -165,7 +187,7 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
         <h3 className={styles.sectionHeading}>Community Cards</h3>
         <div className={styles.cardRow}>
           {communityCards && communityCards.length > 0
-            ? communityCards.map((card, i) => <Card key={i} card={card} />)
+            ? communityCards.map((card, i) => <Card key={i} card={card} dealIndex={i >= communityAnimFrom ? i - communityAnimFrom : undefined} />)
             : <span className={styles.placeholder}>No cards yet</span>}
         </div>
       </section>
@@ -212,7 +234,7 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
         <h3 className={styles.sectionHeading}>Your Hand</h3>
         <div className={styles.cardRow}>
           {myHoleCards && myHoleCards.length > 0
-            ? myHoleCards.map((card, i) => <Card key={i} card={card} />)
+            ? myHoleCards.map((card, i) => <Card key={i} card={card} dealIndex={i >= holeAnimFrom ? i - holeAnimFrom : undefined} />)
             : <span className={styles.placeholder}>No cards</span>}
         </div>
 

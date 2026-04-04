@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './Uno.module.css';
 import { displayName } from '../utils/displayName.js';
 
@@ -30,7 +30,7 @@ function getRankSymbol(rank) {
   return RANK_SYMBOL[rank] ?? null;
 }
 
-function UnoCard({ card, onClick, selected, playable }) {
+function UnoCard({ card, onClick, selected, playable, dealIndex }) {
   const colorClass = card.color ? COLOR_MAP[card.color] : styles.colorWild;
   return (
     <button
@@ -40,9 +40,11 @@ function UnoCard({ card, onClick, selected, playable }) {
         selected ? styles.cardSelected : '',
         playable ? styles.cardPlayable : '',
         onClick ? '' : styles.cardStatic,
+        dealIndex != null ? styles.cardDeal : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      style={dealIndex != null ? { animationDelay: `${dealIndex * 80}ms` } : undefined}
       onClick={onClick}
       disabled={!onClick}
     >
@@ -125,6 +127,7 @@ export default function Uno({ gameState, onAction, nicknames }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [pickingColor, setPickingColor] = useState(false);
   const [pendingCardIndex, setPendingCardIndex] = useState(null);
+  const prevHandCount = useRef(0);
 
   if (!gameState) {
     return (
@@ -149,6 +152,10 @@ export default function Uno({ gameState, onAction, nicknames }) {
   } = gameState;
 
   const isFinished = phase === 'finished';
+
+  const handCount = (myHand || []).length;
+  const unoAnimFrom = prevHandCount.current;
+  useEffect(() => { prevHandCount.current = handCount; }, [handCount]);
 
   // During consecutive play, only same-rank cards are playable
   const inConsecutivePlay = lastPlayedRank !== null && lastPlayedRank !== undefined;
@@ -266,6 +273,7 @@ export default function Uno({ gameState, onAction, nicknames }) {
               selected={selectedIndex === i}
               playable={isMyTurn && isCardPlayable(card)}
               onClick={isMyTurn ? () => handleCardClick(i) : null}
+              dealIndex={i >= unoAnimFrom ? i - unoAnimFrom : undefined}
             />
           ))}
         </div>

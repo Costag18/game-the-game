@@ -315,6 +315,12 @@
   50% { opacity: 0.5; }
 }
 
+@keyframes dealCard {
+  0% { transform: translateY(-30px) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.cardDeal { animation: dealCard 0.35s ease-out both; }
+
 /* Responsive */
 @media (max-width: 600px) {
   .table, .arena { padding: 1rem 0.5rem; gap: 0.75rem; }

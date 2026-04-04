@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './GoFish.module.css';
 import { displayName } from '../utils/displayName.js';
 
@@ -14,11 +14,14 @@ function getRankLabel(rank) {
   return RANK_NAMES[rank] ?? String(rank);
 }
 
-function CardMini({ rank, suit }) {
+function CardMini({ rank, suit, dealIndex }) {
   const isRed = suit === 'hearts' || suit === 'diamonds';
   const suitSymbols = { hearts: '\u2665', diamonds: '\u2666', clubs: '\u2663', spades: '\u2660' };
   return (
-    <span className={`${styles.cardMini} ${isRed ? styles.cardRed : styles.cardBlack}`}>
+    <span
+      className={`${styles.cardMini} ${isRed ? styles.cardRed : styles.cardBlack} ${dealIndex != null ? styles.cardDeal : ''}`}
+      style={dealIndex != null ? { animationDelay: `${dealIndex * 60}ms` } : undefined}
+    >
       {getRankName(rank)}{suitSymbols[suit]}
     </span>
   );
@@ -27,6 +30,7 @@ function CardMini({ rank, suit }) {
 export default function GoFish({ gameState, onAction, currentPlayerId, nicknames }) {
   const [selectedTarget, setSelectedTarget] = useState('');
   const [selectedRank, setSelectedRank] = useState('');
+  const prevHandCount = useRef(0);
 
   if (!gameState) {
     return (
@@ -48,6 +52,10 @@ export default function GoFish({ gameState, onAction, currentPlayerId, nicknames
   } = gameState;
 
   const isFinished = phase === 'finished';
+
+  const goFishHandCount = (myHand || []).length;
+  const goFishAnimFrom = prevHandCount.current;
+  useEffect(() => { prevHandCount.current = goFishHandCount; }, [goFishHandCount]);
 
   // Get unique ranks in my hand for the ask dropdown
   const myRanks = [...new Set((myHand || []).map((c) => c.rank))].sort((a, b) => a - b);
@@ -132,7 +140,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId, nicknames
             <span className={styles.emptyHand}>No cards</span>
           ) : (
             [...(myHand || [])].sort((a, b) => a.rank - b.rank).map((card, i) => (
-              <CardMini key={i} rank={card.rank} suit={card.suit} />
+              <CardMini key={i} rank={card.rank} suit={card.suit} dealIndex={i >= goFishAnimFrom ? i - goFishAnimFrom : undefined} />
             ))
           )}
         </div>

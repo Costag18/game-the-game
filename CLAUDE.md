@@ -131,6 +131,24 @@ Synthesized audio using Web Audio API — no external sound files needed.
 - **Scope:** Affects all screens, panels, buttons, text. Game-specific backgrounds (felt, ocean, etc.) are NOT changed — each game keeps its unique visual identity
 - **SettingsGear:** Replaces the old standalone MuteButton. 44px gear icon (⚙️) top-left, click to roll out panel with sound toggle + theme swatches. Click-outside-to-close. Gear rotates on hover and when open.
 
+## Screen Shake
+
+CSS-based screen shake on big moments — 3 intensity levels.
+
+- **Hook:** `useScreenShake()` in `client/src/hooks/useScreenShake.js` — returns `shake(intensity)` function
+- **CSS:** Keyframes in `global.css` — `shakeLight` (2px, 250ms), `shakeMedium` (4px, 350ms), `shakeHeavy` (6px, 400ms)
+- **Mechanism:** Applies class to `<html>` element, auto-removes after animation duration
+- **Triggers:** Blackjack bust (medium), Blackjack 21 (heavy), Poker all-in (heavy), Poker showdown (medium), Slots jackpot (heavy), Casino wins (light), Chicken crash (medium), Round win (medium), Tournament win (heavy)
+
+## Animated Card Dealing
+
+Cards slide in sequentially instead of appearing instantly.
+
+- **CSS:** `@keyframes dealCard` in each card game's CSS module — `translateY(-30px) scale(0.8)` → normal
+- **Stagger:** Each card gets `animation-delay: ${index * 120}ms` for sequential appearance
+- **Smart animation:** Uses `useRef` to track previous card count — only NEW cards animate, existing ones don't re-animate
+- **Games:** Blackjack, Poker (hole + community), Uno, GoFish
+
 ## Confetti Effect
 
 Canvas-based particle animation on tournament win.

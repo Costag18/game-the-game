@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { EVENTS } from '../../../shared/events.js';
 import { useSound } from '../context/SoundContext.jsx';
+import { useScreenShake } from '../hooks/useScreenShake.js';
 import styles from '../screens/GameVote.module.css';
 
 const SLOT_ICONS = {
@@ -10,6 +11,7 @@ const SLOT_ICONS = {
 
 function CoinFlipPanel({ socket, myScore }) {
   const { playSound } = useSound();
+  const shake = useScreenShake();
   const [wager, setWager] = useState(10);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
@@ -29,6 +31,7 @@ function CoinFlipPanel({ socket, myScore }) {
       setTimeout(() => {
         setResult(data); setSpinning(false);
         playSound(data.won ? 'casinoWin' : 'casinoLoss');
+        if (data.won) shake('light');
       }, 1500);
     }
     socket.on(EVENTS.COIN_FLIP_RESULT, onResult);
@@ -76,6 +79,7 @@ function CoinFlipPanel({ socket, myScore }) {
 
 function SlotsPanel({ socket, myScore }) {
   const { playSound } = useSound();
+  const shake = useScreenShake();
   const [wager, setWager] = useState(10);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
@@ -90,6 +94,8 @@ function SlotsPanel({ socket, myScore }) {
       setTimeout(() => {
         setDisplayReels(data.reels); setResult(data); setSpinning(false);
         playSound(data.net >= 0 ? 'casinoWin' : 'casinoLoss');
+        if (data.multiplier >= 3) shake('heavy');
+        else if (data.net >= 0) shake('light');
       }, 1600);
     }
     socket.on(EVENTS.SLOTS_RESULT, onResult);
@@ -130,6 +136,7 @@ const WHEEL_COLORS = WHEEL_SEGMENTS.map((m) => m >= 10 ? '#e53935' : m >= 5 ? '#
 
 function WheelPanel({ socket, myScore }) {
   const { playSound } = useSound();
+  const shake = useScreenShake();
   const [wager, setWager] = useState(10);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
@@ -147,6 +154,8 @@ function WheelPanel({ socket, myScore }) {
       setTimeout(() => {
         setResult(data); setSpinning(false);
         playSound(data.net >= 0 ? 'casinoWin' : 'casinoLoss');
+        if (data.multiplier >= 5) shake('heavy');
+        else if (data.net >= 0) shake('light');
       }, 3000);
     }
     socket.on(EVENTS.WHEEL_RESULT, onResult);
@@ -190,6 +199,7 @@ function WheelPanel({ socket, myScore }) {
 
 function BJLitePanel({ socket, myScore }) {
   const { playSound } = useSound();
+  const shake = useScreenShake();
   const [wager, setWager] = useState(10);
   const [gameState, setGameState] = useState(null);
   const maxWager = Math.floor((myScore || 0) * 0.5);
@@ -198,7 +208,7 @@ function BJLitePanel({ socket, myScore }) {
     if (!socket) return;
     const h = (d) => {
       setGameState(d);
-      if (d.phase === 'finished') playSound(d.net >= 0 ? 'casinoWin' : 'casinoLoss');
+      if (d.phase === 'finished') { playSound(d.net >= 0 ? 'casinoWin' : 'casinoLoss'); if (d.net > 0) shake('light'); }
       if (d.phase === 'playing') playSound('cardDeal');
     };
     socket.on(EVENTS.BJ_LITE_RESULT, h);
@@ -236,6 +246,7 @@ const ROAD_LANES = 8;
 
 function ChickenPanel({ socket, myScore }) {
   const { playSound } = useSound();
+  const shake = useScreenShake();
   const [wager, setWager] = useState(10);
   const [gameState, setGameState] = useState(null);
   const maxWager = Math.floor((myScore || 0) * 0.5);
@@ -244,7 +255,7 @@ function ChickenPanel({ socket, myScore }) {
     if (!socket) return;
     const h = (d) => {
       setGameState(d);
-      if (d.phase === 'finished') playSound(d.net >= 0 ? 'casinoWin' : 'casinoLoss');
+      if (d.phase === 'finished') { playSound(d.net >= 0 ? 'casinoWin' : 'casinoLoss'); if (!d.alive) shake('medium'); else if (d.net > 0) shake('light'); }
     };
     socket.on(EVENTS.CHICKEN_RESULT, h);
     return () => socket.off(EVENTS.CHICKEN_RESULT, h);

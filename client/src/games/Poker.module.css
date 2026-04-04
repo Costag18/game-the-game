@@ -508,6 +508,12 @@
   width: 100%;
 }
 
+@keyframes dealCard {
+  0% { transform: translateY(-30px) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.cardDeal { animation: dealCard 0.35s ease-out both; }
+
 @media (max-width: 768px) {
   .handRankingsGrid {
     grid-template-columns: repeat(2, 1fr);
