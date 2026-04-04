@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Battleship.module.css';
 import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const GRID_SIZE = 10;
 const COLS = 'ABCDEFGHIJ'.split('');
@@ -210,7 +211,7 @@ function BattleGrid({ label, cells, sunkShips, onClick, clickable, fullReveal })
   );
 }
 
-export default function Battleship({ gameState, onAction, nicknames }) {
+export default function Battleship({ gameState, onAction, nicknames, avatars }) {
   const [timeLeft, setTimeLeft] = useState(0);
 
   if (!gameState) {
@@ -332,7 +333,7 @@ export default function Battleship({ gameState, onAction, nicknames }) {
                   className={`${styles.targetTab} ${opp.playerId === target ? styles.targetTabActive : ''} ${opp.eliminated ? styles.targetTabElim : ''}`}
                   onClick={() => setSelectedTarget(opp.playerId)}
                 >
-                  {displayName(opp.playerId, nicknames)}
+                  <PlayerName playerId={opp.playerId} nicknames={nicknames} avatars={avatars} />
                   {opp.eliminated && ' ☠'}
                 </button>
               ))}

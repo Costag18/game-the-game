@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './Hangman.module.css';
-import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -48,7 +48,7 @@ function HangmanFigure({ wrongCount }) {
   );
 }
 
-export default function Hangman({ gameState, onAction, currentPlayerId, nicknames }) {
+export default function Hangman({ gameState, onAction, currentPlayerId, nicknames, avatars }) {
   if (!gameState) {
     return (
       <div className={styles.table}>
@@ -105,7 +105,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
           <span className={styles.statusFinished}>
             {wordGuessed
               ? (wordGuessWinner
-                ? `${displayName(wordGuessWinner, nicknames)} guessed the word!`
+                ? <><PlayerName playerId={wordGuessWinner} nicknames={nicknames} avatars={avatars} /> guessed the word!</>
                 : 'Word solved!')
               : 'Nobody guessed the word!'}
           </span>
@@ -114,7 +114,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
         ) : isMyTurn ? (
           <span className={styles.statusMyTurn}>Your turn — guess a letter!</span>
         ) : (
-          <span className={styles.statusWaiting}>Waiting for {displayName(currentTurnPlayer, nicknames)}...</span>
+          <span className={styles.statusWaiting}>Waiting for <PlayerName playerId={currentTurnPlayer} nicknames={nicknames} avatars={avatars} />...</span>
         )}
       </div>
 
@@ -212,7 +212,7 @@ export default function Hangman({ gameState, onAction, currentPlayerId, nickname
               key={ps.playerId}
               className={`${styles.playerRow} ${currentTurnPlayer === ps.playerId ? styles.playerActive : ''} ${ps.eliminated ? styles.playerEliminated : ''}`}
             >
-              <span className={styles.playerName}>{displayName(ps.playerId, nicknames)}</span>
+              <span className={styles.playerName}><PlayerName playerId={ps.playerId} nicknames={nicknames} avatars={avatars} /></span>
               <div className={styles.playerGallows}>
                 <HangmanFigure wrongCount={ps.wrongCount} />
               </div>

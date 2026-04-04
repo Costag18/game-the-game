@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Uno.module.css';
-import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const COLOR_MAP = {
   red: styles.colorRed,
@@ -76,10 +76,10 @@ function DiscardPile({ topCard, currentColor }) {
   );
 }
 
-function OpponentBadge({ label, handCount }) {
+function OpponentBadge({ playerId, nicknames, avatars, handCount }) {
   return (
     <div className={styles.opponentBadge}>
-      <span className={styles.opponentName}>{label}</span>
+      <span className={styles.opponentName}><PlayerName playerId={playerId} nicknames={nicknames} avatars={avatars} /></span>
       <span className={styles.opponentCards}>
         {Array.from({ length: Math.min(handCount, 10) }, (_, i) => (
           <span key={i} className={styles.miniCardBack} />
@@ -123,7 +123,7 @@ function canPlay(card, topCard, currentColor) {
   return false;
 }
 
-export default function Uno({ gameState, onAction, nicknames }) {
+export default function Uno({ gameState, onAction, nicknames, avatars }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [pickingColor, setPickingColor] = useState(false);
   const [pendingCardIndex, setPendingCardIndex] = useState(null);
@@ -227,7 +227,9 @@ export default function Uno({ gameState, onAction, nicknames }) {
           {otherPlayers.map((op) => (
             <OpponentBadge
               key={op.playerId}
-              label={displayName(op.playerId, nicknames)}
+              playerId={op.playerId}
+              nicknames={nicknames}
+              avatars={avatars}
               handCount={op.handCount}
             />
           ))}

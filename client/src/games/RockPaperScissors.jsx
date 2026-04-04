@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import styles from './RockPaperScissors.module.css';
 import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const CHOICE_EMOJI = { rock: '✊', paper: '✋', scissors: '✌️' };
 const CHOICE_LABEL = { rock: 'Rock', paper: 'Paper', scissors: 'Scissors' };
 
-export default function RockPaperScissors({ gameState, onAction, nicknames }) {
+export default function RockPaperScissors({ gameState, onAction, nicknames, avatars }) {
   const [acked, setAcked] = useState(false);
   const [lastAckedRound, setLastAckedRound] = useState(0);
 
@@ -56,7 +57,7 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
       <div className={styles.scoreboard}>
         {allPlayers.map((p) => (
           <div key={p.playerId} className={styles.scoreCard}>
-            <span className={styles.playerName}>{displayName(p.playerId, nicknames)}</span>
+            <span className={styles.playerName}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
             <span className={styles.scoreValue}>{p.score}</span>
           </div>
         ))}
@@ -70,7 +71,7 @@ export default function RockPaperScissors({ gameState, onAction, nicknames }) {
             return (
               <div key={pid} className={`${styles.revealCard} ${isWinner ? styles.revealWinner : ''}`}>
                 <span className={styles.revealEmoji}>{CHOICE_EMOJI[choice]}</span>
-                <span className={styles.revealName}>{displayName(pid, nicknames)}</span>
+                <span className={styles.revealName}><PlayerName playerId={pid} nicknames={nicknames} avatars={avatars} /></span>
                 {isWinner && <span className={styles.revealBadge}>Winner!</span>}
               </div>
             );

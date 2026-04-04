@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styles from './LiarsDice.module.css';
 import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 // Dot positions for each die face value (3x3 grid, cells 0-8 top-left to bottom-right)
 const DOT_POSITIONS = {
@@ -26,7 +27,7 @@ function Die({ value, highlight }) {
   );
 }
 
-export default function LiarsDice({ gameState, onAction, playerId, nicknames }) {
+export default function LiarsDice({ gameState, onAction, playerId, nicknames, avatars }) {
   const [bidQuantity, setBidQuantity] = useState(1);
   const [bidFaceValue, setBidFaceValue] = useState(2);
   const [acked, setAcked] = useState(false);
@@ -149,7 +150,7 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
                 key={p.playerId}
                 className={`${styles.playerRow} ${p.eliminated ? styles.eliminated : ''} ${p.playerId === currentTurnPlayer ? styles.activeTurn : ''}`}
               >
-                <span className={styles.playerName}>{displayName(p.playerId, nicknames)}</span>
+                <span className={styles.playerName}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
                 <span className={styles.diceCount}>
                   {p.eliminated ? '0' : p.diceCount} dice
                 </span>
@@ -226,14 +227,14 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
             &mdash; Actual count: <strong>{challengeResult.actualCount}</strong>
           </p>
           <p className={styles.challengeInfo}>
-            {displayName(challengeResult.challenger, nicknames)} challenged {displayName(challengeResult.bidder, nicknames)}
-            &mdash; <strong>{displayName(challengeResult.loser, nicknames)}</strong> loses a die!
+            <PlayerName playerId={challengeResult.challenger} nicknames={nicknames} avatars={avatars} /> challenged <PlayerName playerId={challengeResult.bidder} nicknames={nicknames} avatars={avatars} />
+            &mdash; <strong><PlayerName playerId={challengeResult.loser} nicknames={nicknames} avatars={avatars} /></strong> loses a die!
           </p>
           <p className={styles.wildNote}>1s are wild and count as any face value</p>
           <div className={styles.revealGrid}>
             {Object.entries(challengeResult.allDice).map(([pid, dice]) => (
               <div key={pid} className={styles.revealPlayer}>
-                <span className={styles.revealName}>{displayName(pid, nicknames)}</span>
+                <span className={styles.revealName}><PlayerName playerId={pid} nicknames={nicknames} avatars={avatars} /></span>
                 <div className={styles.diceRow}>
                   {dice.map((val, i) => (
                     <Die key={i} value={val} highlight={val === challengeResult.bid.faceValue || val === 1} />
@@ -265,7 +266,7 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames }) 
             ].map((r, i) => (
               <li key={r.playerId} className={styles.resultItem}>
                 <span className={styles.placement}>#{r.placement}</span>
-                <span className={styles.resultPlayerId}>{displayName(r.playerId, nicknames)}</span>
+                <span className={styles.resultPlayerId}><PlayerName playerId={r.playerId} nicknames={nicknames} avatars={avatars} /></span>
               </li>
             ))}
           </ul>

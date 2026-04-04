@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './GoFish.module.css';
 import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const RANK_NAMES = {
   1: 'A', 11: 'J', 12: 'Q', 13: 'K',
@@ -27,7 +28,7 @@ function CardMini({ rank, suit, dealIndex }) {
   );
 }
 
-export default function GoFish({ gameState, onAction, currentPlayerId, nicknames }) {
+export default function GoFish({ gameState, onAction, currentPlayerId, nicknames, avatars }) {
   const [selectedTarget, setSelectedTarget] = useState('');
   const [selectedRank, setSelectedRank] = useState('');
   const prevHandCount = useRef(0);
@@ -97,7 +98,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId, nicknames
           <span className={styles.statusMyTurn}>Your turn!</span>
         ) : (
           <span className={styles.statusWaiting}>
-            Waiting for {displayName(currentTurnPlayer, nicknames)}...
+            Waiting for <PlayerName playerId={currentTurnPlayer} nicknames={nicknames} avatars={avatars} />...
           </span>
         )}
       </div>
@@ -116,7 +117,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId, nicknames
               key={p.playerId}
               className={`${styles.opponent} ${currentTurnPlayer === p.playerId ? styles.opponentActive : ''}`}
             >
-              <span className={styles.opponentName}>{displayName(p.playerId, nicknames)}</span>
+              <span className={styles.opponentName}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
               <span className={styles.opponentCards}>{p.cardCount} cards</span>
               <span className={styles.opponentSets}>
                 {p.completedSets} {p.completedSets === 1 ? 'set' : 'sets'}
@@ -194,7 +195,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId, nicknames
             </div>
             {(otherPlayers || []).map((p) => (
               <div key={p.playerId} className={styles.resultRow}>
-                <span className={styles.resultName}>{displayName(p.playerId, nicknames)}</span>
+                <span className={styles.resultName}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
                 <span className={styles.resultSets}>{p.completedSets} sets</span>
               </div>
             ))}

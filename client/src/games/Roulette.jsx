@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Roulette.module.css';
-import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const RED_NUMBERS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
 
@@ -139,7 +139,7 @@ const BET_TYPES = [
 
 const CHIP_AMOUNTS = [10, 25, 50, 100, 250, 500];
 
-export default function Roulette({ gameState, onAction, currentPlayerId, nicknames }) {
+export default function Roulette({ gameState, onAction, currentPlayerId, nicknames, avatars }) {
   const [pendingBets, setPendingBets] = useState([]);
   const [straightNumber, setStraightNumber] = useState('');
   const [betAmount, setBetAmount] = useState(10);
@@ -275,7 +275,7 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
         <div className={styles.otherChips}>
           {(otherPlayers || []).map((p) => (
             <div key={p.playerId} className={styles.otherChipRow}>
-              <span className={styles.otherName}>{displayName(p.playerId, nicknames)}</span>
+              <span className={styles.otherName}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
               <span className={styles.otherChipValue}>{p.chips}</span>
               {p.betSubmitted && <span className={styles.betBadge}>Bet placed</span>}
             </div>
@@ -407,7 +407,7 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
             </div>
             {(otherPlayers || []).map((p) => (
               <div key={p.playerId} className={styles.resultRow}>
-                <span className={styles.resultName}>{displayName(p.playerId, nicknames)}</span>
+                <span className={styles.resultName}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
                 <span className={styles.resultChips}>{p.chips} chips</span>
               </div>
             ))}

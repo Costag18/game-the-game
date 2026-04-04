@@ -3,6 +3,7 @@ import styles from './Poker.module.css';
 import { displayName } from '../utils/displayName.js';
 import { useScreenShake } from '../hooks/useScreenShake.js';
 import { useSound } from '../context/SoundContext.jsx';
+import PlayerName from '../components/PlayerName.jsx';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -67,7 +68,7 @@ function Card({ card, hidden = false, small = false, dealIndex }) {
 // Main component
 // ---------------------------------------------------------------------------
 
-export default function Poker({ gameState, onAction, playerId, nicknames }) {
+export default function Poker({ gameState, onAction, playerId, nicknames, avatars }) {
   const shake = useScreenShake();
   const { playSound } = useSound();
   const [raiseAmount, setRaiseAmount] = useState('');
@@ -176,7 +177,7 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
         <div className={styles.handHistory}>
           {handResults.map((hr, i) => (
             <span key={i} className={styles.handHistoryItem}>
-              Hand {hr.hand}: {hr.winner ? displayName(hr.winner, nicknames) : '?'} — {hr.handDescription}
+              Hand {hr.hand}: {hr.winner ? <PlayerName playerId={hr.winner} nicknames={nicknames} avatars={avatars} /> : '?'} — {hr.handDescription}
             </span>
           ))}
         </div>
@@ -202,7 +203,7 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
                 key={p.playerId}
                 className={`${styles.otherPlayer} ${p.folded ? styles.otherPlayerFolded : ''}`}
               >
-                <span className={styles.otherPlayerId}>{displayName(p.playerId, nicknames)}</span>
+                <span className={styles.otherPlayerId}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
 
                 {/* Card backs (or revealed cards in showdown) */}
                 <div className={styles.otherCardRow}>
@@ -298,7 +299,7 @@ export default function Poker({ gameState, onAction, playerId, nicknames }) {
                 <div key={pid} className={`${styles.revealRow} ${isWinner ? styles.revealRowWinner : ''}`}>
                   <div className={styles.revealPlayerInfo}>
                     <span className={styles.revealPlayerId}>
-                      {isWinner && '🏆 '}{displayName(pid, nicknames)}
+                      {isWinner && '🏆 '}<PlayerName playerId={pid} nicknames={nicknames} avatars={avatars} />
                     </span>
                     {desc && <span className={styles.handLabel}>{desc}</span>}
                   </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './CrazyEights.module.css';
-import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const SUIT_SYMBOLS = {
   hearts: '\u2665',
@@ -86,7 +86,7 @@ function SuitPicker({ onPick }) {
   );
 }
 
-export default function CrazyEights({ gameState, onAction, nicknames }) {
+export default function CrazyEights({ gameState, onAction, nicknames, avatars }) {
   const [pickingSuit, setPickingSuit] = useState(false);
   const [pendingCardIndex, setPendingCardIndex] = useState(null);
 
@@ -150,7 +150,7 @@ export default function CrazyEights({ gameState, onAction, nicknames }) {
         <section className={styles.opponentsSection}>
           {otherPlayers.map((op) => (
             <div key={op.playerId} className={styles.opponentBadge}>
-              <span className={styles.opponentName}>{displayName(op.playerId, nicknames)}</span>
+              <span className={styles.opponentName}><PlayerName playerId={op.playerId} nicknames={nicknames} avatars={avatars} /></span>
               <span className={styles.handCountBadge}>{op.handCount}</span>
             </div>
           ))}

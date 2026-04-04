@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './Blackjack.module.css';
-import { displayName } from '../utils/displayName.js';
 import { useScreenShake } from '../hooks/useScreenShake.js';
 import { useSound } from '../context/SoundContext.jsx';
+import PlayerName from '../components/PlayerName.jsx';
 
 const RANK_NAMES = {
   1: 'A',
@@ -54,7 +54,7 @@ function Hand({ cards, label, total, showHoleCard = true, animateFrom = 0 }) {
   );
 }
 
-export default function Blackjack({ gameState, onAction, nicknames }) {
+export default function Blackjack({ gameState, onAction, nicknames, avatars }) {
   const shake = useScreenShake();
   const { playSound } = useSound();
   const prevCardCount = useRef(0);
@@ -127,7 +127,7 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
         <span className={styles.infoBadge}>Hand {handNumber}/{totalHands}</span>
         {Object.entries(wins).map(([pid, w]) => (
           <span key={pid} className={styles.infoBadge}>
-            {displayName(pid, nicknames)}: {w} pts
+            <PlayerName playerId={pid} nicknames={nicknames} avatars={avatars} />: {w} pts
           </span>
         ))}
       </div>
@@ -140,7 +140,7 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
               <strong>Hand {hr.hand}:</strong> Dealer {hr.dealerBusted ? 'BUST' : hr.dealerTotal}
               {hr.players.map((pr) => (
                 <span key={pr.playerId} className={styles.handHistoryPlayer}>
-                  {' '}{displayName(pr.playerId, nicknames)}: {pr.handTotal}
+                  {' '}<PlayerName playerId={pr.playerId} nicknames={nicknames} avatars={avatars} />: {pr.handTotal}
                   {pr.result === 'blackjack' && ' BJ!'}
                   {pr.result === 'win' && ' ✓'}
                   {pr.result === 'push' && ' ═'}
@@ -173,7 +173,7 @@ export default function Blackjack({ gameState, onAction, nicknames }) {
           <div className={styles.otherPlayersList}>
             {otherPlayers.map((p) => (
               <div key={p.playerId} className={styles.otherPlayer}>
-                <span className={styles.otherPlayerId}>{displayName(p.playerId, nicknames)}</span>
+                <span className={styles.otherPlayerId}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
                 <span className={styles.otherCards}>
                   {(p.cards || []).map((card, i) => (
                     <Card key={i} card={card} />

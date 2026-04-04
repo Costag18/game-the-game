@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './SpotTheDifference.module.css';
-import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 const GRID_COLS = 6;
 
@@ -101,7 +101,7 @@ function PuzzleGrid({ label, grid, onCellClick, foundSet, foundByMeSet, missedSe
   );
 }
 
-export default function SpotTheDifference({ gameState, onAction, nicknames }) {
+export default function SpotTheDifference({ gameState, onAction, nicknames, avatars }) {
   const [wrongFlash, setWrongFlash] = useState(null);
   const [acked, setAcked] = useState(false);
   const flashTimer = useRef(null);
@@ -253,7 +253,7 @@ export default function SpotTheDifference({ gameState, onAction, nicknames }) {
         <div className={styles.otherPlayers}>
           {otherPlayers.map((p) => (
             <div key={p.playerId} className={styles.otherPlayer}>
-              <span className={styles.otherName}>{displayName(p.playerId, nicknames)}</span>
+              <span className={styles.otherName}><PlayerName playerId={p.playerId} nicknames={nicknames} avatars={avatars} /></span>
               <span className={styles.otherScore}>{p.score} pts</span>
               <span className={styles.otherFound}>{p.found} found</span>
             </div>

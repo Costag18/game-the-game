@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import styles from './MemoryMatch.module.css';
 import { displayName } from '../utils/displayName.js';
+import PlayerName from '../components/PlayerName.jsx';
 
 function MemoryCard({ card, position, isMyTurn, onFlip }) {
   if (card.matched) {
@@ -29,7 +30,7 @@ function MemoryCard({ card, position, isMyTurn, onFlip }) {
   );
 }
 
-export default function MemoryMatch({ gameState, onAction, playerId, nicknames }) {
+export default function MemoryMatch({ gameState, onAction, playerId, nicknames, avatars }) {
   if (!gameState) {
     return (
       <div className={styles.table}>
@@ -83,7 +84,7 @@ export default function MemoryMatch({ gameState, onAction, playerId, nicknames }
                 key={pid}
                 className={`${styles.scoreItem} ${pid === currentTurnPlayer ? styles.activePlayer : ''}`}
               >
-                {displayName(pid, nicknames)}: {count} pair{count !== 1 ? 's' : ''}
+                <PlayerName playerId={pid} nicknames={nicknames} avatars={avatars} />: {count} pair{count !== 1 ? 's' : ''}
               </li>
             ))}
           </ul>
@@ -117,7 +118,7 @@ export default function MemoryMatch({ gameState, onAction, playerId, nicknames }
               .map(([pid, count], i) => (
                 <li key={pid} className={styles.resultItem}>
                   <span className={styles.placement}>#{i + 1}</span>
-                  <span className={styles.resultPlayerId}>{displayName(pid, nicknames)}</span>
+                  <span className={styles.resultPlayerId}><PlayerName playerId={pid} nicknames={nicknames} avatars={avatars} /></span>
                   <span className={styles.resultPairs}>{count} pairs</span>
                 </li>
               ))}
