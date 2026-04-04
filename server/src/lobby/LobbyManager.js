@@ -16,7 +16,7 @@ export class LobbyManager {
       id, hostId, name: options.name, maxPlayers: options.maxPlayers,
       isPrivate: options.isPrivate, code: options.isPrivate ? generateCode() : null,
       winCondition: options.winCondition, winTarget: options.winTarget,
-      players: [hostId], nicknames: {}, status: 'waiting',
+      players: [hostId], nicknames: {}, avatars: {}, status: 'waiting',
     };
     this.lobbies.set(id, lobby);
     this.playerToLobby.set(hostId, id);
@@ -41,6 +41,7 @@ export class LobbyManager {
     lobby.players = lobby.players.filter((p) => p !== playerId);
     this.playerToLobby.delete(playerId);
     delete lobby.nicknames[playerId];
+    delete lobby.avatars?.[playerId];
     if (lobby.players.length === 0) { this.lobbies.delete(lobbyId); return null; }
     if (lobby.hostId === playerId) lobby.hostId = lobby.players[0];
     return lobby;
@@ -77,6 +78,13 @@ export class LobbyManager {
     if (!lobbyId) return;
     const lobby = this.lobbies.get(lobbyId);
     if (lobby) lobby.nicknames[playerId] = nickname;
+  }
+
+  setAvatar(playerId, avatar) {
+    const lobbyId = this.playerToLobby.get(playerId);
+    if (!lobbyId) return;
+    const lobby = this.lobbies.get(lobbyId);
+    if (lobby) lobby.avatars[playerId] = avatar;
   }
 
   setStatus(lobbyId, status) {

@@ -1,11 +1,12 @@
 import { Scorer } from './Scorer.js';
 
 export class TournamentManager {
-  constructor({ players, winCondition, winTarget, nicknames }) {
+  constructor({ players, winCondition, winTarget, nicknames, avatars }) {
     this.players = [...players];
     this.winCondition = winCondition;
     this.winTarget = winTarget;
     this.nicknames = { ...(nicknames || {}) };
+    this.avatars = { ...(avatars || {}) };
     this.scores = {};
     this.players.forEach((p) => (this.scores[p] = 100));
     this.currentRound = 0;
@@ -100,6 +101,7 @@ export class TournamentManager {
 
   getState() {
     const nicks = this.nicknames || {};
+    const avs = this.avatars || {};
     return {
       currentRound: this.currentRound,
       phase: this.phase,
@@ -107,8 +109,10 @@ export class TournamentManager {
       standings: this.getStandings().map((s) => ({
         ...s,
         nickname: nicks[s.playerId] || s.playerId.slice(0, 8),
+        avatar: avs[s.playerId] || null,
       })),
       nicknames: nicks,
+      avatars: avs,
       selectedGame: this.selectedGame,
       winCondition: this.winCondition,
       winTarget: this.winTarget,

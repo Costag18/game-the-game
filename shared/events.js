@@ -54,4 +54,6 @@ export const EVENTS = {
   AI_IMAGE_SEND: 'ai-image:send',
   AI_IMAGE_BROADCAST: 'ai-image:broadcast',
   AI_IMAGE_ERROR: 'ai-image:error',
+  SET_AVATAR: 'player:setAvatar',
+  AVATAR_UPDATE: 'player:avatarUpdate',
 };

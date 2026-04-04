@@ -25,6 +25,62 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
+// --- Shared FLUX image generation helper ---
+async function generateFluxImage(prompt) {
+  const hfToken = process.env.HF_TOKEN || '';
+  const headers = { 'Content-Type': 'application/json' };
+  if (hfToken) headers['Authorization'] = `Bearer ${hfToken}`;
+
+  const enqueueResp = await fetch('https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ data: [prompt, 0, true, 512, 512, 4] }),
+  });
+  if (!enqueueResp.ok) {
+    const errBody = await enqueueResp.text().catch(() => '');
+    console.error('[FLUX] Enqueue failed:', enqueueResp.status, errBody);
+    throw new Error('Image generation service unavailable');
+  }
+
+  const { event_id } = await enqueueResp.json();
+  if (!event_id) throw new Error('Failed to queue image generation');
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60000);
+  const resultResp = await fetch(
+    `https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer/${event_id}`,
+    { headers, signal: controller.signal }
+  );
+  clearTimeout(timeout);
+
+  const text = await resultResp.text();
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('event: complete')) {
+      const dataLine = lines[i + 1];
+      if (dataLine && dataLine.startsWith('data: ')) {
+        const resultData = JSON.parse(dataLine.slice(6));
+        if (!resultData?.[0]?.url) throw new Error('No image in response');
+        const imgResp = await fetch(resultData[0].url);
+        if (!imgResp.ok) throw new Error('Failed to retrieve generated image');
+        const arrayBuf = await imgResp.arrayBuffer();
+        const base64 = Buffer.from(arrayBuf).toString('base64');
+        return `data:image/webp;base64,${base64}`;
+      }
+    }
+    if (lines[i].startsWith('event: error')) {
+      let errMsg = 'Generation failed';
+      const dataLine = lines[i + 1];
+      if (dataLine?.startsWith('data: ')) {
+        try { errMsg = JSON.parse(dataLine.slice(6)) || errMsg; } catch {}
+      }
+      console.error('[FLUX] HF Space error:', errMsg);
+      throw new Error(typeof errMsg === 'string' ? errMsg : 'Generation failed');
+    }
+  }
+  throw new Error('No image in response');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -248,103 +304,52 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const prompt = data?.prompt;
     if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) return;
     const sanitized = prompt.trim().slice(0, 200);
-    // Rate-limit: 30 seconds between AI image requests per player
     const now = Date.now();
     if (socket.data._lastAiImage && now - socket.data._lastAiImage < 20000) return;
     socket.data._lastAiImage = now;
 
     try {
-      // Step 1: Enqueue the generation request
-      const hfToken = process.env.HF_TOKEN || '';
-      const headers = { 'Content-Type': 'application/json' };
-      if (hfToken) headers['Authorization'] = `Bearer ${hfToken}`;
-
-      const enqueueResp = await fetch('https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          data: [sanitized, 0, true, 512, 512, 4],
-        }),
-      });
-
-      if (!enqueueResp.ok) {
-        const errBody = await enqueueResp.text().catch(() => '');
-        console.error('[AI Image] Enqueue failed:', enqueueResp.status, errBody);
-        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Image generation service unavailable' });
-        socket.data._lastAiImage = 0; // Reset cooldown on failure
-        return;
-      }
-
-      const { event_id } = await enqueueResp.json();
-      if (!event_id) {
-        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Failed to queue image generation' });
-        socket.data._lastAiImage = 0;
-        return;
-      }
-
-      // Step 2: Poll for result via SSE endpoint
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout
-
-      const resultResp = await fetch(
-        `https://evalstate-flux1-schnell.hf.space/gradio_api/call/infer/${event_id}`,
-        { headers, signal: controller.signal }
-      );
-      clearTimeout(timeout);
-
-      const text = await resultResp.text();
-      // Parse SSE — find the "complete" event's data line
-      const lines = text.split('\n');
-      let resultData = null;
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith('event: complete')) {
-          // Next line is "data: ..."
-          const dataLine = lines[i + 1];
-          if (dataLine && dataLine.startsWith('data: ')) {
-            resultData = JSON.parse(dataLine.slice(6));
-          }
-          break;
-        }
-        if (lines[i].startsWith('event: error')) {
-          let errMsg = 'Generation failed';
-          const dataLine = lines[i + 1];
-          if (dataLine && dataLine.startsWith('data: ')) {
-            try { errMsg = JSON.parse(dataLine.slice(6)) || errMsg; } catch {}
-          }
-          console.error('[AI Image] HF Space error:', errMsg);
-          socket.emit(EVENTS.AI_IMAGE_ERROR, { error: typeof errMsg === 'string' ? errMsg : 'Generation failed' });
-          socket.data._lastAiImage = 0;
-          return;
-        }
-      }
-
-      if (!resultData || !resultData[0]?.url) {
-        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'No image in response' });
-        socket.data._lastAiImage = 0;
-        return;
-      }
-
-      // Step 3: Fetch the generated image file and convert to base64
-      const imageUrl = resultData[0].url;
-      const imgResp = await fetch(imageUrl);
-      if (!imgResp.ok) {
-        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Failed to retrieve generated image' });
-        socket.data._lastAiImage = 0;
-        return;
-      }
-      const arrayBuf = await imgResp.arrayBuffer();
-      const base64 = Buffer.from(arrayBuf).toString('base64');
-      const dataUrl = `data:image/webp;base64,${base64}`;
-
-      // Step 4: Broadcast to everyone in the lobby
+      const dataUrl = await generateFluxImage(sanitized);
       io.to(lobbyId).emit(EVENTS.AI_IMAGE_BROADCAST, {
         imageUrl: dataUrl,
         nickname: socket.data.nickname || socket.id,
       });
     } catch (err) {
       console.error('[AI Image] Error:', err.message || err);
-      socket.emit(EVENTS.AI_IMAGE_ERROR, { error: 'Image generation timed out or failed' });
+      socket.emit(EVENTS.AI_IMAGE_ERROR, { error: err.message || 'Image generation failed' });
       socket.data._lastAiImage = 0;
+    }
+  });
+
+  // --- Avatar Generation ---
+  socket.on(EVENTS.SET_AVATAR, async (data, callback) => {
+    const prompt = data?.prompt;
+    if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+      if (callback) callback({ error: 'Prompt is required' });
+      return;
+    }
+    const sanitized = prompt.trim().slice(0, 100);
+    const now = Date.now();
+    if (socket.data._lastAvatar && now - socket.data._lastAvatar < 30000) {
+      if (callback) callback({ error: 'Please wait before generating again' });
+      return;
+    }
+    socket.data._lastAvatar = now;
+
+    try {
+      const dataUrl = await generateFluxImage(sanitized);
+      socket.data.avatar = dataUrl;
+      lobbyManager.setAvatar(socket.id, dataUrl);
+      // Broadcast to lobby so others see the new avatar
+      const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+      if (lobbyId) {
+        io.to(lobbyId).emit(EVENTS.AVATAR_UPDATE, { playerId: socket.id, avatar: dataUrl });
+      }
+      if (callback) callback({ success: true, avatar: dataUrl });
+    } catch (err) {
+      console.error('[Avatar] Error:', err.message || err);
+      socket.data._lastAvatar = 0;
+      if (callback) callback({ error: err.message || 'Avatar generation failed' });
     }
   });
 
@@ -368,11 +373,20 @@ io.on(EVENTS.CONNECTION, (socket) => {
       }
     }
 
+    // Snapshot avatars from socket data
+    for (const pid of lobby.players) {
+      const playerSocket = io.sockets.sockets.get(pid);
+      if (playerSocket?.data?.avatar && !lobby.avatars[pid]) {
+        lobby.avatars[pid] = playerSocket.data.avatar;
+      }
+    }
+
     const tm = new TournamentManager({
       players: [...lobby.players],
       winCondition: lobby.winCondition,
       winTarget: lobby.winTarget,
       nicknames: lobby.nicknames,
+      avatars: lobby.avatars,
     });
     tournaments.set(lobbyId, tm);
 
@@ -805,6 +819,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
             const currentLobby = lobbyManager.getLobby(lobbyId);
             if (!currentLobby) return;
             const nicks = currentLobby.nicknames || {};
+            const avs = currentLobby.avatars || {};
             for (const pid of currentLobby.players) {
               const ps = io.sockets.sockets.get(pid);
               if (ps) {
@@ -812,6 +827,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
                   gameId: tm.selectedGame,
                   state: game.getStateForPlayer(pid),
                   nicknames: nicks,
+                  avatars: avs,
                 });
               }
             }
@@ -829,6 +845,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
                 standings: tm.getStandings().map((s) => ({
                   ...s,
                   nickname: currentLobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+                  avatar: currentLobby.avatars?.[s.playerId] || null,
                 })),
                 gameResults: results,
               });
@@ -854,12 +871,14 @@ io.on(EVENTS.CONNECTION, (socket) => {
             standings: tm.getStandings().map((s) => ({
               ...s,
               nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+              avatar: lobby.avatars?.[s.playerId] || null,
             })),
             gameResults: results,
           });
           io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
         } else {
           const nicknames = lobby.nicknames || {};
+          const avatars = lobby.avatars || {};
           for (const playerId of lobby.players) {
             const playerSocket = io.sockets.sockets.get(playerId);
             if (playerSocket) {
@@ -867,6 +886,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
                 gameId: tm.selectedGame,
                 state: game.getStateForPlayer(playerId),
                 nicknames,
+                avatars,
               });
             }
           }
@@ -957,6 +977,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     const lobby = lobbyManager.getLobby(lobbyId);
     const nicknames = lobby.nicknames || {};
+    const avatars = lobby.avatars || {};
     for (const playerId of lobby.players) {
       const playerSocket = io.sockets.sockets.get(playerId);
       if (playerSocket) {
@@ -964,6 +985,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
           gameId: tm.selectedGame,
           state: game.getStateForPlayer(playerId),
           nicknames,
+          avatars,
         });
       }
     }
@@ -1013,10 +1035,13 @@ function getTournamentState(tm) {
 function buildTournamentEndPayload(tm, lobby) {
   return {
     winner: lobby.nicknames?.[tm.getWinner()] || tm.getWinner().slice(0, 8),
+    winnerAvatar: lobby.avatars?.[tm.getWinner()] || null,
     standings: tm.getStandings().map((s) => ({
       ...s,
       nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+      avatar: lobby.avatars?.[s.playerId] || null,
     })),
+    avatars: lobby.avatars || {},
     roundHistory: tm.roundHistory,
   };
 }
@@ -1080,6 +1105,7 @@ function handlePlayerLeave(socket) {
       if (tm.activeGame) {
         if (lobby) {
           const nicknames = lobby.nicknames || {};
+          const avatars = lobby.avatars || {};
           for (const pid of tm.players) {
             const ps = io.sockets.sockets.get(pid);
             if (ps) {
@@ -1087,6 +1113,7 @@ function handlePlayerLeave(socket) {
                 gameId: tm.selectedGame,
                 state: tm.activeGame.getStateForPlayer(pid),
                 nicknames,
+                avatars,
               });
             }
           }
