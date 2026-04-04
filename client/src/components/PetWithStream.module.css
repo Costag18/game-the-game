@@ -25,6 +25,12 @@
   display: none;
 }
 
+.extraPanel {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--gold-dim, #8a7230);
+  padding: 0.5rem;
+}
+
 @media (min-width: 960px) {
   .streamBox {
     display: block;

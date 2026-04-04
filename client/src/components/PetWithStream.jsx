@@ -3,7 +3,7 @@ import styles from './PetWithStream.module.css';
 
 const STREAM_ID = '5vfaDsMhCF4'; // CBC News 24/7 live
 
-export default function PetWithStream() {
+export default function PetWithStream({ children }) {
   return (
     <div className={styles.wrapper}>
       <div className={styles.streamBox}>
@@ -15,6 +15,7 @@ export default function PetWithStream() {
           className={styles.streamFrame}
         />
       </div>
+      {children && <div className={styles.extraPanel}>{children}</div>}
       <div className={styles.petScroll}>
         <PetSidebar />
       </div>
