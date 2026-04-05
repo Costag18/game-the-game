@@ -71,7 +71,7 @@ html.screen-shake-heavy { animation: shakeHeavy 0.4s ease-out; }
     top: 0;
     left: 0;
     width: 340px;
-    height: 100vh;
+    height: calc(100vh - 46px);
     z-index: 50;
     overflow: hidden;
   }

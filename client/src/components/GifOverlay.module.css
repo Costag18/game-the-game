@@ -1,7 +1,7 @@
 /* --- GIF Trigger Button --- */
 .gifTrigger {
   position: absolute;
-  bottom: 1rem;
+  bottom: calc(1rem + 46px);
   right: 1rem;
   z-index: 102;
   width: 44px;
@@ -47,7 +47,7 @@
 /* --- Search Panel --- */
 .gifPanel {
   position: absolute;
-  bottom: calc(1rem + 52px);
+  bottom: calc(1rem + 46px + 52px);
   right: 1rem;
   z-index: 103;
   width: 300px;
@@ -248,12 +248,12 @@
     left: 0.5rem;
     width: auto;
     max-height: 50vh;
-    bottom: calc(1rem + 48px);
+    bottom: calc(1rem + 46px + 48px);
   }
 
   .gifTrigger {
     right: 0.5rem;
-    bottom: 0.5rem;
+    bottom: calc(0.5rem + 46px);
     width: 40px;
     height: 40px;
   }
