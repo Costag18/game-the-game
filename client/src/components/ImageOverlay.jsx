@@ -3,7 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import styles from './ImageOverlay.module.css';
 
-const BROADCAST_COOLDOWN = 16; // seconds — matches Pollinations global rate limit
+const BROADCAST_COOLDOWN = 18; // seconds — slightly longer than server's 16s global limit
 let flyIdCounter = 0;
 
 export default function ImageOverlay({ isOpen, onToggle, onRequestClose }) {
