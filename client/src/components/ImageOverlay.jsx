@@ -8,7 +8,7 @@ let flyIdCounter = 0;
 
 export default function ImageOverlay({ isOpen, onToggle, onRequestClose }) {
   const { socket } = useSocketContext();
-  const [tab, setTab] = useState('ai'); // 'ai' | 'search'
+  const [tab, setTab] = useState('search'); // 'search' | 'ai'
   const [prompt, setPrompt] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);

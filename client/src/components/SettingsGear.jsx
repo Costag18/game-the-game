@@ -14,7 +14,7 @@ export default function SettingsGear() {
 
   const { socket } = useSocketContext();
   const [avatar, setAvatar] = useState(() => localStorage.getItem('gtg_avatar') || '');
-  const [avatarTab, setAvatarTab] = useState('ai');
+  const [avatarTab, setAvatarTab] = useState('search');
 
   // AI tab state
   const [avatarPrompt, setAvatarPrompt] = useState('');

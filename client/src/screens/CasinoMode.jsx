@@ -121,7 +121,7 @@ const AI_COOLDOWN = 20;
 const SEARCH_DEBOUNCE = 500;
 
 function ImageGenerator({ socket }) {
-  const [tab, setTab] = useState('ai'); // 'ai' | 'search'
+  const [tab, setTab] = useState('search'); // 'search' | 'ai'
 
   // AI tab state
   const [prompt, setPrompt] = useState('');
