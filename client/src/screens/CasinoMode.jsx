@@ -236,7 +236,7 @@ function ImageGenerator({ socket }) {
               placeholder="Describe an image..."
               value={prompt}
               onChange={(e) => setPrompt(e.target.value.slice(0, 200))}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleGenerate(); }}
+              onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
               maxLength={200}
               disabled={generating}
             />

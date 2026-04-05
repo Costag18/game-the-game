@@ -208,7 +208,7 @@ export default function SettingsGear() {
                   placeholder="Describe your avatar..."
                   value={avatarPrompt}
                   onChange={(e) => setAvatarPrompt(e.target.value.slice(0, 100))}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleGenerateAvatar(); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') e.preventDefault(); }}
                   maxLength={100}
                   disabled={avatarGenerating}
                 />

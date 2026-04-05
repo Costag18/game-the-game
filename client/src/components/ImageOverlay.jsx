@@ -113,9 +113,8 @@ export default function ImageOverlay({ isOpen, onToggle, onRequestClose }) {
   }
 
   function handleKeyDown(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      if (tab === 'ai') handleGenerate();
     }
   }
 
