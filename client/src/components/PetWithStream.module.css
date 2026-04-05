@@ -226,7 +226,7 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  animation: tomatoFade 4s ease-out forwards;
+  animation: tomatoFade 8s ease-out forwards;
 }
 
 .tomatoImg {

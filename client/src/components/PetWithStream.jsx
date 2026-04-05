@@ -108,7 +108,7 @@ export default function PetWithStream({ children, screen }) {
 
     function onTomato() {
       setShowTomato(true);
-      setTimeout(() => setShowTomato(false), 4000);
+      setTimeout(() => setShowTomato(false), 8000);
     }
 
     socket.on(EVENTS.EMOTESPLOSION_BROADCAST, onExplosion);
