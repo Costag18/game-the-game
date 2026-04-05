@@ -208,6 +208,15 @@
   100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
 
+.weatherStraight {
+  animation-name: weatherFallStraight !important;
+}
+
+@keyframes weatherFallStraight {
+  0% { transform: translateY(0); opacity: 0.8; }
+  100% { transform: translateY(110vh); opacity: 0; }
+}
+
 @media (min-width: 960px) and (orientation: landscape) {
   .wrapper {
     display: flex;
