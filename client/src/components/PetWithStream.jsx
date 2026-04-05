@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSocketContext } from '../context/SocketContext.jsx';
 import { useSound } from '../context/SoundContext.jsx';
+import { usePet } from '../context/PetContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import PetSidebar from './PetSidebar.jsx';
 import styles from './PetWithStream.module.css';
@@ -10,12 +11,12 @@ const EXPLOSION_COOLDOWN = 60;
 const SPOTLIGHT_COOLDOWN = 180;
 const WEATHER_COOLDOWN = 120;
 const EXPLOSION_EMOJIS = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉', '💥', '✨', '🎆', '🎇'];
-const WEATHER_EMOJIS = { rain: '🌧️', snow: '❄️', confetti: '🎊', stars: '⭐', hearts: '💕' };
 const WEATHER_PARTICLES = { rain: '💧', snow: '❄️', confetti: '🎊', stars: '⭐', hearts: '❤️' };
 
 export default function PetWithStream({ children, screen }) {
   const { socket } = useSocketContext();
   const { playSound } = useSound();
+  const { coins, addCoins } = usePet();
   const [showControls, setShowControls] = useState(false);
 
   // Cooldowns
@@ -25,12 +26,11 @@ export default function PetWithStream({ children, screen }) {
 
   // Effects
   const [explosionParticles, setExplosionParticles] = useState([]);
-  const [spotlights, setSpotlights] = useState([]); // [{playerId, nickname, id}]
-  const [weatherEffect, setWeatherEffect] = useState(null); // {effect, particles}
+  const [spotlights, setSpotlights] = useState([]); // [{playerId, nickname, id, rect}]
+  const [weatherEffect, setWeatherEffect] = useState(null);
 
   // Quick gamble
   const [gambleResult, setGambleResult] = useState(null); // 'win' | 'lose' | null
-  const [gambleFlipping, setGambleFlipping] = useState(false);
 
   const hideTimerRef = useRef(null);
   const particleId = useRef(0);
@@ -70,10 +70,19 @@ export default function PetWithStream({ children, screen }) {
     }
 
     function onSpotlight(data) {
-      const id = ++particleId.current;
-      setSpotlights((prev) => [...prev, { id, playerId: data.playerId, nickname: data.nickname }]);
-      // Auto-remove after 5s
-      setTimeout(() => setSpotlights((prev) => prev.filter((s) => s.id !== id)), 5000);
+      const spotId = ++particleId.current;
+      // Find the player's name element in the leaderboard by searching for their nickname
+      let rect = null;
+      // Look for PlayerName elements — they have data we can search by text content
+      const nameElements = document.querySelectorAll('[class*="standingName"], [class*="standingRow"], [class*="playerName"]');
+      for (const el of nameElements) {
+        if (el.textContent?.includes(data.nickname)) {
+          rect = el.getBoundingClientRect();
+          break;
+        }
+      }
+      setSpotlights((prev) => [...prev, { id: spotId, playerId: data.playerId, nickname: data.nickname, rect }]);
+      setTimeout(() => setSpotlights((prev) => prev.filter((s) => s.id !== spotId)), 5000);
     }
 
     function onWeather(data) {
@@ -90,25 +99,16 @@ export default function PetWithStream({ children, screen }) {
         });
       }
       setWeatherEffect({ effect: data.effect, particles });
-      // Clear after 10s
       setTimeout(() => setWeatherEffect(null), 10000);
-    }
-
-    function onCoinResult(data) {
-      setGambleFlipping(false);
-      setGambleResult(data.won ? 'win' : 'lose');
-      setTimeout(() => setGambleResult(null), 2000);
     }
 
     socket.on(EVENTS.EMOTESPLOSION_BROADCAST, onExplosion);
     socket.on(EVENTS.SPOTLIGHT_BROADCAST, onSpotlight);
     socket.on(EVENTS.WEATHER_BROADCAST, onWeather);
-    socket.on(EVENTS.COIN_FLIP_RESULT, onCoinResult);
     return () => {
       socket.off(EVENTS.EMOTESPLOSION_BROADCAST, onExplosion);
       socket.off(EVENTS.SPOTLIGHT_BROADCAST, onSpotlight);
       socket.off(EVENTS.WEATHER_BROADCAST, onWeather);
-      socket.off(EVENTS.COIN_FLIP_RESULT, onCoinResult);
     };
   }, [socket]);
 
@@ -132,11 +132,11 @@ export default function PetWithStream({ children, screen }) {
   }
 
   function handleGamble() {
-    if (gambleFlipping || !socket) return;
-    const choice = Math.random() > 0.5 ? 'heads' : 'tails';
-    setGambleFlipping(true);
-    setGambleResult(null);
-    socket.emit(EVENTS.COIN_FLIP, { amount: 5, choice });
+    if (gambleResult) return; // wait for previous result to clear
+    const won = Math.random() >= 0.5;
+    addCoins(won ? 5 : -5);
+    setGambleResult(won ? 'win' : 'lose');
+    setTimeout(() => setGambleResult(null), 1500);
   }
 
   function handleOverlayClick() {
@@ -197,19 +197,18 @@ export default function PetWithStream({ children, screen }) {
             {weatherCD > 0 ? <span className={styles.stripCooldown}>{fmt(weatherCD)}</span> : <span>🌧️</span>}
           </button>
 
-          {/* Spacer to push gamble to bottom */}
+          {/* Spacer */}
           <div className={styles.stripSpacer} />
 
-          {/* Quick Gamble — always at bottom */}
+          {/* Quick Gamble — buddy coins, always at bottom */}
           <button
             className={`${styles.stripBtn} ${gambleResult === 'win' ? styles.stripBtnWin : ''} ${gambleResult === 'lose' ? styles.stripBtnLose : ''}`}
             onClick={handleGamble}
-            disabled={gambleFlipping}
-            title="Quick Gamble — 5 coins"
+            disabled={!!gambleResult}
+            title="Buddy Coin Flip — 50/50 for ±5 coins"
           >
-            {gambleFlipping ? <span className={styles.stripCooldown}>...</span> :
-             gambleResult === 'win' ? <span>💰</span> :
-             gambleResult === 'lose' ? <span>💸</span> :
+            {gambleResult === 'win' ? <span>+5</span> :
+             gambleResult === 'lose' ? <span>-5</span> :
              <span>🎰</span>}
           </button>
         </div>
@@ -224,11 +223,22 @@ export default function PetWithStream({ children, screen }) {
         }} onAnimationEnd={() => removeParticle(p.id)}>{p.emoji}</span>
       ))}
 
-      {/* Spotlight overlays */}
+      {/* Spotlight — dim screen + oval over player name */}
       {spotlights.map((s) => (
         <div key={s.id} className={styles.spotlightOverlay}>
-          <div className={styles.spotlightBeam} />
-          <span className={styles.spotlightName}>🔦 {s.nickname}</span>
+          <div className={styles.spotlightDim} />
+          {s.rect ? (
+            <div className={styles.spotlightOval} style={{
+              left: s.rect.left + s.rect.width / 2,
+              top: s.rect.top + s.rect.height / 2,
+              width: Math.max(s.rect.width + 60, 200),
+              height: s.rect.height + 40,
+            }} />
+          ) : null}
+          <span className={styles.spotlightName}
+            style={s.rect ? { left: s.rect.left + s.rect.width / 2, top: s.rect.top - 30 } : {}}>
+            🔦 {s.nickname}
+          </span>
         </div>
       ))}
 
