@@ -33,7 +33,7 @@ cd server && npm install && npm run dev
 ## Project Structure
 
 ```
-client/src/components/       — CasinoSidebar, PetSidebar, EmoteOverlay, GifOverlay, CoinCatchGame, PetMiniGames
+client/src/components/       — CasinoSidebar, PetSidebar, PetWithStream, EmoteOverlay, GifOverlay, ImageOverlay, PlayerName, StockTicker, SettingsGear, CoinCatchGame, PetMiniGames
 client/src/context/          — SocketContext, PetContext (tamagotchi state)
 client/src/games/            — React component + CSS module per mini-game
 client/src/screens/          — Menu, Lobby, WaitingRoom, GameVote, WagerPhase, Results, CasinoMode
@@ -126,7 +126,7 @@ Synthesized audio using Web Audio API — no external sound files needed.
 
 - **Context:** `ThemeContext` provides `{ theme, setTheme }`, persists to `localStorage` key `gtg_theme`
 - **CSS approach:** `[data-theme="..."]` attribute on `<html>` overrides `:root` CSS variables
-- **Themes:** Classic Burgundy (default), Royal Blue, Emerald Table, Midnight Purple, Vegas Noir, Ivory Light
+- **Themes:** Classic Burgundy (default), Royal Blue, Emerald Table, Midnight Purple, Vegas Noir
 - **Variables overridden:** `--gold`, `--gold-dim`, `--gold-light`, `--bg-dark`, `--bg-panel`, `--mahogany`, `--burgundy`, `--text-primary`, `--text-secondary`, `--wood-brown`, `--wood-dark`
 - **Scope:** Affects all screens, panels, buttons, text. Game-specific backgrounds (felt, ocean, etc.) are NOT changed — each game keeps its unique visual identity
 - **SettingsGear:** Replaces the old standalone MuteButton. 44px gear icon (⚙️) top-left, click to roll out panel with sound toggle + theme swatches. Click-outside-to-close. Gear rotates on hover and when open.
@@ -175,35 +175,65 @@ Discord-style GIF picker — players search for GIFs and send them flying across
 - **Default results:** Panel loads "reactions" query on open for instant one-tap sending
 - **Env setup:** Local dev uses `server/.env` with dotenv. Production uses Render environment variables
 
-## AI Image Generation
+## Image Overlay (AI Generate + Photo Search)
 
-Players type a prompt, server generates an image via Hugging Face Spaces (FLUX.1-schnell), and it flies across everyone's screen — same animation as GIF reactions.
+Two-tab panel (🎨 button above GIF button) for sending images flying across everyone's screen.
 
-- **API:** HF Spaces Gradio API (evalstate/flux1_schnell) — free, no monthly credit cap, best-effort
-- **Proxy:** Server-side only. Client sends prompt via socket, server calls HF API, converts to base64, broadcasts
-- **Socket events:** `AI_IMAGE_SEND` (client → server with prompt) → `AI_IMAGE_BROADCAST` (server → all with base64 data URL) / `AI_IMAGE_ERROR` (server → requester)
-- **Rate limit:** 30-second server-enforced cooldown per player (`socket.data._lastAiImage`)
-- **Prompt:** Max 200 characters, sanitized server-side
-- **UI:** 🎨 paintbrush button above GIF button (bottom-right), opens prompt panel with textarea + Generate button
-- **Generation state:** Spinner shows while generating. User can close panel and reopen — spinner persists. On error, message shows in panel (clears after 10s)
-- **Flying animation:** Same LTR/RTL animation as GIFs (3.5s, random direction, 15-65% vertical position)
-- **Mutual exclusivity:** Opening AI panel closes GIF panel and emote menu, and vice versa
-- **Components:** `AiImageOverlay.jsx` + `AiImageOverlay.module.css` — rendered inside `EmoteOverlay`
-- **Env var:** `HF_TOKEN` (optional) — free HF API token for better rate-limit priority. Local: `server/.env`, Production: Render env vars
-- **Image size:** 512x512, 4 inference steps for speed
-- **Shared helper:** `generateFluxImage(prompt)` in `server/src/index.js` — reusable for both flying images and avatar generation
+- **AI Generate tab:** Client sends prompt to server → server calls Pollinations.ai (FLUX) → generates 512x512 image → broadcasts base64 to lobby
+- **Search Photos tab:** Client searches Pexels API via server proxy `/api/image-search` → thumbnail grid → click to send flying
+- **API:** Pollinations.ai for AI generation (free, no auth), Pexels for photo search (free, 200 req/hr)
+- **Global rate limit:** 16-second cooldown across ALL users for Pollinations (1 request per 16s). Client cooldown 18s to prevent bypass
+- **Socket events:** `AI_IMAGE_SEND` (client → server with `{ prompt }` or `{ imageUrl }`) → `AI_IMAGE_BROADCAST` (server → all) / `AI_IMAGE_ERROR` (server → requester with `waitSeconds`)
+- **Env var:** `PEXELS_API_KEY` — free from pexels.com/api
+- **Components:** `ImageOverlay.jsx` + `ImageOverlay.module.css` — rendered inside `EmoteOverlay`
+- **Flying animation:** Same LTR/RTL as GIFs (3.5s), sender nickname below
+- **Mutual exclusivity:** Opening image panel closes GIF panel and emote menu
+- **Enter key disabled** on all AI prompt inputs to prevent accidental submissions
 
-## Profile Photos (AI-Generated Avatars)
+## Profile Photos (AI + Search)
 
-Players generate AI profile photos from text prompts in the SettingsGear panel. Photos appear as circles before player names everywhere.
+Players set profile photos via AI generation or Pexels search in the SettingsGear panel. Photos appear as circles before player names everywhere.
 
-- **Generation:** Same FLUX.1-schnell API via `generateFluxImage()` helper. Prompt max 100 chars, 30s cooldown
-- **Socket events:** `SET_AVATAR` (client → server with prompt, uses callback) → `AVATAR_UPDATE` (server → lobby broadcast)
+- **Two tabs:** "AI" (Pollinations server-side generation) and "Search" (Pexels photo search), default is Search
+- **Socket events:** `SET_AVATAR` (client → server with `{ prompt }` or `{ avatar: url }`, uses callback) → `AVATAR_UPDATE` (server → lobby broadcast)
 - **Storage:** Server: `socket.data.avatar` + `lobby.avatars[playerId]` + `tm.avatars[playerId]`. Client: `localStorage` key `gtg_avatar`
+- **Persistence:** On socket connect, client sends saved avatar from localStorage to server via `SET_AVATAR`
 - **Data flow:** `avatars` map flows alongside `nicknames` through `TournamentManager.getState()`, all `GAME_STATE` emissions, `ROUND_RESULTS` standings, and `buildTournamentEndPayload()`
 - **Display:** `PlayerName` component (`client/src/components/PlayerName.jsx`) renders avatar circle + name. Used in all 5 screen components and all 12 game components
+- **Click to expand:** Clicking any avatar opens a modal with 200px full view
 - **Fallback:** No avatar → gradient circle with first letter of name
-- **UI:** SettingsGear panel → "Profile Photo" section with 48px preview circle, prompt input, generate button with cooldown
+
+## Sidebar Button Strip
+
+Vertical strip of action buttons on the right side of the pet sidebar (21% width). Desktop landscape only.
+
+- **💥 Emotesplosion:** 40 random emojis burst from center of everyone's screen. 60s cooldown, server-enforced
+- **🔦 Spotlight:** Dims screen with radial gradient, bright oval cutout over your name in leaderboard. 3 min cooldown. Only visible on gameVote/wagerPhase screens
+- **🌧️ Weather Change:** Server picks random effect (rain/snow/sunny/stars/hearts), 30 particles fall across everyone's screen for 10s with matching colored edge gradient. Rain falls straight, others spin. 2 min cooldown
+- **🎰 Quick Gamble:** Client-side 50/50 for ±5 buddy coins. No server involved. Pinned to bottom of strip
+- **Socket events:** `EMOTESPLOSION_SEND/BROADCAST`, `SPOTLIGHT_SEND/BROADCAST`, `WEATHER_SEND/BROADCAST`
+- **Component:** `PetWithStream.jsx` manages all strip buttons, effects, and the CBC News live stream
+
+## Live Stream
+
+CBC News 24/7 YouTube live stream embedded above Buddy in the pet sidebar.
+
+- **Stream:** YouTube embed of CBC News live (video ID `5vfaDsMhCF4` — may change if stream restarts)
+- **Overlay:** Transparent click-interceptor hides YouTube controls by default. Click once to reveal controls for 5 seconds
+- **Component:** `PetWithStream.jsx` wraps `PetSidebar` with stream + button strip
+- **Layout:** Stream pinned at top, button strip on right (21%), Buddy scrolls below
+- **Desktop only:** Hidden on mobile and portrait orientation (`min-width: 960px` + `orientation: landscape`)
+- **Sidebar width:** 340px on desktop
+
+## Stock Ticker
+
+Scrolling real-time stock prices at the bottom of the screen during gameplay.
+
+- **Widget:** TradingView ticker tape embed (free, no API key, real-time data)
+- **Symbols:** S&P 500, NASDAQ 100, EUR/USD, Bitcoin, Ethereum, Apple, Google, Microsoft, Amazon, Tesla, NVIDIA, Meta, Shopify, Royal Bank, TD Bank
+- **Visibility:** Only on `gameVote`, `wagerPhase`, and `playing` screens
+- **Height:** 46px fixed at bottom. All bottom-positioned elements (GIF/Image buttons, pet sidebar) offset by 46px
+- **Component:** `StockTicker.jsx` + `StockTicker.module.css`
 
 ## Pet System (Tamagotchi)
 
