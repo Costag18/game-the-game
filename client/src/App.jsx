@@ -126,8 +126,6 @@ function GameRouter() {
 
   return (
     <>
-      <StockTicker />
-      <div style={{ paddingBottom: '46px' }}>
       {screen === 'menu' && <MainMenu onNavigate={setScreen} />}
       {screen === 'casino' && <CasinoMode onBack={() => setScreen('menu')} />}
       {screen === 'lobbyBrowser' && (
@@ -208,7 +206,7 @@ function GameRouter() {
       {screen !== 'menu' && <SettingsGear />}
       {screen === 'playing' && <TurnOverlay isMyTurn={tournament.gameState?.state?.isMyTurn} />}
       {showConfetti && <ConfettiOverlay />}
-      </div>
+      {screen === 'playing' && <StockTicker />}
     </>
   );
 }
