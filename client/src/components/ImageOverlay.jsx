@@ -94,32 +94,12 @@ export default function ImageOverlay({ isOpen, onToggle, onRequestClose }) {
     setError('');
   }
 
-  async function handleGenerate() {
+  function handleGenerate() {
     if (generating || cooldown > 0 || !prompt.trim()) return;
     setGenerating(true);
     setError('');
-    try {
-      const result = await window.puter?.ai?.txt2img?.(prompt.trim());
-      if (!result) throw new Error('Puter.js not available');
-      // result is a Blob or base64 depending on model
-      let imageUrl;
-      if (result instanceof Blob) {
-        imageUrl = URL.createObjectURL(result);
-      } else if (typeof result === 'string') {
-        imageUrl = result.startsWith('data:') ? result : `data:image/png;base64,${result}`;
-      } else if (result?.src) {
-        imageUrl = result.src;
-      } else {
-        throw new Error('Unexpected result format');
-      }
-      sendImage(imageUrl);
-      setGenerating(false);
-    } catch (err) {
-      setGenerating(false);
-      setError(err.message || 'AI generation failed');
-      clearTimeout(errorTimeoutRef.current);
-      errorTimeoutRef.current = setTimeout(() => setError(''), 10000);
-    }
+    setCooldown(BROADCAST_COOLDOWN);
+    socket?.emit(EVENTS.AI_IMAGE_SEND, { prompt: prompt.trim() });
   }
 
   function handleSearchSelect(img) {
@@ -234,7 +214,7 @@ export default function ImageOverlay({ isOpen, onToggle, onRequestClose }) {
 
           {error && <div className={styles.errorText}>{error}</div>}
           <div className={styles.attribution}>
-            {tab === 'ai' ? 'Powered by Puter AI' : 'Photos by Pexels'}
+            {tab === 'ai' ? 'Powered by Pollinations AI' : 'Photos by Pexels'}
           </div>
         </div>
       )}

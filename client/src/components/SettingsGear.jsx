@@ -72,37 +72,20 @@ export default function SettingsGear() {
     return () => clearTimeout(searchDebounceRef.current);
   }, [avatarSearchQuery, avatarTab]);
 
-  async function handleGenerateAvatar() {
+  function handleGenerateAvatar() {
     if (avatarGenerating || !avatarPrompt.trim() || !socket) return;
     setAvatarGenerating(true);
     setAvatarError('');
-    try {
-      const result = await window.puter?.ai?.txt2img?.(avatarPrompt.trim());
-      let dataUrl;
-      if (result instanceof Blob) {
-        dataUrl = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(result);
-        });
-      } else if (typeof result === 'string') {
-        dataUrl = result.startsWith('data:') ? result : `data:image/png;base64,${result}`;
-      } else {
-        throw new Error('Unexpected result from Puter AI');
+    socket.emit(EVENTS.SET_AVATAR, { prompt: avatarPrompt.trim() }, (response) => {
+      setAvatarGenerating(false);
+      if (response?.error) {
+        setAvatarError(response.error);
+      } else if (response?.avatar) {
+        setAvatar(response.avatar);
+        localStorage.setItem('gtg_avatar', response.avatar);
+        setAvatarPrompt('');
       }
-      socket.emit(EVENTS.SET_AVATAR, { avatar: dataUrl }, (response) => {
-        if (response?.success) {
-          setAvatar(dataUrl);
-          localStorage.setItem('gtg_avatar', dataUrl);
-          setAvatarPrompt('');
-        } else {
-          setAvatarError(response?.error || 'Failed to save avatar');
-        }
-      });
-    } catch (err) {
-      setAvatarError(err.message || 'Generation failed');
-    }
-    setAvatarGenerating(false);
+    });
   }
 
   function handleSearchAvatar(img) {
@@ -243,7 +226,7 @@ export default function SettingsGear() {
                 )}
               </div>
               {avatarError && <span className={styles.avatarError}>{avatarError}</span>}
-              <span className={styles.avatarAttrib}>Powered by Puter AI</span>
+              <span className={styles.avatarAttrib}>Powered by Pollinations AI</span>
             </>
           )}
 

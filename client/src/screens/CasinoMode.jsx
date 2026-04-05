@@ -159,24 +159,13 @@ function ImageGenerator({ socket }) {
     };
   }, [socket]);
 
-  async function handleGenerate() {
+  function handleGenerate() {
     if (generating || cooldown > 0 || !prompt.trim()) return;
     setGenerating(true);
     setError('');
     setImage(null);
     setCooldown(AI_COOLDOWN);
-    try {
-      const result = await window.puter.ai.txt2img(prompt.trim());
-      const dataUrl = result?.src || (result instanceof HTMLImageElement ? result.src : null);
-      if (!dataUrl) throw new Error('No image returned');
-      setImage(dataUrl);
-      socket?.emit(EVENTS.AI_IMAGE_SEND, { imageUrl: dataUrl });
-    } catch (err) {
-      setError(err?.message || 'Generation failed');
-      setCooldown(0);
-    } finally {
-      setGenerating(false);
-    }
+    socket?.emit(EVENTS.AI_IMAGE_SEND, { prompt: prompt.trim() });
   }
 
   function handleSearchChange(e) {
@@ -259,7 +248,7 @@ function ImageGenerator({ socket }) {
               {cooldown > 0 ? cooldown : 'Generate'}
             </button>
           </div>
-          <p className={styles.imageGenAttribution}>Powered by Puter AI</p>
+          <p className={styles.imageGenAttribution}>Powered by Pollinations AI</p>
         </>
       )}
 

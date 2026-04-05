@@ -25,6 +25,20 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
+// --- Image generation via Pollinations.ai (FLUX, free, no auth) ---
+async function generateImage(prompt) {
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60000);
+  const resp = await fetch(url, { signal: controller.signal });
+  clearTimeout(timeout);
+  if (!resp.ok) throw new Error(`Image generation failed (HTTP ${resp.status})`);
+  const arrayBuf = await resp.arrayBuffer();
+  if (arrayBuf.byteLength < 1000) throw new Error('Image generation returned empty result');
+  const base64 = Buffer.from(arrayBuf).toString('base64');
+  return `data:image/jpeg;base64,${base64}`;
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -265,25 +279,48 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
-  // --- Image Broadcast (client generates/picks, server validates & broadcasts) ---
-  socket.on(EVENTS.AI_IMAGE_SEND, (data) => {
+  // --- Image Broadcast (prompt → server generates, or imageUrl → direct broadcast) ---
+  socket.on(EVENTS.AI_IMAGE_SEND, async (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (!lobbyId) return;
-    const imageUrl = data?.imageUrl;
-    if (!imageUrl || typeof imageUrl !== 'string') return;
-    // Rate-limit: 10 seconds between image broadcasts per player
     const now = Date.now();
-    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 10000) return;
+    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 15000) return;
     socket.data._lastAiImage = now;
+
+    let imageUrl = data?.imageUrl;
+    if (!imageUrl && data?.prompt) {
+      // Generate via Pollinations
+      try {
+        const sanitized = String(data.prompt).trim().slice(0, 200);
+        if (!sanitized) return;
+        imageUrl = await generateImage(sanitized);
+      } catch (err) {
+        console.error('[AI Image] Error:', err.message);
+        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: err.message || 'Generation failed' });
+        socket.data._lastAiImage = 0;
+        return;
+      }
+    }
+    if (!imageUrl || typeof imageUrl !== 'string') return;
     io.to(lobbyId).emit(EVENTS.AI_IMAGE_BROADCAST, {
       imageUrl,
       nickname: socket.data.nickname || socket.id,
     });
   });
 
-  // --- Avatar Set (client generates/picks, server stores & broadcasts) ---
-  socket.on(EVENTS.SET_AVATAR, (data, callback) => {
-    const avatar = data?.avatar;
+  // --- Avatar Set (prompt → server generates, or avatar URL → direct set) ---
+  socket.on(EVENTS.SET_AVATAR, async (data, callback) => {
+    let avatar = data?.avatar;
+    if (!avatar && data?.prompt) {
+      try {
+        const sanitized = String(data.prompt).trim().slice(0, 100);
+        if (!sanitized) { if (callback) callback({ error: 'Prompt is required' }); return; }
+        avatar = await generateImage(sanitized);
+      } catch (err) {
+        if (callback) callback({ error: err.message || 'Generation failed' });
+        return;
+      }
+    }
     if (!avatar || typeof avatar !== 'string') {
       if (callback) callback({ error: 'Avatar image is required' });
       return;
