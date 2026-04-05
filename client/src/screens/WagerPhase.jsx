@@ -118,7 +118,7 @@ export default function WagerPhase({ tournamentState, voteResult, avatars, onSub
 
   return (
     <div className={styles.outerLayout}>
-      <PetWithStream />
+      <PetWithStream screen="wagerPhase" />
       <div className={styles.container}>
         <div className={styles.panel}>
         <h2 className={styles.title}>Place Your Wager</h2>

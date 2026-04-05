@@ -68,12 +68,13 @@
   border: 1.5px solid var(--gold-dim, #8a7230);
   background: rgba(42, 21, 21, 0.6);
   color: var(--gold, #d4a843);
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  flex-shrink: 0;
 }
 
 .stripBtn:hover:not(:disabled) {
@@ -87,11 +88,25 @@
   cursor: not-allowed;
 }
 
+.stripBtnWin {
+  border-color: #4caf50 !important;
+  background: rgba(76, 175, 80, 0.2) !important;
+}
+
+.stripBtnLose {
+  border-color: #e53935 !important;
+  background: rgba(229, 57, 53, 0.2) !important;
+}
+
 .stripCooldown {
-  font-size: 0.55rem;
+  font-size: 0.5rem;
   font-weight: 700;
   color: #e53935;
   font-family: var(--font-body, 'Raleway', sans-serif);
+}
+
+.stripSpacer {
+  flex: 1;
 }
 
 .extraPanel {
@@ -110,18 +125,76 @@
 }
 
 @keyframes explode {
-  0% {
-    transform: translate(0, 0) scale(0.3);
-    opacity: 1;
-  }
-  20% {
-    transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--dx), var(--dy)) scale(0.5);
-    opacity: 0;
-  }
+  0% { transform: translate(0, 0) scale(0.3); opacity: 1; }
+  20% { transform: translate(calc(var(--dx) * 0.3), calc(var(--dy) * 0.3)) scale(1.2); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.5); opacity: 0; }
+}
+
+/* --- Spotlight Effect --- */
+.spotlightOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  animation: spotlightFade 5s ease-out forwards;
+}
+
+.spotlightBeam {
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 140%;
+  background: radial-gradient(ellipse at center top, rgba(212, 168, 67, 0.25) 0%, transparent 70%);
+  animation: spotlightSweep 5s ease-in-out forwards;
+}
+
+.spotlightName {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--gold, #d4a843);
+  font-family: var(--font-heading, Georgia);
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-shadow: 0 0 20px rgba(212, 168, 67, 0.6), 0 2px 8px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  animation: spotlightNamePop 0.5s ease-out;
+}
+
+@keyframes spotlightFade {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes spotlightSweep {
+  0% { left: 30%; }
+  50% { left: 50%; }
+  100% { left: 70%; }
+}
+
+@keyframes spotlightNamePop {
+  0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+/* --- Weather Particles --- */
+.weatherParticle {
+  position: fixed;
+  top: -5%;
+  z-index: 9996;
+  pointer-events: none;
+  animation: weatherFall linear forwards;
+  will-change: transform;
+}
+
+@keyframes weatherFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
 
 @media (min-width: 960px) and (orientation: landscape) {

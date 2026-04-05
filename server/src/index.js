@@ -286,6 +286,34 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
+  // --- Spotlight (3 min cooldown, queues if multiple) ---
+  socket.on(EVENTS.SPOTLIGHT_SEND, () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    const now = Date.now();
+    if (socket.data._lastSpotlight && now - socket.data._lastSpotlight < 180000) return;
+    socket.data._lastSpotlight = now;
+    io.to(lobbyId).emit(EVENTS.SPOTLIGHT_BROADCAST, {
+      playerId: socket.id,
+      nickname: socket.data.nickname || socket.id,
+    });
+  });
+
+  // --- Weather Change (2 min cooldown) ---
+  socket.on(EVENTS.WEATHER_SEND, () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    const now = Date.now();
+    if (socket.data._lastWeather && now - socket.data._lastWeather < 120000) return;
+    socket.data._lastWeather = now;
+    const effects = ['rain', 'snow', 'confetti', 'stars', 'hearts'];
+    const effect = effects[Math.floor(Math.random() * effects.length)];
+    io.to(lobbyId).emit(EVENTS.WEATHER_BROADCAST, {
+      effect,
+      playerId: socket.id,
+    });
+  });
+
   // --- GIF Reactions ---
   socket.on(EVENTS.GIF_SEND, (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);

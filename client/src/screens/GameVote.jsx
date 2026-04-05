@@ -68,7 +68,7 @@ export default function GameVote({ eligibleGames, tournamentState, nicknames, av
 
   return (
     <div className={styles.outerLayout}>
-      <PetWithStream />
+      <PetWithStream screen="gameVote" />
       {/* Coins background at top */}
       <div className={styles.coinsBackground}>
         <img src={coinsImg} alt="" className={styles.coinsImage} />

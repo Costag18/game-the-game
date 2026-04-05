@@ -58,4 +58,8 @@ export const EVENTS = {
   AVATAR_UPDATE: 'player:avatarUpdate',
   EMOTESPLOSION_SEND: 'emote:explosionSend',
   EMOTESPLOSION_BROADCAST: 'emote:explosionBroadcast',
+  SPOTLIGHT_SEND: 'effect:spotlightSend',
+  SPOTLIGHT_BROADCAST: 'effect:spotlightBroadcast',
+  WEATHER_SEND: 'effect:weatherSend',
+  WEATHER_BROADCAST: 'effect:weatherBroadcast',
 };

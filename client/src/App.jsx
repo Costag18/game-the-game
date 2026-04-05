@@ -174,7 +174,7 @@ function GameRouter() {
                 onAction={tournament.sendAction}
               />
             </div>
-            <div className="petFixedSidebar"><PetWithStream /></div>
+            <div className="petFixedSidebar"><PetWithStream screen="playing" /></div>
           </>
         );
       })()}
