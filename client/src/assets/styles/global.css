@@ -4,6 +4,8 @@ body {
   background-color: var(--bg-dark, #1a0a0a);
   color: var(--text-primary, #f0e6d3);
   min-height: 100vh;
+  max-width: 1920px;
+  margin: 0 auto;
 }
 .app {
   display: flex;
