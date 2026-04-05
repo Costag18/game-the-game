@@ -306,7 +306,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const now = Date.now();
     if (socket.data._lastWeather && now - socket.data._lastWeather < 120000) return;
     socket.data._lastWeather = now;
-    const effects = ['rain', 'snow', 'confetti', 'stars', 'hearts'];
+    const effects = ['rain', 'snow', 'sunny', 'stars', 'hearts'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     io.to(lobbyId).emit(EVENTS.WEATHER_BROADCAST, {
       effect,

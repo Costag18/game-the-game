@@ -11,7 +11,7 @@ const EXPLOSION_COOLDOWN = 60;
 const SPOTLIGHT_COOLDOWN = 180;
 const WEATHER_COOLDOWN = 120;
 const EXPLOSION_EMOJIS = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉', '💥', '✨', '🎆', '🎇'];
-const WEATHER_PARTICLES = { rain: '💧', snow: '❄️', confetti: '🎊', stars: '⭐', hearts: '❤️' };
+const WEATHER_PARTICLES = { rain: '💧', snow: '❄️', sunny: '☀️', stars: '⭐', hearts: '❤️' };
 
 export default function PetWithStream({ children, screen }) {
   const { socket } = useSocketContext();

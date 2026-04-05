@@ -178,9 +178,9 @@
   background: radial-gradient(ellipse at center, transparent 40%, rgba(140, 200, 240, 0.3) 100%);
 }
 
-/* Confetti — warm golden */
-.weather_confetti {
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(212, 168, 67, 0.2) 100%);
+/* Sunny — warm yellow/orange */
+.weather_sunny {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 200, 50, 0.25) 100%);
 }
 
 /* Stars — dark night blue */
