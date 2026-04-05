@@ -28,6 +28,15 @@ export default function SettingsGear() {
 
   const searchDebounceRef = useRef(null);
 
+  // Restore saved avatar on connect — send to server so it's available in lobbies/tournaments
+  useEffect(() => {
+    if (!socket) return;
+    const saved = localStorage.getItem('gtg_avatar');
+    if (saved) {
+      socket.emit(EVENTS.SET_AVATAR, { avatar: saved }, () => {});
+    }
+  }, [socket]);
+
   // Listen for avatar updates (from other sessions or reconnects)
   useEffect(() => {
     if (!socket) return;
