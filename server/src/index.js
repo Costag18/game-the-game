@@ -273,6 +273,19 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
+  // --- Emotesplosion (300s cooldown) ---
+  socket.on(EVENTS.EMOTESPLOSION_SEND, () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    const now = Date.now();
+    if (socket.data._lastExplosion && now - socket.data._lastExplosion < 300000) return;
+    socket.data._lastExplosion = now;
+    io.to(lobbyId).emit(EVENTS.EMOTESPLOSION_BROADCAST, {
+      playerId: socket.id,
+      nickname: socket.data.nickname || socket.id,
+    });
+  });
+
   // --- GIF Reactions ---
   socket.on(EVENTS.GIF_SEND, (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);

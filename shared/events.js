@@ -56,4 +56,6 @@ export const EVENTS = {
   AI_IMAGE_ERROR: 'ai-image:error',
   SET_AVATAR: 'player:setAvatar',
   AVATAR_UPDATE: 'player:avatarUpdate',
+  EMOTESPLOSION_SEND: 'emote:explosionSend',
+  EMOTESPLOSION_BROADCAST: 'emote:explosionBroadcast',
 };
