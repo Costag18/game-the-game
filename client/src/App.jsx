@@ -14,6 +14,7 @@ import RoundResults from './screens/RoundResults.jsx';
 import TournamentEnd from './screens/TournamentEnd.jsx';
 import CasinoMode from './screens/CasinoMode.jsx';
 import PetWithStream from './components/PetWithStream.jsx';
+import StockTicker from './components/StockTicker.jsx';
 import EmoteOverlay from './components/EmoteOverlay.jsx';
 import SettingsGear from './components/SettingsGear.jsx';
 import ConfettiOverlay from './components/ConfettiOverlay.jsx';
@@ -125,6 +126,8 @@ function GameRouter() {
 
   return (
     <>
+      <StockTicker />
+      <div style={{ paddingTop: '46px' }}>
       {screen === 'menu' && <MainMenu onNavigate={setScreen} />}
       {screen === 'casino' && <CasinoMode onBack={() => setScreen('menu')} />}
       {screen === 'lobbyBrowser' && (
@@ -205,6 +208,7 @@ function GameRouter() {
       {screen !== 'menu' && <SettingsGear />}
       {screen === 'playing' && <TurnOverlay isMyTurn={tournament.gameState?.state?.isMyTurn} />}
       {showConfetti && <ConfettiOverlay />}
+      </div>
     </>
   );
 }
