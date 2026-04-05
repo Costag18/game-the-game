@@ -29,8 +29,13 @@ export default function PetWithStream({ children }) {
         )}
       </div>
       {children && <div className={styles.extraPanel}>{children}</div>}
-      <div className={styles.petScroll}>
-        <PetSidebar />
+      <div className={styles.bottomRow}>
+        <div className={styles.petScroll}>
+          <PetSidebar />
+        </div>
+        <div className={styles.buttonStrip}>
+          {/* Buttons go here — tell me what you want! */}
+        </div>
       </div>
     </div>
   );

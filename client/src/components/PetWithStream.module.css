@@ -24,13 +24,37 @@
   z-index: 1;
 }
 
+.bottomRow {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
 .petScroll {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: none;
+  min-width: 0;
 }
 
 .petScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.buttonStrip {
+  display: none;
+  width: 100px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--gold-dim, #8a7230);
+  background: var(--bg-panel, #2a1515);
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 0.4rem;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.buttonStrip::-webkit-scrollbar {
   display: none;
 }
 
@@ -47,5 +71,8 @@
   .streamBox {
     display: block;
     flex-shrink: 0;
+  }
+  .buttonStrip {
+    display: flex;
   }
 }
