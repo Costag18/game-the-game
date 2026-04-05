@@ -130,42 +130,19 @@
   100% { transform: translate(var(--dx), var(--dy)) scale(0.5); opacity: 0; }
 }
 
-/* --- Spotlight Effect — dim screen + oval cutout over name --- */
+/* --- Spotlight Effect — dim screen with bright oval cutout --- */
 .spotlightOverlay {
   position: fixed;
   inset: 0;
   z-index: 9997;
   pointer-events: none;
+  background: radial-gradient(
+    ellipse var(--spot-w, 300px) var(--spot-h, 80px) at var(--spot-x, 50%) var(--spot-y, 50%),
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
   animation: spotlightFade 5s ease-out forwards;
-}
-
-.spotlightDim {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.spotlightOval {
-  position: fixed;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6), 0 0 40px 10px rgba(212, 168, 67, 0.4), 0 0 80px 20px rgba(212, 168, 67, 0.15);
-  background: transparent;
-  z-index: 9998;
-  animation: spotlightPulse 2s ease-in-out infinite;
-}
-
-.spotlightName {
-  position: fixed;
-  transform: translateX(-50%);
-  color: var(--gold, #d4a843);
-  font-family: var(--font-heading, Georgia);
-  font-size: 1rem;
-  font-weight: 700;
-  text-shadow: 0 0 20px rgba(212, 168, 67, 0.8), 0 2px 8px rgba(0, 0, 0, 0.9);
-  white-space: nowrap;
-  z-index: 9999;
-  animation: spotlightNamePop 0.5s ease-out;
 }
 
 @keyframes spotlightFade {
@@ -173,16 +150,6 @@
   10% { opacity: 1; }
   80% { opacity: 1; }
   100% { opacity: 0; }
-}
-
-@keyframes spotlightPulse {
-  0%, 100% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6), 0 0 40px 10px rgba(212, 168, 67, 0.4); }
-  50% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6), 0 0 60px 15px rgba(212, 168, 67, 0.5); }
-}
-
-@keyframes spotlightNamePop {
-  0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
-  100% { transform: translateX(-50%) scale(1); opacity: 1; }
 }
 
 /* --- Weather Particles --- */

@@ -223,22 +223,15 @@ export default function PetWithStream({ children, screen }) {
         }} onAnimationEnd={() => removeParticle(p.id)}>{p.emoji}</span>
       ))}
 
-      {/* Spotlight — dim screen + oval over player name */}
+      {/* Spotlight — dim screen + bright oval cutout over player name */}
       {spotlights.map((s) => (
-        <div key={s.id} className={styles.spotlightOverlay}>
-          <div className={styles.spotlightDim} />
-          {s.rect ? (
-            <div className={styles.spotlightOval} style={{
-              left: s.rect.left + s.rect.width / 2,
-              top: s.rect.top + s.rect.height / 2,
-              width: Math.max(s.rect.width + 60, 200),
-              height: s.rect.height + 40,
-            }} />
-          ) : null}
-          <span className={styles.spotlightName}
-            style={s.rect ? { left: s.rect.left + s.rect.width / 2, top: s.rect.top - 30 } : {}}>
-            🔦 {s.nickname}
-          </span>
+        <div key={s.id} className={styles.spotlightOverlay}
+          style={s.rect ? {
+            '--spot-x': `${s.rect.left + s.rect.width / 2}px`,
+            '--spot-y': `${s.rect.top + s.rect.height / 2}px`,
+            '--spot-w': `${Math.max(s.rect.width + 80, 220)}px`,
+            '--spot-h': `${s.rect.height + 50}px`,
+          } : {}}>
         </div>
       ))}
 
