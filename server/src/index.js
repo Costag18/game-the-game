@@ -25,8 +25,21 @@ function adjustScore(tm, playerId, delta) {
   return tm.scores[playerId];
 }
 
+// --- Global Pollinations rate limit: 1 request per 16s across all users ---
+let _lastPollinationsRequest = 0;
+const POLLINATIONS_COOLDOWN_MS = 16000;
+
+function getPollinationsWaitTime() {
+  const elapsed = Date.now() - _lastPollinationsRequest;
+  if (elapsed >= POLLINATIONS_COOLDOWN_MS) return 0;
+  return Math.ceil((POLLINATIONS_COOLDOWN_MS - elapsed) / 1000);
+}
+
 // --- Image generation via Pollinations.ai (FLUX, free, no auth) ---
 async function generateImage(prompt) {
+  const wait = getPollinationsWaitTime();
+  if (wait > 0) throw new Error(`AI is busy — try again in ${wait}s`);
+  _lastPollinationsRequest = Date.now();
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 60000);
@@ -283,13 +296,15 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.AI_IMAGE_SEND, async (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (!lobbyId) return;
-    const now = Date.now();
-    if (socket.data._lastAiImage && now - socket.data._lastAiImage < 15000) return;
-    socket.data._lastAiImage = now;
 
     let imageUrl = data?.imageUrl;
     if (!imageUrl && data?.prompt) {
-      // Generate via Pollinations
+      // Check global Pollinations cooldown before generating
+      const wait = getPollinationsWaitTime();
+      if (wait > 0) {
+        socket.emit(EVENTS.AI_IMAGE_ERROR, { error: `AI is busy — try again in ${wait}s`, waitSeconds: wait });
+        return;
+      }
       try {
         const sanitized = String(data.prompt).trim().slice(0, 200);
         if (!sanitized) return;
@@ -297,7 +312,6 @@ io.on(EVENTS.CONNECTION, (socket) => {
       } catch (err) {
         console.error('[AI Image] Error:', err.message);
         socket.emit(EVENTS.AI_IMAGE_ERROR, { error: err.message || 'Generation failed' });
-        socket.data._lastAiImage = 0;
         return;
       }
     }
@@ -312,6 +326,11 @@ io.on(EVENTS.CONNECTION, (socket) => {
   socket.on(EVENTS.SET_AVATAR, async (data, callback) => {
     let avatar = data?.avatar;
     if (!avatar && data?.prompt) {
+      const wait = getPollinationsWaitTime();
+      if (wait > 0) {
+        if (callback) callback({ error: `AI is busy — try again in ${wait}s` });
+        return;
+      }
       try {
         const sanitized = String(data.prompt).trim().slice(0, 100);
         if (!sanitized) { if (callback) callback({ error: 'Prompt is required' }); return; }

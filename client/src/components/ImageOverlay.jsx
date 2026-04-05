@@ -3,7 +3,7 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import styles from './ImageOverlay.module.css';
 
-const BROADCAST_COOLDOWN = 10; // seconds — matches server rate limit
+const BROADCAST_COOLDOWN = 16; // seconds — matches Pollinations global rate limit
 let flyIdCounter = 0;
 
 export default function ImageOverlay({ isOpen, onToggle, onRequestClose }) {
@@ -55,7 +55,12 @@ export default function ImageOverlay({ isOpen, onToggle, onRequestClose }) {
     function onError(data) {
       setGenerating(false);
       setError(data?.error || 'Failed');
-      setCooldown(0);
+      // If server tells us how long to wait, set that as cooldown
+      if (data?.waitSeconds) {
+        setCooldown(data.waitSeconds);
+      } else {
+        setCooldown(0);
+      }
       clearTimeout(errorTimeoutRef.current);
       errorTimeoutRef.current = setTimeout(() => setError(''), 10000);
     }
