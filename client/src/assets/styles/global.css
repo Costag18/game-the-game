@@ -67,7 +67,7 @@ html.screen-shake-heavy { animation: shakeHeavy 0.4s ease-out; }
   .petFixedSidebar {
     display: block;
     position: fixed;
-    top: 46px;
+    top: 0;
     left: 0;
     width: 340px;
     height: calc(100vh - 46px);

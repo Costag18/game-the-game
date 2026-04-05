@@ -127,7 +127,7 @@ function GameRouter() {
   return (
     <>
       <StockTicker />
-      <div style={{ paddingTop: '46px' }}>
+      <div style={{ paddingBottom: '46px' }}>
       {screen === 'menu' && <MainMenu onNavigate={setScreen} />}
       {screen === 'casino' && <CasinoMode onBack={() => setScreen('menu')} />}
       {screen === 'lobbyBrowser' && (
