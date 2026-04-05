@@ -206,7 +206,7 @@ function GameRouter() {
       {screen !== 'menu' && <SettingsGear />}
       {screen === 'playing' && <TurnOverlay isMyTurn={tournament.gameState?.state?.isMyTurn} />}
       {showConfetti && <ConfettiOverlay />}
-      {screen === 'playing' && <StockTicker />}
+      {['playing', 'gameVote', 'wagerPhase'].includes(screen) && <StockTicker />}
     </>
   );
 }

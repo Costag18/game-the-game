@@ -1,5 +1,6 @@
 .outerLayout {
   min-height: 100vh;
+  padding-bottom: 46px;
   background-color: var(--mahogany);
   background-image:
     radial-gradient(ellipse at top, var(--burgundy) 0%, var(--mahogany) 50%, var(--bg-dark) 100%);
