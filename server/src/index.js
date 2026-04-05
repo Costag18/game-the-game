@@ -278,7 +278,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (!lobbyId) return;
     const now = Date.now();
-    if (socket.data._lastExplosion && now - socket.data._lastExplosion < 300000) return;
+    if (socket.data._lastExplosion && now - socket.data._lastExplosion < 60000) return;
     socket.data._lastExplosion = now;
     io.to(lobbyId).emit(EVENTS.EMOTESPLOSION_BROADCAST, {
       playerId: socket.id,

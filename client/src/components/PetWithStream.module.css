@@ -44,7 +44,7 @@
 
 .buttonStrip {
   display: none;
-  width: 22%;
+  width: 21%;
   flex-shrink: 0;
   border-left: 0.25px solid rgba(138, 114, 48, 0.4);
   background: var(--bg-panel, #2a1515);

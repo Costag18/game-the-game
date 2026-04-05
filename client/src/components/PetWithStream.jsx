@@ -5,7 +5,7 @@ import PetSidebar from './PetSidebar.jsx';
 import styles from './PetWithStream.module.css';
 
 const STREAM_ID = '5vfaDsMhCF4'; // CBC News 24/7 live
-const EXPLOSION_COOLDOWN = 300; // 5 minutes
+const EXPLOSION_COOLDOWN = 60; // 1 minute
 const EXPLOSION_EMOJIS = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉', '💥', '✨', '🎆', '🎇'];
 
 export default function PetWithStream({ children }) {
