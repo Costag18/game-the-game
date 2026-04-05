@@ -10,7 +10,6 @@ export const THEMES = [
   { id: 'emerald', name: 'Emerald', swatch: '#1c6b2c' },
   { id: 'midnight', name: 'Midnight', swatch: '#3c1c6b' },
   { id: 'noir', name: 'Noir', swatch: '#222222' },
-  { id: 'ivory', name: 'Ivory', swatch: '#ece5d5' },
 ];
 
 function applyTheme(id) {
