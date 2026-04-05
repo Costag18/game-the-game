@@ -30,7 +30,7 @@ export default function PetWithStream({ children, screen }) {
   const [explosionParticles, setExplosionParticles] = useState([]);
   const [spotlights, setSpotlights] = useState([]);
   const [weatherEffect, setWeatherEffect] = useState(null);
-  const [showTomato, setShowTomato] = useState(false);
+  const [tomatoState, setTomatoState] = useState(null); // null | 'flying' | 'splat'
 
   // Quick gamble
   const [gambleResult, setGambleResult] = useState(null);
@@ -107,8 +107,14 @@ export default function PetWithStream({ children, screen }) {
     }
 
     function onTomato() {
-      setShowTomato(true);
-      setTimeout(() => setShowTomato(false), 8000);
+      setTomatoState('flying');
+      // After arc completes (1.2s), show splat + play sound
+      setTimeout(() => {
+        setTomatoState('splat');
+        try { playSound('tomatoSplat'); } catch {}
+      }, 1200);
+      // Clear after splat fades (another 1.5s)
+      setTimeout(() => setTomatoState(null), 2700);
     }
 
     socket.on(EVENTS.EMOTESPLOSION_BROADCAST, onExplosion);
@@ -276,11 +282,12 @@ export default function PetWithStream({ children, screen }) {
         </>
       )}
 
-      {/* Tomato fullscreen overlay */}
-      {showTomato && (
-        <div className={styles.tomatoOverlay}>
-          <img src={`/tomato.gif?t=${Date.now()}`} alt="Tomato!" className={styles.tomatoImg} />
-        </div>
+      {/* Tomato throw animation */}
+      {tomatoState === 'flying' && (
+        <span className={styles.tomatoFlying}>🍅</span>
+      )}
+      {tomatoState === 'splat' && (
+        <span className={styles.tomatoSplat}>💥</span>
       )}
     </div>
   );

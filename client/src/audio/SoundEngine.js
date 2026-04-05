@@ -147,6 +147,11 @@ const sounds = {
     setTimeout(() => playTone(1500, 0.1, { type: 'square', gain: 0.09 }), 70);
   },
   coinCollect: () => playTone(1400, 0.06, { type: 'triangle', gain: 0.08 }),
+  tomatoSplat: () => {
+    playTone(120, 0.15, { type: 'sine', gain: 0.15 });
+    playNoise(0.2, { gain: 0.12, bandpass: 800 });
+    setTimeout(() => playNoise(0.15, { gain: 0.08, bandpass: 600 }), 50);
+  },
 };
 
 export default sounds;

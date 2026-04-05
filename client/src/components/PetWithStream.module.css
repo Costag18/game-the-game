@@ -217,29 +217,52 @@
   100% { transform: translateY(110vh); opacity: 0; }
 }
 
-/* --- Tomato Fullscreen Overlay --- */
-.tomatoOverlay {
+/* --- Tomato Throw Animation --- */
+.tomatoFlying {
   position: fixed;
-  inset: 0;
   z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 4rem;
   pointer-events: none;
-  animation: tomatoFade 8s ease-out forwards;
+  animation: tomatoArc 1.2s ease-in forwards;
 }
 
-.tomatoImg {
-  width: 100vw;
-  height: 100vh;
-  object-fit: contain;
+@keyframes tomatoArc {
+  0% {
+    left: -10%;
+    top: 80%;
+    transform: rotate(0deg) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    left: 40%;
+    top: 20%;
+    transform: rotate(360deg) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    left: 50%;
+    top: 45%;
+    transform: rotate(720deg) scale(1);
+    opacity: 1;
+  }
 }
 
-@keyframes tomatoFade {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
+.tomatoSplat {
+  position: fixed;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  font-size: 8rem;
+  pointer-events: none;
+  animation: splatPop 1.5s ease-out forwards;
+}
+
+@keyframes splatPop {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+  15% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+  40% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
 }
 
 @media (min-width: 960px) and (orientation: landscape) {
