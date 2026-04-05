@@ -152,6 +152,47 @@
   100% { opacity: 0; }
 }
 
+/* --- Weather Overlay (edge gradient per effect) --- */
+.weatherOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9995;
+  pointer-events: none;
+  animation: weatherOverlayFade 10s ease-out forwards;
+}
+
+@keyframes weatherOverlayFade {
+  0% { opacity: 0; }
+  8% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Rain — dark blue */
+.weather_rain {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(30, 60, 120, 0.35) 100%);
+}
+
+/* Snow — light icy blue */
+.weather_snow {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(140, 200, 240, 0.3) 100%);
+}
+
+/* Confetti — warm golden */
+.weather_confetti {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(212, 168, 67, 0.2) 100%);
+}
+
+/* Stars — dark night blue */
+.weather_stars {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(15, 15, 60, 0.45) 100%);
+}
+
+/* Hearts — soft red/pink */
+.weather_hearts {
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(200, 50, 80, 0.3) 100%);
+}
+
 /* --- Weather Particles --- */
 .weatherParticle {
   position: fixed;

@@ -236,14 +236,20 @@ export default function PetWithStream({ children, screen }) {
       ))}
 
       {/* Weather particles */}
-      {weatherEffect && weatherEffect.particles.map((p) => (
-        <span key={p.id} className={styles.weatherParticle} style={{
-          left: `${p.x}%`, fontSize: `${p.size}rem`,
-          animationDuration: `${p.duration}s`, animationDelay: `${p.delay}s`,
-        }} onAnimationEnd={() => setWeatherEffect((w) => w ? { ...w, particles: w.particles.filter((pp) => pp.id !== p.id) } : null)}>
-          {p.emoji}
-        </span>
-      ))}
+      {/* Weather overlay + particles */}
+      {weatherEffect && (
+        <>
+          <div className={`${styles.weatherOverlay} ${styles[`weather_${weatherEffect.effect}`] || ''}`} />
+          {weatherEffect.particles.map((p) => (
+            <span key={p.id} className={styles.weatherParticle} style={{
+              left: `${p.x}%`, fontSize: `${p.size}rem`,
+              animationDuration: `${p.duration}s`, animationDelay: `${p.delay}s`,
+            }} onAnimationEnd={() => setWeatherEffect((w) => w ? { ...w, particles: w.particles.filter((pp) => pp.id !== p.id) } : null)}>
+              {p.emoji}
+            </span>
+          ))}
+        </>
+      )}
     </div>
   );
 }
