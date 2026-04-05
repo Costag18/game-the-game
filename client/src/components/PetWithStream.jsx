@@ -106,13 +106,20 @@ export default function PetWithStream({ children, screen }) {
       setTimeout(() => setWeatherEffect(null), 10000);
     }
 
+    function onTomato() {
+      setShowTomato(true);
+      setTimeout(() => setShowTomato(false), 4000);
+    }
+
     socket.on(EVENTS.EMOTESPLOSION_BROADCAST, onExplosion);
     socket.on(EVENTS.SPOTLIGHT_BROADCAST, onSpotlight);
     socket.on(EVENTS.WEATHER_BROADCAST, onWeather);
+    socket.on(EVENTS.TOMATO_BROADCAST, onTomato);
     return () => {
       socket.off(EVENTS.EMOTESPLOSION_BROADCAST, onExplosion);
       socket.off(EVENTS.SPOTLIGHT_BROADCAST, onSpotlight);
       socket.off(EVENTS.WEATHER_BROADCAST, onWeather);
+      socket.off(EVENTS.TOMATO_BROADCAST, onTomato);
     };
   }, [socket]);
 
@@ -136,10 +143,9 @@ export default function PetWithStream({ children, screen }) {
   }
 
   function handleTomato() {
-    if (tomatoCD > 0) return;
-    setShowTomato(true);
+    if (tomatoCD > 0 || !socket) return;
+    socket.emit(EVENTS.TOMATO_SEND);
     setTomatoCD(TOMATO_COOLDOWN);
-    setTimeout(() => setShowTomato(false), 4000);
   }
 
   function handleGamble() {
@@ -273,7 +279,7 @@ export default function PetWithStream({ children, screen }) {
       {/* Tomato fullscreen overlay */}
       {showTomato && (
         <div className={styles.tomatoOverlay}>
-          <img src="/tomato.gif" alt="Tomato!" className={styles.tomatoImg} />
+          <img src={`/tomato.gif?t=${Date.now()}`} alt="Tomato!" className={styles.tomatoImg} />
         </div>
       )}
     </div>

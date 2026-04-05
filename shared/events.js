@@ -62,4 +62,6 @@ export const EVENTS = {
   SPOTLIGHT_BROADCAST: 'effect:spotlightBroadcast',
   WEATHER_SEND: 'effect:weatherSend',
   WEATHER_BROADCAST: 'effect:weatherBroadcast',
+  TOMATO_SEND: 'effect:tomatoSend',
+  TOMATO_BROADCAST: 'effect:tomatoBroadcast',
 };

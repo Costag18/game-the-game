@@ -222,7 +222,6 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -231,16 +230,16 @@
 }
 
 .tomatoImg {
-  max-width: 80vw;
-  max-height: 80vh;
+  width: 100vw;
+  height: 100vh;
   object-fit: contain;
 }
 
 @keyframes tomatoFade {
-  0% { opacity: 0; transform: scale(0.5); }
-  15% { opacity: 1; transform: scale(1); }
-  75% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.1); }
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @media (min-width: 960px) and (orientation: landscape) {

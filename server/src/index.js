@@ -314,6 +314,16 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
+  // --- Tomato (30s cooldown) ---
+  socket.on(EVENTS.TOMATO_SEND, () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    const now = Date.now();
+    if (socket.data._lastTomato && now - socket.data._lastTomato < 30000) return;
+    socket.data._lastTomato = now;
+    io.to(lobbyId).emit(EVENTS.TOMATO_BROADCAST, { playerId: socket.id });
+  });
+
   // --- GIF Reactions ---
   socket.on(EVENTS.GIF_SEND, (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
