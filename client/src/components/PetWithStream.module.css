@@ -217,6 +217,32 @@
   100% { transform: translateY(110vh); opacity: 0; }
 }
 
+/* --- Tomato Fullscreen Overlay --- */
+.tomatoOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: tomatoFade 4s ease-out forwards;
+}
+
+.tomatoImg {
+  max-width: 80vw;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+@keyframes tomatoFade {
+  0% { opacity: 0; transform: scale(0.5); }
+  15% { opacity: 1; transform: scale(1); }
+  75% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
 @media (min-width: 960px) and (orientation: landscape) {
   .wrapper {
     display: flex;

@@ -338,7 +338,7 @@
     order: 0;
     flex: 0 0 280px;
     width: 280px;
-    height: 100vh;
+    height: calc(100vh - 46px);
     max-height: none;
     border-top: none;
     border-left: 2px solid var(--gold-dim, #8a7230);

@@ -10,6 +10,7 @@ const STREAM_ID = '5vfaDsMhCF4'; // CBC News 24/7 live
 const EXPLOSION_COOLDOWN = 60;
 const SPOTLIGHT_COOLDOWN = 180;
 const WEATHER_COOLDOWN = 120;
+const TOMATO_COOLDOWN = 30;
 const EXPLOSION_EMOJIS = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉', '💥', '✨', '🎆', '🎇'];
 const WEATHER_PARTICLES = { rain: '💧', snow: '❄️', sunny: '☀️', stars: '⭐', hearts: '❤️' };
 
@@ -23,29 +24,32 @@ export default function PetWithStream({ children, screen }) {
   const [explosionCD, setExplosionCD] = useState(0);
   const [spotlightCD, setSpotlightCD] = useState(0);
   const [weatherCD, setWeatherCD] = useState(0);
+  const [tomatoCD, setTomatoCD] = useState(0);
 
   // Effects
   const [explosionParticles, setExplosionParticles] = useState([]);
-  const [spotlights, setSpotlights] = useState([]); // [{playerId, nickname, id, rect}]
+  const [spotlights, setSpotlights] = useState([]);
   const [weatherEffect, setWeatherEffect] = useState(null);
+  const [showTomato, setShowTomato] = useState(false);
 
   // Quick gamble
-  const [gambleResult, setGambleResult] = useState(null); // 'win' | 'lose' | null
+  const [gambleResult, setGambleResult] = useState(null);
 
   const hideTimerRef = useRef(null);
   const particleId = useRef(0);
 
   // Unified cooldown ticker
   useEffect(() => {
-    const hasAnyCooldown = explosionCD > 0 || spotlightCD > 0 || weatherCD > 0;
+    const hasAnyCooldown = explosionCD > 0 || spotlightCD > 0 || weatherCD > 0 || tomatoCD > 0;
     if (!hasAnyCooldown) return;
     const iv = setInterval(() => {
       setExplosionCD((c) => Math.max(0, c - 1));
       setSpotlightCD((c) => Math.max(0, c - 1));
       setWeatherCD((c) => Math.max(0, c - 1));
+      setTomatoCD((c) => Math.max(0, c - 1));
     }, 1000);
     return () => clearInterval(iv);
-  }, [explosionCD > 0 || spotlightCD > 0 || weatherCD > 0]);
+  }, [explosionCD > 0 || spotlightCD > 0 || weatherCD > 0 || tomatoCD > 0]);
 
   // --- Socket listeners ---
   useEffect(() => {
@@ -131,6 +135,13 @@ export default function PetWithStream({ children, screen }) {
     setWeatherCD(WEATHER_COOLDOWN);
   }
 
+  function handleTomato() {
+    if (tomatoCD > 0) return;
+    setShowTomato(true);
+    setTomatoCD(TOMATO_COOLDOWN);
+    setTimeout(() => setShowTomato(false), 4000);
+  }
+
   function handleGamble() {
     if (gambleResult) return; // wait for previous result to clear
     const won = Math.random() >= 0.5;
@@ -197,6 +208,12 @@ export default function PetWithStream({ children, screen }) {
             {weatherCD > 0 ? <span className={styles.stripCooldown}>{fmt(weatherCD)}</span> : <span>🌧️</span>}
           </button>
 
+          {/* Tomato */}
+          <button className={styles.stripBtn} onClick={handleTomato} disabled={tomatoCD > 0}
+            title={tomatoCD > 0 ? `Wait ${fmt(tomatoCD)}` : 'Tomato!'}>
+            {tomatoCD > 0 ? <span className={styles.stripCooldown}>{fmt(tomatoCD)}</span> : <span>🍅</span>}
+          </button>
+
           {/* Spacer */}
           <div className={styles.stripSpacer} />
 
@@ -251,6 +268,13 @@ export default function PetWithStream({ children, screen }) {
             </span>
           ))}
         </>
+      )}
+
+      {/* Tomato fullscreen overlay */}
+      {showTomato && (
+        <div className={styles.tomatoOverlay}>
+          <img src="/tomato.gif" alt="Tomato!" className={styles.tomatoImg} />
+        </div>
       )}
     </div>
   );

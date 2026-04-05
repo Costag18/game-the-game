@@ -1114,6 +1114,27 @@ function handlePlayerLeave(socket) {
       try {
         tm.activeGame.removePlayer?.(socket.id);
       } catch (e) { /* ignore */ }
+      // If only 1 player left in active game, force-complete it
+      if (tm.players.length === 1 && !tm.activeGame.isComplete()) {
+        try {
+          const results = tm.activeGame.getResults();
+          const placements = results.map((r) => r.playerId);
+          const lobby = lobbyManager.getLobby(lobbyId);
+          tm.activeGame = null;
+          const roundScores = tm.completeRound(placements, results);
+          io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
+          io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
+            placements, scores: roundScores, gameId: tm.selectedGame,
+            standings: tm.getStandings().map((s) => ({
+              ...s,
+              nickname: lobby?.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+              avatar: lobby?.avatars?.[s.playerId] || null,
+            })),
+            gameResults: results,
+          });
+          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+        } catch (e) { console.error('[Leave] Force-complete error:', e.message); }
+      }
     }
 
     const lobby = lobbyManager.getLobby(lobbyId);
