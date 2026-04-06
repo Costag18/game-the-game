@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import path from 'path';
+import fs from 'fs';
 import { EVENTS } from '../../shared/events.js';
 import { LobbyManager } from './lobby/LobbyManager.js';
 import { TournamentManager } from './tournament/TournamentManager.js';
@@ -54,6 +55,10 @@ async function generateImage(prompt) {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// --- Suggestions directory ---
+const suggestionsDir = path.join(__dirname, '../data/suggestions');
+fs.mkdirSync(suggestionsDir, { recursive: true });
 
 const app = express();
 const httpServer = createServer(app);
@@ -1079,6 +1084,37 @@ io.on(EVENTS.CONNECTION, (socket) => {
       } else {
         emitRoundEnd();
       }
+    }
+  });
+
+  // --- Suggestion Box ---
+  socket.on(EVENTS.SUGGESTION_SUBMIT, (data, callback) => {
+    const text = typeof data?.text === 'string' ? data.text.trim().slice(0, 500) : '';
+    if (!text) {
+      if (typeof callback === 'function') callback({ error: 'Suggestion cannot be empty' });
+      return;
+    }
+    const now = Date.now();
+    if (socket.data._lastSuggestion && now - socket.data._lastSuggestion < 60000) {
+      if (typeof callback === 'function') callback({ error: 'Please wait before submitting another suggestion' });
+      return;
+    }
+    socket.data._lastSuggestion = now;
+    const nickname = socket.data.nickname || 'Anonymous';
+    const date = new Date();
+    const timestamp = date.toISOString().slice(0, 16).replace('T', ' ');
+    // ISO week number for file grouping
+    const jan1 = new Date(date.getFullYear(), 0, 1);
+    const weekNum = Math.ceil(((date - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+    const weekStr = String(weekNum).padStart(2, '0');
+    const filename = `suggestions-${date.getFullYear()}-W${weekStr}.txt`;
+    const line = `[${timestamp}] (${nickname}): ${text}\n`;
+    try {
+      fs.appendFileSync(path.join(suggestionsDir, filename), line);
+      if (typeof callback === 'function') callback({ success: true });
+    } catch (err) {
+      console.error('[Suggestion] Write error:', err.message);
+      if (typeof callback === 'function') callback({ error: 'Failed to save suggestion' });
     }
   });
 

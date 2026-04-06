@@ -64,4 +64,6 @@ export const EVENTS = {
   WEATHER_BROADCAST: 'effect:weatherBroadcast',
   TOMATO_SEND: 'effect:tomatoSend',
   TOMATO_BROADCAST: 'effect:tomatoBroadcast',
+  SUGGESTION_SUBMIT: 'suggestion:submit',
+  SUGGESTION_RESULT: 'suggestion:result',
 };
