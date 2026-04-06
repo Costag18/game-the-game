@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import admin from 'firebase-admin';
 import { EVENTS } from '../../shared/events.js';
 import { LobbyManager } from './lobby/LobbyManager.js';
 import { TournamentManager } from './tournament/TournamentManager.js';
@@ -56,9 +57,21 @@ async function generateImage(prompt) {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// --- Suggestions directory ---
-const suggestionsDir = path.join(__dirname, '../data/suggestions');
-fs.mkdirSync(suggestionsDir, { recursive: true });
+// --- Firebase init ---
+let db = null;
+try {
+  const saJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (saJson) {
+    const serviceAccount = JSON.parse(saJson);
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+    db = admin.firestore();
+    console.log('[Firebase] Connected to Firestore');
+  } else {
+    console.warn('[Firebase] No FIREBASE_SERVICE_ACCOUNT env var — suggestions will not persist');
+  }
+} catch (err) {
+  console.error('[Firebase] Init error:', err.message);
+}
 
 const app = express();
 const httpServer = createServer(app);
@@ -1088,7 +1101,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
   });
 
   // --- Suggestion Box ---
-  socket.on(EVENTS.SUGGESTION_SUBMIT, (data, callback) => {
+  socket.on(EVENTS.SUGGESTION_SUBMIT, async (data, callback) => {
     const text = typeof data?.text === 'string' ? data.text.trim().slice(0, 500) : '';
     if (!text) {
       if (typeof callback === 'function') callback({ error: 'Suggestion cannot be empty' });
@@ -1101,19 +1114,21 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
     socket.data._lastSuggestion = now;
     const nickname = socket.data.nickname || 'Anonymous';
-    const date = new Date();
-    const timestamp = date.toISOString().slice(0, 16).replace('T', ' ');
-    // ISO week number for file grouping
-    const jan1 = new Date(date.getFullYear(), 0, 1);
-    const weekNum = Math.ceil(((date - jan1) / 86400000 + jan1.getDay() + 1) / 7);
-    const weekStr = String(weekNum).padStart(2, '0');
-    const filename = `suggestions-${date.getFullYear()}-W${weekStr}.txt`;
-    const line = `[${timestamp}] (${nickname}): ${text}\n`;
+    if (!db) {
+      console.warn('[Suggestion] No Firestore — suggestion lost:', text);
+      if (typeof callback === 'function') callback({ success: true });
+      return;
+    }
     try {
-      fs.appendFileSync(path.join(suggestionsDir, filename), line);
+      await db.collection('game-suggestions').add({
+        text,
+        nickname,
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        source: 'game-the-game',
+      });
       if (typeof callback === 'function') callback({ success: true });
     } catch (err) {
-      console.error('[Suggestion] Write error:', err.message);
+      console.error('[Suggestion] Firestore write error:', err.message);
       if (typeof callback === 'function') callback({ error: 'Failed to save suggestion' });
     }
   });
