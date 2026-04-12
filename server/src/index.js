@@ -23,9 +23,56 @@ const bodycamStreams = new Map();
 
 function initBodycamForLobby(lobbyId, excludeId = null) {
   const videoId = pickRandomBodycamVideo(excludeId);
-  const state = { videoId, time: 0, updatedAt: Date.now(), paused: false };
+  const state = {
+    videoId,
+    time: 0,
+    updatedAt: Date.now(),
+    paused: false,
+    history: [videoId],
+    historyIndex: 0,
+  };
   bodycamStreams.set(lobbyId, state);
   return state;
+}
+
+function advanceBodycamForward(state) {
+  // If we're not at the tip of history, step forward into existing history
+  if (state.historyIndex < state.history.length - 1) {
+    state.historyIndex += 1;
+    state.videoId = state.history[state.historyIndex];
+  } else {
+    // Pick a new random, excluding the current
+    const newId = pickRandomBodycamVideo(state.videoId);
+    state.history.push(newId);
+    // Cap history length to avoid unbounded growth
+    if (state.history.length > 50) {
+      state.history.shift();
+    } else {
+      state.historyIndex = state.history.length - 1;
+    }
+    state.videoId = newId;
+  }
+  state.time = 0;
+  state.paused = false;
+  state.updatedAt = Date.now();
+}
+
+function advanceBodycamBackward(state) {
+  if (state.historyIndex > 0) {
+    state.historyIndex -= 1;
+    state.videoId = state.history[state.historyIndex];
+  } else {
+    // At the start of history — prepend a new random video so "previous"
+    // always gives the user something different to watch.
+    const newId = pickRandomBodycamVideo(state.videoId);
+    state.history.unshift(newId);
+    if (state.history.length > 50) state.history.pop();
+    state.videoId = newId;
+    state.historyIndex = 0;
+  }
+  state.time = 0;
+  state.paused = false;
+  state.updatedAt = Date.now();
 }
 
 function getBodycamPayload(lobbyId) {
@@ -537,18 +584,26 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     if (action.type === 'next') {
       // Rate-limit next per lobby to avoid spam
-      if (state._lastNextAt && now - state._lastNextAt < 2000) return;
-      const newState = initBodycamForLobby(lobbyId, state.videoId);
-      newState._lastNextAt = now;
+      if (state._lastChangeAt && now - state._lastChangeAt < 1500) return;
+      advanceBodycamForward(state);
+      state._lastChangeAt = now;
+      io.to(lobbyId).emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
+      return;
+    }
+
+    if (action.type === 'prev') {
+      if (state._lastChangeAt && now - state._lastChangeAt < 1500) return;
+      advanceBodycamBackward(state);
+      state._lastChangeAt = now;
       io.to(lobbyId).emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
       return;
     }
 
     if (action.type === 'ended') {
-      // Auto-advance to next random video when current ends (lobby-wide, debounced)
-      if (state._lastNextAt && now - state._lastNextAt < 3000) return;
-      const newState = initBodycamForLobby(lobbyId, state.videoId);
-      newState._lastNextAt = now;
+      // Auto-advance to next random video when current ends (debounced)
+      if (state._lastChangeAt && now - state._lastChangeAt < 3000) return;
+      advanceBodycamForward(state);
+      state._lastChangeAt = now;
       io.to(lobbyId).emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
       return;
     }

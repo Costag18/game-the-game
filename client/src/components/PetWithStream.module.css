@@ -33,31 +33,43 @@
   display: block;
 }
 
-.streamOverlay {
+.streamBlocker {
   position: absolute;
-  inset: 0 0 24px 0;
-  cursor: pointer;
-  z-index: 1;
+  inset: 0;
+  z-index: 2;
+  cursor: default;
+  background: transparent;
+  pointer-events: auto;
 }
 
-.nextVideoBtn {
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  z-index: 3;
+.streamControls {
+  display: flex;
+  gap: 4px;
+  padding: 4px 6px;
   background: rgba(0, 0, 0, 0.72);
+  border-bottom: 1px solid var(--gold-dim, #8a7230);
+  justify-content: space-between;
+}
+.ctrlBtn {
+  flex: 1;
+  background: rgba(20, 20, 20, 0.9);
   color: var(--gold, #d4af37);
   border: 1px solid var(--gold-dim, #8a7230);
   border-radius: 4px;
-  padding: 3px 8px;
-  font-size: 11px;
+  padding: 4px 0;
+  font-size: 12px;
   font-family: inherit;
+  font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.5px;
+  transition: background 0.15s, color 0.15s;
 }
-.nextVideoBtn:hover {
-  background: rgba(0, 0, 0, 0.9);
+.ctrlBtn:hover {
+  background: rgba(40, 40, 40, 1);
   color: var(--gold-light, #f5d67a);
+}
+.ctrlBtn:active {
+  background: rgba(60, 60, 60, 1);
 }
 
 .bottomRow {

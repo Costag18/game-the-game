@@ -51,6 +51,7 @@ export default function PetWithStream({ children, screen }) {
   const suppressSeekUntilRef = useRef(0);
   const seekWatchdogRef = useRef(null);
   const [streamReady, setStreamReady] = useState(false);
+  const [streamMuted, setStreamMuted] = useState(true);
 
   // Initialize the YouTube player once
   useEffect(() => {
@@ -64,10 +65,12 @@ export default function PetWithStream({ children, screen }) {
         playerVars: {
           autoplay: 1,
           mute: 1,
-          controls: 1,
+          controls: 0,
+          disablekb: 1,
           modestbranding: 1,
           rel: 0,
           playsinline: 1,
+          fs: 0,
         },
         events: {
           onReady: () => {
@@ -314,10 +317,40 @@ export default function PetWithStream({ children, screen }) {
     setTimeout(() => setGambleResult(null), 1500);
   }
 
-  function handleOverlayClick() {
-    setShowControls(true);
-    clearTimeout(hideTimerRef.current);
-    hideTimerRef.current = setTimeout(() => setShowControls(false), 5000);
+  function handleBodycamNext() {
+    socket?.emit(EVENTS.BODYCAM_ACTION, { type: 'next' });
+  }
+
+  function handleBodycamPrev() {
+    socket?.emit(EVENTS.BODYCAM_ACTION, { type: 'prev' });
+  }
+
+  function handleBodycamToggleMute() {
+    const player = ytPlayerRef.current;
+    if (!player || !ytReadyRef.current) return;
+    try {
+      if (streamMuted) {
+        player.unMute?.();
+        player.setVolume?.(60);
+        setStreamMuted(false);
+      } else {
+        player.mute?.();
+        setStreamMuted(true);
+      }
+    } catch {}
+  }
+
+  function handleBodycamSkip(deltaSec) {
+    const player = ytPlayerRef.current;
+    if (!player || !ytReadyRef.current || !socket) return;
+    try {
+      const cur = player.getCurrentTime?.() ?? 0;
+      const dur = player.getDuration?.() ?? 0;
+      let target = cur + deltaSec;
+      if (target < 0) target = 0;
+      if (dur > 0 && target > dur - 1) target = Math.max(0, dur - 1);
+      socket.emit(EVENTS.BODYCAM_ACTION, { type: 'seek', time: target });
+    } catch {}
   }
 
   function removeParticle(id) {
@@ -337,17 +370,46 @@ export default function PetWithStream({ children, screen }) {
       <div className={styles.streamBox}>
         <div className={styles.streamFrameWrap}>
           <div ref={playerContainerRef} className={styles.streamFrame} />
+          {/* Full overlay blocks all clicks on the YouTube iframe */}
+          <div className={styles.streamBlocker} />
         </div>
-        {!showControls && (
-          <div className={styles.streamOverlay} onClick={handleOverlayClick} />
-        )}
-        <button
-          className={styles.nextVideoBtn}
-          onClick={() => socket?.emit(EVENTS.BODYCAM_ACTION, { type: 'next' })}
-          title="Skip to a new random bodycam video"
-        >
-          ⏭ Next
-        </button>
+        <div className={styles.streamControls}>
+          <button
+            className={styles.ctrlBtn}
+            onClick={handleBodycamPrev}
+            title="Previous random bodycam video"
+          >
+            ⏮
+          </button>
+          <button
+            className={styles.ctrlBtn}
+            onClick={() => handleBodycamSkip(-30)}
+            title="Rewind 30 seconds"
+          >
+            −30s
+          </button>
+          <button
+            className={styles.ctrlBtn}
+            onClick={() => handleBodycamSkip(30)}
+            title="Forward 30 seconds"
+          >
+            +30s
+          </button>
+          <button
+            className={styles.ctrlBtn}
+            onClick={handleBodycamNext}
+            title="Next random bodycam video"
+          >
+            ⏭
+          </button>
+          <button
+            className={styles.ctrlBtn}
+            onClick={handleBodycamToggleMute}
+            title={streamMuted ? 'Unmute video' : 'Mute video'}
+          >
+            {streamMuted ? '🔇' : '🔊'}
+          </button>
+        </div>
       </div>
       {children && <div className={styles.extraPanel}>{children}</div>}
       <div className={styles.bottomRow}>
