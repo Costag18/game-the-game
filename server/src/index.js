@@ -12,6 +12,27 @@ import { TournamentManager } from './tournament/TournamentManager.js';
 import { Scorer } from './tournament/Scorer.js';
 import { createGame, isGameRegistered } from './games/registry.js';
 import { getEligibleGames } from '../../shared/gameList.js';
+import { pickRandomBodycamVideo } from '../../shared/policeVideos.js';
+
+// --- Police bodycam stream state per lobby ---
+// { videoId, time, updatedAt, paused }
+// time = last known playhead position (seconds)
+// updatedAt = server Date.now() when `time` was captured
+// paused = whether playback is paused
+const bodycamStreams = new Map();
+
+function initBodycamForLobby(lobbyId, excludeId = null) {
+  const videoId = pickRandomBodycamVideo(excludeId);
+  const state = { videoId, time: 0, updatedAt: Date.now(), paused: false };
+  bodycamStreams.set(lobbyId, state);
+  return state;
+}
+
+function getBodycamPayload(lobbyId) {
+  const s = bodycamStreams.get(lobbyId);
+  if (!s) return null;
+  return { videoId: s.videoId, time: s.time, paused: s.paused, serverTime: Date.now() };
+}
 
 function shuffle(arr) {
   const a = [...arr];
@@ -230,6 +251,9 @@ io.on(EVENTS.CONNECTION, (socket) => {
         nickname: socket.data.nickname || socket.id,
       });
       io.to(lobbyId).emit(EVENTS.LOBBY_STATE, updated);
+      // Sync current bodycam stream to the new joiner
+      const bodycamPayload = getBodycamPayload(lobbyId);
+      if (bodycamPayload) socket.emit(EVENTS.BODYCAM_STATE, bodycamPayload);
       if (typeof callback === 'function') callback({ success: true, lobby: updated });
     } catch (err) {
       if (typeof callback === 'function') callback({ success: false, error: err.message });
@@ -471,11 +495,63 @@ io.on(EVENTS.CONNECTION, (socket) => {
     tm.startNextRound();
     lobbyManager.setStatus(lobbyId, 'voting');
     const eligible = shuffle(getEligibleGames(lobby.players.length));
+    // Pick a random bodycam video for this tournament
+    initBodycamForLobby(lobbyId);
+    io.to(lobbyId).emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
     io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
     io.to(lobbyId).emit(EVENTS.ROUND_START, {
       round: tm.currentRound,
       eligibleGames: eligible,
     });
+  });
+
+  // --- Police bodycam sync ---
+  // action: { type: 'seek', time } | { type: 'next' } | { type: 'play' } | { type: 'pause', time } | { type: 'requestState' }
+  socket.on(EVENTS.BODYCAM_ACTION, (action) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    if (!lobbyId) return;
+    let state = bodycamStreams.get(lobbyId);
+    if (!state) state = initBodycamForLobby(lobbyId);
+
+    if (!action || typeof action !== 'object') return;
+    const now = Date.now();
+
+    if (action.type === 'requestState') {
+      // Only reply to requester
+      socket.emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
+      return;
+    }
+
+    if (action.type === 'seek') {
+      const t = Number(action.time);
+      if (!Number.isFinite(t) || t < 0) return;
+      // Rate-limit seeks per socket to avoid feedback loops
+      if (socket.data._lastBodycamSeek && now - socket.data._lastBodycamSeek < 400) return;
+      socket.data._lastBodycamSeek = now;
+      state.time = t;
+      state.updatedAt = now;
+      state.paused = false;
+      io.to(lobbyId).emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
+      return;
+    }
+
+    if (action.type === 'next') {
+      // Rate-limit next per lobby to avoid spam
+      if (state._lastNextAt && now - state._lastNextAt < 2000) return;
+      const newState = initBodycamForLobby(lobbyId, state.videoId);
+      newState._lastNextAt = now;
+      io.to(lobbyId).emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
+      return;
+    }
+
+    if (action.type === 'ended') {
+      // Auto-advance to next random video when current ends (lobby-wide, debounced)
+      if (state._lastNextAt && now - state._lastNextAt < 3000) return;
+      const newState = initBodycamForLobby(lobbyId, state.videoId);
+      newState._lastNextAt = now;
+      io.to(lobbyId).emit(EVENTS.BODYCAM_STATE, getBodycamPayload(lobbyId));
+      return;
+    }
   });
 
   socket.on(EVENTS.VOTE_GAME, (gameId) => {

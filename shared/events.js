@@ -66,4 +66,6 @@ export const EVENTS = {
   TOMATO_BROADCAST: 'effect:tomatoBroadcast',
   SUGGESTION_SUBMIT: 'suggestion:submit',
   SUGGESTION_RESULT: 'suggestion:result',
+  BODYCAM_STATE: 'bodycam:state',
+  BODYCAM_ACTION: 'bodycam:action',
 };

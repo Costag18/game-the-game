@@ -6,7 +6,6 @@ import { EVENTS } from '../../../shared/events.js';
 import PetSidebar from './PetSidebar.jsx';
 import styles from './PetWithStream.module.css';
 
-const STREAM_ID = '5vfaDsMhCF4'; // CBC News 24/7 live
 const EXPLOSION_COOLDOWN = 60;
 const SPOTLIGHT_COOLDOWN = 180;
 const WEATHER_COOLDOWN = 120;
@@ -14,11 +13,164 @@ const TOMATO_COOLDOWN = 30;
 const EXPLOSION_EMOJIS = ['😂', '😮', '👏', '😭', '🔥', '❤️', '💀', '🎉', '💥', '✨', '🎆', '🎇'];
 const WEATHER_PARTICLES = { rain: '💧', snow: '❄️', sunny: '☀️', stars: '⭐', hearts: '❤️' };
 
+// --- YouTube IFrame API loader (shared singleton) ---
+let ytApiPromise = null;
+function loadYouTubeAPI() {
+  if (typeof window === 'undefined') return Promise.resolve(null);
+  if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+  if (ytApiPromise) return ytApiPromise;
+  ytApiPromise = new Promise((resolve) => {
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      if (typeof prev === 'function') { try { prev(); } catch {} }
+      resolve(window.YT);
+    };
+    if (!document.querySelector('script[data-yt-iframe-api]')) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      tag.async = true;
+      tag.setAttribute('data-yt-iframe-api', '1');
+      document.head.appendChild(tag);
+    }
+  });
+  return ytApiPromise;
+}
+
 export default function PetWithStream({ children, screen }) {
   const { socket } = useSocketContext();
   const { playSound } = useSound();
   const { coins, addCoins } = usePet();
   const [showControls, setShowControls] = useState(false);
+
+  // --- Police bodycam stream sync ---
+  const playerContainerRef = useRef(null);
+  const ytPlayerRef = useRef(null);
+  const ytReadyRef = useRef(false);
+  const currentVideoIdRef = useRef(null);
+  const lastRemoteTimeRef = useRef(0);
+  const suppressSeekUntilRef = useRef(0);
+  const seekWatchdogRef = useRef(null);
+  const [streamReady, setStreamReady] = useState(false);
+
+  // Initialize the YouTube player once
+  useEffect(() => {
+    let cancelled = false;
+    loadYouTubeAPI().then((YT) => {
+      if (cancelled || !YT || !playerContainerRef.current) return;
+      ytPlayerRef.current = new YT.Player(playerContainerRef.current, {
+        width: '100%',
+        height: '100%',
+        videoId: '',
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 1,
+          modestbranding: 1,
+          rel: 0,
+          playsinline: 1,
+        },
+        events: {
+          onReady: () => {
+            ytReadyRef.current = true;
+            setStreamReady(true);
+            // Ask server for current state (in case we joined mid-tournament)
+            try { socket?.emit(EVENTS.BODYCAM_ACTION, { type: 'requestState' }); } catch {}
+          },
+          onStateChange: (e) => {
+            // 0 = ended → ask server to pick a new random video for everyone
+            if (e.data === 0 && socket) {
+              socket.emit(EVENTS.BODYCAM_ACTION, { type: 'ended' });
+            }
+          },
+        },
+      });
+    });
+    return () => {
+      cancelled = true;
+      try { ytPlayerRef.current?.destroy?.(); } catch {}
+      ytPlayerRef.current = null;
+      ytReadyRef.current = false;
+      if (seekWatchdogRef.current) clearInterval(seekWatchdogRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Apply incoming server state to local player
+  useEffect(() => {
+    if (!socket) return;
+    const pendingStateRef = { current: null };
+    function applyState(payload) {
+      if (!payload || !ytReadyRef.current || !ytPlayerRef.current) {
+        // Stash payload for when player becomes ready
+        pendingStateRef.current = payload;
+        return;
+      }
+      const { videoId, time, paused, serverTime } = payload;
+      const delay = Math.max(0, (Date.now() - (serverTime || Date.now())) / 1000);
+      const target = paused ? time : time + delay;
+      lastRemoteTimeRef.current = target;
+      // Suppress our own seek-detection briefly so we don't echo the remote seek
+      suppressSeekUntilRef.current = Date.now() + 1500;
+
+      if (videoId !== currentVideoIdRef.current) {
+        currentVideoIdRef.current = videoId;
+        try { ytPlayerRef.current.loadVideoById({ videoId, startSeconds: target }); } catch {}
+      } else {
+        try {
+          const cur = ytPlayerRef.current.getCurrentTime?.() ?? 0;
+          if (Math.abs(cur - target) > 1.5) {
+            ytPlayerRef.current.seekTo(target, true);
+          }
+        } catch {}
+        try {
+          if (paused) ytPlayerRef.current.pauseVideo?.();
+          else ytPlayerRef.current.playVideo?.();
+        } catch {}
+      }
+    }
+
+    function onState(payload) { applyState(payload); }
+    socket.on(EVENTS.BODYCAM_STATE, onState);
+
+    // Flush any pending state once the player is ready
+    const flushIv = setInterval(() => {
+      if (ytReadyRef.current && pendingStateRef.current) {
+        applyState(pendingStateRef.current);
+        pendingStateRef.current = null;
+      }
+    }, 300);
+
+    return () => {
+      socket.off(EVENTS.BODYCAM_STATE, onState);
+      clearInterval(flushIv);
+    };
+  }, [socket]);
+
+  // Detect local seeks and broadcast them (user scrubbed the timeline)
+  useEffect(() => {
+    if (!socket || !streamReady) return;
+    const iv = setInterval(() => {
+      const player = ytPlayerRef.current;
+      if (!player || !ytReadyRef.current) return;
+      try {
+        const state = player.getPlayerState?.();
+        const cur = player.getCurrentTime?.();
+        if (typeof cur !== 'number') return;
+        // Expected time advances by ~1s per tick when playing
+        const expected = lastRemoteTimeRef.current + 1;
+        lastRemoteTimeRef.current = cur;
+        if (Date.now() < suppressSeekUntilRef.current) return;
+        // State 1 = playing, 2 = paused, 3 = buffering
+        if (state === 1 && Math.abs(cur - expected) > 2.5) {
+          // Local seek detected → broadcast
+          socket.emit(EVENTS.BODYCAM_ACTION, { type: 'seek', time: cur });
+          suppressSeekUntilRef.current = Date.now() + 1500;
+        }
+      } catch {}
+    }, 1000);
+    seekWatchdogRef.current = iv;
+    return () => clearInterval(iv);
+  }, [socket, streamReady]);
 
   // Cooldowns
   const [explosionCD, setExplosionCD] = useState(0);
@@ -183,16 +335,19 @@ export default function PetWithStream({ children, screen }) {
   return (
     <div className={styles.wrapper}>
       <div className={styles.streamBox}>
-        <iframe
-          src={`https://www.youtube.com/embed/${STREAM_ID}?autoplay=1&mute=1&controls=1&modestbranding=1`}
-          title="CBC News Live"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          className={styles.streamFrame}
-        />
+        <div className={styles.streamFrameWrap}>
+          <div ref={playerContainerRef} className={styles.streamFrame} />
+        </div>
         {!showControls && (
           <div className={styles.streamOverlay} onClick={handleOverlayClick} />
         )}
+        <button
+          className={styles.nextVideoBtn}
+          onClick={() => socket?.emit(EVENTS.BODYCAM_ACTION, { type: 'next' })}
+          title="Skip to a new random bodycam video"
+        >
+          ⏭ Next
+        </button>
       </div>
       {children && <div className={styles.extraPanel}>{children}</div>}
       <div className={styles.bottomRow}>
