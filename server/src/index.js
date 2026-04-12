@@ -78,7 +78,17 @@ function advanceBodycamBackward(state) {
 function getBodycamPayload(lobbyId) {
   const s = bodycamStreams.get(lobbyId);
   if (!s) return null;
-  return { videoId: s.videoId, time: s.time, paused: s.paused, serverTime: Date.now() };
+  // Advance the reported time by real elapsed seconds since the last
+  // update, so mid-tournament joiners receive the CURRENT playhead
+  // instead of the last-seeked value (which could be minutes stale).
+  const now = Date.now();
+  const elapsed = s.paused ? 0 : Math.max(0, (now - s.updatedAt) / 1000);
+  return {
+    videoId: s.videoId,
+    time: s.time + elapsed,
+    paused: s.paused,
+    serverTime: now,
+  };
 }
 
 function shuffle(arr) {
