@@ -50,6 +50,11 @@ export default function PetWithStream({ children, screen }) {
   const lastRemoteTimeRef = useRef(0);
   const suppressSeekUntilRef = useRef(0);
   const seekWatchdogRef = useRef(null);
+  // Tracks the "true" playhead anchor from the server for each video load,
+  // so we can re-seek accurately the moment the player actually starts
+  // playing — covers the 500ms-2s embed load delay that a startSeconds
+  // hint alone can't account for.
+  const pendingSyncRef = useRef(null); // { videoId, baseTime, serverTime, paused, deadline }
   const [streamReady, setStreamReady] = useState(false);
   const [streamMuted, setStreamMuted] = useState(true);
 
@@ -83,6 +88,25 @@ export default function PetWithStream({ children, screen }) {
             // 0 = ended → ask server to pick a new random video for everyone
             if (e.data === 0 && socket) {
               socket.emit(EVENTS.BODYCAM_ACTION, { type: 'ended' });
+            }
+            // State 1 = playing. If we have a pending sync anchor from
+            // the server, recompute the exact target NOW (the player
+            // may have taken hundreds of ms to load) and seek to it.
+            if (e.data === 1) {
+              const p = pendingSyncRef.current;
+              if (p && ytPlayerRef.current) {
+                try {
+                  const cur = ytPlayerRef.current.getCurrentTime?.() ?? 0;
+                  const elapsed = p.paused ? 0 : (Date.now() - p.serverTime) / 1000;
+                  const target = p.baseTime + elapsed;
+                  if (Math.abs(cur - target) > 0.6) {
+                    suppressSeekUntilRef.current = Date.now() + 1500;
+                    ytPlayerRef.current.seekTo(target, true);
+                    lastRemoteTimeRef.current = target;
+                  }
+                } catch {}
+                pendingSyncRef.current = null;
+              }
             }
           },
           onError: (e) => {
@@ -118,19 +142,31 @@ export default function PetWithStream({ children, screen }) {
         return;
       }
       const { videoId, time, paused, serverTime } = payload;
-      const delay = Math.max(0, (Date.now() - (serverTime || Date.now())) / 1000);
-      const target = paused ? time : time + delay;
+      const anchorServerTime = serverTime || Date.now();
+      const networkDelay = Math.max(0, (Date.now() - anchorServerTime) / 1000);
+      // Initial target uses the network delay so far — the onStateChange
+      // "playing" handler will re-seek once the player actually starts,
+      // which accounts for the extra embed-load time on top of this.
+      const target = paused ? time : time + networkDelay;
       lastRemoteTimeRef.current = target;
       // Suppress our own seek-detection briefly so we don't echo the remote seek
-      suppressSeekUntilRef.current = Date.now() + 1500;
+      suppressSeekUntilRef.current = Date.now() + 2500;
 
       if (videoId !== currentVideoIdRef.current) {
         currentVideoIdRef.current = videoId;
+        // Store anchor BEFORE loadVideoById so the onStateChange(playing)
+        // handler can compute the accurate target once playback begins.
+        pendingSyncRef.current = {
+          videoId,
+          baseTime: time,
+          serverTime: anchorServerTime,
+          paused,
+        };
         try { ytPlayerRef.current.loadVideoById({ videoId, startSeconds: target }); } catch {}
       } else {
         try {
           const cur = ytPlayerRef.current.getCurrentTime?.() ?? 0;
-          if (Math.abs(cur - target) > 1.5) {
+          if (Math.abs(cur - target) > 1.0) {
             ytPlayerRef.current.seekTo(target, true);
           }
         } catch {}
