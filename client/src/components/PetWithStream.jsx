@@ -85,6 +85,15 @@ export default function PetWithStream({ children, screen }) {
               socket.emit(EVENTS.BODYCAM_ACTION, { type: 'ended' });
             }
           },
+          onError: (e) => {
+            // 101 / 150 = embedding disabled by owner
+            // 100 = video not found, 2 = invalid parameter, 5 = HTML5 error
+            // For any of these, auto-skip to the next random video.
+            if (!socket) return;
+            if ([2, 5, 100, 101, 150].includes(e.data)) {
+              socket.emit(EVENTS.BODYCAM_ACTION, { type: 'next' });
+            }
+          },
         },
       });
     });
