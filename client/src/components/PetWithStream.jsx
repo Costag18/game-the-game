@@ -91,18 +91,25 @@ export default function PetWithStream({ children, screen }) {
             }
             // State 1 = playing. If we have a pending sync anchor from
             // the server, recompute the exact target NOW (the player
-            // may have taken hundreds of ms to load) and seek to it.
+            // took hundreds of ms to load), seek locally, AND emit a
+            // `seek` action so the server rebroadcasts a fresh
+            // authoritative state to everyone. This mirrors exactly
+            // what manually pressing ±30 does — which was the only
+            // thing that reliably resynced a new joiner.
             if (e.data === 1) {
               const p = pendingSyncRef.current;
               if (p && ytPlayerRef.current) {
                 try {
-                  const cur = ytPlayerRef.current.getCurrentTime?.() ?? 0;
                   const elapsed = p.paused ? 0 : (Date.now() - p.serverTime) / 1000;
                   const target = p.baseTime + elapsed;
-                  if (Math.abs(cur - target) > 0.6) {
-                    suppressSeekUntilRef.current = Date.now() + 1500;
-                    ytPlayerRef.current.seekTo(target, true);
-                    lastRemoteTimeRef.current = target;
+                  suppressSeekUntilRef.current = Date.now() + 2500;
+                  ytPlayerRef.current.seekTo(target, true);
+                  lastRemoteTimeRef.current = target;
+                  // Force-rebroadcast through the same path as ±30 so
+                  // every client (including us) gets a fresh serverTime
+                  // anchor and clock skew is eliminated.
+                  if (socket) {
+                    socket.emit(EVENTS.BODYCAM_ACTION, { type: 'seek', time: target });
                   }
                 } catch {}
                 pendingSyncRef.current = null;
