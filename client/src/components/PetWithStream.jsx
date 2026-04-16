@@ -57,6 +57,9 @@ export default function PetWithStream({ children, screen }) {
   const pendingSyncRef = useRef(null); // { videoId, baseTime, serverTime, paused, deadline }
   const [streamReady, setStreamReady] = useState(false);
   const [streamMuted, setStreamMuted] = useState(true);
+  const [streamVolume, setStreamVolume] = useState(60);
+  const [volumeOpen, setVolumeOpen] = useState(false);
+  const volumeRef = useRef(null);
 
   // Initialize the YouTube player once
   useEffect(() => {
@@ -377,20 +380,55 @@ export default function PetWithStream({ children, screen }) {
     socket?.emit(EVENTS.BODYCAM_ACTION, { type: 'prev' });
   }
 
-  function handleBodycamToggleMute() {
+  function handleVolumeToggle() {
+    setVolumeOpen((o) => !o);
+  }
+
+  function handleVolumeChange(e) {
+    const v = Number(e.target.value);
+    setStreamVolume(v);
+    const player = ytPlayerRef.current;
+    if (!player || !ytReadyRef.current) return;
+    try {
+      if (v === 0) {
+        player.mute?.();
+        setStreamMuted(true);
+      } else {
+        player.unMute?.();
+        player.setVolume?.(v);
+        setStreamMuted(false);
+      }
+    } catch {}
+  }
+
+  function handleVolumeMuteClick() {
     const player = ytPlayerRef.current;
     if (!player || !ytReadyRef.current) return;
     try {
       if (streamMuted) {
+        const vol = streamVolume > 0 ? streamVolume : 60;
         player.unMute?.();
-        player.setVolume?.(60);
+        player.setVolume?.(vol);
         setStreamMuted(false);
+        if (streamVolume === 0) setStreamVolume(vol);
       } else {
         player.mute?.();
         setStreamMuted(true);
       }
     } catch {}
   }
+
+  // Click-outside to close volume popup
+  useEffect(() => {
+    if (!volumeOpen) return;
+    function onDown(e) {
+      if (volumeRef.current && !volumeRef.current.contains(e.target)) {
+        setVolumeOpen(false);
+      }
+    }
+    document.addEventListener('pointerdown', onDown, true);
+    return () => document.removeEventListener('pointerdown', onDown, true);
+  }, [volumeOpen]);
 
   function handleBodycamSkip(deltaSec) {
     const player = ytPlayerRef.current;
@@ -454,13 +492,38 @@ export default function PetWithStream({ children, screen }) {
           >
             ⏭
           </button>
-          <button
-            className={styles.ctrlBtn}
-            onClick={handleBodycamToggleMute}
-            title={streamMuted ? 'Unmute video' : 'Mute video'}
-          >
-            {streamMuted ? '🔇' : '🔊'}
-          </button>
+          <div className={styles.volumeWrap} ref={volumeRef}>
+            <button
+              className={styles.ctrlBtn}
+              onClick={handleVolumeToggle}
+              title="Volume"
+            >
+              {streamMuted || streamVolume === 0 ? '🔇' : streamVolume < 40 ? '🔈' : '🔊'}
+            </button>
+            {volumeOpen && (
+              <div className={styles.volumePopup}>
+                <button
+                  className={styles.volumeMuteBtn}
+                  onClick={handleVolumeMuteClick}
+                  title={streamMuted ? 'Unmute' : 'Mute'}
+                >
+                  {streamMuted ? '🔇' : '🔊'}
+                </button>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={streamMuted ? 0 : streamVolume}
+                  onChange={handleVolumeChange}
+                  className={styles.volumeSlider}
+                />
+                <span className={styles.volumeLabel}>
+                  {streamMuted ? 0 : streamVolume}%
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {children && <div className={styles.extraPanel}>{children}</div>}
