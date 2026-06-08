@@ -28,6 +28,9 @@ export class RockPaperScissors extends BaseGame {
     for (const p of players) this.scores[p] = 0;
   }
 
+  setOnStateChange(cb) { this._onStateChange = cb; }
+  _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
+
   startGame() {
     this.scores = {};
     for (const p of this.players) this.scores[p] = 0;
@@ -51,6 +54,7 @@ export class RockPaperScissors extends BaseGame {
     delete this.choices[playerId];
 
     if (this.players.length <= 1) {
+      if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
       if (this.state !== 'finished') this.state = 'finished';
       return;
     }
@@ -114,7 +118,12 @@ export class RockPaperScissors extends BaseGame {
       if (this.state !== 'reveal') return;
       for (const p of this.players) this.acknowledged.add(p);
       this._checkRevealComplete();
+      this._emitChange();
     }, 10000);
+  }
+
+  destroy() {
+    if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
   }
 
   _resolveRound() {

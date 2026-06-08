@@ -86,8 +86,26 @@ export class GoFish extends BaseGame {
       const anyHasCards = this.players.some((p) => (this.hands[p] || []).length > 0);
       if (!anyHasCards) {
         this.transition('finish');
+        return;
+      }
+      // Stalemate: deck is empty and no two players share a rank, so no ask can
+      // ever transfer a card and no further set can form. This can happen after a
+      // player leaves (their cards are removed, so 13 sets is unreachable).
+      if (!this._anyProductiveAskPossible()) {
+        this.transition('finish');
       }
     }
+  }
+
+  _anyProductiveAskPossible() {
+    const rankOwners = {};
+    for (const p of this.players) {
+      for (const r of new Set((this.hands[p] || []).map((c) => c.rank))) {
+        rankOwners[r] = (rankOwners[r] || 0) + 1;
+        if (rankOwners[r] >= 2) return true;
+      }
+    }
+    return false;
   }
 
   handleAction(playerId, action) {
@@ -180,6 +198,26 @@ export class GoFish extends BaseGame {
     }
     // No valid next player
     this._checkGameEnd();
+  }
+
+  removePlayer(playerId) {
+    const wasCurrent = this.currentTurnPlayer === playerId;
+    // Move the turn off the leaver first (while they're still in this.players so
+    // rotation order is preserved), then prune them and their stranded hand.
+    if (wasCurrent && this.players.length > 1) {
+      this._advanceTurn();
+    }
+    super.removePlayer(playerId);
+    delete this.hands[playerId];
+    delete this.completedSets[playerId];
+    if (this.state === 'playing') {
+      if (this.players.length <= 1) {
+        this.transition('finish');
+      } else {
+        // A leaver's stranded hand no longer blocks the deck-empty terminator.
+        this._checkGameEnd();
+      }
+    }
   }
 
   getStateForPlayer(playerId) {

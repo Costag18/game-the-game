@@ -261,7 +261,7 @@ Client-side only, per-session (resets on page reload). Lives in `PetContext`.
 ## Critical Patterns & Lessons Learned
 
 ### Timer-Driven State Broadcasting
-Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnStateChange` callback registered in `index.js`. The callback broadcasts state to all players AND checks `game.isComplete()` for auto-finishing. Without this, clients get stuck when timers expire because `handleAction` is never called.
+Games with timers (SpotTheDifference, Battleship, Poker reveal, Hangman word-reveal, Blackjack reveal, RPS reveal, LiarsDice challenge, Roulette spinning-ack, MemoryMatch turn) must use `setOnStateChange` callback registered in `index.js`. The callback broadcasts state to all players AND checks `game.isComplete()` for auto-finishing. Without this, clients get stuck when timers expire because `handleAction` is never called. (Adding the missing `setOnStateChange` to Blackjack/RPS/LiarsDice and the missing timers to Roulette/MemoryMatch was part of the v2.7.0 deadlock overhaul.)
 
 ### Deadlock Prevention
 - All acknowledge/reveal phases need a 10-second auto-advance timer
@@ -276,6 +276,18 @@ Games with timers (SpotTheDifference, Battleship, Poker reveal) must use `setOnS
 - If waiting for their vote/wager, auto-advances without them
 - **Simultaneous games (RPS, Roulette, SpotTheDifference):** override `removePlayer()` to auto-submit/auto-ack for the leaving player so the game doesn't wait for them
 - Results acknowledgment checks `tm.players` not `lobby.players` (lobby may have mid-round joiners)
+
+### Engine Leave/Elimination Contract (v2.7.0 — the big leave/deadlock overhaul)
+A 49-agent audit found ~30 distinct mid-game leave/deadlock bugs. Root causes + the contract that fixes them:
+- **`BaseGame` now has THREE removal methods.** Do not conflate them:
+  - `_removeFromActive(playerId)` — player is out of the turn rotation but STAYS in `this.players` (still scored). Use for in-game **elimination** (Hangman wrong-out, LiarsDice loses-all-dice). Hangman/LiarsDice call this internally — NOT `removePlayer`.
+  - `removePlayer(playerId)` — player **left entirely** (disconnect). Prunes `this.players` AND the rotation. Called by `handlePlayerLeave`. Games override it (calling `super.removePlayer` first) to advance the turn off the leaver, re-check ack/round completion, and finish if ≤1 remain.
+  - `destroy()` — teardown; games owning timers override to clear them. The orchestration calls `game.destroy?.()` before every `tm.activeGame = null`, so orphaned timers can't fire on a discarded game (this previously double-called `completeRound` → corrupted scores).
+- **Root cause #1 — `this.players` was never pruned on leave.** Turn rotation (Uno/GoFish/Poker/Battleship rotate over `this.players`), ack gates (Blackjack reveal, LiarsDice challenge used `this.players.every`), end-conditions (CrazyEights `_isStalemate`, GoFish `_checkGameEnd`, Hangman `_startRound`) and `getResults()` all wait on / include a ghost. Fixed by pruning `this.players` in `BaseGame.removePlayer`.
+- **Root cause #2 — timer auto-advances that don't broadcast.** Blackjack/RPS/LiarsDice had internal `setTimeout` advances but never registered `setOnStateChange`, so the advance was invisible (no GAME_STATE, no `isComplete()` recheck). Roulette (spinning-ack) and MemoryMatch (turn) had NO server timer at all. All now wire `setOnStateChange` + `_emitChange`, and Roulette/MemoryMatch got the missing timers.
+- **Root cause #3 — orchestration gaps.** Wagering-leave only emitted `WAGER_LOCKED` and NEVER created the game → everyone stuck on `loadingGame` forever (worst bug). Now `startSelectedGame()` (module-level helper, shared with `WAGER_SUBMIT`) is called from the wagering-leave path. Also: results-phase acks are re-checked on leave; `tm._resultsTimer` is cleared on tournament teardown; `advanceAfterResults` is module-level so `handlePlayerLeave` can call it.
+- **GoFish stalemate:** because a leaver's cards are deleted, 13 sets can be unreachable. `_checkGameEnd` now also finishes when the deck is empty and no two players share a rank (no productive ask possible).
+- Verified with a leave/deadlock harness (fake clock + auto-players): 12 games × {2,3,4 players} × {leave current / leave other}, asserting leaver pruned, turn always on a present player, `getResults` safe + leaver-free, and completion reached.
 
 ### Mid-Tournament Joining
 - Players can join during voting or wagering phases (blocked during active games)

@@ -246,6 +246,43 @@ export class Battleship extends BaseGame {
     }
   }
 
+  removePlayer(playerId) {
+    super.removePlayer(playerId); // prune this.players + activePlayers + reassign turn
+    this.setupReady.delete(playerId);
+
+    if (this.state === 'setup') {
+      // Don't make remaining players wait out the 60s setup timer for a ghost.
+      if (this.players.length > 0 && this.players.every((p) => this.setupReady.has(p))) {
+        this._startPlaying();
+        this._emitChange();
+      }
+      return;
+    }
+
+    if (this.state === 'playing') {
+      const alive = this.players.filter((p) => !this.eliminated.has(p));
+      if (alive.length <= 1) {
+        this._clearTimers();
+        this.transition('finish');
+        this._emitChange();
+        return;
+      }
+      // If the turn now rests on a departed/eliminated/invalid player, pass it on
+      // immediately rather than stalling up to 30s for the auto-fire fallback.
+      const cur = this.currentTurnPlayer;
+      if (cur == null || this.eliminated.has(cur) || !this.players.includes(cur)) {
+        this._advanceToNextAlive();
+        this._startTurnTimer();
+        this._emitChange();
+      }
+    }
+  }
+
+  destroy() {
+    this._clearTimers();
+    this._onStateChange = null;
+  }
+
   getStateForPlayer(playerId) {
     const myBoard = this.boards[playerId];
     const isFinished = this.state === 'finished';

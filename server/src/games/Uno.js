@@ -344,6 +344,21 @@ export class Uno extends BaseGame {
     }
   }
 
+  removePlayer(playerId) {
+    const wasCurrent = this.currentTurnPlayer === playerId;
+    // If the leaver holds the turn, advance to the next player FIRST (while they
+    // are still in this.players so direction is correct), then prune them.
+    if (wasCurrent && this.players.length > 1) {
+      this._advanceTurn();        // also clears drawnCard + lastPlayedRank
+      this.pendingDrawCount = 0;  // don't saddle the next player with the leaver's stack
+    }
+    super.removePlayer(playerId); // prune roster + turn rotation
+    delete this.hands[playerId];
+    if (this.players.length <= 1 && this.state === 'playing') {
+      this.transition('finish');
+    }
+  }
+
   getStateForPlayer(playerId) {
     const topCard = this.discardPile[this.discardPile.length - 1] || null;
     const isMyTurn = this.currentTurnPlayer === playerId && this.state === 'playing';

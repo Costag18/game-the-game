@@ -1,5 +1,7 @@
 import { BaseGame } from './BaseGame.js';
 
+const TURN_TIMER_MS = 30000;
+
 export class MemoryMatch extends BaseGame {
   constructor(players) {
     super(players, {
@@ -14,7 +16,11 @@ export class MemoryMatch extends BaseGame {
     this.pairs = {}; // playerId -> count
     this.flippedThisTurn = []; // indices of cards flipped this turn (max 2)
     this.pendingFlipBack = false; // true when 2 non-matching cards are shown
+    this._turnTimer = null;
   }
+
+  setOnStateChange(cb) { this._onStateChange = cb; }
+  _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
 
   startGame() {
     // Create 24-card board: 12 pairs (values 1-12)
@@ -34,6 +40,36 @@ export class MemoryMatch extends BaseGame {
     this.flippedThisTurn = [];
     this.transition('start');
     this.setTurnPlayer(this.players[0]);
+    this._startTurnTimer();
+  }
+
+  _clearTurnTimer() {
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+  }
+
+  /**
+   * Server-authoritative turn timeout. Without this a current player who freezes
+   * (but doesn't disconnect) hangs the round forever for everyone else.
+   */
+  _startTurnTimer() {
+    this._clearTurnTimer();
+    if (this.state !== 'playing') return;
+    this._turnTimer = setTimeout(() => {
+      if (this.state !== 'playing') return;
+      this._autoPassTurn();
+      this._emitChange();
+    }, TURN_TIMER_MS);
+  }
+
+  _autoPassTurn() {
+    // Flip any in-progress unmatched cards face-down, clear transient state, pass.
+    for (const idx of this.flippedThisTurn) {
+      if (this.board[idx] && !this.board[idx].matched) this.board[idx].faceUp = false;
+    }
+    this.flippedThisTurn = [];
+    this.pendingFlipBack = false;
+    if (this.activePlayers.length > 0) this.nextTurn();
+    this._startTurnTimer();
   }
 
   handleAction(playerId, action) {
@@ -48,6 +84,7 @@ export class MemoryMatch extends BaseGame {
       this.flippedThisTurn = [];
       this.pendingFlipBack = false;
       this.nextTurn();
+      this._startTurnTimer();
       return;
     }
 
@@ -85,6 +122,36 @@ export class MemoryMatch extends BaseGame {
         this.pendingFlipBack = true;
       }
     }
+
+    // Refresh / stop the turn timer depending on whether play continues.
+    if (this.state === 'playing') this._startTurnTimer();
+    else this._clearTurnTimer();
+  }
+
+  removePlayer(playerId) {
+    const wasCurrent = this.currentTurnPlayer === playerId;
+    if (wasCurrent) {
+      // Wind back the leaver's in-progress flips so the next player starts clean
+      // (prevents their leftover face-up card matching against the next player's flip).
+      for (const idx of this.flippedThisTurn) {
+        if (this.board[idx] && !this.board[idx].matched) this.board[idx].faceUp = false;
+      }
+      this.flippedThisTurn = [];
+      this.pendingFlipBack = false;
+    }
+    super.removePlayer(playerId); // prune roster + reassign turn
+    if (this.state === 'playing') {
+      if (this.isComplete()) {
+        this.transition('finish');
+        this._clearTurnTimer();
+      } else {
+        this._startTurnTimer();
+      }
+    }
+  }
+
+  destroy() {
+    this._clearTurnTimer();
   }
 
   getStateForPlayer(playerId) {

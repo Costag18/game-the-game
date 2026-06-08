@@ -2,6 +2,7 @@ import { BaseGame } from './BaseGame.js';
 
 const RED_NUMBERS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
 const TOTAL_ROUNDS = 5;
+const SPIN_ACK_TIMER_MS = 10000;
 
 export class Roulette extends BaseGame {
   constructor(players) {
@@ -21,6 +22,21 @@ export class Roulette extends BaseGame {
     this.round = 0;
     this.history = [];     // array of { round, result, payouts }
     this.acknowledged = new Set();
+    this._spinAckTimer = null;
+  }
+
+  setOnStateChange(cb) { this._onStateChange = cb; }
+  _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
+
+  /** Auto-advance the spinning/acknowledge phase if a player never clicks through. */
+  _startSpinAckTimer() {
+    if (this._spinAckTimer) clearTimeout(this._spinAckTimer);
+    this._spinAckTimer = setTimeout(() => {
+      if (this.state !== 'spinning') return;
+      for (const p of this.players) this.acknowledged.add(p);
+      this._advanceAfterSpin();
+      this._emitChange();
+    }, SPIN_ACK_TIMER_MS);
   }
 
   startGame() {
@@ -140,10 +156,15 @@ export class Roulette extends BaseGame {
     // If all players are now broke, everyone auto-acked
     if (this.players.every((p) => this.acknowledged.has(p))) {
       this._advanceAfterSpin();
+    } else {
+      // Otherwise arm a fallback so one non-acking player can't hang the round.
+      this._startSpinAckTimer();
     }
   }
 
   _advanceAfterSpin() {
+    if (this.state !== 'spinning') return; // guard against double-advance (ack + timer race)
+    if (this._spinAckTimer) { clearTimeout(this._spinAckTimer); this._spinAckTimer = null; }
     // End if all rounds played
     if (this.round >= TOTAL_ROUNDS) {
       this.transition('finish');
@@ -219,6 +240,7 @@ export class Roulette extends BaseGame {
     super.removePlayer(playerId);
     this.players = this.players.filter((p) => p !== playerId);
     if (this.players.length <= 1) {
+      if (this._spinAckTimer) { clearTimeout(this._spinAckTimer); this._spinAckTimer = null; }
       this.state = 'finished';
       return;
     }
@@ -238,6 +260,10 @@ export class Roulette extends BaseGame {
 
   isComplete() {
     return this.state === 'finished';
+  }
+
+  destroy() {
+    if (this._spinAckTimer) { clearTimeout(this._spinAckTimer); this._spinAckTimer = null; }
   }
 
   getResults() {

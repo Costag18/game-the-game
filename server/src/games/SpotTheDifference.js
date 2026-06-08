@@ -314,9 +314,13 @@ export class SpotTheDifference extends BaseGame {
   removePlayer(playerId) {
     super.removePlayer(playerId);
     this.players = this.players.filter((p) => p !== playerId);
-    if (this.players.length === 0) {
+    // <=1 (not just 0): with one player left the orchestration force-completes
+    // the round, so stop our timers and finish to avoid an orphaned timer later
+    // firing _emitChange and double-completing the round.
+    if (this.players.length <= 1) {
       this._clearTimers();
       this.state = 'finished';
+      return;
     }
     // Auto-ack if in roundEnd
     if (this.state === 'roundEnd') {
@@ -329,6 +333,11 @@ export class SpotTheDifference extends BaseGame {
 
   isComplete() {
     return this.state === 'finished';
+  }
+
+  destroy() {
+    this._clearTimers();
+    this._onStateChange = null;
   }
 
   getResults() {

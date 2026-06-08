@@ -26,6 +26,9 @@ export class Blackjack extends BaseGame {
     this.acknowledged = new Set();
   }
 
+  setOnStateChange(cb) { this._onStateChange = cb; }
+  _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
+
   startGame() {
     this.handNumber = 0;
     this.wins = {};
@@ -88,6 +91,7 @@ export class Blackjack extends BaseGame {
       if (this.state !== 'reveal') return;
       for (const p of this.players) this.acknowledged.add(p);
       this._checkRevealComplete();
+      this._emitChange();
     }, 10000);
   }
 
@@ -175,6 +179,37 @@ export class Blackjack extends BaseGame {
     }
     while (total > 21 && aces > 0) { total -= 10; aces--; }
     return total;
+  }
+
+  removePlayer(playerId) {
+    // Prune the leaver from this.players + the turn rotation so reveal-ack,
+    // hand setup, scoring and results no longer wait on / include a ghost.
+    super.removePlayer(playerId);
+
+    if (this.state === 'reveal') {
+      // The leaver can no longer hold up the acknowledgement gate.
+      this._checkRevealComplete();
+    } else if (this.state === 'playing') {
+      const remaining = this.activePlayers.filter(
+        (p) => !this.busted.includes(p) && !this.stood.includes(p)
+      );
+      if (remaining.length === 0) {
+        // No one left to act this hand — resolve the dealer and reveal.
+        this.transition('allDone');
+        this.dealerPlay();
+        this._recordHandResult();
+        this.transition('resolve');
+        this.acknowledged = new Set();
+        this._startRevealTimer();
+      } else if (!remaining.includes(this.currentTurnPlayer)) {
+        // Turn landed on an already-stood/busted/absent player — pass it on.
+        this.setTurnPlayer(remaining[0]);
+      }
+    }
+  }
+
+  destroy() {
+    if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
   }
 
   getStateForPlayer(playerId) {

@@ -644,6 +644,50 @@ export class Poker extends BaseGame {
   }
 
   // -------------------------------------------------------------------------
+  // Leave / teardown
+  // -------------------------------------------------------------------------
+
+  removePlayer(playerId) {
+    // Prune the leaver from this.players + the turn rotation. Because Poker
+    // derives its active set from this.players (_activePlayers/_nonFoldedPlayers),
+    // pruning alone removes them from contention and turn rotation.
+    super.removePlayer(playerId);
+
+    const bettingStates = ['preflop', 'flop', 'turn', 'river'];
+    if (!bettingStates.includes(this.state)) return;
+
+    // If only one (or zero) contender is left, award the pot and finish the hand.
+    const remaining = this._nonFoldedPlayers();
+    if (remaining.length <= 1) {
+      this._collectBets();
+      if (remaining.length === 1) {
+        this.chips[remaining[0]] += this.pot;
+        this.pot = 0;
+      }
+      this._forceFinish();
+      return;
+    }
+
+    // The leaver may have held the turn, or the reassigned turn may now point at
+    // a player who already acted / can't act. Re-resolve to a valid next actor
+    // (or advance the stage) so the betting round can never wait on a ghost.
+    const cur = this.currentTurnPlayer;
+    const curCantAct = cur == null || !this.players.includes(cur) || this.folded.has(cur)
+      || (this.chips[cur] || 0) <= 0 || this.actedThisRound.has(cur);
+    if (curCantAct) {
+      if (this._isBettingRoundComplete()) {
+        this._advanceStage();
+      } else {
+        this._nextNonFoldedTurn(playerId);
+      }
+    }
+  }
+
+  destroy() {
+    if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+  }
+
+  // -------------------------------------------------------------------------
   // State access
   // -------------------------------------------------------------------------
 

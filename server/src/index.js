@@ -1024,114 +1024,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
     const lobby = lobbyManager.getLobby(lobbyId);
     if (tm.allWagersIn()) {
-      tm.startPlaying();
-      lobbyManager.setStatus(lobbyId, 'playing');
-      io.to(lobbyId).emit(EVENTS.WAGER_LOCKED, { wagers: { ...tm.wagers } });
-
-      if (isGameRegistered(tm.selectedGame)) {
-        const game = createGame(tm.selectedGame, lobby.players);
-        tm.activeGame = game;
-
-        // Set up timer-driven state broadcast for games that need it
-        if (typeof game.setOnStateChange === 'function') {
-          game.setOnStateChange(() => {
-            const currentLobby = lobbyManager.getLobby(lobbyId);
-            if (!currentLobby) return;
-            const nicks = currentLobby.nicknames || {};
-            const avs = currentLobby.avatars || {};
-            for (const pid of currentLobby.players) {
-              const ps = io.sockets.sockets.get(pid);
-              if (ps) {
-                ps.emit(EVENTS.GAME_STATE, {
-                  gameId: tm.selectedGame,
-                  state: game.getStateForPlayer(pid),
-                  nicknames: nicks,
-                  avatars: avs,
-                });
-              }
-            }
-            // Check if game completed from timer
-            if (game.isComplete()) {
-              const results = game.getResults();
-              const placements = results.map((r) => r.playerId);
-              tm.activeGame = null;
-              const roundScores = tm.completeRound(placements, results);
-              io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
-              io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
-                placements,
-                scores: roundScores,
-                gameId: tm.selectedGame,
-                standings: tm.getStandings().map((s) => ({
-                  ...s,
-                  nickname: currentLobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
-                  avatar: currentLobby.avatars?.[s.playerId] || null,
-                })),
-                gameResults: results,
-              });
-              io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
-            }
-          });
-        }
-
-        game.startGame();
-
-        // Check if game completed immediately (e.g., roulette all players broke)
-        if (game.isComplete()) {
-          const results = game.getResults();
-          const placements = results.map((r) => r.playerId);
-          tm.activeGame = null;
-          const roundScores = tm.completeRound(placements, results);
-
-          io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
-          io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
-            placements,
-            scores: roundScores,
-            gameId: tm.selectedGame,
-            standings: tm.getStandings().map((s) => ({
-              ...s,
-              nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
-              avatar: lobby.avatars?.[s.playerId] || null,
-            })),
-            gameResults: results,
-          });
-          io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
-        } else {
-          const nicknames = lobby.nicknames || {};
-          const avatars = lobby.avatars || {};
-          for (const playerId of lobby.players) {
-            const playerSocket = io.sockets.sockets.get(playerId);
-            if (playerSocket) {
-              playerSocket.emit(EVENTS.GAME_STATE, {
-                gameId: tm.selectedGame,
-                state: game.getStateForPlayer(playerId),
-                nicknames,
-                avatars,
-              });
-            }
-          }
-        }
-      } else {
-        // Game not yet implemented — random placements
-        const shuffled = [...lobby.players].sort(() => Math.random() - 0.5);
-        const roundScores = tm.completeRound(shuffled);
-        io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
-          placements: shuffled,
-          scores: roundScores,
-          gameId: tm.selectedGame,
-          standings: tm.getStandings().map((s) => ({
-            ...s,
-            nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
-          })),
-          gameResults: null,
-        });
-        io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
-
-        if (tm.isTournamentOver()) {
-          io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
-          tournaments.delete(lobbyId);
-          lobbyManager.setStatus(lobbyId, 'waiting');
-        }
-      }
+      startSelectedGame(lobbyId, tm, lobby);
     }
   });
 
@@ -1149,7 +1042,8 @@ io.on(EVENTS.CONNECTION, (socket) => {
     // Start auto-advance timer on first ack
     if (!tm._resultsTimer) {
       tm._resultsTimer = setTimeout(() => {
-        if (tm.phase !== 'results') return;
+        // Bail if the tournament was torn down (leave / threshold win) meanwhile.
+        if (tournaments.get(lobbyId) !== tm || tm.phase !== 'results') return;
         // Force advance — auto-ack everyone
         tm.resultsAcknowledged = null;
         tm._resultsTimer = null;
@@ -1163,23 +1057,6 @@ io.on(EVENTS.CONNECTION, (socket) => {
     tm.resultsAcknowledged = null;
     advanceAfterResults(lobbyId, tm, lobby);
   });
-
-  function advanceAfterResults(lobbyId, tm, lobby) {
-    if (tm.isTournamentOver()) {
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
-      tournaments.delete(lobbyId);
-      lobbyManager.setStatus(lobbyId, 'waiting');
-    } else {
-      tm.startNextRound();
-      lobbyManager.setStatus(lobbyId, 'voting');
-      const eligible = shuffle(getEligibleGames(lobby.players.length));
-      io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
-      io.to(lobbyId).emit(EVENTS.ROUND_START, {
-        round: tm.currentRound,
-        eligibleGames: eligible,
-      });
-    }
-  }
 
   socket.on(EVENTS.GAME_ACTION, (action) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
@@ -1212,6 +1089,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     if (game.isComplete()) {
       const results = game.getResults();
       const placements = results.map((r) => r.playerId);
+      game.destroy?.();
       tm.activeGame = null;
       const roundScores = tm.completeRound(placements, results);
 
@@ -1284,6 +1162,131 @@ function getTournamentState(tm) {
   return tm.getState();
 }
 
+// Start the round's selected game and broadcast its initial state. Shared by the
+// normal WAGER_SUBMIT path AND the wagering-leave path (where the last
+// outstanding wager belonged to a player who just left) so a leave can never
+// strand the remaining players on the "Loading game…" screen.
+function startSelectedGame(lobbyId, tm, lobby) {
+  tm.startPlaying();
+  lobbyManager.setStatus(lobbyId, 'playing');
+  io.to(lobbyId).emit(EVENTS.WAGER_LOCKED, { wagers: { ...tm.wagers } });
+
+  // Use tm.players (the real participants) — on the leave path lobby.players may
+  // still include the player who just left.
+  const players = [...tm.players];
+
+  const completeAndEmit = (game, lb) => {
+    const results = game.getResults();
+    const placements = results.map((r) => r.playerId);
+    game.destroy?.();
+    tm.activeGame = null;
+    const roundScores = tm.completeRound(placements, results);
+    io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
+    io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
+      placements,
+      scores: roundScores,
+      gameId: tm.selectedGame,
+      standings: tm.getStandings().map((s) => ({
+        ...s,
+        nickname: lb?.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+        avatar: lb?.avatars?.[s.playerId] || null,
+      })),
+      gameResults: results,
+    });
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+  };
+
+  if (isGameRegistered(tm.selectedGame)) {
+    const game = createGame(tm.selectedGame, players);
+    tm.activeGame = game;
+
+    // Set up timer-driven state broadcast for games that need it
+    if (typeof game.setOnStateChange === 'function') {
+      game.setOnStateChange(() => {
+        const currentLobby = lobbyManager.getLobby(lobbyId);
+        if (!currentLobby) return;
+        const nicks = currentLobby.nicknames || {};
+        const avs = currentLobby.avatars || {};
+        for (const pid of tm.players) {
+          const ps = io.sockets.sockets.get(pid);
+          if (ps) {
+            ps.emit(EVENTS.GAME_STATE, {
+              gameId: tm.selectedGame,
+              state: game.getStateForPlayer(pid),
+              nicknames: nicks,
+              avatars: avs,
+            });
+          }
+        }
+        // Check if game completed from timer
+        if (game.isComplete() && tm.activeGame === game) {
+          completeAndEmit(game, currentLobby);
+        }
+      });
+    }
+
+    game.startGame();
+
+    // Check if game completed immediately (e.g., roulette all players broke)
+    if (game.isComplete()) {
+      completeAndEmit(game, lobby);
+    } else {
+      const nicknames = lobby.nicknames || {};
+      const avatars = lobby.avatars || {};
+      for (const playerId of tm.players) {
+        const playerSocket = io.sockets.sockets.get(playerId);
+        if (playerSocket) {
+          playerSocket.emit(EVENTS.GAME_STATE, {
+            gameId: tm.selectedGame,
+            state: game.getStateForPlayer(playerId),
+            nicknames,
+            avatars,
+          });
+        }
+      }
+    }
+  } else {
+    // Game not yet implemented — random placements
+    const shuffled = [...players].sort(() => Math.random() - 0.5);
+    const roundScores = tm.completeRound(shuffled);
+    io.to(lobbyId).emit(EVENTS.ROUND_RESULTS, {
+      placements: shuffled,
+      scores: roundScores,
+      gameId: tm.selectedGame,
+      standings: tm.getStandings().map((s) => ({
+        ...s,
+        nickname: lobby.nicknames?.[s.playerId] || s.playerId.slice(0, 8),
+      })),
+      gameResults: null,
+    });
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+
+    if (tm.isTournamentOver()) {
+      io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+      tournaments.delete(lobbyId);
+      lobbyManager.setStatus(lobbyId, 'waiting');
+    }
+  }
+}
+
+function advanceAfterResults(lobbyId, tm, lobby) {
+  if (tm._resultsTimer) { clearTimeout(tm._resultsTimer); tm._resultsTimer = null; }
+  if (tm.isTournamentOver()) {
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
+    tournaments.delete(lobbyId);
+    lobbyManager.setStatus(lobbyId, 'waiting');
+  } else {
+    tm.startNextRound();
+    lobbyManager.setStatus(lobbyId, 'voting');
+    const eligible = shuffle(getEligibleGames(lobby.players.length));
+    io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+    io.to(lobbyId).emit(EVENTS.ROUND_START, {
+      round: tm.currentRound,
+      eligibleGames: eligible,
+    });
+  }
+}
+
 function buildTournamentEndPayload(tm, lobby) {
   return {
     winner: lobby.nicknames?.[tm.getWinner()] || tm.getWinner().slice(0, 8),
@@ -1322,6 +1325,7 @@ function handlePlayerLeave(socket) {
           const results = tm.activeGame.getResults();
           const placements = results.map((r) => r.playerId);
           const lobby = lobbyManager.getLobby(lobbyId);
+          tm.activeGame.destroy?.();
           tm.activeGame = null;
           const roundScores = tm.completeRound(placements, results);
           io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });
@@ -1346,6 +1350,8 @@ function handlePlayerLeave(socket) {
       if (tm.players.length === 1 && lobby) {
         io.to(lobbyId).emit(EVENTS.TOURNAMENT_END, buildTournamentEndPayload(tm, lobby));
       }
+      if (tm._resultsTimer) { clearTimeout(tm._resultsTimer); tm._resultsTimer = null; }
+      tm.activeGame?.destroy?.();
       tournaments.delete(lobbyId);
       if (lobby) lobbyManager.setStatus(lobbyId, 'waiting');
     } else {
@@ -1367,10 +1373,21 @@ function handlePlayerLeave(socket) {
       } else if (tm.phase === 'wagering') {
         // Remove their wager requirement
         tm.wagerSubmitted?.delete(socket.id);
-        if (tm.allWagersIn()) {
-          // Trigger game start logic (simplified — emit wager locked)
-          tm.startPlaying();
-          io.to(lobbyId).emit(EVENTS.WAGER_LOCKED, { wagers: { ...tm.wagers } });
+        if (tm.allWagersIn() && lobby) {
+          // Actually create, start and broadcast the game (same as WAGER_SUBMIT).
+          // The old code only emitted WAGER_LOCKED, leaving everyone stuck forever
+          // on the "Loading game…" screen because no GAME_STATE was ever sent.
+          startSelectedGame(lobbyId, tm, lobby);
+        }
+      } else if (tm.phase === 'results') {
+        // The leaver may have been the last outstanding "Next round" ack.
+        if (tm.resultsAcknowledged) {
+          tm.resultsAcknowledged.delete(socket.id);
+          if (tm.players.length > 0 && lobby
+              && tm.players.every((p) => tm.resultsAcknowledged.has(p))) {
+            tm.resultsAcknowledged = null;
+            advanceAfterResults(lobbyId, tm, lobby);
+          }
         }
       }
 
@@ -1394,6 +1411,7 @@ function handlePlayerLeave(socket) {
         if (tm.activeGame.isComplete()) {
           const results = tm.activeGame.getResults();
           const placements = results.map((r) => r.playerId);
+          tm.activeGame.destroy?.();
           tm.activeGame = null;
           const roundScores = tm.completeRound(placements, results);
           io.to(lobbyId).emit(EVENTS.GAME_COMPLETE, { results });

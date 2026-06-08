@@ -117,7 +117,7 @@ export class Hangman extends BaseGame {
         this.wrongCounts[playerId] = MAX_WRONG;
         if (!this.eliminated.includes(playerId)) {
           this.eliminated.push(playerId);
-          this.removePlayer(playerId);
+          this._removeFromActive(playerId);
         }
         if (this._allEliminated()) {
           this._endRound();
@@ -152,7 +152,7 @@ export class Hangman extends BaseGame {
         this.wrongCounts[playerId] = (this.wrongCounts[playerId] || 0) + 1;
         if (this.wrongCounts[playerId] >= MAX_WRONG) {
           this.eliminated.push(playerId);
-          this.removePlayer(playerId);
+          this._removeFromActive(playerId);
         }
         if (this._allEliminated()) {
           this._endRound();
@@ -170,6 +170,28 @@ export class Hangman extends BaseGame {
         }
       }
     }
+  }
+
+  removePlayer(playerId) {
+    // Departure (not elimination): prune the leaver from this.players too, so the
+    // per-round reset (_startRound rebuilds activePlayers from this.players) never
+    // resurrects them and assigns the turn to a ghost.
+    super.removePlayer(playerId);
+    if (this.state !== 'playing') return;
+
+    const active = this.activePlayers.filter((p) => !this.eliminated.includes(p));
+    if (active.length === 0) {
+      // Nobody left who can still guess — end the round (advances or finishes).
+      this._endRound();
+      return;
+    }
+    if (!active.includes(this.currentTurnPlayer)) {
+      this.setTurnPlayer(active[0]);
+    }
+  }
+
+  destroy() {
+    if (this._roundTimer) { clearTimeout(this._roundTimer); this._roundTimer = null; }
   }
 
   getStateForPlayer(playerId) {

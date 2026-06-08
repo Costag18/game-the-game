@@ -20,6 +20,9 @@ export class LiarsDice extends BaseGame {
     this.challengeAcknowledged = new Set();
   }
 
+  setOnStateChange(cb) { this._onStateChange = cb; }
+  _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
+
   startGame() {
     this.dice = {};
     this.eliminated = [];
@@ -115,7 +118,9 @@ export class LiarsDice extends BaseGame {
 
   _checkChallengeAckComplete() {
     if (this.state !== 'challenging') return;
-    const needAck = this.players.filter((p) => !this.eliminated.includes(p));
+    // activePlayers already excludes eliminated AND departed players, so it is
+    // exactly the set that still needs to acknowledge the reveal.
+    const needAck = this.activePlayers;
     if (!needAck.every((p) => this.challengeAcknowledged.has(p))) return;
     if (this._challengeTimer) { clearTimeout(this._challengeTimer); this._challengeTimer = null; }
     this._advanceAfterChallenge();
@@ -125,11 +130,10 @@ export class LiarsDice extends BaseGame {
     if (this._challengeTimer) clearTimeout(this._challengeTimer);
     this._challengeTimer = setTimeout(() => {
       if (this.state !== 'challenging') return;
-      // Auto-ack all non-eliminated players
-      for (const p of this.players) {
-        if (!this.eliminated.includes(p)) this.challengeAcknowledged.add(p);
-      }
+      // Auto-ack all present, non-eliminated players
+      for (const p of this.activePlayers) this.challengeAcknowledged.add(p);
       this._checkChallengeAckComplete();
+      this._emitChange();
     }, 10000); // 10 second auto-advance
   }
 
@@ -140,7 +144,7 @@ export class LiarsDice extends BaseGame {
 
     if (this.dice[loser].length === 0) {
       this.eliminated.push(loser);
-      this.removePlayer(loser);
+      this._removeFromActive(loser);
     }
 
     this.currentBid = null;
@@ -163,6 +167,26 @@ export class LiarsDice extends BaseGame {
     this._rollAll();
     this.transition('reroll');
     this.setTurnPlayer(nextPlayer);
+  }
+
+  removePlayer(playerId) {
+    // Departure (not elimination): prune the leaver from this.players too.
+    super.removePlayer(playerId);
+    this.challengeAcknowledged?.delete(playerId);
+
+    if (this.activePlayers.length <= 1 && this.state !== 'finished') {
+      if (this._challengeTimer) { clearTimeout(this._challengeTimer); this._challengeTimer = null; }
+      this.state = 'finished';
+      return;
+    }
+    // If they were holding up the reveal acknowledgement, re-check now.
+    if (this.state === 'challenging') {
+      this._checkChallengeAckComplete();
+    }
+  }
+
+  destroy() {
+    if (this._challengeTimer) { clearTimeout(this._challengeTimer); this._challengeTimer = null; }
   }
 
   getStateForPlayer(playerId) {
