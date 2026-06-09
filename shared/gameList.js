@@ -88,6 +88,19 @@ export const GAMES = {
       'Note: your network latency is included in the measured time — the server times your tap on its own clock and never trusts the browser, so results are spoof-proof but slightly favor faster connections.',
     ],
   },
+  typingRace: {
+    id: 'typingRace', name: 'Typing Race', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.TYPING,
+    description: 'Transcribe the scroll fastest. First to finish wins the sprint.',
+    instructions: [
+      'A passage from an ancient scroll appears — type it exactly as written.',
+      'Your typing is checked live: a wrong character stops your progress until you fix it (backspace and retype).',
+      'Watch the race track — every player\'s marker crawls toward the finish line in real time.',
+      'You have 90 seconds. First player to finish the whole passage ranks highest.',
+      'If time runs out, players are ranked by how many correct characters they typed, then by speed.',
+      'Your WPM (words per minute) is shown live and frozen when you finish.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

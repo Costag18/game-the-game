@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (13)
+## Mini-Games (14)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -98,6 +98,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Spot the Difference | 2-8 | Simultaneous, 3 rounds |
 | Battleship | 2-8 | Turn-based, setup + firing, target selector |
 | Reaction Tap | 2-8 | Simultaneous, 5 rounds, timer-driven GO (server-authoritative reflex timing) |
+| Typing Race | 2-8 | Simultaneous, single 90s sprint, server-authoritative prefix validation |
 
 ## Casino Side Games
 
@@ -445,6 +446,7 @@ The owner cares about:
 | Spot the Difference | Special Elite |
 | Battleship | Archivo Black |
 | Reaction Tap | Black Ops One |
+| Typing Race | Special Elite (title) / Cutive Mono (passage) |
 
 ## Versioning & Commits
 

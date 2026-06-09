@@ -23,6 +23,7 @@ import previewHangman from '../assets/gamepreviews/Hangman_web-1024x682.png';
 import previewSpotDiff from '../assets/gamepreviews/spotthedifference.png';
 import previewBattleship from '../assets/gamepreviews/battleship.jpg';
 import previewReactionTap from '../assets/gamepreviews/reactionTap.png';
+import previewTypingRace from '../assets/gamepreviews/typingrace.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -38,6 +39,7 @@ const GAME_PREVIEWS = {
   spotTheDifference: previewSpotDiff,
   battleship: previewBattleship,
   reactionTap: previewReactionTap,
+  typingRace: previewTypingRace,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

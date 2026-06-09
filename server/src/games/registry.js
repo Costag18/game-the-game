@@ -12,6 +12,7 @@ import { Hangman } from './Hangman.js';
 import { SpotTheDifference } from './SpotTheDifference.js';
 import { Battleship } from './Battleship.js';
 import { ReactionTap } from './ReactionTap.js';
+import { TypingRace } from './TypingRace.js';
 
 const gameEngines = {};
 
@@ -47,3 +48,4 @@ registerGame('poker', Poker);
 registerGame('spotTheDifference', SpotTheDifference);
 registerGame('battleship', Battleship);
 registerGame('reactionTap', ReactionTap);
+registerGame('typingRace', TypingRace);
