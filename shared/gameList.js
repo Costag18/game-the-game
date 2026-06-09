@@ -114,6 +114,18 @@ export const GAMES = {
       'There are 3 rounds. Highest total of unique answers wins!',
     ],
   },
+  bsCheat: {
+    id: 'bsCheat', name: 'BS (Cheat)', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Bluff your cards away. Call BS to bust the liar — first to empty their hand escapes.',
+    instructions: [
+      'Cards are dealt evenly and the claimed rank cycles A, 2, 3 … K each turn.',
+      'On your turn place 1–4 cards FACE DOWN and claim they are the current rank (e.g. "two Kings").',
+      'Other players get a few seconds to call BS. First to call wins the challenge.',
+      'If the claim was a lie, the liar takes the whole pile. If it was true, the challenger takes it.',
+      'Empty your hand to escape — the last player still holding cards loses. Finish earliest to place highest.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

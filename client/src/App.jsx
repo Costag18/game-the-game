@@ -36,6 +36,7 @@ import BattleshipGame from './games/Battleship.jsx';
 import ReactionTapGame from './games/ReactionTap.jsx';
 import TypingRaceGame from './games/TypingRace.jsx';
 import ScattergoriesGame from './games/Scattergories.jsx';
+import BsCheatGame from './games/BsCheat.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -56,6 +57,7 @@ const GAME_COMPONENTS = {
   reactionTap: ReactionTapGame,
   typingRace: TypingRaceGame,
   scattergories: ScattergoriesGame,
+  bsCheat: BsCheatGame,
 };
 
 function GameRouter() {

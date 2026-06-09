@@ -1,0 +1,102 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 760px;
+  margin: 0 auto;
+  min-height: 70vh;
+}
+
+.header { display: flex; align-items: center; gap: 1.2rem; }
+.title {
+  font-family: 'Creepster', 'Bangers', cursive;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: var(--gold, #d4a843);
+  letter-spacing: 2px;
+  margin: 0;
+}
+.pile { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+
+.opponents { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.oppChip {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: var(--bg-panel, #2a1518);
+  border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.82rem;
+}
+.oppTurn { border-color: var(--gold, #d4a843); box-shadow: 0 0 8px rgba(212,168,67,0.5); }
+.oppDone { opacity: 0.55; }
+.oppCount { color: var(--gold, #d4a843); font-weight: 700; }
+
+.center {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.6rem; min-height: 140px; text-align: center;
+}
+.banner { font-size: 1.15rem; color: var(--text-primary, #f3e9d2); }
+
+.challengeBox { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
+.announce { font-size: 1.15rem; color: var(--text-primary, #f3e9d2); }
+.subtle { color: var(--text-secondary, #b8a88a); }
+.bsBtn {
+  border: none;
+  background: #c62828;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 900;
+  padding: 0.8rem 2rem;
+  border-radius: 14px;
+  cursor: pointer;
+  animation: bsPulse 0.7s ease-in-out infinite;
+  box-shadow: 0 6px 18px rgba(198,40,40,0.5);
+}
+@keyframes bsPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+.revealBox { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; }
+.revealCards { display: flex; gap: 0.4rem; }
+.verdict { font-size: 1.2rem; font-weight: 800; }
+.good { color: #69d07a; }
+.bad { color: #e86d6d; }
+
+.finishedBox { color: var(--text-primary, #f3e9d2); }
+.gameOver { font-family: 'Creepster', cursive; color: var(--gold, #d4a843); }
+.ranks { text-align: left; }
+
+.hand { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; margin-top: auto; }
+.escaped { font-size: 1.3rem; color: #69d07a; font-weight: 800; margin-top: auto; }
+
+.card {
+  width: 46px; height: 64px;
+  border-radius: 7px;
+  border: 1px solid #b9a06a;
+  background: #fdfaf0;
+  color: #222;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-weight: 800;
+  transition: transform 90ms ease, box-shadow 90ms ease;
+  position: relative;
+}
+.card.red { color: #c62828; }
+.cardSel { transform: translateY(-12px); box-shadow: 0 6px 14px rgba(0,0,0,0.4); border-color: var(--gold, #d4a843); }
+.cardRank { font-size: 1.1rem; line-height: 1; }
+.cardSuit { font-size: 1rem; line-height: 1; }
+
+.playBtn {
+  margin-top: 0.6rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--gold, #d4a843);
+  color: #1a0e10;
+  font-weight: 800;
+  font-size: 1.05rem;
+  padding: 0.65rem 1.5rem;
+  cursor: pointer;
+}
+.playBtn:disabled { opacity: 0.5; cursor: default; }
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

@@ -14,6 +14,7 @@ import { Battleship } from './Battleship.js';
 import { ReactionTap } from './ReactionTap.js';
 import { TypingRace } from './TypingRace.js';
 import { Scattergories } from './Scattergories.js';
+import { BsCheat } from './BsCheat.js';
 
 const gameEngines = {};
 
@@ -51,3 +52,4 @@ registerGame('battleship', Battleship);
 registerGame('reactionTap', ReactionTap);
 registerGame('typingRace', TypingRace);
 registerGame('scattergories', Scattergories);
+registerGame('bsCheat', BsCheat);
