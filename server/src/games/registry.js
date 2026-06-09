@@ -15,6 +15,7 @@ import { ReactionTap } from './ReactionTap.js';
 import { TypingRace } from './TypingRace.js';
 import { Scattergories } from './Scattergories.js';
 import { BsCheat } from './BsCheat.js';
+import { Wavelength } from './Wavelength.js';
 
 const gameEngines = {};
 
@@ -53,3 +54,4 @@ registerGame('reactionTap', ReactionTap);
 registerGame('typingRace', TypingRace);
 registerGame('scattergories', Scattergories);
 registerGame('bsCheat', BsCheat);
+registerGame('wavelength', Wavelength);

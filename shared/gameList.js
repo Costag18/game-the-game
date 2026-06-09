@@ -126,6 +126,18 @@ export const GAMES = {
       'Empty your hand to escape — the last player still holding cards loses. Finish earliest to place highest.',
     ],
   },
+  wavelength: {
+    id: 'wavelength', name: 'Wavelength', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.WAVELENGTH_CLUE,
+    description: 'Read the psychic\'s mind. Slide to the hidden target on the spectrum.',
+    instructions: [
+      'Each sub-round one player is the Psychic and sees a hidden target band on a spectrum (e.g. Cold ↔ Hot).',
+      'The Psychic writes one short clue (no numbers!) hinting where the target sits.',
+      'Everyone else slides a marker from 0 to 100 to guess the band — guesses stay hidden until reveal.',
+      'Bullseye = 4 pts, close = 3, near = 2, miss = 0. The Psychic scores from how well the guessers did (capped at 4).',
+      'Every player is Psychic once. Highest total across all sub-rounds wins the round!',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

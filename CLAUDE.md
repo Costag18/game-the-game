@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (16)
+## Mini-Games (17)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -101,6 +101,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Typing Race | 2-8 | Simultaneous, single 90s sprint, server-authoritative prefix validation |
 | Scattergories | 2-8 | Simultaneous, 3 rounds, letter+categories, unique-answer scoring + peer-challenge |
 | BS (Cheat) | 2-8 | Turn-based bluff, claim+challenge window, reveal, finish-order ranking |
+| Wavelength | 2-8 | Turn-based, rotating psychic, hidden spectrum band, slider guessing |
 
 ## Casino Side Games
 
@@ -452,6 +453,7 @@ The owner cares about:
 | Typing Race | Special Elite (title) / Cutive Mono (passage) |
 | Scattergories | Bungee |
 | BS (Cheat) | Creepster |
+| Wavelength | Audiowide (title) / Quicksand (body) |
 
 ## Versioning & Commits
 

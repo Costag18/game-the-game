@@ -37,6 +37,7 @@ import ReactionTapGame from './games/ReactionTap.jsx';
 import TypingRaceGame from './games/TypingRace.jsx';
 import ScattergoriesGame from './games/Scattergories.jsx';
 import BsCheatGame from './games/BsCheat.jsx';
+import WavelengthGame from './games/Wavelength.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -58,6 +59,7 @@ const GAME_COMPONENTS = {
   typingRace: TypingRaceGame,
   scattergories: ScattergoriesGame,
   bsCheat: BsCheatGame,
+  wavelength: WavelengthGame,
 };
 
 function GameRouter() {
