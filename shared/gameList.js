@@ -150,6 +150,18 @@ export const GAMES = {
       'Clicking empty space counts as a miss and lowers your accuracy — aim, do not spray.',
     ],
   },
+  mastermind: {
+    id: 'mastermind', name: 'Mastermind', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.MASTERMIND,
+    description: 'Crack the secret code. First to break it wins.',
+    instructions: [
+      'Everyone races to crack the SAME hidden 4-peg code (6 colors, duplicates allowed).',
+      'Submit a guess of 4 colors. You get feedback: black = right color AND right spot, white = right color WRONG spot.',
+      'Your board is private — opponents only see whether you solved it and how many guesses you used.',
+      'You get up to 10 guesses and 120 seconds. First to crack it (fewest guesses, then fastest) ranks highest.',
+      'If nobody cracks it, you rank by best progress — most black pegs, then most white.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

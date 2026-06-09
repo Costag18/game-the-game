@@ -17,6 +17,7 @@ import { Scattergories } from './Scattergories.js';
 import { BsCheat } from './BsCheat.js';
 import { Wavelength } from './Wavelength.js';
 import { AimTrainer } from './AimTrainer.js';
+import { Mastermind } from './Mastermind.js';
 
 const gameEngines = {};
 
@@ -57,3 +58,4 @@ registerGame('scattergories', Scattergories);
 registerGame('bsCheat', BsCheat);
 registerGame('wavelength', Wavelength);
 registerGame('aimTrainer', AimTrainer);
+registerGame('mastermind', Mastermind);
