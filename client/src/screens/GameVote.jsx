@@ -24,6 +24,7 @@ import previewSpotDiff from '../assets/gamepreviews/spotthedifference.png';
 import previewBattleship from '../assets/gamepreviews/battleship.jpg';
 import previewReactionTap from '../assets/gamepreviews/reactionTap.png';
 import previewTypingRace from '../assets/gamepreviews/typingrace.png';
+import previewScattergories from '../assets/gamepreviews/scattergories.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -40,6 +41,7 @@ const GAME_PREVIEWS = {
   battleship: previewBattleship,
   reactionTap: previewReactionTap,
   typingRace: previewTypingRace,
+  scattergories: previewScattergories,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

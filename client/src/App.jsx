@@ -35,6 +35,7 @@ import SpotTheDifferenceGame from './games/SpotTheDifference.jsx';
 import BattleshipGame from './games/Battleship.jsx';
 import ReactionTapGame from './games/ReactionTap.jsx';
 import TypingRaceGame from './games/TypingRace.jsx';
+import ScattergoriesGame from './games/Scattergories.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -54,6 +55,7 @@ const GAME_COMPONENTS = {
   battleship: BattleshipGame,
   reactionTap: ReactionTapGame,
   typingRace: TypingRaceGame,
+  scattergories: ScattergoriesGame,
 };
 
 function GameRouter() {

@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (14)
+## Mini-Games (15)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -99,6 +99,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Battleship | 2-8 | Turn-based, setup + firing, target selector |
 | Reaction Tap | 2-8 | Simultaneous, 5 rounds, timer-driven GO (server-authoritative reflex timing) |
 | Typing Race | 2-8 | Simultaneous, single 90s sprint, server-authoritative prefix validation |
+| Scattergories | 2-8 | Simultaneous, 3 rounds, letter+categories, unique-answer scoring |
 
 ## Casino Side Games
 
@@ -447,6 +448,7 @@ The owner cares about:
 | Battleship | Archivo Black |
 | Reaction Tap | Black Ops One |
 | Typing Race | Special Elite (title) / Cutive Mono (passage) |
+| Scattergories | Bungee |
 
 ## Versioning & Commits
 

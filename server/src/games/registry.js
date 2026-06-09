@@ -13,6 +13,7 @@ import { SpotTheDifference } from './SpotTheDifference.js';
 import { Battleship } from './Battleship.js';
 import { ReactionTap } from './ReactionTap.js';
 import { TypingRace } from './TypingRace.js';
+import { Scattergories } from './Scattergories.js';
 
 const gameEngines = {};
 
@@ -49,3 +50,4 @@ registerGame('spotTheDifference', SpotTheDifference);
 registerGame('battleship', Battleship);
 registerGame('reactionTap', ReactionTap);
 registerGame('typingRace', TypingRace);
+registerGame('scattergories', Scattergories);

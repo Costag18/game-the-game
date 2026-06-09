@@ -101,6 +101,18 @@ export const GAMES = {
       'Your WPM (words per minute) is shown live and frozen when you finish.',
     ],
   },
+  scattergories: {
+    id: 'scattergories', name: 'Scattergories', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.SCATTERGORIES,
+    description: 'One letter, ten categories. Be the only one with each answer.',
+    instructions: [
+      'Each round a random letter and 10 categories appear.',
+      'Type one answer per category that STARTS with the letter, before the 75-second timer runs out.',
+      'An answer scores 1 point only if it is valid AND unique — if two or more players write the same thing, nobody gets the point.',
+      'Empty answers and answers that do not start with the letter score 0.',
+      'There are 3 rounds. Highest total of unique answers wins!',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {
