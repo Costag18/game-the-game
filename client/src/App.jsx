@@ -40,6 +40,7 @@ import BsCheatGame from './games/BsCheat.jsx';
 import WavelengthGame from './games/Wavelength.jsx';
 import AimTrainerGame from './games/AimTrainer.jsx';
 import MastermindGame from './games/Mastermind.jsx';
+import PresidentGame from './games/President.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -64,6 +65,7 @@ const GAME_COMPONENTS = {
   wavelength: WavelengthGame,
   aimTrainer: AimTrainerGame,
   mastermind: MastermindGame,
+  president: PresidentGame,
 };
 
 function GameRouter() {

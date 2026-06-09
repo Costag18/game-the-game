@@ -29,6 +29,7 @@ import previewBsCheat from '../assets/gamepreviews/bsCheat.png';
 import previewWavelength from '../assets/gamepreviews/wavelength.png';
 import previewAimTrainer from '../assets/gamepreviews/aimTrainer.png';
 import previewMastermind from '../assets/gamepreviews/mastermind.png';
+import previewPresident from '../assets/gamepreviews/president.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -50,6 +51,7 @@ const GAME_PREVIEWS = {
   wavelength: previewWavelength,
   aimTrainer: previewAimTrainer,
   mastermind: previewMastermind,
+  president: previewPresident,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

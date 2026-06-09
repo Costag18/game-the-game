@@ -1,0 +1,75 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: 'Playfair Display', 'Cinzel', serif;
+  font-weight: 800;
+  font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+  color: var(--gold, #d4a843);
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.opponents { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.oppChip {
+  display: flex; align-items: center; gap: 0.35rem;
+  background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px; padding: 0.25rem 0.7rem; font-size: 0.82rem;
+}
+.oppTurn { border-color: var(--gold, #d4a843); box-shadow: 0 0 10px rgba(212, 168, 67, 0.5); }
+.oppCards { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.oppTag { color: #c98; font-style: italic; font-size: 0.72rem; }
+.oppLead { color: var(--gold, #d4a843); }
+
+.pile {
+  min-height: 110px; width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;
+  background: radial-gradient(circle at 50% 50%, #1f5130, #0d3119 80%);
+  border: 2px solid rgba(0, 0, 0, 0.3); border-radius: 14px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+.pileMsg { color: rgba(255, 255, 255, 0.7); font-style: italic; }
+.pileMeta { color: var(--gold-light, #f0d896); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; }
+.pileCards { display: flex; gap: 0.3rem; }
+.bigMsg { color: var(--gold, #d4a843); font-weight: 700; font-size: 1.2rem; }
+
+.finishStrip { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.finishBadge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: rgba(212, 168, 67, 0.15); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 8px; padding: 0.15rem 0.5rem; font-size: 0.78rem; color: var(--text-primary, #f3e9d2);
+}
+
+.hand {
+  display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center;
+  padding: 0.4rem; max-width: 100%;
+}
+.card {
+  position: relative;
+  width: 46px; height: 64px; border-radius: 7px;
+  background: #fdfaf3; border: 1px solid #d8cdb5;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+.card:hover { transform: translateY(-3px); }
+.cardSel { transform: translateY(-12px); box-shadow: 0 0 0 2px var(--gold, #d4a843), 0 6px 10px rgba(0, 0, 0, 0.4); }
+.cardFaded { opacity: 0.45; }
+.cardLabel { font-weight: 800; font-size: 1.1rem; line-height: 1; }
+.cardSuit { font-size: 1.1rem; line-height: 1; }
+
+.actions { display: flex; gap: 0.7rem; }
+.playBtn { background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 8px; padding: 0.55rem 1.6rem; font-weight: 800; cursor: pointer; }
+.playBtn:disabled { opacity: 0.45; cursor: default; }
+.passBtn { background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.55rem 1.4rem; font-weight: 700; cursor: pointer; }
+.passBtn:disabled { opacity: 0.45; cursor: default; }
+.hint { color: var(--text-secondary, #b8a88a); font-size: 0.85rem; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

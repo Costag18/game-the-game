@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (19)
+## Mini-Games (20)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -104,6 +104,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Wavelength | 2-8 | Turn-based, rotating psychic, hidden spectrum band, slider guessing |
 | Aim Trainer Duel | 2-8 | Simultaneous, 25s, per-player server-spawned targets, hits+accuracy ranking |
 | Mastermind | 2-8 | Simultaneous deduction race, shared hidden code, private boards, black/white feedback |
+| President | 2-8 | Turn-based shedding, trick groups, pass-persistence, finish-order ranking |
 
 ## Casino Side Games
 
@@ -458,6 +459,7 @@ The owner cares about:
 | Wavelength | Audiowide (title) / Quicksand (body) |
 | Aim Trainer Duel | Wallpoet |
 | Mastermind | Orbitron |
+| President | Playfair Display |
 
 ## Versioning & Commits
 

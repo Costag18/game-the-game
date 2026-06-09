@@ -162,6 +162,18 @@ export const GAMES = {
       'If nobody cracks it, you rank by best progress — most black pegs, then most white.',
     ],
   },
+  president: {
+    id: 'president', name: 'President', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Shed your hand first to rule. Last one stuck is the Scumlord.',
+    instructions: [
+      'Everyone is dealt the whole deck. Card order low to high: 3,4,5,6,7,8,9,10,J,Q,K,A,2 (2 is highest).',
+      'The leader plays any group of same-rank cards (single, pair, triple, or four).',
+      'On your turn, beat the pile with a higher group of the SAME size, or pass.',
+      'Once you pass you are out until the trick clears. When all but one player passes, that player leads a fresh trick.',
+      'Empty your hand to finish. First out is President, last left is Scumlord. Your finish order is your ranking.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {
