@@ -41,7 +41,7 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
 
   const {
     letter, categories = [], totalRounds, hasSubmitted, submittedCount = 0,
-    totalPlayers = 0, roundResult, scores = {}, myId, otherPlayers = [],
+    totalPlayers = 0, roundResult, reportsView = {}, scores = {}, myId, otherPlayers = [],
   } = gameState;
 
   const allPlayers = [myId, ...otherPlayers.map((o) => o.playerId)];
@@ -104,6 +104,9 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
       {(phase === 'reveal' || phase === 'finished') && roundResult && (
         <div className={styles.revealWrap}>
           <div className={styles.revealLetter}>Letter: <strong>{roundResult.letter}</strong></div>
+          {phase === 'reveal' && (
+            <p className={styles.reportHint}>🚩 Tap a rival’s answer to flag it as fake — if everyone else agrees, it’s removed.</p>
+          )}
           <div className={styles.tableScroll}>
             <table className={styles.table}>
               <thead>
@@ -122,9 +125,21 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
                     <td className={styles.catCell}>{cat}</td>
                     {allPlayers.map((pid) => {
                       const cell = roundResult.perPlayer?.[pid]?.[c] || { text: '', status: 'empty' };
+                      const rv = reportsView?.[pid]?.[String(c)];
+                      const canReport = phase === 'reveal' && pid !== myId && !!cell.text && cell.status !== 'challenged';
                       return (
-                        <td key={pid} className={`${styles.answerCell} ${styles['st_' + cell.status]}`}>
-                          {cell.text || '—'}
+                        <td
+                          key={pid}
+                          className={[
+                            styles.answerCell, styles['st_' + cell.status],
+                            canReport ? styles.reportable : '',
+                            rv && rv.mine ? styles.reportedByMe : '',
+                          ].filter(Boolean).join(' ')}
+                          onClick={canReport ? () => onAction({ type: 'report', targetPlayer: pid, categoryIndex: c }) : undefined}
+                          title={canReport ? 'Flag as fake' : undefined}
+                        >
+                          <span className={styles.cellText}>{cell.text || '—'}</span>
+                          {rv && rv.count > 0 && <span className={styles.flag}>🚩{rv.count}</span>}
                         </td>
                       );
                     })}

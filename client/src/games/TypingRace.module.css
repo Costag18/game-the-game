@@ -106,7 +106,3 @@
 .standDesc { font-size: 0.85rem; color: #5a4420; }
 
 .loading { font-family: 'Special Elite', monospace; padding-top: 2rem; text-align: center; }
-
-@media (min-width: 960px) and (orientation: landscape) {
-  .scroll { margin-left: 220px; }
-}

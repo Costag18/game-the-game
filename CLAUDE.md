@@ -362,7 +362,8 @@ A 49-agent audit found ~30 distinct mid-game leave/deadlock bugs. Root causes + 
 - Cold start on first visit is acceptable (~30-60s), but mid-game disconnects are not
 
 ### Game Layout & Sidebar Sizing
-- During gameplay, `.gameMainArea` has `margin-left: 220px` (pet sidebar) and `width: calc(100% - 220px)` on desktop
+- During gameplay, `.gameMainArea` (the wrapper App.jsx renders the game into) ALREADY applies the pet-sidebar offset on desktop — `margin-left: 340px; width: calc(100% - 340px)` (see `global.css`; 340px matches the desktop sidebar width)
+- **A game component's own CSS must NOT re-apply that margin** — doing so double-offsets and pushes the game off-center to the right (the v2.x ReactionTap/TypingRace/Scattergories bug). Just center content inside the wrapper with `max-width` + `margin: 0 auto` (or `align-items: center`), no `margin-left`/`calc(100% - …)`.
 - Without `calc`, `width: 100%` + `margin-left` causes overflow off the right edge
 - Casino sidebar is 280px fixed on desktop during voting/wagering screens
 - Always account for fixed sidebars when calculating main content width

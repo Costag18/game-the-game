@@ -153,5 +153,61 @@ test('destroy clears timers', () => {
   eq(pendingTimers(), 0);
 });
 
+test('unanimous report removes an answer and re-scores (blocked partner gains the point)', () => {
+  const g = newGame(['a', 'b', 'c']);
+  g.letter = 'S'; g.categories = ['X'];
+  submit(g, 'a', { 0: 'Sun' });
+  submit(g, 'b', { 0: 'Sun' });   // dup with a -> both 0
+  submit(g, 'c', { 0: 'Star' });  // unique -> 1
+  eq(g.state, 'reveal');
+  eq(g.roundScores['b'], 0);
+  // b and c report a's "Sun" (others of a = {b,c}) -> unanimous
+  g.handleAction('b', { type: 'report', targetPlayer: 'a', categoryIndex: 0 });
+  g.handleAction('c', { type: 'report', targetPlayer: 'a', categoryIndex: 0 });
+  eq(g.roundResult.perPlayer['a'][0].status, 'challenged');
+  eq(g.roundScores['a'], 0);
+  eq(g.roundScores['b'], 1, 'b is now the only Sun -> unique');
+});
+
+test('non-unanimous report does not remove the answer', () => {
+  const g = newGame(['a', 'b', 'c']);
+  g.letter = 'S'; g.categories = ['X'];
+  submit(g, 'a', { 0: 'Sun' }); submit(g, 'b', { 0: 'Sea' }); submit(g, 'c', { 0: 'Star' });
+  g.handleAction('b', { type: 'report', targetPlayer: 'a', categoryIndex: 0 }); // only b
+  eq(g.roundResult.perPlayer['a'][0].status, 'scored');
+  eq(g.roundScores['a'], 1);
+});
+
+test('cannot report your own answer or during writing', () => {
+  const g = newGame(['a', 'b']);
+  g.letter = 'S'; g.categories = ['X'];
+  g.handleAction('a', { type: 'report', targetPlayer: 'b', categoryIndex: 0 }); // writing -> ignored
+  submit(g, 'a', { 0: 'Sun' }); submit(g, 'b', { 0: 'Sea' });
+  g.handleAction('a', { type: 'report', targetPlayer: 'a', categoryIndex: 0 }); // self -> ignored
+  assert(!(g.challenged['a'] && g.challenged['a'].has(0)), 'no self challenge');
+});
+
+test('a leave can tip pending reports into a unanimous challenge', () => {
+  const g = newGame(['a', 'b', 'c', 'd']);
+  g.letter = 'S'; g.categories = ['X'];
+  submit(g, 'a', { 0: 'Sun' }); submit(g, 'b', { 0: 'Sea' });
+  submit(g, 'c', { 0: 'Star' }); submit(g, 'd', { 0: 'Sky' });
+  g.handleAction('b', { type: 'report', targetPlayer: 'a', categoryIndex: 0 });
+  g.handleAction('c', { type: 'report', targetPlayer: 'a', categoryIndex: 0 });
+  assert(!(g.challenged['a'] && g.challenged['a'].has(0)), 'not yet unanimous (d has not reported)');
+  g.removePlayer('d'); // others of a become {b,c}, both reported -> unanimous
+  eq(g.roundResult.perPlayer['a'][0].status, 'challenged');
+});
+
+test('report toggles off when the same reporter reports again', () => {
+  const g = newGame(['a', 'b', 'c']);
+  g.letter = 'S'; g.categories = ['X'];
+  submit(g, 'a', { 0: 'Sun' }); submit(g, 'b', { 0: 'Sea' }); submit(g, 'c', { 0: 'Star' });
+  g.handleAction('b', { type: 'report', targetPlayer: 'a', categoryIndex: 0 });
+  g.handleAction('b', { type: 'report', targetPlayer: 'a', categoryIndex: 0 }); // toggle off
+  const view = g.getStateForPlayer('c').reportsView || {};
+  assert(!view['a'] || !view['a']['0'] || view['a']['0'].count === 0, 'report retracted');
+});
+
 uninstallClock();
 report('Scattergories');

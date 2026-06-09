@@ -76,11 +76,19 @@
   border-bottom: 2px solid var(--gold-dim, #8a6d2f);
 }
 .catCell { color: var(--text-secondary, #b8a88a); padding: 0.35rem 0.5rem; white-space: nowrap; }
-.answerCell { padding: 0.35rem 0.5rem; border-radius: 4px; }
+.answerCell { padding: 0.35rem 0.5rem; border-radius: 4px; position: relative; }
 .st_scored { background: rgba(67,160,71,0.28); color: #cfeecf; font-weight: 700; }
 .st_dup { background: rgba(120,120,120,0.22); color: #c9c2b4; }
 .st_invalid { background: rgba(198,40,40,0.22); color: #f0c2c2; }
 .st_empty { color: rgba(184,168,138,0.5); }
+.st_challenged { background: rgba(198,40,40,0.32); color: #f0c2c2; text-decoration: line-through; opacity: 0.8; }
+
+.cellText { }
+.flag { margin-left: 0.3rem; font-size: 0.75rem; white-space: nowrap; }
+.reportable { cursor: pointer; }
+.reportable:hover { outline: 2px dashed rgba(224,85,85,0.6); outline-offset: -2px; }
+.reportedByMe { outline: 2px solid #e05555; outline-offset: -2px; }
+.reportHint { text-align: center; color: var(--text-secondary, #b8a88a); font-size: 0.85rem; margin: 0; }
 
 .scoreStrip { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.4rem; }
 .scoreCard {
@@ -91,7 +99,3 @@
   padding: 0.25rem 0.8rem;
 }
 .scoreVal { font-weight: 800; color: var(--gold, #d4a843); }
-
-@media (min-width: 960px) and (orientation: landscape) {
-  .arena { margin-left: 220px; width: calc(100% - 220px); }
-}

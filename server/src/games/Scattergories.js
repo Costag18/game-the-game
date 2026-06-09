@@ -57,6 +57,10 @@ export class Scattergories extends BaseGame {
     this.roundResult = null;
     this.acknowledged = new Set();
     this.roundHistory = [];
+    this.reports = {};        // { [targetPlayer]: { [categoryIndex]: Set<reporterId> } }
+    this.challenged = {};     // { [targetPlayer]: Set<categoryIndex> } voted-out answers
+    this._priorScores = {};   // cumulative scores before the current round (for re-scoring)
+    this._roundScored = false;
     this._writeStartTime = 0;
     this._writeTimer = null;
     this._ackTimer = null;
@@ -83,6 +87,10 @@ export class Scattergories extends BaseGame {
     this.roundResult = null;
     this.roundScores = {};
     for (const p of this.players) this.roundScores[p] = 0;
+    this._priorScores = { ...this.scores };  // snapshot cumulative from prior rounds
+    this.reports = {};
+    this.challenged = {};
+    this._roundScored = false;
     this._writeStartTime = Date.now();
     this._clearTimers();
     this._writeTimer = setTimeout(() => {
@@ -118,6 +126,12 @@ export class Scattergories extends BaseGame {
     return typeof v === 'string' ? v : '';
   }
 
+  _isChallengedOut(p, c) {
+    return !!(this.challenged[p] && this.challenged[p].has(c));
+  }
+
+  // Idempotent / re-runnable: recomputes the round from current answers + challenges.
+  // Called on reveal entry and again whenever a unanimous report removes an answer.
   _scoreRound() {
     this.roundResult = { letter: this.letter, categories: this.categories, perPlayer: {} };
     for (const p of this.players) this.roundScores[p] = 0;
@@ -126,27 +140,57 @@ export class Scattergories extends BaseGame {
       const counts = {};
       for (const p of this.players) {
         const raw = this._answerOf(p, c);
-        if (raw.trim() && this._startsOk(raw)) {
-          const key = this._norm(raw);
-          counts[key] = (counts[key] || 0) + 1;
+        if (!this._isChallengedOut(p, c) && raw.trim() && this._startsOk(raw)) {
+          counts[this._norm(raw)] = (counts[this._norm(raw)] || 0) + 1;
         }
       }
       for (const p of this.players) {
         const raw = this._answerOf(p, c);
-        const valid = !!raw.trim() && this._startsOk(raw);
+        const challengedOut = this._isChallengedOut(p, c);
+        const valid = !challengedOut && !!raw.trim() && this._startsOk(raw);
         const unique = valid && counts[this._norm(raw)] === 1;
-        if (unique) {
-          this.scores[p] = (this.scores[p] || 0) + 1;
-          this.roundScores[p] += 1;
-        }
+        if (unique) this.roundScores[p] += 1;
         if (!this.roundResult.perPlayer[p]) this.roundResult.perPlayer[p] = {};
         this.roundResult.perPlayer[p][c] = {
           text: raw,
-          status: !raw.trim() ? 'empty' : !valid ? 'invalid' : unique ? 'scored' : 'dup',
+          status: challengedOut ? 'challenged'
+            : !raw.trim() ? 'empty'
+            : !this._startsOk(raw) ? 'invalid'
+            : unique ? 'scored' : 'dup',
         };
       }
     }
-    this.roundHistory.push({ round: this.round, letter: this.letter, roundScores: { ...this.roundScores } });
+    // cumulative = prior rounds + this round (recompute-safe)
+    for (const p of this.players) this.scores[p] = (this._priorScores[p] || 0) + this.roundScores[p];
+
+    const entry = { round: this.round, letter: this.letter, roundScores: { ...this.roundScores } };
+    if (!this._roundScored) { this.roundHistory.push(entry); this._roundScored = true; }
+    else this.roundHistory[this.roundHistory.length - 1] = entry;
+  }
+
+  // Re-evaluate pending reports: an answer is voted out when EVERY other present
+  // player has reported it. Re-scores if any new challenge lands.
+  _reevaluateChallenges() {
+    if (this.state !== 'reveal') return;
+    let changed = false;
+    for (const target of this.players) {
+      const byCat = this.reports[target];
+      if (!byCat) continue;
+      const others = this.players.filter((p) => p !== target);
+      if (others.length === 0) continue;
+      for (const cKey of Object.keys(byCat)) {
+        const c = Number(cKey);
+        const set = byCat[cKey];
+        const unanimous = others.every((o) => set.has(o));
+        const already = this._isChallengedOut(target, c);
+        if (unanimous && !already) {
+          if (!this.challenged[target]) this.challenged[target] = new Set();
+          this.challenged[target].add(c);
+          changed = true;
+        }
+      }
+    }
+    if (changed) this._scoreRound();
   }
 
   _advanceAfterReveal() {
@@ -177,8 +221,24 @@ export class Scattergories extends BaseGame {
       if (type === 'acknowledge') {
         this.acknowledged.add(playerId);
         if (this.players.every((p) => this.acknowledged.has(p))) this._advanceAfterReveal();
+      } else if (type === 'report') {
+        this._handleReport(playerId, action);
       }
     }
+  }
+
+  _handleReport(reporter, action) {
+    const target = action && action.targetPlayer;
+    const c = Number(action && action.categoryIndex);
+    if (!this.players.includes(target) || target === reporter) return;
+    if (!(c >= 0 && c < this.categories.length)) return;
+    if (this._isChallengedOut(target, c)) return;        // already voted out
+    if (!this._answerOf(target, c).trim()) return;        // nothing to report
+    if (!this.reports[target]) this.reports[target] = {};
+    if (!this.reports[target][c]) this.reports[target][c] = new Set();
+    const set = this.reports[target][c];
+    if (set.has(reporter)) set.delete(reporter); else set.add(reporter); // toggle
+    this._reevaluateChallenges();
   }
 
   _sanitize(answers) {
@@ -205,6 +265,7 @@ export class Scattergories extends BaseGame {
     if (this.state === 'writing') {
       if (this.players.every((p) => this.submitted.has(p))) this.transition('revealNow');
     } else if (this.state === 'reveal') {
+      this._reevaluateChallenges(); // fewer "others" may now make a pending report unanimous
       if (this.players.every((p) => this.acknowledged.has(p))) this._advanceAfterReveal();
     }
   }
@@ -243,8 +304,28 @@ export class Scattergories extends BaseGame {
         answers: revealing ? (this.answers[p] || {}) : null,
       })),
       roundResult: revealing ? this.roundResult : null,
+      reportsView: revealing ? this._reportsView(playerId) : null,
       roundHistory: this.roundHistory,
     };
+  }
+
+  _reportsView(viewer) {
+    const out = {};
+    for (const target of this.players) {
+      const byCat = this.reports[target];
+      if (!byCat) continue;
+      for (const cKey of Object.keys(byCat)) {
+        const set = byCat[cKey];
+        if (!set || set.size === 0) continue;
+        if (!out[target]) out[target] = {};
+        out[target][cKey] = {
+          count: set.size,
+          mine: set.has(viewer),
+          challenged: this._isChallengedOut(target, Number(cKey)),
+        };
+      }
+    }
+    return out;
   }
 
   isComplete() { return this.state === 'finished'; }

@@ -110,6 +110,7 @@ export const GAMES = {
       'Type one answer per category that STARTS with the letter, before the 75-second timer runs out.',
       'An answer scores 1 point only if it is valid AND unique — if two or more players write the same thing, nobody gets the point.',
       'Empty answers and answers that do not start with the letter score 0.',
+      'During the reveal you can flag a rival\'s answer as fake — if EVERY other player flags it, it is removed and scores nothing.',
       'There are 3 rounds. Highest total of unique answers wins!',
     ],
   },

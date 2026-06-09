@@ -113,7 +113,3 @@
 .standMs { color: var(--text-secondary, #b8a88a); font-variant-numeric: tabular-nums; }
 
 .loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
-
-@media (min-width: 960px) and (orientation: landscape) {
-  .arena { margin-left: 220px; width: calc(100% - 220px); }
-}
