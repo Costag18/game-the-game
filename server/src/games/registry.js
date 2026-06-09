@@ -21,6 +21,7 @@ import { Mastermind } from './Mastermind.js';
 import { President } from './President.js';
 import { Spoons } from './Spoons.js';
 import { Fibbage } from './Fibbage.js';
+import { Connect4 } from './Connect4.js';
 
 const gameEngines = {};
 
@@ -65,3 +66,4 @@ registerGame('mastermind', Mastermind);
 registerGame('president', President);
 registerGame('spoons', Spoons);
 registerGame('fibbage', Fibbage);
+registerGame('connect4', Connect4);

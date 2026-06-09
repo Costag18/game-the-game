@@ -43,6 +43,7 @@ import MastermindGame from './games/Mastermind.jsx';
 import PresidentGame from './games/President.jsx';
 import SpoonsGame from './games/Spoons.jsx';
 import FibbageGame from './games/Fibbage.jsx';
+import Connect4Game from './games/Connect4.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -70,6 +71,7 @@ const GAME_COMPONENTS = {
   president: PresidentGame,
   spoons: SpoonsGame,
   fibbage: FibbageGame,
+  connect4: Connect4Game,
 };
 
 function GameRouter() {

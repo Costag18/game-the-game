@@ -186,6 +186,18 @@ export const GAMES = {
       'Survive each round. The last player standing wins; finishing order sets your placement.',
     ],
   },
+  connect4: {
+    id: 'connect4', name: 'Connect 4', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Drop discs, get four in a row. 1v1 matchups across a best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 against another player each mini-round (odd player count = one free-win bye).',
+      'Take turns dropping a disc into a column — it falls to the lowest empty slot.',
+      'First to line up four of your discs in a row (across, down, or diagonally) wins the match.',
+      'Full board with no four-in-a-row = a draw (counts as half a win for both).',
+      'Win your matches across 3 mini-rounds; the most wins ranks first. Slowpokes get a random drop after 30s.',
+    ],
+  },
   fibbage: {
     id: 'fibbage', name: 'Fibbage', minPlayers: 3, maxPlayers: 8,
     turnTimer: TIMERS.FIBBAGE_WRITE,

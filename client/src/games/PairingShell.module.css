@@ -1,0 +1,29 @@
+.shell { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; padding: 1rem; max-width: 640px; margin: 0 auto; }
+.header { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+.title { font-family: 'Fredoka', 'Baloo 2', sans-serif; font-weight: 700; font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--gold, #d4a843); margin: 0; }
+.miniRound { color: var(--text-secondary, #b8a88a); font-weight: 600; }
+
+.standings { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
+.standRow { display: flex; align-items: center; gap: 0.35rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.78rem; }
+.standMe { border-color: var(--gold, #d4a843); }
+.standRank { color: var(--gold, #d4a843); font-weight: 800; }
+.standWins { color: var(--text-secondary, #b8a88a); }
+
+.byeCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: 2rem 1rem; }
+.byeBig { font-size: 1.6rem; color: var(--gold, #d4a843); font-weight: 800; margin: 0; }
+.byeSub { color: var(--text-secondary, #b8a88a); margin: 0; }
+
+.matchArea { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; }
+.matchTop { min-height: 1.8rem; display: flex; align-items: center; }
+.turnInfo { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text-primary, #f3e9d2); }
+.countdown { color: var(--gold, #d4a843); font-variant-numeric: tabular-nums; font-weight: 800; }
+.banner { font-weight: 800; font-size: 1.2rem; padding: 0.2rem 0.8rem; border-radius: 8px; }
+.banner_win { color: #5cd85c; }
+.banner_loss { color: #e88; }
+.banner_draw { color: var(--gold-light, #f0d896); }
+.waitOn { color: var(--text-secondary, #b8a88a); font-style: italic; }
+
+.summary { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; width: 100%; }
+.summaryTitle { font-family: 'Fredoka', sans-serif; color: var(--gold, #d4a843); margin: 0.2rem 0; }
+.pairRow { background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.35rem 0.7rem; font-size: 0.9rem; }
+.contBtn { background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 8px; padding: 0.55rem 1.6rem; font-weight: 800; cursor: pointer; margin-top: 0.3rem; }

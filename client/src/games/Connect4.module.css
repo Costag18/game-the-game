@@ -1,0 +1,32 @@
+.boardWrap { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; width: 100%; max-width: 380px; }
+
+.colStrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; width: 100%; }
+.colBtn {
+  background: rgba(255,255,255,0.08); color: var(--gold, #d4a843);
+  border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 6px;
+  padding: 0.25rem 0; cursor: pointer; font-size: 0.9rem; min-height: 32px;
+}
+.colBtn:disabled { opacity: 0.25; cursor: default; }
+.colBtnSel { background: var(--gold, #d4a843); color: #1a0e10; }
+
+.grid {
+  display: grid; gap: 4px; width: 100%;
+  background: #1565c0; padding: 8px; border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4), inset 0 2px 6px rgba(255,255,255,0.2);
+}
+.cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.disc {
+  width: 86%; height: 86%; border-radius: 50%;
+  background: #0d47a1; box-shadow: inset 0 3px 6px rgba(0,0,0,0.5);
+  transition: transform 120ms ease;
+}
+.red { background: radial-gradient(circle at 35% 30%, #ff6b6b, #c62828); box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 1px 3px rgba(0,0,0,0.4); }
+.yellow { background: radial-gradient(circle at 35% 30%, #ffe16b, #f9a825); box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 1px 3px rgba(0,0,0,0.4); }
+.ghost { opacity: 0.45; animation: pulse 1s ease-in-out infinite; }
+.ghostRed { background: radial-gradient(circle at 35% 30%, #ff6b6b, #c62828); }
+.ghostYellow { background: radial-gradient(circle at 35% 30%, #ffe16b, #f9a825); }
+@keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+.win { box-shadow: 0 0 0 3px #fff, 0 0 14px 3px #fff; }
+
+.dropBtn { background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 8px; padding: 0.45rem 1.6rem; font-weight: 800; cursor: pointer; }
+.dropBtn:disabled { opacity: 0.4; cursor: default; }

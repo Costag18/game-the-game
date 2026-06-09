@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (22)
+## Mini-Games (23)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -107,6 +107,18 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | President | 2-8 | Turn-based shedding, trick groups, pass-persistence, finish-order ranking |
 | Spoons | 3-8 | Real-time pass ring + grab race, internal elimination rounds, reverse-elim ranking |
 | Fibbage | 3-8 | Bluff trivia, write fakes + vote for truth, hidden ballot, +1000 truth / +500 per fool |
+| Connect 4 | 2-8 | 1v1 board (Pairing Engine Swiss best-of-3), drop discs, 4-in-a-row |
+
+## 1v1 Pairing Engine (Swiss layer)
+
+Inherently-1v1 games (Connect 4, more to come) can't natively produce a 1..N round ranking. `server/src/games/PairingEngine.js` solves this once: `class PairingEngine extends BaseGame` wraps N players in a Swiss mini-tournament (K=3 mini-rounds; odd count → one **bye** = free win), runs all pairings **simultaneously** as parallel 1v1 matches, re-pairs by record between mini-rounds, and `getResults()` ranks everyone by (wins → head-to-head → score differential).
+
+- **MatchEngine contract** (a plain object, NOT a BaseGame): `applyMove(pid, move)→bool`, `getView(pid)`, `isOver()`, `winner()`, `isDraw()`, optional `scoreDiff(pid)` (final tiebreak) and `autoMove()` (per-turn-timeout auto-play instead of forfeit). The match owns ONE board; it never touches ranking, byes, timers, the barrier, or leave handling.
+- **Thin wrapper** per game: `class Connect4 extends PairingEngine` just passes `matchFactory`, `miniRounds`, `matchTimerSec`, `matchHardCapSec`, `title`. Registered as a normal game; the PairingEngine itself is NOT registered and has no gameList entry.
+- **Barrier:** fast finishers wait (`phase` stays `match`, `myMiniRoundDone:true`, `waitingOn` lists unfinished pairings); the engine transitions to `miniRoundSummary` only when ALL pairings resolve.
+- **Timers (engine-owned):** per-turn (`autoMove()` if provided, else forfeit the staller), a 90s hard-cap (always forfeits), and a 10s summary ack auto-advance — each pairs with `_emitChange()`.
+- **Leave contract:** a leaver forfeits their live match (opponent +1 win), is excluded from future mini-rounds, auto-acked on the summary barrier, and pruned from results; ≤1 player → finish.
+- **Client:** `client/src/games/PairingShell.jsx` is the shared chrome (mini-round header, live standings, bye card, "waiting on" barrier, summary + AckStatus). A board component renders inside it via a render-prop: `<PairingShell …>{(myMatch) => <Board myMatch={myMatch} … />}</PairingShell>`.
 
 ## Casino Side Games
 
@@ -464,6 +476,7 @@ The owner cares about:
 | President | Playfair Display |
 | Spoons | Bangers |
 | Fibbage | Shrikhand |
+| Connect 4 | Fredoka |
 
 ## Versioning & Commits
 
