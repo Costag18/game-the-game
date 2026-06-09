@@ -7,18 +7,16 @@ import { useScreenShake } from '../hooks/useScreenShake.js';
 export default function ReactionTap({ gameState, onAction, nicknames, avatars }) {
   const { playSound } = useSound();
   const shake = useScreenShake();
-  const [estimate, setEstimate] = useState(null);
+  const [tappedLocally, setTappedLocally] = useState(false);
   const [tooSoon, setTooSoon] = useState(false);
-  const goLocalRef = useRef(0);
   const ackedRoundRef = useRef(-1);
 
   const phase = gameState?.phase;
   const round = gameState?.round;
 
-  // Capture local GO time for a display-only reaction estimate; reset per round.
+  // Reset per-round local feedback flags when a new round arms.
   useEffect(() => {
-    if (phase === 'go') goLocalRef.current = performance.now();
-    if (phase === 'arming') { setEstimate(null); setTooSoon(false); }
+    if (phase === 'arming') { setTappedLocally(false); setTooSoon(false); }
   }, [phase, round]);
 
   if (!gameState) {
@@ -38,8 +36,8 @@ export default function ReactionTap({ gameState, onAction, nicknames, avatars })
       shake('light');
       onAction({ type: 'tap' });
     } else if (phase === 'go') {
-      if (hasActed) return;
-      setEstimate(Math.round(performance.now() - goLocalRef.current));
+      if (hasActed || tappedLocally) return;
+      setTappedLocally(true);
       playSound('correct');
       shake('light');
       onAction({ type: 'tap' });
@@ -91,15 +89,15 @@ export default function ReactionTap({ gameState, onAction, nicknames, avatars })
           </>
         )}
 
-        {phase === 'go' && !hasActed && (
+        {phase === 'go' && !(hasActed || tappedLocally) && (
           <>
             <span className={styles.big}>GO!</span>
             <span className={styles.sub}>TAP NOW</span>
           </>
         )}
-        {phase === 'go' && hasActed && (
+        {phase === 'go' && (hasActed || tappedLocally) && (
           <>
-            <span className={styles.big}>{estimate != null ? `${estimate}ms` : 'Tapped!'}</span>
+            <span className={styles.big}>{myResult ? `${myResult.ms}ms` : 'Tapped!'}</span>
             <span className={styles.sub}>Waiting for others ⏳</span>
           </>
         )}
