@@ -174,6 +174,18 @@ export const GAMES = {
       'Empty your hand to finish. First out is President, last left is Scumlord. Your finish order is your ranking.',
     ],
   },
+  spoons: {
+    id: 'spoons', name: 'Spoons', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.SPOONS_GRAB,
+    description: 'Pass cards fast, get four of a kind, then GRAB a spoon. Last one out each round is gone.',
+    instructions: [
+      'Everyone holds 4 cards. There is always one fewer spoon than players.',
+      'Cards flow around the table — pick up the card coming to you, then tap one card to pass on.',
+      'The instant someone gets four of a kind, the GRAB phase opens for everyone.',
+      'Tap as fast as you can — the one player left without a spoon is eliminated.',
+      'Survive each round. The last player standing wins; finishing order sets your placement.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

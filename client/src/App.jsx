@@ -41,6 +41,7 @@ import WavelengthGame from './games/Wavelength.jsx';
 import AimTrainerGame from './games/AimTrainer.jsx';
 import MastermindGame from './games/Mastermind.jsx';
 import PresidentGame from './games/President.jsx';
+import SpoonsGame from './games/Spoons.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -66,6 +67,7 @@ const GAME_COMPONENTS = {
   aimTrainer: AimTrainerGame,
   mastermind: MastermindGame,
   president: PresidentGame,
+  spoons: SpoonsGame,
 };
 
 function GameRouter() {

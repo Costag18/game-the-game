@@ -1,0 +1,58 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.title { font-family: 'Bangers', 'Luckiest Guy', cursive; font-size: clamp(2rem, 6vw, 3rem); letter-spacing: 4px; color: var(--gold, #d4a843); margin: 0; text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; font-weight: 600; }
+
+.seats { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.seat { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 10px; padding: 0.35rem 0.6rem; font-size: 0.8rem; }
+.seatTrigger { border-color: var(--gold, #d4a843); box-shadow: 0 0 12px rgba(212,168,67,0.6); }
+.seatMeta { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.inBadge { color: #5fb0e8; margin-left: 0.2rem; }
+
+.passArea { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.hint { color: var(--text-secondary, #b8a88a); font-style: italic; text-align: center; }
+.hand { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+
+.card {
+  width: 56px; height: 78px; border-radius: 8px;
+  background: #fdfaf3; border: 1px solid #d8cdb5;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+  transition: transform 90ms ease, box-shadow 90ms ease;
+}
+.tappable { cursor: pointer; }
+.tappable:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+.cardRank { font-weight: 800; font-size: 1.3rem; line-height: 1; }
+.cardSuit { font-size: 1.3rem; line-height: 1; }
+.cardBack { background: linear-gradient(135deg, #6a1b2a, #3a0e16); color: rgba(255,255,255,0.5); font-size: 1.6rem; }
+.cardIncoming { outline: 3px solid #5fb0e8; outline-offset: 1px; animation: pop 200ms ease-out; }
+@keyframes pop { from { transform: scale(0.6); } to { transform: scale(1); } }
+
+.grabArea { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; padding: 1rem 0; }
+.grabTitle { font-family: 'Bangers', cursive; font-size: clamp(2.5rem, 9vw, 4rem); letter-spacing: 3px; margin: 0; color: #e63946; text-shadow: 3px 3px 0 rgba(0,0,0,0.35); animation: throb 600ms ease-in-out infinite alternate; }
+@keyframes throb { from { transform: scale(1); } to { transform: scale(1.08); } }
+.spoonCount { color: var(--gold-light, #f0d896); font-weight: 700; font-size: 1.1rem; margin: 0; }
+.grabBtn {
+  background: radial-gradient(circle at 40% 35%, #ffd66b, #d4a843);
+  color: #2a1508; border: none; border-radius: 16px;
+  padding: 1.3rem 2.4rem; font-size: 1.5rem; font-weight: 900; letter-spacing: 1px;
+  cursor: pointer; box-shadow: 0 6px 0 #8a6d2f, 0 10px 18px rgba(0,0,0,0.4);
+  min-width: 220px; min-height: 64px;
+}
+.grabBtn:active { transform: translateY(4px); box-shadow: 0 2px 0 #8a6d2f; }
+.grabBtn:disabled { opacity: 0.7; cursor: default; box-shadow: 0 2px 0 #8a6d2f; }
+.triggerNote { color: var(--text-secondary, #b8a88a); margin: 0; }
+
+.endArea { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 0.6rem 0; }
+.elimLine { font-size: 1.3rem; font-weight: 700; color: var(--text-primary, #f3e9d2); margin: 0; }
+.elimMeta { color: var(--text-secondary, #b8a88a); margin: 0; }
+.contBtn { background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 8px; padding: 0.55rem 1.6rem; font-weight: 800; cursor: pointer; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

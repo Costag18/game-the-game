@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (20)
+## Mini-Games (21)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -105,6 +105,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Aim Trainer Duel | 2-8 | Simultaneous, 25s, per-player server-spawned targets, hits+accuracy ranking |
 | Mastermind | 2-8 | Simultaneous deduction race, shared hidden code, private boards, black/white feedback |
 | President | 2-8 | Turn-based shedding, trick groups, pass-persistence, finish-order ranking |
+| Spoons | 3-8 | Real-time pass ring + grab race, internal elimination rounds, reverse-elim ranking |
 
 ## Casino Side Games
 
@@ -460,6 +461,7 @@ The owner cares about:
 | Aim Trainer Duel | Wallpoet |
 | Mastermind | Orbitron |
 | President | Playfair Display |
+| Spoons | Bangers |
 
 ## Versioning & Commits
 
