@@ -30,11 +30,14 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
   const shake = useScreenShake();
   const [selected, setSelected] = useState([]);
   const [iAcked, setIAcked] = useState(false);
+  const [chFrac, setChFrac] = useState(1);
   const prevPhase = useRef(null);
+  const chPinged = useRef(false);
 
   const phase = gameState?.phase;
   const isMyTurn = gameState?.isMyTurn;
   const revealResult = gameState?.revealResult;
+  const challengeEndsAt = gameState?.challengeEndsAt;
 
   useEffect(() => {
     if (!(phase === 'playing' && isMyTurn)) setSelected([]);
@@ -46,6 +49,20 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
       prevPhase.current = phase;
     }
   }, [phase, shake]);
+
+  // CALL BS countdown — drives a shrinking timer bar; ping once if it elapses.
+  useEffect(() => {
+    if (phase !== 'challengeWindow' || !challengeEndsAt) { setChFrac(1); chPinged.current = false; return; }
+    const total = gameState?.challengeMs || 4000;
+    const tick = () => {
+      const remaining = Math.max(0, challengeEndsAt - Date.now());
+      setChFrac(remaining / total);
+      if (remaining <= 0 && !chPinged.current) { chPinged.current = true; onAction({ type: 'ping' }); }
+    };
+    tick();
+    const id = setInterval(tick, 50);
+    return () => clearInterval(id);
+  }, [phase, challengeEndsAt, gameState?.challengeMs, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Dealing…</p></div>;
 
@@ -108,6 +125,12 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
               <PlayerName playerId={pendingPlay.playerId} nicknames={nicknames} avatars={avatars} /> played{' '}
               <strong>{pendingPlay.claimedCount}</strong> as <strong>{rankName(pendingPlay.claimedRank)}</strong>
             </p>
+            <div className={styles.timerBar}>
+              <div
+                className={styles.timerFill}
+                style={{ width: `${Math.round(chFrac * 100)}%`, background: chFrac < 0.35 ? '#c62828' : '#d4a843' }}
+              />
+            </div>
             {canCallBS
               ? <button className={styles.bsBtn} onClick={callBS}>CALL BS! 🚨</button>
               : <p className={styles.subtle}>Waiting…</p>}

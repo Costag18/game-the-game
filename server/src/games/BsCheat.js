@@ -39,6 +39,7 @@ export class BsCheat extends BaseGame {
     this._challengeTimer = null;
     this._revealTimer = null;
     this._turnTimer = null;
+    this._challengeStartedAt = null;
   }
 
   setOnStateChange(cb) { this._onStateChange = cb; }
@@ -71,6 +72,7 @@ export class BsCheat extends BaseGame {
 
   onEnterChallengeWindow() {
     if (this._challengeTimer) clearTimeout(this._challengeTimer);
+    this._challengeStartedAt = Date.now();
     this._challengeTimer = setTimeout(() => {
       if (this.state !== 'challengeWindow') return;
       this._resolveNoChallenge();
@@ -130,7 +132,7 @@ export class BsCheat extends BaseGame {
         this._challenger = playerId;
         this.transition('challenge'); // -> onEnterReveal
       } else if (type === 'ping') {
-        if (Date.now() >= 0 && !this._challengeTimer) this._resolveNoChallenge();
+        if (this._challengeStartedAt && Date.now() >= this._challengeStartedAt + CHALLENGE_MS) this._resolveNoChallenge();
       }
     } else if (this.state === 'reveal') {
       if (type === 'acknowledge') {
@@ -289,6 +291,9 @@ export class BsCheat extends BaseGame {
         claimedRank: this.pendingPlay.claimedRank,
         claimedCount: this.pendingPlay.claimedCount,
       } : null,
+      challengeEndsAt: this.state === 'challengeWindow' && this._challengeStartedAt
+        ? this._challengeStartedAt + CHALLENGE_MS : null,
+      challengeMs: CHALLENGE_MS,
       canCallBS: this.state === 'challengeWindow'
         && !!this.pendingPlay
         && this.pendingPlay.playerId !== playerId

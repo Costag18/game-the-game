@@ -39,8 +39,20 @@
 }
 .banner { font-size: 1.15rem; color: var(--text-primary, #f3e9d2); }
 
-.challengeBox { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
+.challengeBox { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; width: 100%; max-width: 360px; }
 .announce { font-size: 1.15rem; color: var(--text-primary, #f3e9d2); }
+.timerBar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+.timerFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 60ms linear;
+}
 .subtle { color: var(--text-secondary, #b8a88a); }
 .bsBtn {
   border: none;
