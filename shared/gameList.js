@@ -75,6 +75,19 @@ export const GAMES = {
       'Sink all 5 of your opponent\'s ships to win.',
     ],
   },
+  reactionTap: {
+    id: 'reactionTap', name: 'Reaction Tap', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.REACTION_TAP,
+    description: 'Wait for green, then tap. Fastest reflexes win.',
+    instructions: [
+      'Each round shows a red WAIT screen. Do NOT tap while it is red.',
+      'After a random delay (1.5–5s) the screen turns green and says GO — tap as fast as you can.',
+      'Tapping while red is a foul (max 3000ms penalty). Not tapping in time also scores the max.',
+      'Your reaction time in milliseconds is recorded by the server (lower is better).',
+      'Play 5 rounds; the lowest total reaction time across all rounds wins.',
+      'Note: your network latency is included in the measured time — the server times your tap on its own clock and never trusts the browser, so results are spoof-proof but slightly favor faster connections.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

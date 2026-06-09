@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (12)
+## Mini-Games (13)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -97,6 +97,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Hangman | 2-8 | Turn-based, 5 words per game |
 | Spot the Difference | 2-8 | Simultaneous, 3 rounds |
 | Battleship | 2-8 | Turn-based, setup + firing, target selector |
+| Reaction Tap | 2-8 | Simultaneous, 5 rounds, timer-driven GO (server-authoritative reflex timing) |
 
 ## Casino Side Games
 
@@ -443,6 +444,7 @@ The owner cares about:
 | Hangman | Fredericka the Great |
 | Spot the Difference | Special Elite |
 | Battleship | Archivo Black |
+| Reaction Tap | Black Ops One |
 
 ## Versioning & Commits
 

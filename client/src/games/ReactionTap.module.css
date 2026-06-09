@@ -1,0 +1,119 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  min-height: 70vh;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.title {
+  font-family: 'Black Ops One', 'Wallpoet', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  color: var(--gold, #d4a843);
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.roundLabel {
+  font-size: 1rem;
+  color: var(--text-secondary, #b8a88a);
+  font-weight: 700;
+}
+
+/* The dominant reactive panel — full-width, color flips per phase. */
+.panel {
+  width: min(680px, 100%);
+  min-height: 46vh;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: #fff;
+  text-align: center;
+  transition: background 80ms ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) inset, 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.panelWait   { background: linear-gradient(160deg, #c62828, #8e1c1c); }
+.panelGo     { background: linear-gradient(160deg, #2e7d32, #1b5e20); animation: goFlash 90ms ease; }
+.panelResult { background: linear-gradient(160deg, #263238, #16202a); cursor: default; }
+
+@keyframes goFlash {
+  from { filter: brightness(1.6); }
+  to   { filter: brightness(1); }
+}
+
+.big {
+  font-family: 'Black Ops One', 'Wallpoet', sans-serif;
+  font-size: clamp(2.4rem, 9vw, 5rem);
+  line-height: 1;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.sub {
+  font-size: clamp(0.9rem, 2.4vw, 1.2rem);
+  opacity: 0.92;
+}
+
+/* round / final results */
+.results { width: 100%; padding: 0 1rem; }
+.resultsTitle {
+  font-family: 'Black Ops One', 'Wallpoet', sans-serif;
+  font-size: 1.3rem;
+  margin: 0 0 0.6rem;
+}
+.resultRows { display: flex; flex-direction: column; gap: 0.35rem; max-width: 420px; margin: 0 auto; }
+.resultRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+}
+.resultName { font-weight: 600; }
+.resultMs { font-variant-numeric: tabular-nums; font-weight: 700; }
+.tapHint { display: block; margin-top: 0.8rem; opacity: 0.8; font-size: 0.9rem; }
+
+/* standings strip */
+.standings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.standCard {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-panel, #2a1518);
+  border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.85rem;
+}
+.standRank { color: var(--gold, #d4a843); font-weight: 800; }
+.standName { color: var(--text-primary, #f3e9d2); }
+.standMs { color: var(--text-secondary, #b8a88a); font-variant-numeric: tabular-nums; }
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+
+@media (min-width: 960px) and (orientation: landscape) {
+  .arena { margin-left: 220px; width: calc(100% - 220px); }
+}
