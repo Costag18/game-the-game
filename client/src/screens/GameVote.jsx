@@ -31,6 +31,7 @@ import previewAimTrainer from '../assets/gamepreviews/aimTrainer.png';
 import previewMastermind from '../assets/gamepreviews/mastermind.png';
 import previewPresident from '../assets/gamepreviews/president.png';
 import previewSpoons from '../assets/gamepreviews/spoons.png';
+import previewFibbage from '../assets/gamepreviews/fibbage.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -54,6 +55,7 @@ const GAME_PREVIEWS = {
   mastermind: previewMastermind,
   president: previewPresident,
   spoons: previewSpoons,
+  fibbage: previewFibbage,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

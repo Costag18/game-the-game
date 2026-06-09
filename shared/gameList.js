@@ -186,6 +186,18 @@ export const GAMES = {
       'Survive each round. The last player standing wins; finishing order sets your placement.',
     ],
   },
+  fibbage: {
+    id: 'fibbage', name: 'Fibbage', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.FIBBAGE_WRITE,
+    description: 'Bluff your friends with a fake answer to an obscure question. Spot the truth, fool the rest.',
+    instructions: [
+      'Each round shows an obscure trivia question with a blank.',
+      'Everyone secretly writes a FAKE answer to fool others (you cannot reuse the real answer or someone else\'s fib).',
+      'All fakes plus the REAL answer are shuffled and shown. Pick the one you think is true — you can\'t pick your own fib.',
+      'Score +1000 for finding the truth, and +500 for every player your fib fools.',
+      'Highest total after 4 questions wins the round!',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {
