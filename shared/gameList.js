@@ -198,6 +198,18 @@ export const GAMES = {
       'Win your matches across 3 mini-rounds; the most wins ranks first. Slowpokes get a random drop after 30s.',
     ],
   },
+  ultimateTTT: {
+    id: 'ultimateTTT', name: 'Ultimate Tic-Tac-Toe', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Nine tic-tac-toe boards in one. Win three boards in a row. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'The big board is 9 small tic-tac-toe boards. Win a small board to claim its big-board cell.',
+      'The cell you play in decides which small board your opponent must play in next.',
+      'If you are sent to a board that is already finished, you may play in any open board.',
+      'Win three small boards in a row to win the match. Most wins across 3 mini-rounds ranks first.',
+    ],
+  },
   fibbage: {
     id: 'fibbage', name: 'Fibbage', minPlayers: 3, maxPlayers: 8,
     turnTimer: TIMERS.FIBBAGE_WRITE,

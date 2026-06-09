@@ -22,6 +22,7 @@ import { President } from './President.js';
 import { Spoons } from './Spoons.js';
 import { Fibbage } from './Fibbage.js';
 import { Connect4 } from './Connect4.js';
+import { UltimateTicTacToe } from './UltimateTicTacToe.js';
 
 const gameEngines = {};
 
@@ -67,3 +68,4 @@ registerGame('president', President);
 registerGame('spoons', Spoons);
 registerGame('fibbage', Fibbage);
 registerGame('connect4', Connect4);
+registerGame('ultimateTTT', UltimateTicTacToe);

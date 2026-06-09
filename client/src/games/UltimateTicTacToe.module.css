@@ -1,0 +1,42 @@
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1;
+  background: #2a1a3a;
+  padding: 6px;
+  border-radius: 12px;
+}
+
+.subBoard {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+}
+.subActive { border-color: var(--gold, #d4a843); box-shadow: 0 0 10px rgba(212, 168, 67, 0.5); background: rgba(212, 168, 67, 0.08); }
+.subDecided { background: rgba(0, 0, 0, 0.25); }
+
+.cells { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; width: 100%; height: 100%; padding: 3px; }
+.cell {
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, 0.06); border: none; border-radius: 3px;
+  font-weight: 900; font-size: clamp(0.6rem, 2.4vw, 1rem); cursor: pointer;
+  color: var(--text-secondary, #b8a88a); aspect-ratio: 1; padding: 0;
+}
+.cell:disabled { cursor: default; }
+.x { color: #ff6b6b; }
+.o { color: #5fb0e8; }
+.preview { background: var(--gold, #d4a843); color: #1a0e10; }
+.last { box-shadow: inset 0 0 0 2px var(--gold, #d4a843); }
+
+.metaMark { font-family: 'Russo One', sans-serif; font-size: clamp(2rem, 9vw, 3.4rem); font-weight: 900; }
+.xMark { color: #ff6b6b; }
+.oMark { color: #5fb0e8; }
+.dMark { color: var(--text-secondary, #777); }

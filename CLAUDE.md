@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (23)
+## Mini-Games (24)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -108,6 +108,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Spoons | 3-8 | Real-time pass ring + grab race, internal elimination rounds, reverse-elim ranking |
 | Fibbage | 3-8 | Bluff trivia, write fakes + vote for truth, hidden ballot, +1000 truth / +500 per fool |
 | Connect 4 | 2-8 | 1v1 board (Pairing Engine Swiss best-of-3), drop discs, 4-in-a-row |
+| Ultimate Tic-Tac-Toe | 2-8 | 1v1 board (Pairing Engine), 9 sub-boards, forced-board rule, win 3-in-a-row of boards |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -477,6 +478,7 @@ The owner cares about:
 | Spoons | Bangers |
 | Fibbage | Shrikhand |
 | Connect 4 | Fredoka |
+| Ultimate Tic-Tac-Toe | Russo One |
 
 ## Versioning & Commits
 

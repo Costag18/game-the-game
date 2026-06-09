@@ -23,7 +23,7 @@ function Countdown({ endsAt }) {
  * on" barrier, and the mini-round summary. The board is supplied as a render-prop
  * child: children(myMatch) is called only when there's a live board to show.
  */
-export default function PairingShell({ gameState, nicknames, avatars, onAction, children }) {
+export default function PairingShell({ gameState, nicknames, avatars, onAction, children, titleFont }) {
   const { playSound } = useSound();
   const [iAcked, setIAcked] = useState(false);
   const prevPhase = useRef(null);
@@ -44,7 +44,7 @@ export default function PairingShell({ gameState, nicknames, avatars, onAction, 
   return (
     <div className={shell.shell}>
       <div className={shell.header}>
-        <h1 className={shell.title}>{title}</h1>
+        <h1 className={shell.title} style={titleFont ? { fontFamily: titleFont } : undefined}>{title}</h1>
         <span className={shell.miniRound}>Mini-round {miniRound} / {totalMiniRounds}</span>
       </div>
 
