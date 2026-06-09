@@ -38,6 +38,7 @@ import TypingRaceGame from './games/TypingRace.jsx';
 import ScattergoriesGame from './games/Scattergories.jsx';
 import BsCheatGame from './games/BsCheat.jsx';
 import WavelengthGame from './games/Wavelength.jsx';
+import AimTrainerGame from './games/AimTrainer.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -60,6 +61,7 @@ const GAME_COMPONENTS = {
   scattergories: ScattergoriesGame,
   bsCheat: BsCheatGame,
   wavelength: WavelengthGame,
+  aimTrainer: AimTrainerGame,
 };
 
 function GameRouter() {

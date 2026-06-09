@@ -16,6 +16,7 @@ import { TypingRace } from './TypingRace.js';
 import { Scattergories } from './Scattergories.js';
 import { BsCheat } from './BsCheat.js';
 import { Wavelength } from './Wavelength.js';
+import { AimTrainer } from './AimTrainer.js';
 
 const gameEngines = {};
 
@@ -55,3 +56,4 @@ registerGame('typingRace', TypingRace);
 registerGame('scattergories', Scattergories);
 registerGame('bsCheat', BsCheat);
 registerGame('wavelength', Wavelength);
+registerGame('aimTrainer', AimTrainer);

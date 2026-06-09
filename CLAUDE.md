@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (17)
+## Mini-Games (18)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -102,6 +102,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Scattergories | 2-8 | Simultaneous, 3 rounds, letter+categories, unique-answer scoring + peer-challenge |
 | BS (Cheat) | 2-8 | Turn-based bluff, claim+challenge window, reveal, finish-order ranking |
 | Wavelength | 2-8 | Turn-based, rotating psychic, hidden spectrum band, slider guessing |
+| Aim Trainer Duel | 2-8 | Simultaneous, 25s, per-player server-spawned targets, hits+accuracy ranking |
 
 ## Casino Side Games
 
@@ -454,6 +455,7 @@ The owner cares about:
 | Scattergories | Bungee |
 | BS (Cheat) | Creepster |
 | Wavelength | Audiowide (title) / Quicksand (body) |
+| Aim Trainer Duel | Wallpoet |
 
 ## Versioning & Commits
 

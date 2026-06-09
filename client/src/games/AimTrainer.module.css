@@ -1,0 +1,68 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: 'Wallpoet', 'Teko', sans-serif;
+  font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+  color: #4fd1e0;
+  letter-spacing: 3px;
+  margin: 0;
+  text-shadow: 0 0 12px rgba(79, 209, 224, 0.5);
+}
+
+.hud { display: flex; gap: 1.5rem; }
+.hudItem { display: flex; flex-direction: column; align-items: center; }
+.hudLabel { font-family: 'Wallpoet', sans-serif; font-size: 0.7rem; color: var(--text-secondary, #b8a88a); letter-spacing: 2px; }
+.hudBig { font-family: 'Wallpoet', 'Teko', sans-serif; font-size: 1.6rem; color: var(--gold, #d4a843); font-variant-numeric: tabular-nums; }
+
+.playfield {
+  position: relative;
+  width: min(86vw, 60vh);
+  aspect-ratio: 1;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 50%, #122530, #0a151c 75%);
+  border: 2px solid rgba(79, 209, 224, 0.35);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.target {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: radial-gradient(circle at 35% 35%, #ff6b6b, #c62828 70%);
+  box-shadow: 0 0 18px rgba(255, 107, 107, 0.7);
+  cursor: pointer;
+  padding: 0;
+  animation: pop 90ms ease-out;
+}
+@keyframes pop { from { transform: translate(-50%, -50%) scale(0.6); } to { transform: translate(-50%, -50%) scale(1); } }
+
+.center { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; min-height: 30vh; justify-content: center; }
+.getReady { font-family: 'Wallpoet', sans-serif; font-size: 1.6rem; color: var(--text-secondary, #b8a88a); }
+.timeUp { font-family: 'Wallpoet', sans-serif; font-size: 2.4rem; color: #4fd1e0; }
+.finalStat { color: var(--text-primary, #f3e9d2); font-size: 1.2rem; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; max-width: 360px; }
+.sbRow {
+  display: grid; grid-template-columns: 24px 1fr auto; align-items: center; gap: 0.5rem;
+  background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 8px; padding: 0.25rem 0.6rem;
+}
+.sbRank { color: #4fd1e0; font-weight: 800; font-family: 'Wallpoet', sans-serif; }
+.sbName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sbHits { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

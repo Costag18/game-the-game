@@ -138,6 +138,18 @@ export const GAMES = {
       'Every player is Psychic once. Highest total across all sub-rounds wins the round!',
     ],
   },
+  aimTrainer: {
+    id: 'aimTrainer', name: 'Aim Trainer Duel', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.AIM,
+    description: 'Hit as many targets as you can in 25 seconds. Fastest aim wins.',
+    instructions: [
+      'When the round starts, a target appears in your own play area.',
+      'Click or tap the target as fast as you can — each hit instantly spawns the next one.',
+      'You have 25 seconds. Every player gets their own private stream of targets, so it is perfectly fair.',
+      'Most hits wins the round. If tied, the higher accuracy (hits ÷ clicks) ranks first.',
+      'Clicking empty space counts as a miss and lowers your accuracy — aim, do not spray.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {
