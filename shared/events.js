@@ -68,4 +68,12 @@ export const EVENTS = {
   SUGGESTION_RESULT: 'suggestion:result',
   BODYCAM_STATE: 'bodycam:state',
   BODYCAM_ACTION: 'bodycam:action',
+  // Drawing canvas infra (Skribbl, Telephone Pictionary)
+  STROKE_SEND: 'draw:strokeSend',
+  STROKE_BROADCAST: 'draw:strokeBroadcast',
+  CANVAS_CLEAR_SEND: 'draw:clearSend',
+  CANVAS_CLEAR: 'draw:clear',
+  CANVAS_UNDO_SEND: 'draw:undoSend',
+  CANVAS_UNDO: 'draw:undo',
+  CANVAS_SNAPSHOT: 'draw:snapshot',
 };

@@ -23,6 +23,7 @@ import { Spoons } from './Spoons.js';
 import { Fibbage } from './Fibbage.js';
 import { Connect4 } from './Connect4.js';
 import { UltimateTicTacToe } from './UltimateTicTacToe.js';
+import { Skribbl } from './Skribbl.js';
 
 const gameEngines = {};
 
@@ -69,3 +70,4 @@ registerGame('spoons', Spoons);
 registerGame('fibbage', Fibbage);
 registerGame('connect4', Connect4);
 registerGame('ultimateTTT', UltimateTicTacToe);
+registerGame('skribbl', Skribbl);

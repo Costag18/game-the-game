@@ -442,6 +442,35 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
+  // --- Drawing canvas relay (Skribbl / Telephone Pictionary) ---
+  // High-frequency pixel traffic on its own channel — never through GAME_ACTION.
+  // No-ops for any game that doesn't hold a CanvasSession (duck-typed `.canvas`).
+  socket.on(EVENTS.STROKE_SEND, (data) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || !tm.activeGame || !tm.activeGame.canvas) return;
+    const res = tm.activeGame.canvas.addStroke(socket.id, data && data.stroke);
+    if (!res.ok) return;
+    io.to(lobbyId).emit(EVENTS.STROKE_BROADCAST, { stroke: res.stroke, drawerId: socket.id });
+  });
+
+  socket.on(EVENTS.CANVAS_UNDO_SEND, () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || !tm.activeGame || !tm.activeGame.canvas) return;
+    const res = tm.activeGame.canvas.undo(socket.id);
+    if (res.ok) io.to(lobbyId).emit(EVENTS.CANVAS_UNDO, { strokeId: res.strokeId });
+  });
+
+  socket.on(EVENTS.CANVAS_CLEAR_SEND, () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    if (!tm || !tm.activeGame || !tm.activeGame.canvas) return;
+    if (tm.activeGame.canvas.clear(socket.id).ok) {
+      io.to(lobbyId).emit(EVENTS.CANVAS_CLEAR, { drawerId: socket.id });
+    }
+  });
+
   // --- Image Broadcast (prompt → server generates, or imageUrl → direct broadcast) ---
   socket.on(EVENTS.AI_IMAGE_SEND, async (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);

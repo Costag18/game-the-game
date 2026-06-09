@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (24)
+## Mini-Games (25)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -109,6 +109,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Fibbage | 3-8 | Bluff trivia, write fakes + vote for truth, hidden ballot, +1000 truth / +500 per fool |
 | Connect 4 | 2-8 | 1v1 board (Pairing Engine Swiss best-of-3), drop discs, 4-in-a-row |
 | Ultimate Tic-Tac-Toe | 2-8 | 1v1 board (Pairing Engine), 9 sub-boards, forced-board rule, win 3-in-a-row of boards |
+| Skribbl | 2-8 | Draw-and-guess, real-time shared canvas, masked word, server-side guess matching |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -120,6 +121,17 @@ Inherently-1v1 games (Connect 4, more to come) can't natively produce a 1..N rou
 - **Timers (engine-owned):** per-turn (`autoMove()` if provided, else forfeit the staller), a 90s hard-cap (always forfeits), and a 10s summary ack auto-advance — each pairs with `_emitChange()`.
 - **Leave contract:** a leaver forfeits their live match (opponent +1 win), is excluded from future mini-rounds, auto-acked on the summary barrier, and pruned from results; ≤1 player → finish.
 - **Client:** `client/src/games/PairingShell.jsx` is the shared chrome (mini-round header, live standings, bye card, "waiting on" barrier, summary + AckStatus). A board component renders inside it via a render-prop: `<PairingShell …>{(myMatch) => <Board myMatch={myMatch} … />}</PairingShell>`.
+
+## Drawing Canvas Infra (draw-and-guess games)
+
+Reusable real-time drawing layer for Skribbl (and future Telephone Pictionary). **Pixels only** — it does NOT own turns, words, scoring, or completion (that stays in the consuming game's FSM).
+
+- **`server/src/utils/CanvasSession.js`** — pure server state + validation for one drawing surface. The game FSM holds `this.canvas = new CanvasSession()`. `addStroke/undo/clear/snapshot/reset/setDrawer`. Sanitizes everything (clamps coords to 800×600 logical space, clamps width 1–64, validates hex color, reissues canonical stroke ids `senderId:seq`, throttles ~30/s, caps points/strokes). Only the active drawer may add/undo/clear.
+- **`server/src/utils/wordBank.js`** — 5 categories × 3 difficulties; `pickWord(s)` with exclude-dedup + exhaustion fallback.
+- **`server/src/utils/guessMatch.js`** — server-only `normalizeGuess` (case/punct/accents/leading-article), `levenshtein`, `isCorrectGuess` (exact + fuzzy distance-1 gated to word length ≥4), `isCloseGuess`. The word is NEVER sent to a guesser.
+- **Socket relay (separate from GAME_ACTION):** `STROKE_SEND/STROKE_BROADCAST`, `CANVAS_UNDO_SEND/CANVAS_UNDO`, `CANVAS_CLEAR_SEND/CANVAS_CLEAR`, `CANVAS_SNAPSHOT` in `shared/events.js`. Handlers in `index.js` duck-type `tm.activeGame.canvas` (no-op for non-drawing games) — high-frequency pixel traffic must NOT flow through the FSM's per-action `GAME_STATE` rebroadcast.
+- **Anti-cheat (structural):** word lives only in the FSM; `getStateForPlayer` sends `word` to the drawer only, a masked `_ _ _` length hint to guessers; guess matching is server-side; the drawer can't guess; wrong guesses are never echoed to the room (no chat leak) — only private `myGuessFeedback`.
+- **Client:** `client/src/components/DrawingCanvas.jsx` — controlled `<canvas>` (renders exactly the `strokes` array the parent passes), Pointer Events (mouse+touch+stylus, `setPointerCapture`, `touch-action:none`), one `STROKE_SEND` per gesture on pen-up. The **game screen** owns `strokes` state + the 4 canvas listeners and resets on `drawPhase` change (new turn). Mid-game joins are blocked during play, so snapshots are reserved for reconnect.
 
 ## Casino Side Games
 
@@ -479,6 +491,7 @@ The owner cares about:
 | Fibbage | Shrikhand |
 | Connect 4 | Fredoka |
 | Ultimate Tic-Tac-Toe | Russo One |
+| Skribbl | Lilita One |
 
 ## Versioning & Commits
 

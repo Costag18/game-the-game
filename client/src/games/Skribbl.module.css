@@ -1,0 +1,23 @@
+.arena { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 1rem; max-width: 600px; margin: 0 auto; }
+.head { display: flex; align-items: baseline; gap: 0.8rem; }
+.title { font-family: 'Lilita One', cursive; font-size: clamp(1.8rem, 5vw, 2.6rem); color: #5fb0e8; margin: 0; letter-spacing: 1px; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
+.meta { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.drawerLine { color: var(--text-primary, #f3e9d2); font-weight: 600; }
+
+.wordBox { min-height: 2rem; display: flex; align-items: center; }
+.theWord { font-size: 1.3rem; font-weight: 800; color: var(--gold, #d4a843); letter-spacing: 2px; }
+.blanks { display: flex; gap: 0.35rem; }
+.blank { font-size: 1.4rem; font-weight: 800; color: var(--text-primary, #f3e9d2); min-width: 0.9rem; text-align: center; border-bottom: 2px solid var(--gold-dim, #8a6d2f); }
+
+.guessRow { display: flex; gap: 0.4rem; align-items: center; width: 100%; max-width: 460px; }
+.guessInput { flex: 1; padding: 0.6rem 0.9rem; border-radius: 10px; border: 2px solid var(--gold-dim, #8a6d2f); background: #fdfaf3; color: #1a1a1a; font-size: 1rem; }
+.guessInput:focus { outline: none; border-color: var(--gold, #d4a843); }
+.guessBtn { background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px; padding: 0.6rem 1.3rem; font-weight: 800; cursor: pointer; min-height: 44px; }
+.closeTag { color: #ffb74d; font-weight: 700; font-size: 0.85rem; }
+.solvedMsg { color: #5cd85c; font-weight: 700; }
+
+.scores { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; width: 100%; }
+.scoreRow { display: flex; align-items: center; gap: 0.4rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 999px; padding: 0.2rem 0.7rem; font-size: 0.82rem; }
+.scoreSolved { border-color: #5cd85c; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

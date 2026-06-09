@@ -45,6 +45,7 @@ import SpoonsGame from './games/Spoons.jsx';
 import FibbageGame from './games/Fibbage.jsx';
 import Connect4Game from './games/Connect4.jsx';
 import UltimateTicTacToeGame from './games/UltimateTicTacToe.jsx';
+import SkribblGame from './games/Skribbl.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -74,6 +75,7 @@ const GAME_COMPONENTS = {
   fibbage: FibbageGame,
   connect4: Connect4Game,
   ultimateTTT: UltimateTicTacToeGame,
+  skribbl: SkribblGame,
 };
 
 function GameRouter() {

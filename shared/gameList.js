@@ -222,6 +222,18 @@ export const GAMES = {
       'Highest total after 4 questions wins the round!',
     ],
   },
+  skribbl: {
+    id: 'skribbl', name: 'Skribbl', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.SKRIBBL_TURN,
+    description: 'One player draws a secret word, everyone else races to guess it.',
+    instructions: [
+      'Each player takes a turn drawing a secret word; everyone else guesses in the chat box.',
+      'Only the drawer sees the word — guessers get blanks showing its length.',
+      'Type your guess: the faster you get it, the more points you score.',
+      'The drawer earns points for every player who guesses it. The drawer cannot guess.',
+      'Everyone draws once. Highest total points ranks first.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {
