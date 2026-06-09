@@ -191,6 +191,7 @@ export class ReactionTap extends BaseGame {
     const mine = this.results[playerId] || null;
     return {
       phase: this.state,
+      myId: playerId,
       round: this.round,
       totalRounds: this.totalRounds,
       goSignaled: this.state === 'go',

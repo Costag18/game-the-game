@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './Scattergories.module.css';
 import PlayerName from '../components/PlayerName.jsx';
+import AckStatus from '../components/AckStatus.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 
 export default function Scattergories({ gameState, onAction, nicknames, avatars }) {
   const { playSound } = useSound();
   const [draft, setDraft] = useState({});
   const [remaining, setRemaining] = useState(null);
+  const [iAcked, setIAcked] = useState(false);
   const roundRef = useRef(-1);
   const ackedRound = useRef(-1);
   const pinged = useRef(false);
@@ -23,6 +25,9 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
       pinged.current = false;
     }
   }, [phase, round]);
+
+  // reset the local "acknowledged" flag at the start of each round's reveal
+  useEffect(() => { setIAcked(false); }, [round]);
 
   // countdown from writeEndTime
   useEffect(() => {
@@ -42,6 +47,7 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
   const {
     letter, categories = [], totalRounds, hasSubmitted, submittedCount = 0,
     totalPlayers = 0, roundResult, reportsView = {}, scores = {}, myId, otherPlayers = [],
+    acknowledged = [],
   } = gameState;
 
   const allPlayers = [myId, ...otherPlayers.map((o) => o.playerId)];
@@ -53,6 +59,7 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
   function ack() {
     if (ackedRound.current === round) return;
     ackedRound.current = round;
+    setIAcked(true);
     onAction({ type: 'acknowledge' });
     playSound('click');
   }
@@ -162,7 +169,10 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
           </div>
 
           {phase === 'reveal' && (
-            <button className={styles.submitBtn} onClick={ack}>Continue →</button>
+            <>
+              {!iAcked && <button className={styles.submitBtn} onClick={ack}>Continue →</button>}
+              <AckStatus players={allPlayers} acknowledged={acknowledged} me={myId} iActed={iAcked} nicknames={nicknames} avatars={avatars} />
+            </>
           )}
         </div>
       )}

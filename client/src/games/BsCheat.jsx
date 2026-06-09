@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './BsCheat.module.css';
 import PlayerName from '../components/PlayerName.jsx';
+import AckStatus from '../components/AckStatus.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 import { useScreenShake } from '../hooks/useScreenShake.js';
 
@@ -28,8 +29,8 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
   const { playSound } = useSound();
   const shake = useScreenShake();
   const [selected, setSelected] = useState([]);
+  const [iAcked, setIAcked] = useState(false);
   const prevPhase = useRef(null);
-  const acked = useRef(false);
 
   const phase = gameState?.phase;
   const isMyTurn = gameState?.isMyTurn;
@@ -41,7 +42,7 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
 
   useEffect(() => {
     if (phase !== prevPhase.current) {
-      if (phase === 'reveal') { shake('medium'); acked.current = false; }
+      if (phase === 'reveal') { shake('medium'); setIAcked(false); }
       prevPhase.current = phase;
     }
   }, [phase, shake]);
@@ -51,7 +52,14 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
   const {
     myHand = [], requiredRank, pileCount = 0, currentTurnPlayer,
     pendingPlay, canCallBS, finished, finishOrder = [], otherPlayers = [],
+    myId, acknowledged = [],
   } = gameState;
+
+  // Players who still need to acknowledge the reveal = present, non-finished players.
+  const ackPlayers = [
+    ...(finished ? [] : [myId]),
+    ...otherPlayers.filter((o) => !o.finished).map((o) => o.playerId),
+  ].filter(Boolean);
 
   function toggle(i) {
     setSelected((s) => (s.includes(i) ? s.filter((x) => x !== i) : (s.length < 4 ? [...s, i] : s)));
@@ -64,7 +72,7 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
     setSelected([]);
   }
   function callBS() { onAction({ type: 'callBS' }); shake('light'); }
-  function ack() { if (acked.current) return; acked.current = true; onAction({ type: 'acknowledge' }); }
+  function ack() { if (iAcked) return; setIAcked(true); onAction({ type: 'acknowledge' }); }
 
   return (
     <div className={styles.arena}>
@@ -116,7 +124,8 @@ export default function BsCheat({ gameState, onAction, nicknames, avatars }) {
                 ? <><PlayerName playerId={revealResult.playerId} nicknames={nicknames} avatars={avatars} /> LIED — takes {revealResult.pileSize} cards!</>
                 : <>Clean! <PlayerName playerId={revealResult.challenger} nicknames={nicknames} avatars={avatars} /> was wrong — takes {revealResult.pileSize}</>}
             </p>
-            <button className={styles.playBtn} onClick={ack}>Got it →</button>
+            {!iAcked && <button className={styles.playBtn} onClick={ack}>Got it →</button>}
+            <AckStatus players={ackPlayers} acknowledged={acknowledged} me={myId} iActed={iAcked} nicknames={nicknames} avatars={avatars} />
           </div>
         )}
 

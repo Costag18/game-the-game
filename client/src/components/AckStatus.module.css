@@ -1,0 +1,19 @@
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.9rem;
+  font-size: 0.92rem;
+  margin-top: 0.3rem;
+}
+.ready {
+  color: #69d07a;
+  font-weight: 700;
+  background: rgba(67, 160, 71, 0.16);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+}
+.waiting { color: var(--text-secondary, #b8a88a); }
+.who :global(*) { display: inline; }
+.done { color: var(--gold, #d4a843); font-weight: 600; }

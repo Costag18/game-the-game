@@ -294,6 +294,8 @@ export class BsCheat extends BaseGame {
         && this.pendingPlay.playerId !== playerId
         && this.activePlayers.includes(playerId),
       revealResult: this.state === 'reveal' ? this.revealResult : null,
+      myId: playerId,
+      acknowledged: [...this.acknowledged],
       finished: this.finishOrder.includes(playerId),
       finishOrder: [...this.finishOrder],
       otherPlayers: this.players.filter((p) => p !== playerId).map((p) => ({

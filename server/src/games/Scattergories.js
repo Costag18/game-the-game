@@ -305,6 +305,7 @@ export class Scattergories extends BaseGame {
       })),
       roundResult: revealing ? this.roundResult : null,
       reportsView: revealing ? this._reportsView(playerId) : null,
+      acknowledged: [...this.acknowledged],
       roundHistory: this.roundHistory,
     };
   }

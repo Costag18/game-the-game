@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './ReactionTap.module.css';
 import PlayerName from '../components/PlayerName.jsx';
+import AckStatus from '../components/AckStatus.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 import { useScreenShake } from '../hooks/useScreenShake.js';
 
@@ -9,6 +10,7 @@ export default function ReactionTap({ gameState, onAction, nicknames, avatars })
   const shake = useScreenShake();
   const [tappedLocally, setTappedLocally] = useState(false);
   const [tooSoon, setTooSoon] = useState(false);
+  const [iAcked, setIAcked] = useState(false);
   const ackedRoundRef = useRef(-1);
 
   const phase = gameState?.phase;
@@ -16,7 +18,7 @@ export default function ReactionTap({ gameState, onAction, nicknames, avatars })
 
   // Reset per-round local feedback flags when a new round arms.
   useEffect(() => {
-    if (phase === 'arming') { setTappedLocally(false); setTooSoon(false); }
+    if (phase === 'arming') { setTappedLocally(false); setTooSoon(false); setIAcked(false); }
   }, [phase, round]);
 
   if (!gameState) {
@@ -26,7 +28,10 @@ export default function ReactionTap({ gameState, onAction, nicknames, avatars })
   const {
     totalRounds, hasActed, myResult, roundResults,
     totals = {}, otherPlayers = [], myTotalMs = 0,
+    myId, acknowledged = [],
   } = gameState;
+
+  const ackPlayers = [myId, ...otherPlayers.map((o) => o.playerId)].filter(Boolean);
 
   function handleTap() {
     if (phase === 'arming') {
@@ -44,6 +49,7 @@ export default function ReactionTap({ gameState, onAction, nicknames, avatars })
     } else if (phase === 'roundEnd') {
       if (ackedRoundRef.current === round) return;
       ackedRoundRef.current = round;
+      setIAcked(true);
       onAction({ type: 'acknowledge' });
     }
   }
@@ -118,7 +124,10 @@ export default function ReactionTap({ gameState, onAction, nicknames, avatars })
               ))}
             </div>
             {phase === 'roundEnd' && (
-              <span className={styles.tapHint}>Tap anywhere to continue →</span>
+              <>
+                {!iAcked && <span className={styles.tapHint}>Tap anywhere to continue →</span>}
+                <AckStatus players={ackPlayers} acknowledged={acknowledged} me={myId} iActed={iAcked} nicknames={nicknames} avatars={avatars} />
+              </>
             )}
           </div>
         )}
