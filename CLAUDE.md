@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (25)
+## Mini-Games (26)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -110,6 +110,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Connect 4 | 2-8 | 1v1 board (Pairing Engine Swiss best-of-3), drop discs, 4-in-a-row |
 | Ultimate Tic-Tac-Toe | 2-8 | 1v1 board (Pairing Engine), 9 sub-boards, forced-board rule, win 3-in-a-row of boards |
 | Skribbl | 2-8 | Draw-and-guess, real-time shared canvas, masked word, server-side guess matching |
+| Telephone Pictionary | 3-8 | Lockstep write→draw→guess chains, private per-chain canvases, reveal + vote |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -131,7 +132,8 @@ Reusable real-time drawing layer for Skribbl (and future Telephone Pictionary). 
 - **`server/src/utils/guessMatch.js`** — server-only `normalizeGuess` (case/punct/accents/leading-article), `levenshtein`, `isCorrectGuess` (exact + fuzzy distance-1 gated to word length ≥4), `isCloseGuess`. The word is NEVER sent to a guesser.
 - **Socket relay (separate from GAME_ACTION):** `STROKE_SEND/STROKE_BROADCAST`, `CANVAS_UNDO_SEND/CANVAS_UNDO`, `CANVAS_CLEAR_SEND/CANVAS_CLEAR`, `CANVAS_SNAPSHOT` in `shared/events.js`. Handlers in `index.js` duck-type `tm.activeGame.canvas` (no-op for non-drawing games) — high-frequency pixel traffic must NOT flow through the FSM's per-action `GAME_STATE` rebroadcast.
 - **Anti-cheat (structural):** word lives only in the FSM; `getStateForPlayer` sends `word` to the drawer only, a masked `_ _ _` length hint to guessers; guess matching is server-side; the drawer can't guess; wrong guesses are never echoed to the room (no chat leak) — only private `myGuessFeedback`.
-- **Client:** `client/src/components/DrawingCanvas.jsx` — controlled `<canvas>` (renders exactly the `strokes` array the parent passes), Pointer Events (mouse+touch+stylus, `setPointerCapture`, `touch-action:none`), one `STROKE_SEND` per gesture on pen-up. The **game screen** owns `strokes` state + the 4 canvas listeners and resets on `drawPhase` change (new turn). Mid-game joins are blocked during play, so snapshots are reserved for reconnect.
+- **Client:** `client/src/components/DrawingCanvas.jsx` — controlled `<canvas>` (renders exactly the `strokes` array the parent passes), Pointer Events (mouse+touch+stylus, `setPointerCapture`, `touch-action:none`), one `STROKE_SEND` per gesture on pen-up. The **game screen** owns `strokes` state + the 4 canvas listeners and resets on `drawPhase`/step change. Mid-game joins are blocked during play, so snapshots are reserved for reconnect.
+- **Telephone Pictionary divergence:** Telephone uses **one `CanvasSession` per chain** (`this.canvases[chainId]`, NOT a single `this.canvas`), because every player draws privately at once. Its stroke relay in `index.js` is a SEPARATE scoped path (guarded by `constructor.name === 'TelephonePictionary'`) that echoes strokes back to the **author's own socket only** (`socket.emit`, never `io.to(room)`) — so no one sees another player's in-progress drawing until reveal. The generic `tm.activeGame.canvas` handlers no-op for it (it has no singular `.canvas`).
 
 ## Casino Side Games
 
@@ -492,6 +494,7 @@ The owner cares about:
 | Connect 4 | Fredoka |
 | Ultimate Tic-Tac-Toe | Russo One |
 | Skribbl | Lilita One |
+| Telephone Pictionary | Gochi Hand |
 
 ## Versioning & Commits
 

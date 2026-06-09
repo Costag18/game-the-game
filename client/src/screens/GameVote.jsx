@@ -35,6 +35,7 @@ import previewFibbage from '../assets/gamepreviews/fibbage.png';
 import previewConnect4 from '../assets/gamepreviews/connect4.png';
 import previewUltimateTTT from '../assets/gamepreviews/ultimateTTT.png';
 import previewSkribbl from '../assets/gamepreviews/skribbl.png';
+import previewTelephone from '../assets/gamepreviews/telephonePictionary.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -62,6 +63,7 @@ const GAME_PREVIEWS = {
   connect4: previewConnect4,
   ultimateTTT: previewUltimateTTT,
   skribbl: previewSkribbl,
+  telephonePictionary: previewTelephone,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

@@ -24,6 +24,7 @@ import { Fibbage } from './Fibbage.js';
 import { Connect4 } from './Connect4.js';
 import { UltimateTicTacToe } from './UltimateTicTacToe.js';
 import { Skribbl } from './Skribbl.js';
+import { TelephonePictionary } from './TelephonePictionary.js';
 
 const gameEngines = {};
 
@@ -71,3 +72,4 @@ registerGame('fibbage', Fibbage);
 registerGame('connect4', Connect4);
 registerGame('ultimateTTT', UltimateTicTacToe);
 registerGame('skribbl', Skribbl);
+registerGame('telephonePictionary', TelephonePictionary);

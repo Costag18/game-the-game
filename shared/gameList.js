@@ -234,6 +234,19 @@ export const GAMES = {
       'Everyone draws once. Highest total points ranks first.',
     ],
   },
+  telephonePictionary: {
+    id: 'telephonePictionary', name: 'Telephone Pictionary', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.TELEPHONE_STEP,
+    description: 'Write a phrase, draw the last one, guess the last drawing. Chaos by reveal.',
+    instructions: [
+      'Everyone secretly writes a starting phrase.',
+      'Each step you get the page before you: draw the phrase, or guess the drawing.',
+      'You only ever see the ONE thing right before you — never the whole chain.',
+      'Steps alternate draw / write and rotate around the table until every page is full.',
+      'All chains are revealed one frame at a time — watch the phrase mutate into nonsense.',
+      'Vote for the funniest chain. Most votes + taking part scores you the round.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

@@ -471,6 +471,34 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
+  // --- Telephone Pictionary: PRIVATE per-chain canvases. Strokes echo back to the
+  //     author ONLY (socket.emit), never io.to(room) — every player draws privately.
+  const _teleCanvas = () => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    const g = tm && tm.activeGame;
+    if (!g || g.constructor.name !== 'TelephonePictionary' || !g.canvases) return null;
+    const chainId = g.assignment && g.assignment[socket.id];
+    return chainId ? g.canvases[chainId] || null : null;
+  };
+  socket.on(EVENTS.STROKE_SEND, (data) => {
+    const cv = _teleCanvas();
+    if (!cv || cv.getDrawer() !== socket.id) return;
+    const res = cv.addStroke(socket.id, data && data.stroke);
+    if (res.ok) socket.emit(EVENTS.STROKE_BROADCAST, { stroke: res.stroke, drawerId: socket.id });
+  });
+  socket.on(EVENTS.CANVAS_UNDO_SEND, () => {
+    const cv = _teleCanvas();
+    if (!cv || cv.getDrawer() !== socket.id) return;
+    const res = cv.undo(socket.id);
+    if (res.ok) socket.emit(EVENTS.CANVAS_UNDO, { strokeId: res.strokeId });
+  });
+  socket.on(EVENTS.CANVAS_CLEAR_SEND, () => {
+    const cv = _teleCanvas();
+    if (!cv || cv.getDrawer() !== socket.id) return;
+    if (cv.clear(socket.id).ok) socket.emit(EVENTS.CANVAS_CLEAR, { drawerId: socket.id });
+  });
+
   // --- Image Broadcast (prompt → server generates, or imageUrl → direct broadcast) ---
   socket.on(EVENTS.AI_IMAGE_SEND, async (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
