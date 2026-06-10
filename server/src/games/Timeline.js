@@ -4,8 +4,8 @@ import { pickEvents } from '../utils/triviaBank.js';
 const TOTAL_ROUNDS  = 6;
 const GUESS_MS      = 30_000;  // window to lock a year guess
 const REVEAL_MS     = 6_000;   // reveal auto-advance
-const YEAR_MIN      = 1400;
-const YEAR_MAX      = 2025;
+const YEAR_MIN      = -3000;   // bank spans antiquity (e.g. 776 BC Olympics) to today —
+const YEAR_MAX      = 2100;    // the slider must REACH every event or exact guesses can't score
 const POINTS_PER_YR = 20;      // points lost per year of distance
 const MAX_POINTS    = 1000;    // perfect guess
 

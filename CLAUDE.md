@@ -407,6 +407,17 @@ A 49-agent audit found ~30 distinct mid-game leave/deadlock bugs. Root causes + 
 - `getResults()` must assign same placement number to tied players
 - Use `let placement = 1; if (i > 0 && score < prev.score) placement = i + 1;` pattern
 
+### Trivia Data Banks (`server/src/utils/triviaBank.js`)
+The shared knowledge banks (MULTIPLE_CHOICE, QUANTITIES, NUMERIC_FACTS, EVENTS, ODD_ONE_OUT, RANK_SETS, THIS_OR_THAT) feed 8 games (Buzzer Royale, Higher/Lower, Price Is Wrong, Guesstimate, Timeline, Odd One Out, Rank It, This or That). They are **static arrays loaded once** at startup — growing them has **negligible runtime cost** (memory only; each game does one O(n) shuffle+slice at start). So expand them freely for variety. Pipeline: generate via parallel agents → adversarially fact-check each batch (drop wrong/ambiguous/volatile) → `scripts/integrateTrivia.mjs` (dedups against the live bank + re-validates structure + splices in the file style). Curate for **canonical, stable** facts only (no live populations/prices/records).
+- **Dedup is by normalized text** — semantic duplicates with different wording slip through (e.g. "First human steps on the Moon" vs "Apollo 11 lands the first humans on the Moon"). After a big add, scan for same-year EVENTS, same sorted-(a,b) THIS_OR_THAT pairs, and near-identical MC questions, and prune the re-wordings (`scripts/dedupEvents.mjs`, `scripts/dedupMcTot.mjs`).
+- **`pickThisOrThat` randomizes which side (A/B) each fact sits on** so a player can't "always pick A". Every fact had its answer on side A originally — that was an exploit.
+- **Consumer-game invariants the bank MUST satisfy** (growing the bank exposed each of these):
+  - **NUMERIC_FACTS answers must be > 0** — Guesstimate uses log-relative scoring and rejects non-positive guesses (a `0`-answer fact, e.g. "Freezing point of water in °C", hangs the round). QUANTITIES may be 0/negative (Higher/Lower only compares magnitudes).
+  - **RANK_SETS `ordered` must have UNIQUE items** — Rank It scores adjacent pairs by value, so a duplicate (e.g. Fibonacci `1,1,2,3…`) makes even a perfect submission lose a pair.
+  - **Timeline's slider [YEAR_MIN, YEAR_MAX] must cover every EVENTS year** (now `-3000..2100` for BC events) — otherwise an exact guess on an out-of-range event clamps and scores 0. The client formats negative years as "N BC".
+  - **Higher/Lower caps its run** (`MAX_STEPS`) instead of using the whole (now hundreds-long) deck — each game draws a fresh subset, keeping variety high and the game a tight sprint.
+- **Anti-cheat leak tests must be STRUCTURAL, not substring** — assert the question-phase state has no answer field (`!('answer' in s)` / `!('nextValue' in s)`), NOT `JSON.stringify(s).includes(String(answer))`. The latter false-positives when the secret is a digit-substring of an exposed number (e.g. the epoch-ms `deadline`, or anchor 64 vs next 6) — a data-dependent flake. After enlarging a bank, run each consumer suite ~20× to catch random-pick flakes.
+
 ### Nicknames
 - Snapshotted at tournament start on TournamentManager constructor
 - Also captured from socket.data.nickname for players who set name before joining lobby

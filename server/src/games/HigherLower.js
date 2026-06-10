@@ -3,6 +3,9 @@ import { shuffledQuantities } from '../utils/triviaBank.js';
 
 const ANSWER_MS = 15_000;  // window to call HIGHER/LOWER each step
 const REVEAL_MS = 6_000;   // reveal hold before the next step / finish
+const MAX_STEPS = 20;      // cap the run length (the bank has hundreds of quantities —
+                           // each game draws a fresh shuffled subset, so variety stays high
+                           // while a single game stays a tight survival sprint, not a slog)
 
 /**
  * Higher or Lower — survival streak game. The server shuffles a sequence of
@@ -46,7 +49,8 @@ export class HigherLower extends BaseGame {
   _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
 
   startGame() {
-    this.sequence = shuffledQuantities();
+    // Take a fresh shuffled subset each game (anchor + up to MAX_STEPS comparisons).
+    this.sequence = shuffledQuantities().slice(0, MAX_STEPS + 1);
     this.anchorIndex = 0;
     this.stepNumber = 0;
     for (const p of this.players) this.streaks[p] = 0;

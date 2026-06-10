@@ -61,9 +61,9 @@ test('scoring: closer guess scores more; exact = 1000; far = 0', () => {
 test('year is clamped to [min,max]', () => {
   const g = newGame(['a', 'b']);
   g.handleAction('a', { type: 'submitYear', year: 99999 });
-  g.handleAction('b', { type: 'submitYear', year: -50 });
-  eq(g.guesses['a'], 2025);
-  eq(g.guesses['b'], 1400);
+  g.handleAction('b', { type: 'submitYear', year: -99999 });
+  eq(g.guesses['a'], 2100);
+  eq(g.guesses['b'], -3000);
 });
 
 test('cannot lock twice; ignores non-players', () => {

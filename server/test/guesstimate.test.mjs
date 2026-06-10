@@ -24,7 +24,9 @@ test('answer key is NOT in question-phase state but IS in reveal state', () => {
   const g = newGame(['a', 'b']);
   const answer = g.fact.answer;
   const sQ = g.getStateForPlayer('a');
-  assert(!JSON.stringify(sQ).includes(String(answer)) || answer < 10, 'answer not leaked during question');
+  // structural anti-cheat: the engine never includes an `answer` field pre-reveal. Don't
+  // substring-search the number — the epoch-ms `deadline` in state makes that check flaky.
+  assert(!('answer' in sQ), 'answer key not exposed during question');
   // robust check: reveal is null and no per-player results during question
   eq(sQ.reveal, null);
   g.handleAction('a', { type: 'submitGuess', value: answer });

@@ -31,11 +31,11 @@ test('starts in question with an anchor, a next label, and an answer timer', () 
 
 test('next value is hidden during question but revealed in reveal', () => {
   const g = newGame(['a', 'b', 'c']);
-  const secret = g.nextItem.value;
   const sQ = g.getStateForPlayer('a');
-  assert(!JSON.stringify(sQ).includes(String(secret)) || g.anchor.value === secret,
-    'next value not leaked during question');
-  // also no correctCall / nextValue keys before reveal
+  // structural anti-cheat: the engine exposes nextLabel/nextUnit but NEVER the next VALUE
+  // (nor correctCall) until reveal. Don't substring-search the number — that false-positives
+  // when the secret is a digit-substring of an exposed number (e.g. anchor 64 vs next 6).
+  assert(!('nextValue' in sQ) && !('correctCall' in sQ), 'next value/answer not exposed during question');
   assert(sQ.reveal === null, 'no reveal payload during question');
   // everyone calls -> reveal
   for (const p of g.players) g.handleAction(p, { type: 'call', direction: correctDir(g) === 'push' ? 'higher' : correctDir(g) });

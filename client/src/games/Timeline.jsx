@@ -52,6 +52,7 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
   const allPlayers = Object.keys(scores);
   const span = yearMax - yearMin;
   const pctFor = (y) => `${((Math.max(yearMin, Math.min(yearMax, y)) - yearMin) / span) * 100}%`;
+  const fmtYear = (y) => (y == null ? '' : y < 0 ? `${-y} BC` : `${y}`);
 
   return (
     <div className={styles.arena}>
@@ -75,12 +76,12 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
       {phase === 'guessing' && (
         locked ? (
           <div className={styles.waitBox}>
-            <p className={styles.waitMsg}>Year locked: <span className={styles.lockYear}>{myGuess}</span></p>
+            <p className={styles.waitMsg}>Year locked: <span className={styles.lockYear}>{fmtYear(myGuess)}</span></p>
             <p className={styles.sub}>Waiting for others… {submittedCount}/{playerCount}</p>
           </div>
         ) : (
           <div className={styles.guessBox}>
-            <div className={styles.readout}>{year}</div>
+            <div className={styles.readout}>{fmtYear(year)}</div>
             <input
               className={styles.slider}
               type="range"
@@ -91,10 +92,10 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
               onChange={(e) => setYear(Number(e.target.value))}
             />
             <div className={styles.scaleRow}>
-              <span>{yearMin}</span>
-              <span>{yearMax}</span>
+              <span>{fmtYear(yearMin)}</span>
+              <span>{fmtYear(yearMax)}</span>
             </div>
-            <button className={styles.primaryBtn} onClick={lockYear}>Lock in {year}</button>
+            <button className={styles.primaryBtn} onClick={lockYear}>Lock in {fmtYear(year)}</button>
           </div>
         )
       )}
@@ -104,26 +105,26 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
         <div className={styles.reveal}>
           {trueYear != null && (
             <div className={styles.trueBanner}>
-              Answer: <span className={styles.trueYear}>{trueYear}</span>
+              Answer: <span className={styles.trueYear}>{fmtYear(trueYear)}</span>
             </div>
           )}
 
           <div className={styles.track}>
             <div className={styles.trackBar} />
-            <div className={styles.trueMarker} style={{ left: pctFor(trueYear) }} title={`${trueYear}`}>
-              <span className={styles.trueFlag}>{trueYear}</span>
+            <div className={styles.trueMarker} style={{ left: pctFor(trueYear) }} title={fmtYear(trueYear)}>
+              <span className={styles.trueFlag}>{fmtYear(trueYear)}</span>
             </div>
             {results.filter((r) => !r.missed).map((r) => (
               <div
                 key={r.playerId}
                 className={`${styles.guessMarker} ${r.playerId === myId ? styles.mineMarker : ''}`}
                 style={{ left: pctFor(r.guess) }}
-                title={`${r.guess}`}
+                title={fmtYear(r.guess)}
               />
             ))}
             <div className={styles.trackEnds}>
-              <span>{yearMin}</span>
-              <span>{yearMax}</span>
+              <span>{fmtYear(yearMin)}</span>
+              <span>{fmtYear(yearMax)}</span>
             </div>
           </div>
 
@@ -132,7 +133,7 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
               <div key={r.playerId} className={`${styles.resRow} ${r.playerId === myId ? styles.resMine : ''}`}>
                 <PlayerName playerId={r.playerId} nicknames={nicknames} avatars={avatars} />
                 <span className={styles.resGuess}>
-                  {r.missed ? 'no guess' : `${r.guess} (${r.distance === 0 ? 'exact!' : `${r.distance} yr off`})`}
+                  {r.missed ? 'no guess' : `${fmtYear(r.guess)} (${r.distance === 0 ? 'exact!' : `${r.distance} yr off`})`}
                 </span>
                 <span className={styles.resPts}>+{r.points}</span>
               </div>
