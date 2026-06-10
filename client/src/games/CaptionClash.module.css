@@ -1,0 +1,168 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.title {
+  font-family: 'Bungee', cursive;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  color: #ff5fa2;
+  margin: 0;
+  letter-spacing: 1px;
+  text-align: center;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+
+.phaseCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.promptBox {
+  background: var(--bg-panel, #2a1518);
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  border-radius: 14px;
+  padding: 0.6rem 1.1rem;
+  color: var(--text-primary, #f3e9d2);
+  font-size: 1.05rem;
+  text-align: center;
+  max-width: 600px;
+}
+.promptBox strong { color: var(--gold, #d4a843); }
+
+.subtle { color: var(--text-secondary, #b8a88a); font-size: 0.85rem; text-align: center; }
+.waitMsg { color: #5cd85c; font-weight: 700; text-align: center; }
+
+.primaryBtn {
+  background: #ff5fa2;
+  color: #1a0e10;
+  border: none;
+  border-radius: 12px;
+  padding: 0.7rem 1.6rem;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.5; cursor: default; }
+
+.captionInput {
+  width: 100%;
+  max-width: 500px;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  background: #fdfaf3;
+  color: #1a1a1a;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.captionInput:focus { outline: none; border-color: #ff5fa2; }
+
+/* gallery of doodle+caption cards */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.card {
+  background: var(--bg-panel, #2a1518);
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  border-radius: 14px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+.cardSel { border-color: #ff5fa2; box-shadow: 0 0 0 2px #ff5fa2; }
+.cardMine { opacity: 0.75; }
+
+.cardCanvas {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+/* shrink the embedded canvas to fit the card */
+.cardCanvas :global(canvas) {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 4 / 3;
+  display: block;
+}
+
+.cardCaption {
+  color: var(--text-primary, #f3e9d2);
+  font-style: italic;
+  text-align: center;
+  margin: 0;
+  font-size: 0.95rem;
+  min-height: 1.4rem;
+}
+
+.voteBtn {
+  background: var(--gold, #d4a843);
+  color: #1a0e10;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  min-height: 40px;
+  width: 100%;
+}
+.voteBtn:disabled { opacity: 0.55; cursor: default; }
+
+.credits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #b8a88a);
+}
+.credit { display: flex; align-items: center; gap: 0.3rem; }
+.voteTally {
+  color: var(--gold, #d4a843);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.ackWrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+
+/* scoreboard */
+.scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.4rem;
+}
+.scoreRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--bg-panel, #2a1518);
+  border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.82rem;
+}
+.place { color: #ff5fa2; font-weight: 800; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; }

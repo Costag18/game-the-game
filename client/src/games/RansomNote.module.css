@@ -1,0 +1,111 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
+  color: #e9e2d0; margin: 0;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 #000, -1px -1px 0 #b33;
+}
+.round { color: var(--text-secondary, #b8a88a); font-weight: 700; font-family: 'Special Elite', monospace; }
+
+.section { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+
+/* the secret word card — styled like a torn paper strip */
+.wordCard {
+  display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+  background: repeating-linear-gradient(45deg, #f7f1e3, #f7f1e3 10px, #efe7d3 10px, #efe7d3 20px);
+  color: #1a1a1a; border-radius: 4px; padding: 0.7rem 1.4rem; width: 100%; max-width: 460px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4); transform: rotate(-0.6deg);
+  border: 1px dashed #9a8f78;
+}
+.wordLabel { font-family: 'Special Elite', monospace; font-size: 0.85rem; color: #6b5d44; }
+.theWord {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: clamp(1.4rem, 4.5vw, 2.1rem); font-weight: 700; color: #1a1a1a;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+.hint { font-family: 'Special Elite', monospace; color: var(--text-secondary, #b8a88a); margin: 0.1rem 0; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; }
+
+/* note being composed */
+.noteSlots {
+  display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; align-items: center;
+  min-height: 56px; width: 100%; max-width: 460px; padding: 0.5rem;
+  background: rgba(0,0,0,0.25); border: 2px dashed var(--gold-dim, #8a6d2f); border-radius: 10px;
+}
+.notePlaceholder { color: var(--text-secondary, #b8a88a); font-family: 'Special Elite', monospace; font-size: 0.9rem; }
+.noteEmojiBtn {
+  font-size: 1.9rem; line-height: 1; background: #fdf8ec; border: 1px solid #c9bb9a; border-radius: 6px;
+  padding: 0.15rem 0.3rem; cursor: pointer; transform: rotate(-2deg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.noteEmojiBtn:nth-child(even) { transform: rotate(3deg); }
+
+/* the hand of dealt emoji */
+.hand {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.4rem;
+  width: 100%; max-width: 460px;
+}
+.handTile {
+  font-size: 1.7rem; line-height: 1; aspect-ratio: 1 / 1;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-panel, #2a1518); border: 2px solid var(--gold-dim, #8a6d2f);
+  border-radius: 8px; cursor: pointer; min-height: 44px;
+}
+.handTile:hover:not(:disabled) { border-color: var(--gold, #d4a843); transform: translateY(-2px); }
+.handTile:disabled { cursor: default; }
+.handUsed { opacity: 0.25; }
+
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+  font-family: 'Special Elite', monospace; letter-spacing: 1px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+
+.waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.waitMsg { font-size: 1.2rem; color: var(--gold, #d4a843); font-weight: 700; margin: 0; font-family: 'Special Elite', monospace; }
+.noteStrip { display: flex; gap: 0.3rem; flex-wrap: wrap; justify-content: center; }
+.noteEmoji { font-size: 1.6rem; }
+
+/* voting + reveal gallery */
+.gallery { display: flex; flex-direction: column; gap: 0.55rem; width: 100%; max-width: 460px; }
+.galleryCard {
+  display: flex; flex-direction: column; gap: 0.3rem; align-items: center;
+  background: var(--bg-panel, #2a1518); border: 2px solid var(--gold-dim, #8a6d2f);
+  border-radius: 10px; padding: 0.7rem; cursor: pointer; min-height: 56px; width: 100%;
+}
+.galleryCard:hover:not(:disabled) { border-color: var(--gold, #d4a843); }
+.galleryCard:disabled { cursor: default; }
+.gallerySel { border-color: var(--gold, #d4a843); box-shadow: 0 0 0 2px var(--gold, #d4a843); }
+.galleryMine { opacity: 0.55; }
+.galleryEmojis { display: flex; gap: 0.35rem; flex-wrap: wrap; justify-content: center; }
+.galleryEmoji { font-size: 2rem; line-height: 1; }
+.mineTag { font-style: italic; color: var(--text-secondary, #b8a88a); font-size: 0.8rem; }
+.votedTag { color: var(--gold, #d4a843); font-weight: 800; font-size: 0.85rem; }
+
+.revealCard {
+  display: flex; flex-direction: column; gap: 0.35rem; align-items: center;
+  background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 10px; padding: 0.7rem; width: 100%;
+}
+.revealMine { border-color: var(--gold, #d4a843); background: rgba(212,168,67,0.12); }
+.revealMeta { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 0.5rem; }
+.voteCount { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; max-width: 460px; margin-top: 0.4rem; }
+.scoreRow { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.3rem 0.6rem; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; font-family: 'Special Elite', monospace; }

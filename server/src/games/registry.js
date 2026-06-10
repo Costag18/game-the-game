@@ -82,6 +82,12 @@ import { CrackTheVault } from './CrackTheVault.js';
 import { SudokuSixer } from './SudokuSixer.js';
 import { FlashFlood } from './FlashFlood.js';
 import { SequenceSleuth } from './SequenceSleuth.js';
+import { OneLineWonder } from './OneLineWonder.js';
+import { CopyThat } from './CopyThat.js';
+import { CaptionClash } from './CaptionClash.js';
+import { ExquisiteCorpse } from './ExquisiteCorpse.js';
+import { TraceRace } from './TraceRace.js';
+import { RansomNote } from './RansomNote.js';
 
 const gameEngines = {};
 
@@ -187,3 +193,9 @@ registerGame('crackTheVault', CrackTheVault);
 registerGame('sudokuSixer', SudokuSixer);
 registerGame('flashFlood', FlashFlood);
 registerGame('sequenceSleuth', SequenceSleuth);
+registerGame('oneLineWonder', OneLineWonder);
+registerGame('copyThat', CopyThat);
+registerGame('captionClash', CaptionClash);
+registerGame('exquisiteCorpse', ExquisiteCorpse);
+registerGame('traceRace', TraceRace);
+registerGame('ransomNote', RansomNote);

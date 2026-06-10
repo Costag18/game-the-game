@@ -104,6 +104,12 @@ import CrackTheVaultGame from './games/CrackTheVault.jsx';
 import SudokuSixerGame from './games/SudokuSixer.jsx';
 import FlashFloodGame from './games/FlashFlood.jsx';
 import SequenceSleuthGame from './games/SequenceSleuth.jsx';
+import OneLineWonderGame from './games/OneLineWonder.jsx';
+import CopyThatGame from './games/CopyThat.jsx';
+import CaptionClashGame from './games/CaptionClash.jsx';
+import ExquisiteCorpseGame from './games/ExquisiteCorpse.jsx';
+import TraceRaceGame from './games/TraceRace.jsx';
+import RansomNoteGame from './games/RansomNote.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -192,6 +198,12 @@ const GAME_COMPONENTS = {
   sudokuSixer: SudokuSixerGame,
   flashFlood: FlashFloodGame,
   sequenceSleuth: SequenceSleuthGame,
+  oneLineWonder: OneLineWonderGame,
+  copyThat: CopyThatGame,
+  captionClash: CaptionClashGame,
+  exquisiteCorpse: ExquisiteCorpseGame,
+  traceRace: TraceRaceGame,
+  ransomNote: RansomNoteGame,
 };
 
 function GameRouter() {

@@ -93,6 +93,12 @@ import previewCrackTheVault from '../assets/gamepreviews/crackTheVault.png';
 import previewSudokuSixer from '../assets/gamepreviews/sudokuSixer.png';
 import previewFlashFlood from '../assets/gamepreviews/flashFlood.png';
 import previewSequenceSleuth from '../assets/gamepreviews/sequenceSleuth.png';
+import previewOneLineWonder from '../assets/gamepreviews/oneLineWonder.png';
+import previewCopyThat from '../assets/gamepreviews/copyThat.png';
+import previewCaptionClash from '../assets/gamepreviews/captionClash.png';
+import previewExquisiteCorpse from '../assets/gamepreviews/exquisiteCorpse.png';
+import previewTraceRace from '../assets/gamepreviews/traceRace.png';
+import previewRansomNote from '../assets/gamepreviews/ransomNote.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -178,6 +184,12 @@ const GAME_PREVIEWS = {
   sudokuSixer: previewSudokuSixer,
   flashFlood: previewFlashFlood,
   sequenceSleuth: previewSequenceSleuth,
+  oneLineWonder: previewOneLineWonder,
+  copyThat: previewCopyThat,
+  captionClash: previewCaptionClash,
+  exquisiteCorpse: previewExquisiteCorpse,
+  traceRace: previewTraceRace,
+  ransomNote: previewRansomNote,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

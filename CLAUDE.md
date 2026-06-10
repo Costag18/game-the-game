@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (83)
+## Mini-Games (89)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -168,6 +168,12 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Sudoku Sixer | 2-8 | 6×6 sudoku race, server-generated solution + givens, finish order + correct cells |
 | Flash Flood | 2-8 | Flashed-pattern memory race, growing grid, server-only pattern, rounds-banked ranking |
 | Sequence Sleuth | 2-8 | Guess the next term, fewer-terms-shown scores more, rule hidden server-side |
+| One-Line Wonder | 3-8 | Draw a word in a single server-enforced stroke, peer star-rating ranks |
+| Copy That | 2-8 | Flash-then-redraw from memory, server IoU similarity scoring (no voting) |
+| Caption Clash | 3-8 | Draw → caption a rival's doodle → vote funniest pair, both authors score |
+| Exquisite Corpse | 3-8 | Draw one server-clamped band of a shared monster, vote best band |
+| Trace Race | 2-8 | Trace a target path, server coverage-minus-spillover scoring (no voting) |
+| Ransom Note | 3-8 | Convey a secret word with emoji from your hand, vote cleverest |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -617,6 +623,12 @@ The owner cares about:
 | Sudoku Sixer | Cinzel |
 | Flash Flood | Bungee |
 | Sequence Sleuth | Orbitron |
+| One-Line Wonder | Gochi Hand |
+| Copy That | Lilita One |
+| Caption Clash | Bungee |
+| Exquisite Corpse | Permanent Marker |
+| Trace Race | Audiowide |
+| Ransom Note | Special Elite |
 
 ## Versioning & Commits
 

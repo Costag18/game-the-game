@@ -931,6 +931,78 @@ export const GAMES = {
       'Highest total across 5 sequences wins; ties share a placement.',
     ],
   },
+  oneLineWonder: {
+    id: 'oneLineWonder', name: 'One-Line Wonder', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Draw the secret word in a single unbroken line, then rate everyone else\'s masterpiece.',
+    instructions: [
+      'A secret word is revealed — everyone draws the SAME word.',
+      'You get ONE unbroken stroke: lift your pen and your drawing locks in.',
+      'Submit your one-line masterpiece before the timer runs out.',
+      'Then privately give every other drawing 1–5 stars (you can\'t rate your own).',
+      'Most stars received wins; ties share a placement.',
+    ],
+  },
+  copyThat: {
+    id: 'copyThat', name: 'Copy That', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Memorise a flashed drawing, then redraw it — scored by shape similarity, no voting.',
+    instructions: [
+      'Each round flashes a simple reference drawing for a few seconds — memorise it.',
+      'When it vanishes, redraw it from memory on a blank canvas and submit.',
+      'The server scores your sketch by overlap with the original — closer shapes score higher.',
+      'The reference and everyone\'s drawing are revealed with a similarity percent.',
+      'Highest cumulative similarity over 3 rounds wins; ties share a placement.',
+    ],
+  },
+  captionClash: {
+    id: 'captionClash', name: 'Caption Clash', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Draw an absurd doodle, caption a rival\'s, then vote the funniest doodle+caption combo.',
+    instructions: [
+      'Everyone doodles the same silly prompt — you only see your own canvas.',
+      'You\'re handed someone else\'s doodle and write a funny caption for it.',
+      'Every doodle+caption pair is shown anonymously; vote the funniest (not your own).',
+      'Each vote scores BOTH the artist and the caption writer.',
+      'Most points wins; ties share a placement.',
+    ],
+  },
+  exquisiteCorpse: {
+    id: 'exquisiteCorpse', name: 'Exquisite Corpse', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Everyone draws one horizontal band of a shared monster, then votes the best band.',
+    instructions: [
+      'The canvas is split into horizontal bands — you draw only in yours.',
+      'You see just a thin sliver of the band above to connect to — never the rest.',
+      'Draw your band and submit; your pen is clamped to your strip.',
+      'The full composite monster is revealed and everyone votes the best band (not their own).',
+      'Most votes for your band wins; ties share a placement.',
+    ],
+  },
+  traceRace: {
+    id: 'traceRace', name: 'Trace Race', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Trace the target path as accurately as you can — scored by coverage vs spillover, no voting.',
+    instructions: [
+      'A faint target path is shown on your canvas.',
+      'Trace over it as accurately as you can before time runs out.',
+      'The server scores your trace by how much of the path you covered minus how far you strayed.',
+      'It\'s pure dexterity — no voting, just accuracy.',
+      'Highest score wins; ties share a placement.',
+    ],
+  },
+  ransomNote: {
+    id: 'ransomNote', name: 'Ransom Note', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Convey a secret word using only emoji from your hand, then vote the cleverest note.',
+    instructions: [
+      'Each round you\'re dealt a hand of random emoji and a secret word.',
+      'Arrange 3–5 emoji into a "ransom note" that conveys the word — without writing it.',
+      'All notes are shown anonymously beside the revealed word.',
+      'Vote the cleverest note (you can\'t vote your own).',
+      'Most votes over the rounds wins; ties share a placement.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {
