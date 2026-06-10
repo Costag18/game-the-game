@@ -1,0 +1,61 @@
+.boardWrap { display: flex; flex-direction: column; align-items: center; gap: 0.55rem; width: 100%; max-width: 460px; }
+
+.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 1rem; font-size: 0.78rem; color: var(--text-secondary, #d8cdb6); }
+.legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+/* The frame holds the parallelogram and the colored edge bars around it. */
+.frame {
+  position: relative;
+  padding: 14px;
+  background: #14181f;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45), inset 0 1px 4px rgba(255,255,255,0.06);
+  width: 100%;
+  overflow: hidden;
+}
+
+.edge { position: absolute; z-index: 0; }
+.edgeTop { top: 0; left: 0; right: 0; height: 7px; transform: skewX(-26deg); }
+.edgeBottom { bottom: 0; left: 0; right: 0; height: 7px; transform: skewX(-26deg); }
+.edgeLeft { top: 0; bottom: 0; left: 0; width: 7px; }
+.edgeRight { top: 0; bottom: 0; right: 0; width: 7px; }
+
+/* The rhombus: each row is shifted right by an inline margin-left to make a parallelogram. */
+.rhombus { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 2px; }
+.row { display: flex; gap: 2px; }
+
+.cell {
+  flex: 0 0 auto;
+  width: 1.55rem; height: 1.55rem;
+  padding: 0; border: 1px solid rgba(255,255,255,0.14);
+  background: #2a313d;
+  /* hexagon-ish: pointy diamond cut */
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  cursor: pointer;
+  transition: transform 90ms ease, filter 90ms ease;
+}
+.cell:disabled { cursor: default; }
+.cell:not(:disabled):hover { filter: brightness(1.25); }
+
+.violet { background: radial-gradient(circle at 35% 30%, #c08bff, #6a2fb8); }
+.orange { background: radial-gradient(circle at 35% 30%, #ffc46b, #e07b1a); }
+
+/* preview ghosts use the player's own colour at low opacity + pulse */
+.ghostViolet { background: radial-gradient(circle at 35% 30%, #c08bff, #6a2fb8); opacity: 0.5; animation: hexPulse 1s ease-in-out infinite; }
+.ghostOrange { background: radial-gradient(circle at 35% 30%, #ffc46b, #e07b1a); opacity: 0.5; animation: hexPulse 1s ease-in-out infinite; }
+@keyframes hexPulse { 0%,100% { opacity: 0.35; } 50% { opacity: 0.7; } }
+
+.last { box-shadow: 0 0 0 2px #fff inset; }
+.win { box-shadow: 0 0 0 2px #fff, 0 0 12px 2px #fff; filter: brightness(1.2); }
+
+.placeBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 8px;
+  padding: 0.55rem 1.6rem; font-weight: 800; cursor: pointer; min-height: 44px; min-width: 44px;
+}
+.placeBtn:disabled { opacity: 0.4; cursor: default; }
+
+@media (max-width: 560px) {
+  .cell { width: 1.2rem; height: 1.2rem; }
+  .frame { padding: 10px; }
+}

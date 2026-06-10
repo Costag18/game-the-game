@@ -47,6 +47,12 @@ import Connect4Game from './games/Connect4.jsx';
 import UltimateTicTacToeGame from './games/UltimateTicTacToe.jsx';
 import SkribblGame from './games/Skribbl.jsx';
 import TelephonePictionaryGame from './games/TelephonePictionary.jsx';
+import OthelloGame from './games/Othello.jsx';
+import DotsAndBoxesGame from './games/DotsAndBoxes.jsx';
+import GomokuGame from './games/Gomoku.jsx';
+import HexGame from './games/Hex.jsx';
+import OrderAndChaosGame from './games/OrderAndChaos.jsx';
+import NimHeistGame from './games/NimHeist.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -78,6 +84,12 @@ const GAME_COMPONENTS = {
   ultimateTTT: UltimateTicTacToeGame,
   skribbl: SkribblGame,
   telephonePictionary: TelephonePictionaryGame,
+  othello: OthelloGame,
+  dotsAndBoxes: DotsAndBoxesGame,
+  gomoku: GomokuGame,
+  hex: HexGame,
+  orderChaos: OrderAndChaosGame,
+  nim: NimHeistGame,
 };
 
 function GameRouter() {

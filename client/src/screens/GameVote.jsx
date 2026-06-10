@@ -36,6 +36,12 @@ import previewConnect4 from '../assets/gamepreviews/connect4.png';
 import previewUltimateTTT from '../assets/gamepreviews/ultimateTTT.png';
 import previewSkribbl from '../assets/gamepreviews/skribbl.png';
 import previewTelephone from '../assets/gamepreviews/telephonePictionary.png';
+import previewOthello from '../assets/gamepreviews/othello.png';
+import previewDotsAndBoxes from '../assets/gamepreviews/dotsAndBoxes.png';
+import previewGomoku from '../assets/gamepreviews/gomoku.png';
+import previewHex from '../assets/gamepreviews/hex.png';
+import previewOrderChaos from '../assets/gamepreviews/orderChaos.png';
+import previewNim from '../assets/gamepreviews/nim.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -64,6 +70,12 @@ const GAME_PREVIEWS = {
   ultimateTTT: previewUltimateTTT,
   skribbl: previewSkribbl,
   telephonePictionary: previewTelephone,
+  othello: previewOthello,
+  dotsAndBoxes: previewDotsAndBoxes,
+  gomoku: previewGomoku,
+  hex: previewHex,
+  orderChaos: previewOrderChaos,
+  nim: previewNim,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

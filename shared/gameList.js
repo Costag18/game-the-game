@@ -247,6 +247,78 @@ export const GAMES = {
       'Vote for the funniest chain. Most votes + taking part scores you the round.',
     ],
   },
+  othello: {
+    id: 'othello', name: 'Othello', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Bracket and flip your rival\'s discs to own the most of the board. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'Black moves first. Place a disc so it sandwiches a straight line of your opponent\'s discs between it and one of yours.',
+      'Every opponent disc you bracket (in any of 8 directions) flips to your colour.',
+      'You can only play moves that flip at least one disc; with no legal move your turn is auto-passed.',
+      'When neither player can move, the most discs wins. Win matches across 3 mini-rounds to rank first.',
+    ],
+  },
+  dotsAndBoxes: {
+    id: 'dotsAndBoxes', name: 'Dots & Boxes', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Draw the fourth side to claim a box and go again. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'Take turns drawing one line between two adjacent dots on the 5x5 grid.',
+      'Complete the 4th side of a box to claim it — and immediately take another turn.',
+      'Chain your captures, but beware handing your rival a long chain at the end.',
+      'When all 25 boxes are filled, the most boxes wins. Win matches across 3 mini-rounds to rank first.',
+    ],
+  },
+  gomoku: {
+    id: 'gomoku', name: 'Gomoku', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Five stones in a row on a 15x15 board. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'Black moves first; players alternate placing one stone on an empty intersection.',
+      'Get five or more of your stones in an unbroken line — across, down, or diagonally — to win the board.',
+      'Block your rival\'s lines while building your own.',
+      'Win matches across 3 mini-rounds; the most wins ranks first.',
+    ],
+  },
+  hex: {
+    id: 'hex', name: 'Hex', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Connect your two edges with an unbroken chain. 1v1 best-of-3 ladder — never a draw.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'Take turns placing one stone on any empty cell of the 11x11 rhombus.',
+      'If you own the top & bottom edges, win by linking them with a connected chain; otherwise link left & right.',
+      'Stones connect through 6 hex neighbours (both diagonals count) — plan winding paths and block your foe.',
+      'Hex can never tie. Win matches across 3 mini-rounds to rank first.',
+    ],
+  },
+  orderChaos: {
+    id: 'orderChaos', name: 'Order & Chaos', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'One player wants five in a row, the other wants to stop it. 1v1 best-of-3 ladder.',
+    instructions: [
+      'Each match pits Order against Chaos on a 6x6 board (roles shown to you).',
+      'On your turn place EITHER an X or an O on any empty cell — both players use both symbols.',
+      'Order wins instantly if any line of five identical symbols appears (row, column, or diagonal).',
+      'Chaos wins if the board fills up with no five-in-a-row anywhere.',
+      'Win matches across 3 mini-rounds to climb the standings.',
+    ],
+  },
+  nim: {
+    id: 'nim', name: 'Nim Heist', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Raid the gem stacks — but grab the last gem and you lose. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'Three stacks of gems sit on the table; on your turn take any number of gems from ONE stack.',
+      'Players alternate, each removing at least one gem from a single stack.',
+      'Misère twist: whoever is forced to take the very last gem LOSES.',
+      'Win your 1v1 matches across the mini-rounds to climb the Swiss standings.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

@@ -1,0 +1,87 @@
+.boardWrap { display: flex; flex-direction: column; align-items: center; gap: 0.55rem; width: 100%; max-width: 420px; }
+
+.scoreBar { display: flex; gap: 0.6rem; }
+.scoreChip {
+  padding: 0.25rem 0.8rem; border-radius: 999px; font-weight: 800; font-size: 0.95rem;
+  border: 2px solid rgba(0,0,0,0.25);
+}
+
+.grid {
+  display: flex; flex-direction: column; align-items: center;
+  background: #fdf6e3; padding: 10px; border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4), inset 0 2px 6px rgba(255,255,255,0.6);
+}
+
+/* Lattice rows. Cell sizing: dot = 14px, h-edge = 34px long, v-edge = 14px wide,
+   box / edge thickness lanes = 34px. Tap targets get padding via min sizes. */
+.dotRow, .gapRow { display: flex; align-items: center; }
+
+.dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #3a2c1a; flex: 0 0 auto;
+}
+
+/* horizontal edge sits between two dots in a dot row */
+.hEdge {
+  width: 34px; height: 14px; flex: 0 0 auto;
+  border: none; padding: 0; margin: 0; background: transparent; cursor: pointer;
+  position: relative; border-radius: 6px;
+}
+.hEdge::after {
+  content: ''; position: absolute; left: 2px; right: 2px; top: 50%; height: 6px;
+  transform: translateY(-50%); border-radius: 4px; background: rgba(58,44,26,0.14);
+}
+.hEdge:disabled { cursor: default; }
+
+/* vertical edge sits between dots vertically, occupying a gap row */
+.vEdge {
+  width: 14px; height: 34px; flex: 0 0 auto;
+  border: none; padding: 0; margin: 0; background: transparent; cursor: pointer;
+  position: relative; border-radius: 6px;
+}
+.vEdge::after {
+  content: ''; position: absolute; top: 2px; bottom: 2px; left: 50%; width: 6px;
+  transform: translateX(-50%); border-radius: 4px; background: rgba(58,44,26,0.14);
+}
+.vEdge:disabled { cursor: default; }
+
+/* enlarge the actual hit area for touch without growing the visual lane */
+.hEdge:not(:disabled)::before, .vEdge:not(:disabled)::before {
+  content: ''; position: absolute; inset: -8px; border-radius: 8px;
+}
+
+/* a drawn edge */
+.filled.hEdge::after, .filled.vEdge::after { background: #6d4c1b; }
+.filled.mine.hEdge::after, .filled.mine.vEdge::after { background: #d4351c; }
+.filled.theirs.hEdge::after, .filled.theirs.vEdge::after { background: #1565c0; }
+
+/* preview (first tap) — pulsing highlight */
+.preview.hEdge::after, .preview.vEdge::after {
+  background: var(--gold, #d4a843); animation: dabPulse 0.9s ease-in-out infinite;
+}
+@keyframes dabPulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+/* most-recent move ring */
+.last.hEdge::after, .last.vEdge::after { box-shadow: 0 0 0 2px rgba(255,255,255,0.85); }
+
+/* a claimed box */
+.box {
+  width: 34px; height: 34px; flex: 0 0 auto;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.9);
+  border-radius: 4px; user-select: none;
+}
+.boxClaimed.mine { background: rgba(212,53,28,0.85); }
+.boxClaimed.theirs { background: rgba(21,101,192,0.85); }
+
+/* shared owner colors for score chips */
+.mine { background: rgba(212,53,28,0.18); color: #d4351c; border-color: #d4351c; }
+.theirs { background: rgba(21,101,192,0.18); color: #1565c0; border-color: #1565c0; }
+.scoreChip.mine { background: #d4351c; color: #fff; }
+.scoreChip.theirs { background: #1565c0; color: #fff; }
+
+.confirmBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.55rem 1.4rem; font-weight: 800; cursor: pointer; min-height: 44px; min-width: 200px;
+}
+.confirmBtn:disabled { opacity: 0.5; cursor: default; }

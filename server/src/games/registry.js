@@ -25,6 +25,12 @@ import { Connect4 } from './Connect4.js';
 import { UltimateTicTacToe } from './UltimateTicTacToe.js';
 import { Skribbl } from './Skribbl.js';
 import { TelephonePictionary } from './TelephonePictionary.js';
+import { Othello } from './Othello.js';
+import { DotsAndBoxes } from './DotsAndBoxes.js';
+import { Gomoku } from './Gomoku.js';
+import { Hex } from './Hex.js';
+import { OrderAndChaos } from './OrderAndChaos.js';
+import { NimHeist } from './NimHeist.js';
 
 const gameEngines = {};
 
@@ -73,3 +79,9 @@ registerGame('connect4', Connect4);
 registerGame('ultimateTTT', UltimateTicTacToe);
 registerGame('skribbl', Skribbl);
 registerGame('telephonePictionary', TelephonePictionary);
+registerGame('othello', Othello);
+registerGame('dotsAndBoxes', DotsAndBoxes);
+registerGame('gomoku', Gomoku);
+registerGame('hex', Hex);
+registerGame('orderChaos', OrderAndChaos);
+registerGame('nim', NimHeist);

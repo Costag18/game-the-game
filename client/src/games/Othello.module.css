@@ -1,0 +1,46 @@
+.boardWrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%; max-width: 420px; }
+
+.scoreBar { display: flex; gap: 0.6rem; width: 100%; justify-content: center; }
+.scorePill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.8rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem;
+  border: 1px solid var(--gold-dim, #8a6d2f); color: var(--text-primary, #f3e9d2);
+}
+.pillBlack { background: rgba(0,0,0,0.45); }
+.pillWhite { background: rgba(255,255,255,0.12); }
+.dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.dot.black { background: radial-gradient(circle at 35% 30%, #555, #050505); }
+.dot.white { background: radial-gradient(circle at 35% 30%, #fff, #cfcfcf); }
+
+.grid {
+  display: grid; gap: 3px; width: 100%;
+  background: #1b7a3e; padding: 8px; border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45), inset 0 2px 8px rgba(255,255,255,0.12);
+}
+.cell {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  background: #1f8f49; border-radius: 4px; cursor: default;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
+}
+.cellLegal { cursor: pointer; background: #25a455; }
+
+.disc {
+  width: 84%; height: 84%; border-radius: 50%;
+  animation: drop 160ms ease;
+}
+.black { background: radial-gradient(circle at 35% 28%, #4a4a4a, #060606); box-shadow: inset 0 2px 4px rgba(255,255,255,0.25), 0 1px 3px rgba(0,0,0,0.5); }
+.white { background: radial-gradient(circle at 35% 28%, #ffffff, #c4c4c4); box-shadow: inset 0 2px 4px rgba(255,255,255,0.7), 0 1px 3px rgba(0,0,0,0.45); }
+.lastDisc { box-shadow: 0 0 0 2px var(--gold, #d4a843), inset 0 2px 4px rgba(255,255,255,0.3); }
+@keyframes drop { from { transform: scale(0.4); opacity: 0.3; } to { transform: scale(1); opacity: 1; } }
+
+.ghost { width: 60%; height: 60%; border-radius: 50%; opacity: 0.4; animation: pulse 1.1s ease-in-out infinite; }
+.ghostBlack { background: #0a0a0a; }
+.ghostWhite { background: #f2f2f2; }
+.ghostSel { opacity: 0.85; width: 84%; height: 84%; box-shadow: 0 0 0 3px var(--gold, #d4a843); }
+@keyframes pulse { 0%,100% { opacity: 0.3; } 50% { opacity: 0.6; } }
+
+.placeBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 8px;
+  padding: 0.55rem 1.4rem; font-weight: 800; cursor: pointer; min-height: 44px; font-size: 0.95rem;
+}
+.placeBtn:disabled { opacity: 0.4; cursor: default; }

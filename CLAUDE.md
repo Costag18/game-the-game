@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (26)
+## Mini-Games (32)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -111,6 +111,12 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Ultimate Tic-Tac-Toe | 2-8 | 1v1 board (Pairing Engine), 9 sub-boards, forced-board rule, win 3-in-a-row of boards |
 | Skribbl | 2-8 | Draw-and-guess, real-time shared canvas, masked word, server-side guess matching |
 | Telephone Pictionary | 3-8 | Lockstep write→draw→guess chains, private per-chain canvases, reveal + vote |
+| Othello | 2-8 | 1v1 board (Pairing Engine), 8×8 disc-flip/bracket, most discs wins |
+| Dots & Boxes | 2-8 | 1v1 board (Pairing Engine), claim 4th edge → extra turn, most boxes (5×5) |
+| Gomoku | 2-8 | 1v1 board (Pairing Engine), 15×15 five-in-a-row |
+| Hex | 2-8 | 1v1 board (Pairing Engine), 11×11 connect-your-edges, never draws |
+| Order & Chaos | 2-8 | 1v1 board (Pairing Engine), 6×6, Order wants 5-in-a-row, Chaos blocks |
+| Nim Heist | 2-8 | 1v1 (Pairing Engine), misère take-away — take the last gem and you lose |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -495,6 +501,12 @@ The owner cares about:
 | Ultimate Tic-Tac-Toe | Russo One |
 | Skribbl | Lilita One |
 | Telephone Pictionary | Gochi Hand |
+| Othello | Cinzel |
+| Dots & Boxes | Fredoka |
+| Gomoku | Russo One |
+| Hex | Orbitron |
+| Order & Chaos | Audiowide |
+| Nim Heist | Wallpoet |
 
 ## Versioning & Commits
 
