@@ -142,7 +142,29 @@ export const GROUP_CATEGORIES = [
   'Name a school subject',
 ];
 
+// ---- Caption This: vivid scene prompts. The CLIENT builds a Pollinations image URL
+// from the scene text (https://image.pollinations.ai/prompt/<encoded>) — no server fetch. ----
+export const CAPTION_SCENES = [
+  'a cat wearing a tiny business suit sitting at a desk',
+  'a dog driving a small convertible car with sunglasses',
+  'a penguin riding a skateboard down a city street',
+  'a giraffe stuck in a doorway looking embarrassed',
+  'a goldfish wearing a crown ruling a tiny kingdom',
+  'a llama at a fancy dinner party holding a wine glass',
+  'a raccoon DJing at a nightclub with headphones',
+  'a sloth competing in a fast-paced video game tournament',
+  'a flamingo doing yoga on a beach at sunrise',
+  'a hamster bodybuilder lifting tiny weights at the gym',
+  'a pug dressed as a wizard casting a spell',
+  'a duck wearing a detective hat investigating a crime scene',
+  'a cow astronaut floating in space eating cereal',
+  'a frog in a business meeting pointing at a chart',
+  'a chicken riding a motorcycle through the desert',
+  'a hedgehog painting a self-portrait in an art studio',
+];
+
 function pick(list, n) { return shuffle(list).slice(0, n); }
+export function pickCaptions(n = 1) { return pick(CAPTION_SCENES, n); }
 export function pickQuips(n = 1) { return pick(QUIP_PROMPTS, n); }
 export function pickDefinitionWords(n = 1) { return pick(DEFINITION_WORDS, n); }
 export function pickMostLikely(n = 1) { return pick(MOST_LIKELY, n); }

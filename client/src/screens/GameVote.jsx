@@ -50,6 +50,16 @@ import previewGuesstimate from '../assets/gamepreviews/guesstimate.png';
 import previewOddOneOut from '../assets/gamepreviews/oddOneOut.png';
 import previewRankIt from '../assets/gamepreviews/rankIt.png';
 import previewThisOrThat from '../assets/gamepreviews/thisOrThat.png';
+import previewDefinitionDuel from '../assets/gamepreviews/definitionDuel.png';
+import previewQuiplashClash from '../assets/gamepreviews/quiplashClash.png';
+import previewCaptionThis from '../assets/gamepreviews/captionThis.png';
+import previewAwkwardAward from '../assets/gamepreviews/awkwardAward.png';
+import previewMostLikelyTo from '../assets/gamepreviews/mostLikelyTo.png';
+import previewVoteProphet from '../assets/gamepreviews/voteProphet.png';
+import previewGroupMind from '../assets/gamepreviews/groupMind.png';
+import previewMobRule from '../assets/gamepreviews/mobRule.png';
+import previewTwoTruths from '../assets/gamepreviews/twoTruths.png';
+import previewSuperlativeShowdown from '../assets/gamepreviews/superlativeShowdown.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -92,6 +102,16 @@ const GAME_PREVIEWS = {
   oddOneOut: previewOddOneOut,
   rankIt: previewRankIt,
   thisOrThat: previewThisOrThat,
+  definitionDuel: previewDefinitionDuel,
+  quiplashClash: previewQuiplashClash,
+  captionThis: previewCaptionThis,
+  awkwardAward: previewAwkwardAward,
+  mostLikelyTo: previewMostLikelyTo,
+  voteProphet: previewVoteProphet,
+  groupMind: previewGroupMind,
+  mobRule: previewMobRule,
+  twoTruths: previewTwoTruths,
+  superlativeShowdown: previewSuperlativeShowdown,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

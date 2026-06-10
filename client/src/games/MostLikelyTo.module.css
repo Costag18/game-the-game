@@ -1,0 +1,113 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Audiowide', 'Cinzel', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2.4rem);
+  color: #ff6fd8; margin: 0; letter-spacing: 1px;
+  text-shadow: 0 0 12px rgba(255,111,216,0.5), 3px 3px 0 rgba(0,0,0,0.45);
+}
+.meta { color: var(--text-secondary, #b8a88a); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.statusBar { display: flex; gap: 1rem; align-items: center; width: 100%; justify-content: center; }
+.clock {
+  font-variant-numeric: tabular-nums; font-weight: 800; color: #ff6fd8;
+  background: rgba(0,0,0,0.3); border-radius: 999px; padding: 0.15rem 0.7rem; min-width: 48px; text-align: center;
+}
+
+.qArea { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; width: 100%; }
+.prompt {
+  display: flex; flex-direction: column; gap: 0.3rem; align-items: center;
+  text-align: center; width: 100%; margin: 0;
+  background: linear-gradient(135deg, #3a1a52, #1a0c2e);
+  border: 2px solid #7d3fb5; border-radius: 16px; padding: 1rem 1.2rem;
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.45);
+}
+.promptLead {
+  font-family: 'Audiowide', sans-serif; font-size: clamp(0.85rem, 2.4vw, 1.05rem);
+  color: #c79fe6; letter-spacing: 0.5px; text-transform: uppercase;
+}
+.promptBody {
+  font-size: clamp(1.3rem, 4vw, 1.9rem); font-weight: 800; line-height: 1.25;
+  color: var(--text-primary, #f3e9d2);
+}
+.hint { color: var(--text-secondary, #b8a88a); text-align: center; margin: 0; font-size: 0.9rem; }
+
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.6rem; width: 100%;
+}
+.voteBtn {
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+  min-height: 56px; padding: 0.7rem 0.8rem; border-radius: 14px; cursor: pointer;
+  border: 3px solid #5a2b85; color: var(--text-primary, #f3e9d2); font-weight: 700;
+  background: linear-gradient(160deg, #2c1640, #1a0c2e);
+  transition: transform 0.08s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.voteBtn:disabled { cursor: default; opacity: 0.6; }
+.voteBtn:active:not(:disabled) { transform: scale(0.97); }
+.voteBtn:hover:not(:disabled) { border-color: #b06fe0; }
+.voteSel { box-shadow: 0 0 0 4px #ff6fd8, 0 6px 18px rgba(0,0,0,0.4); border-color: #ff6fd8; }
+.voteMe { border-style: dashed; }
+.youTag {
+  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;
+  background: rgba(255,111,216,0.2); color: #ff9fe6; border-radius: 999px; padding: 0.05rem 0.4rem;
+}
+
+.waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; width: 100%; }
+.waitMsg { font-size: 1.2rem; color: #ff6fd8; font-weight: 800; margin: 0; text-align: center; display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; justify-content: center; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; text-align: center; }
+
+.reveal { display: flex; flex-direction: column; gap: 0.7rem; width: 100%; align-items: center; }
+.revPrompt {
+  font-size: clamp(1.05rem, 3vw, 1.4rem); font-weight: 800; text-align: center;
+  color: var(--text-primary, #f3e9d2); margin: 0;
+}
+.winnerBox {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;
+  background: rgba(255,111,216,0.14); border: 2px solid #ff6fd8; border-radius: 14px;
+  padding: 0.6rem 1.2rem; width: 100%;
+}
+.crown { font-size: 1.6rem; }
+.winnerNames { font-size: 1.2rem; font-weight: 800; color: #ff9fe6; display: flex; flex-wrap: wrap; gap: 0.2rem; align-items: center; }
+.noVotes { color: var(--text-secondary, #b8a88a); font-weight: 700; text-align: center; }
+
+.tally { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; }
+.tallyRow {
+  display: grid; grid-template-columns: minmax(90px, 0.9fr) 2fr auto; gap: 0.6rem; align-items: center;
+  background: rgba(0,0,0,0.22); border-radius: 10px; padding: 0.35rem 0.6rem;
+}
+.tallyWin { background: rgba(255,111,216,0.12); box-shadow: inset 0 0 0 1px rgba(255,111,216,0.4); }
+.tallyName { overflow: hidden; }
+.barTrack { background: rgba(255,255,255,0.08); border-radius: 999px; height: 16px; overflow: hidden; }
+.barFill {
+  height: 100%; border-radius: 999px; min-width: 2px;
+  background: linear-gradient(90deg, #7d3fb5, #ff6fd8);
+  transition: width 0.5s ease;
+}
+.tallyCount { color: #ff9fe6; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 1.2rem; text-align: right; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; margin-top: 0.4rem; }
+.boardTitle { color: var(--text-secondary, #b8a88a); font-weight: 700; margin: 0 0 0.2rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.scoreRow { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.3rem 0.6rem; }
+.scoreVal { color: #ff6fd8; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.contBtn {
+  background: #ff6fd8; color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px; margin-top: 0.3rem;
+}
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+
+@media (max-width: 420px) {
+  .grid { grid-template-columns: 1fr 1fr; }
+  .tallyRow { grid-template-columns: minmax(70px, 0.9fr) 1.6fr auto; }
+}

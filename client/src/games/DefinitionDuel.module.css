@@ -1,0 +1,81 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Shrikhand', 'Fredoka', cursive;
+  font-size: clamp(1.7rem, 5vw, 2.6rem);
+  color: #f2c14e;
+  margin: 0;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+}
+.round { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+
+.wordCard {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  width: 100%; padding: 1rem 1.2rem; position: relative;
+  background: linear-gradient(135deg, #3a2456, #1d1230);
+  border: 2px solid #7c5cc4; border-radius: 14px;
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.4);
+}
+.wordLabel { color: var(--text-secondary, #c9b6e8); font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.word {
+  font-family: 'Shrikhand', 'Fredoka', cursive;
+  font-size: clamp(1.6rem, 5.5vw, 2.4rem); color: #f3e9d2;
+  text-align: center; word-break: break-word;
+}
+.timer {
+  position: absolute; top: 0.6rem; right: 0.8rem;
+  color: #f2c14e; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 1.1rem;
+}
+
+.writeBox, .waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; }
+.hint { color: var(--text-secondary, #b8a88a); margin: 0; text-align: center; font-size: 0.95rem; }
+.input {
+  width: 100%; max-width: 480px; padding: 0.7rem 1rem; font-size: 1.05rem; line-height: 1.4;
+  border-radius: 10px; border: 2px solid var(--gold-dim, #8a6d2f);
+  background: #fdfaf3; color: #1a1a1a; resize: vertical; font-family: inherit;
+}
+.input:focus { outline: none; border-color: var(--gold, #d4a843); }
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+.reject { color: #ff8a8a; font-size: 0.9rem; text-align: center; }
+.waitMsg { font-size: 1.3rem; color: var(--gold, #d4a843); font-weight: 700; margin: 0; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; }
+
+.ballot { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+.option {
+  text-align: left; padding: 0.8rem 1rem; font-size: 1.02rem; line-height: 1.35;
+  background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2);
+  border: 2px solid var(--gold-dim, #8a6d2f); border-radius: 10px; cursor: pointer; min-height: 48px;
+}
+.option:hover:not(:disabled) { border-color: var(--gold, #d4a843); }
+.optionSel { border-color: var(--gold, #d4a843); box-shadow: 0 0 0 2px var(--gold, #d4a843); }
+.optionMine { opacity: 0.5; cursor: default; }
+.mineTag { font-style: italic; color: var(--text-secondary, #b8a88a); font-size: 0.85rem; }
+
+.reveal { display: flex; flex-direction: column; gap: 0.5rem; width: 100%; }
+.revealWord { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; margin-bottom: 0.3rem; }
+.revOption { background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 10px; padding: 0.6rem 0.8rem; }
+.revTruth { border-color: var(--gold, #d4a843); background: rgba(212, 168, 67, 0.12); }
+.revTop { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.revText { font-weight: 700; color: var(--text-primary, #f3e9d2); }
+.truthTag { color: var(--gold, #d4a843); font-weight: 800; white-space: nowrap; }
+.byTag { color: var(--text-secondary, #b8a88a); font-size: 0.85rem; white-space: nowrap; }
+.voters { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.voterChip { font-size: 0.75rem; background: rgba(255, 255, 255, 0.08); border-radius: 999px; padding: 0.1rem 0.5rem; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; margin-top: 0.4rem; }
+.scoreRow { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.2); border-radius: 8px; padding: 0.3rem 0.6rem; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

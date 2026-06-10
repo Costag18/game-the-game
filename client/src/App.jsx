@@ -61,6 +61,16 @@ import GuesstimateGame from './games/Guesstimate.jsx';
 import OddOneOutGame from './games/OddOneOut.jsx';
 import RankItGame from './games/RankIt.jsx';
 import ThisOrThatGame from './games/ThisOrThat.jsx';
+import DefinitionDuelGame from './games/DefinitionDuel.jsx';
+import QuiplashClashGame from './games/QuiplashClash.jsx';
+import CaptionThisGame from './games/CaptionThis.jsx';
+import AwkwardAwardGame from './games/AwkwardAward.jsx';
+import MostLikelyToGame from './games/MostLikelyTo.jsx';
+import VoteProphetGame from './games/VoteProphet.jsx';
+import GroupMindGame from './games/GroupMind.jsx';
+import MobRuleGame from './games/MobRule.jsx';
+import TwoTruthsGame from './games/TwoTruths.jsx';
+import SuperlativeShowdownGame from './games/SuperlativeShowdown.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -106,6 +116,16 @@ const GAME_COMPONENTS = {
   oddOneOut: OddOneOutGame,
   rankIt: RankItGame,
   thisOrThat: ThisOrThatGame,
+  definitionDuel: DefinitionDuelGame,
+  quiplashClash: QuiplashClashGame,
+  captionThis: CaptionThisGame,
+  awkwardAward: AwkwardAwardGame,
+  mostLikelyTo: MostLikelyToGame,
+  voteProphet: VoteProphetGame,
+  groupMind: GroupMindGame,
+  mobRule: MobRuleGame,
+  twoTruths: TwoTruthsGame,
+  superlativeShowdown: SuperlativeShowdownGame,
 };
 
 function GameRouter() {

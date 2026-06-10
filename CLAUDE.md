@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (40)
+## Mini-Games (50)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -125,6 +125,16 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Odd One Out | 2-8 | Tap the rule-breaker, arrival-order speed scoring, rule hidden pre-reveal |
 | Rank It | 2-8 | Reorder shuffled items, adjacent-pair accuracy scoring |
 | This or That | 2-8 | Binary trivia survival, wrong = eliminated, reverse-elimination ranking |
+| Definition Duel | 3-8 | Balderdash — fake definitions for a real word, vote the truth (Fibbage-shaped) |
+| Quiplash Clash | 3-8 | Head-to-head prompt duels, room votes funnier, points by vote share |
+| Caption This | 3-8 | Caption AI-generated scenes (client Pollinations URL), vote funniest |
+| Awkward Award | 3-8 | Write an acceptance reason for a silly trophy pinned to a random nominee, vote |
+| Most Likely To | 3-8 | Secret-vote a player per prompt, votes received scored (vote-only) |
+| Vote Prophet | 3-8 | Vote your opinion + predict the group plurality, score the prediction |
+| Group Mind | 3-8 | Type to MATCH others (server normalize+bucket), score per match |
+| Mob Rule | 3-8 | Pick a side for the majority, twist rounds reward the minority |
+| Two Truths and a Lie | 3-8 | Rotating storyteller, guess the lie; catcher + fooler scoring |
+| Superlative Showdown | 3-8 | Privately rank the lobby, Borda consensus IS the placement |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -523,6 +533,16 @@ The owner cares about:
 | Odd One Out | Luckiest Guy |
 | Rank It | Audiowide |
 | This or That | Black Ops One |
+| Definition Duel | Shrikhand |
+| Quiplash Clash | Bungee |
+| Caption This | Lilita One |
+| Awkward Award | Fredoka |
+| Most Likely To | Audiowide |
+| Vote Prophet | Black Ops One |
+| Group Mind | Quicksand |
+| Mob Rule | Permanent Marker |
+| Two Truths and a Lie | Special Elite |
+| Superlative Showdown | Bungee |
 
 ## Versioning & Commits
 

@@ -1,0 +1,105 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Fredoka', 'Trebuchet MS', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 5vw, 2.7rem);
+  margin: 0;
+  color: #ffd34e;
+  text-shadow: 2px 2px 0 rgba(120, 50, 10, 0.55);
+  letter-spacing: 1px;
+}
+.round { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+
+.trophy {
+  display: flex; align-items: center; gap: 0.7rem; width: 100%;
+  text-align: center; justify-content: center;
+  background: linear-gradient(135deg, #5a2d82, #2c1448);
+  border: 2px solid #c79bff; border-radius: 16px;
+  padding: 0.9rem 1.2rem;
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.45), 0 0 16px rgba(199,155,255,0.2);
+}
+.trophyIcon { font-size: 2rem; line-height: 1; flex-shrink: 0; }
+.trophyName {
+  font-family: 'Fredoka', sans-serif; font-weight: 600;
+  font-size: clamp(1.1rem, 3.2vw, 1.5rem); line-height: 1.25;
+  color: #fff3d6;
+}
+
+.cue {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;
+  font-size: clamp(0.95rem, 2.6vw, 1.15rem); text-align: center;
+  color: var(--text-primary, #f3e9d2); margin: 0.2rem 0;
+}
+.cue em { color: #ffd34e; font-style: italic; }
+.timer {
+  background: rgba(0,0,0,0.35); border: 1px solid #ffd34e; color: #ffd34e;
+  border-radius: 999px; padding: 0.05rem 0.55rem; font-weight: 800;
+  font-variant-numeric: tabular-nums; font-size: 0.9rem;
+}
+
+.writeBox, .waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; }
+.input {
+  width: 100%; max-width: 460px; padding: 0.7rem 1rem; font-size: 1.05rem;
+  border-radius: 12px; border: 2px solid var(--gold-dim, #8a6d2f);
+  background: #fdfaf3; color: #1a1a1a; resize: vertical; font-family: inherit; line-height: 1.4;
+}
+.input:focus { outline: none; border-color: #ffd34e; }
+
+.primaryBtn {
+  background: #ffd34e; color: #2a1448; border: none; border-radius: 12px;
+  padding: 0.65rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer;
+  min-height: 44px; font-family: 'Fredoka', sans-serif;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+
+.waitMsg { font-size: 1.3rem; color: #ffd34e; font-weight: 700; margin: 0; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; }
+
+.ballot { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
+.card {
+  display: flex; flex-direction: column; gap: 0.35rem; text-align: left;
+  padding: 0.8rem 1rem;
+  background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2);
+  border: 2px solid var(--gold-dim, #8a6d2f); border-radius: 12px; cursor: pointer; min-height: 56px;
+}
+.card:not(:disabled):active { transform: scale(0.99); }
+.cardSel { border-color: #ffd34e; box-shadow: 0 0 0 2px #ffd34e; }
+.cardMine { opacity: 0.5; cursor: default; }
+.cardNominee { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; }
+.cardText { font-style: italic; color: var(--text-primary, #f3e9d2); line-height: 1.35; }
+.mineTag {
+  font-style: italic; color: #ffd34e; font-size: 0.78rem;
+  border: 1px solid #ffd34e; border-radius: 999px; padding: 0 0.5rem;
+}
+
+.reveal { display: flex; flex-direction: column; gap: 0.55rem; width: 100%; }
+.revCard {
+  background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 12px; padding: 0.65rem 0.85rem;
+}
+.revWinner { border-color: #ffd34e; background: rgba(255,211,78,0.12); box-shadow: 0 0 14px rgba(255,211,78,0.25); }
+.revTop { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.revNominee { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; }
+.winTag { color: #ffd34e; font-weight: 800; font-size: 0.8rem; }
+.revVotes { color: #ffd34e; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.revText { font-style: italic; color: var(--text-primary, #f3e9d2); margin: 0.3rem 0; line-height: 1.35; }
+.byLine { font-size: 0.82rem; color: var(--text-secondary, #b8a88a); display: flex; align-items: center; gap: 0.35rem; }
+.voters { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.voterChip { font-size: 0.72rem; background: rgba(255,255,255,0.08); border-radius: 999px; padding: 0.1rem 0.5rem; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; margin-top: 0.4rem; }
+.scoreRow { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.3rem 0.6rem; }
+.scoreVal { color: #ffd34e; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
