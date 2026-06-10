@@ -1,0 +1,146 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
+  letter-spacing: 0.04em;
+  color: #e8c876;
+  margin: 0;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.6), 0 0 18px rgba(232,200,118,0.25);
+}
+.meta { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+
+/* ---- progress / crack meter ---- */
+.progress { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.pips { display: flex; gap: 0.5rem; }
+.pip {
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem;
+  border: 2px solid #4a4a52; background: #1c1c22; color: #8a8a92;
+}
+.pip_pass { border-color: #4caf6e; background: rgba(76,175,110,0.18); color: #7ee0a0; }
+.pip_fail { border-color: #d8504a; background: rgba(216,80,74,0.18); color: #ff938e; }
+.pip_live { border-color: #e8c876; background: rgba(232,200,118,0.15); color: #f3e2b0; animation: livePulse 1.1s ease-in-out infinite; }
+.pip_pending { opacity: 0.7; }
+@keyframes livePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(232,200,118,0.5); } 50% { box-shadow: 0 0 0 5px rgba(232,200,118,0); } }
+.crackLine { margin: 0; color: var(--text-secondary, #b8a88a); font-size: 0.95rem; }
+.crackLine strong { color: #e8c876; }
+
+.clockBar { width: 100%; display: flex; justify-content: center; }
+.clock {
+  font-variant-numeric: tabular-nums; font-weight: 800; font-size: 1.2rem;
+  color: #f3e2b0; background: rgba(0,0,0,0.35); border: 1px solid #4a4a52;
+  border-radius: 999px; padding: 0.15rem 0.9rem;
+}
+
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; }
+.hint { color: var(--text-secondary, #b8a88a); font-size: 0.9rem; text-align: center; margin: 0.2rem 0 0; }
+.waitMsg { font-size: 1.2rem; color: #e8c876; font-weight: 700; margin: 0; text-align: center; }
+.waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+
+.primaryBtn {
+  background: #e8c876; color: #1a140a; border: none; border-radius: 10px;
+  padding: 0.7rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+.primaryBtn:hover:not(:disabled) { background: #f3da95; }
+
+/* ---- reveal: role card ---- */
+.revealWrap { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.roleCard {
+  width: 100%; max-width: 460px; border-radius: 16px; padding: 1.4rem 1.2rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem; text-align: center;
+  border: 2px solid; box-shadow: 0 8px 26px rgba(0,0,0,0.45);
+}
+.roleLoyal { background: linear-gradient(160deg, #123a2a, #0a241a); border-color: #4caf6e; }
+.roleTraitor { background: linear-gradient(160deg, #3a1416, #240a0c); border-color: #d8504a; }
+.roleIcon { font-size: 3rem; }
+.roleLabel { font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 800; color: #f3e9d2; }
+.roleHint { color: #d8cdb6; font-size: 0.95rem; line-height: 1.4; }
+
+/* ---- stage: help / sabotage ---- */
+.stageWrap { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.roleTag { margin: 0; color: var(--text-secondary, #b8a88a); }
+.tTrait { color: #ff938e; }
+.tLoyal { color: #7ee0a0; }
+.stagePrompt { font-family: 'Cinzel', serif; font-size: 1.25rem; color: #f3e9d2; margin: 0; text-align: center; }
+.moveRow { display: flex; gap: 0.8rem; width: 100%; max-width: 460px; }
+.moveBtn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  padding: 1.1rem 0.8rem; border-radius: 14px; font-weight: 800; font-size: 1.05rem;
+  cursor: pointer; min-height: 92px; border: 2px solid; color: #f3e9d2;
+}
+.moveIcon { font-size: 2rem; }
+.helpBtn { background: linear-gradient(160deg, #14463a, #0c2e26); border-color: #4caf6e; }
+.helpBtn:hover { border-color: #7ee0a0; }
+.sabBtn { background: linear-gradient(160deg, #46161a, #2e0c0f); border-color: #d8504a; }
+.sabBtn:hover { border-color: #ff938e; }
+
+/* ---- stage result ---- */
+.resultWrap { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.resultCard {
+  width: 100%; max-width: 460px; border-radius: 14px; padding: 1.2rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem; text-align: center;
+  border: 2px solid;
+}
+.resPass { background: rgba(76,175,110,0.15); border-color: #4caf6e; }
+.resFail { background: rgba(216,80,74,0.15); border-color: #d8504a; }
+.resBig { font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 800; color: #f3e9d2; }
+.resSub { color: #d8cdb6; }
+
+/* ---- eject vote ---- */
+.ejectWrap { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; }
+.ejectTitle { font-family: 'Cinzel', serif; font-size: 1.4rem; color: #e8c876; margin: 0; }
+.ejectSub { color: var(--text-secondary, #b8a88a); text-align: center; margin: 0; font-size: 0.95rem; }
+.voteGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.6rem; width: 100%; max-width: 480px; }
+.voteBtn {
+  display: flex; align-items: center; gap: 0.4rem; justify-content: center;
+  padding: 0.7rem 0.8rem; border-radius: 12px; min-height: 56px; cursor: pointer;
+  background: var(--bg-panel, #221b14); border: 2px solid #4a4a52; color: var(--text-primary, #f3e9d2);
+}
+.voteBtn:hover { border-color: #e8c876; }
+.voteSel { border-color: #e8c876; box-shadow: 0 0 0 2px #e8c876; }
+
+/* ---- finished ---- */
+.finishWrap { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.outcomeCard {
+  width: 100%; max-width: 500px; border-radius: 16px; padding: 1.3rem 1.2rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem; text-align: center;
+  border: 2px solid; box-shadow: 0 8px 26px rgba(0,0,0,0.45);
+}
+.outLoyal { background: linear-gradient(160deg, #123a2a, #0a241a); border-color: #4caf6e; }
+.outTraitor { background: linear-gradient(160deg, #3a1416, #240a0c); border-color: #d8504a; }
+.outBig { font-family: 'Cinzel', serif; font-size: 1.6rem; font-weight: 800; color: #f3e9d2; }
+.outSub { color: #e6dcc4; line-height: 1.4; }
+.outEject { color: #f3e2b0; font-size: 0.95rem; margin-top: 0.2rem; }
+
+.rolesReveal, .scoreboard { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 0.3rem; }
+.boardTitle { font-family: 'Cinzel', serif; color: #e8c876; margin: 0.4rem 0 0.1rem; font-size: 1.05rem; }
+.roleRow {
+  display: flex; justify-content: space-between; align-items: center;
+  border-radius: 8px; padding: 0.35rem 0.7rem; border-left: 4px solid;
+  background: rgba(0,0,0,0.22);
+}
+.rrTrait { border-left-color: #d8504a; }
+.rrLoyal { border-left-color: #4caf6e; }
+.roleBadge { font-weight: 800; font-size: 0.85rem; color: #f3e9d2; }
+.scoreRow {
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(0,0,0,0.22); border-radius: 8px; padding: 0.35rem 0.7rem;
+}
+.scoreVal { color: #e8c876; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 520px) {
+  .moveRow { flex-direction: column; }
+}

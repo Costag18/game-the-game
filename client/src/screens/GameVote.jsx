@@ -60,6 +60,11 @@ import previewGroupMind from '../assets/gamepreviews/groupMind.png';
 import previewMobRule from '../assets/gamepreviews/mobRule.png';
 import previewTwoTruths from '../assets/gamepreviews/twoTruths.png';
 import previewSuperlativeShowdown from '../assets/gamepreviews/superlativeShowdown.png';
+import previewSpyfall from '../assets/gamepreviews/spyfall.png';
+import previewChameleon from '../assets/gamepreviews/chameleon.png';
+import previewTraitorsVault from '../assets/gamepreviews/traitorsVault.png';
+import previewWhisperNetwork from '../assets/gamepreviews/whisperNetwork.png';
+import previewSketchImpostor from '../assets/gamepreviews/sketchImpostor.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -112,6 +117,11 @@ const GAME_PREVIEWS = {
   mobRule: previewMobRule,
   twoTruths: previewTwoTruths,
   superlativeShowdown: previewSuperlativeShowdown,
+  spyfall: previewSpyfall,
+  chameleon: previewChameleon,
+  traitorsVault: previewTraitorsVault,
+  whisperNetwork: previewWhisperNetwork,
+  sketchImpostor: previewSketchImpostor,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

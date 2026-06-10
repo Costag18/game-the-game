@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (50)
+## Mini-Games (55)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -135,6 +135,11 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Mob Rule | 3-8 | Pick a side for the majority, twist rounds reward the minority |
 | Two Truths and a Lie | 3-8 | Rotating storyteller, guess the lie; catcher + fooler scoring |
 | Superlative Showdown | 3-8 | Privately rank the lobby, Borda consensus IS the placement |
+| Spyfall | 3-8 | Hidden spy among players sharing a location, vote + spy location guess |
+| Chameleon Clues | 3-8 | Hidden chameleon lacks the grid word, one-word clues + vote + guess |
+| Traitor's Vault | 4-8 | Co-op 5-stage crack with hidden traitors, sabotage counts + eject vote |
+| Whisper Network | 4-8 | Two hidden factions tug a shared meter, then tag everyone's side |
+| Sketch Impostor | 3-8 | Hidden impostor draws without the word (shared canvas, one stroke/turn), vote |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -543,6 +548,11 @@ The owner cares about:
 | Mob Rule | Permanent Marker |
 | Two Truths and a Lie | Special Elite |
 | Superlative Showdown | Bungee |
+| Spyfall | Special Elite |
+| Chameleon Clues | Creepster |
+| Traitor's Vault | Cinzel |
+| Whisper Network | Audiowide |
+| Sketch Impostor | Permanent Marker |
 
 ## Versioning & Commits
 

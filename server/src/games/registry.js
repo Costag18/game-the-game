@@ -49,6 +49,11 @@ import { GroupMind } from './GroupMind.js';
 import { MobRule } from './MobRule.js';
 import { TwoTruths } from './TwoTruths.js';
 import { SuperlativeShowdown } from './SuperlativeShowdown.js';
+import { Spyfall } from './Spyfall.js';
+import { ChameleonClues } from './ChameleonClues.js';
+import { TraitorsVault } from './TraitorsVault.js';
+import { WhisperNetwork } from './WhisperNetwork.js';
+import { SketchImpostor } from './SketchImpostor.js';
 
 const gameEngines = {};
 
@@ -121,3 +126,8 @@ registerGame('groupMind', GroupMind);
 registerGame('mobRule', MobRule);
 registerGame('twoTruths', TwoTruths);
 registerGame('superlativeShowdown', SuperlativeShowdown);
+registerGame('spyfall', Spyfall);
+registerGame('chameleon', ChameleonClues);
+registerGame('traitorsVault', TraitorsVault);
+registerGame('whisperNetwork', WhisperNetwork);
+registerGame('sketchImpostor', SketchImpostor);

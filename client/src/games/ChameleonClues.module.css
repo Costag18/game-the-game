@@ -1,0 +1,129 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Creepster', cursive;
+  font-size: clamp(2rem, 6vw, 3rem);
+  color: #6ad36a;
+  margin: 0;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.45), 0 0 18px rgba(106,211,106,0.35);
+}
+.theme { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.clock {
+  font-weight: 800; font-variant-numeric: tabular-nums;
+  color: #1a0e10; background: #6ad36a; border-radius: 999px; padding: 0.15rem 0.7rem; min-width: 2.4rem; text-align: center;
+}
+
+.section { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; width: 100%; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.heading { font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 800; color: var(--text-primary, #f3e9d2); text-align: center; margin: 0; }
+
+/* role cards */
+.roleCardChameleon, .roleCardCrew {
+  width: 100%; border-radius: 14px; padding: 1rem 1.2rem; text-align: center;
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.4);
+}
+.roleCardChameleon { background: linear-gradient(135deg, #1d3a1d, #0e220e); border: 2px solid #6ad36a; }
+.roleCardCrew { background: linear-gradient(135deg, #15323f, #0c2230); border: 2px solid #3a9bc9; }
+.roleBig { font-size: 1.3rem; font-weight: 800; margin: 0 0 0.4rem; color: var(--text-primary, #f3e9d2); }
+.secretWord { font-size: clamp(1.6rem, 5vw, 2.4rem); font-weight: 900; color: #6fd0f5; margin: 0.2rem 0; letter-spacing: 1px; }
+.roleSub { color: var(--text-secondary, #b8a88a); margin: 0.4rem 0 0; font-size: 0.95rem; }
+
+.bannerCrew, .bannerChameleon { margin: 0; padding: 0.5rem 1rem; border-radius: 10px; font-size: 1.05rem; text-align: center; }
+.bannerCrew { background: rgba(58,155,201,0.18); color: #bfe6f6; }
+.bannerCrew strong { color: #6fd0f5; }
+.bannerChameleon { background: rgba(106,211,106,0.16); color: #cdeccd; }
+
+/* 4x4 grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 480px;
+}
+.cell {
+  position: relative;
+  min-height: 54px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0.35rem;
+  font-size: clamp(0.75rem, 2.2vw, 0.95rem); font-weight: 700;
+  background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2);
+  border: 2px solid var(--gold-dim, #8a6d2f); border-radius: 10px;
+  cursor: default; text-align: center; line-height: 1.1;
+}
+.cellTappable { cursor: pointer; }
+.cellTappable:hover { border-color: #6ad36a; }
+.cellTarget { border-color: #6fd0f5; background: rgba(111,208,245,0.18); box-shadow: 0 0 0 2px #6fd0f5; }
+.cellPicked { border-color: #6ad36a; box-shadow: 0 0 0 2px #6ad36a; }
+.cellGuess { border-color: #ff5e7e; box-shadow: 0 0 0 2px #ff5e7e; }
+.cellTag {
+  position: absolute; top: -8px; right: -6px; font-size: 0.6rem; font-weight: 800;
+  background: #1a0e10; color: #6fd0f5; border-radius: 999px; padding: 0.05rem 0.4rem; border: 1px solid currentColor;
+}
+.cellGuess .cellTag { color: #ff5e7e; }
+
+/* clue input */
+.writeBox, .waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; }
+.input {
+  width: 100%; max-width: 360px; padding: 0.7rem 1rem; font-size: 1.1rem;
+  border-radius: 10px; border: 2px solid var(--gold-dim, #8a6d2f);
+  background: #fdfaf3; color: #1a1a1a; text-align: center;
+}
+.input:focus { outline: none; border-color: #6ad36a; }
+.reject { color: #ff8a8a; font-size: 0.85rem; margin: 0; }
+
+.primaryBtn {
+  background: #6ad36a; color: #0e220e; border: none; border-radius: 10px;
+  padding: 0.7rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+.waitMsg { font-size: 1.15rem; color: var(--gold, #d4a843); font-weight: 700; margin: 0; }
+.waitMsg strong { color: #6ad36a; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; }
+
+/* clue list */
+.clueList { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; max-width: 420px; }
+.clueRow {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+  background: rgba(0,0,0,0.22); border-radius: 8px; padding: 0.35rem 0.7rem;
+}
+.clueWord { font-weight: 800; color: #6fd0f5; }
+.clueChameleon { border: 1px solid #6ad36a; background: rgba(106,211,106,0.12); }
+.clueChameleon .clueWord { color: #6ad36a; }
+
+/* vote grid */
+.voteGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem; width: 100%; }
+.voteBtn {
+  position: relative; display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+  padding: 0.7rem 0.6rem; min-height: 52px;
+  background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2);
+  border: 2px solid var(--gold-dim, #8a6d2f); border-radius: 12px; cursor: pointer;
+}
+.voteBtn:hover:not(:disabled) { border-color: #6ad36a; }
+.voteBtn:disabled { opacity: 0.5; cursor: default; }
+.voteSel { border-color: #6ad36a; box-shadow: 0 0 0 2px #6ad36a; }
+.youTag { font-size: 0.7rem; color: var(--text-secondary, #b8a88a); font-style: italic; }
+
+/* finished */
+.outcomeBox { width: 100%; border-radius: 14px; padding: 1rem 1.2rem; text-align: center; }
+.outcomeChameleon { background: linear-gradient(135deg, #1d3a1d, #0e220e); border: 2px solid #6ad36a; }
+.outcomeCrew { background: linear-gradient(135deg, #15323f, #0c2230); border: 2px solid #3a9bc9; }
+.outcomeLine { margin: 0; font-size: 1.05rem; color: var(--text-primary, #f3e9d2); }
+.outcomeResult { margin: 0.4rem 0; font-size: 1.4rem; font-weight: 900; color: #6ad36a; }
+.outcomeCrew .outcomeResult { color: #6fd0f5; }
+.outcomeDetail { margin: 0; color: var(--text-secondary, #b8a88a); font-size: 0.95rem; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; max-width: 420px; margin-top: 0.4rem; }
+.scoreRow { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.35rem 0.7rem; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; }

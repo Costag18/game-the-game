@@ -535,6 +535,66 @@ export const GAMES = {
       'Most consensus points after 4 rounds ranks first; ties share a placement.',
     ],
   },
+  spyfall: {
+    id: 'spyfall', name: 'Spyfall', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'One secret spy hides among players who all share a hidden location.',
+    instructions: [
+      'Everyone but the spy secretly learns the location and a role — the spy sees neither.',
+      'Discuss out loud: ask and answer questions to expose the spy without naming the location.',
+      'Secretly vote the player you suspect is the spy (you can\'t vote yourself).',
+      'If accused, the spy gets one last chance to guess the real location and steal the win.',
+      'The spy wins if they escape the vote OR guess the location; otherwise the group wins.',
+    ],
+  },
+  chameleon: {
+    id: 'chameleon', name: 'Chameleon Clues', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Everyone shares a secret word on a grid except the hidden chameleon, who must bluff.',
+    instructions: [
+      'Everyone learns the secret word on the 4x4 grid — except the random chameleon, who sees only the theme.',
+      'Everyone submits ONE word hinting at the secret word; the chameleon must fake a fitting clue.',
+      'All clues go public, then everyone secretly votes who the chameleon is.',
+      'If caught, the chameleon secretly picks the grid cell they think is the word.',
+      'Chameleon wins if they escape the vote OR guess the word; otherwise the crew scores.',
+    ],
+  },
+  traitorsVault: {
+    id: 'traitorsVault', name: "Traitor's Vault", minPlayers: 4, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Co-op heist with hidden traitors — crack the vault while rooting out saboteurs.',
+    instructions: [
+      'You are secretly Loyal crew or a hidden Traitor (1 traitor at 4-5 players, 2 at 6-8).',
+      'Each of 5 stages, privately pick Help or Sabotage — a stage cracks only if nobody sabotaged.',
+      'You see the pass/fail and how many sabotaged, but never who.',
+      'After stage 3 the crew holds one secret eject vote.',
+      'Crack 4+ stages and Loyal players win; otherwise the Traitors do. Ejecting a traitor pays a bonus.',
+    ],
+  },
+  whisperNetwork: {
+    id: 'whisperNetwork', name: 'Whisper Network', minPlayers: 4, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Two secret factions tug a shared meter, then everyone guesses who is on which side.',
+    instructions: [
+      'You are secretly on the Red or Blue faction — Red wants the meter positive, Blue negative.',
+      'Each of 5 rounds, privately push the meter (-2 to +2); only the running total is shown, never who pushed.',
+      'Hide your hand: push too hard and you give yourself away.',
+      'After 5 rounds, secretly tag every other player\'s faction.',
+      'Your faction scores if the meter ends on your side, plus a bonus for every correct tag.',
+    ],
+  },
+  sketchImpostor: {
+    id: 'sketchImpostor', name: 'Sketch Impostor', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Everyone draws the same secret word one stroke at a time — except the wordless impostor.',
+    instructions: [
+      'Everyone shares a secret word except one random impostor, who has no word.',
+      'Take turns adding ONE stroke each to a shared drawing — the impostor must fake a convincing line.',
+      'After two strokes each, everyone votes who the impostor is.',
+      'If caught, the impostor can still steal the win by naming the secret word.',
+      'Catch the impostor to score as the crew; survive or guess the word to score as the impostor.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

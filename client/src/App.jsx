@@ -71,6 +71,11 @@ import GroupMindGame from './games/GroupMind.jsx';
 import MobRuleGame from './games/MobRule.jsx';
 import TwoTruthsGame from './games/TwoTruths.jsx';
 import SuperlativeShowdownGame from './games/SuperlativeShowdown.jsx';
+import SpyfallGame from './games/Spyfall.jsx';
+import ChameleonCluesGame from './games/ChameleonClues.jsx';
+import TraitorsVaultGame from './games/TraitorsVault.jsx';
+import WhisperNetworkGame from './games/WhisperNetwork.jsx';
+import SketchImpostorGame from './games/SketchImpostor.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -126,6 +131,11 @@ const GAME_COMPONENTS = {
   mobRule: MobRuleGame,
   twoTruths: TwoTruthsGame,
   superlativeShowdown: SuperlativeShowdownGame,
+  spyfall: SpyfallGame,
+  chameleon: ChameleonCluesGame,
+  traitorsVault: TraitorsVaultGame,
+  whisperNetwork: WhisperNetworkGame,
+  sketchImpostor: SketchImpostorGame,
 };
 
 function GameRouter() {

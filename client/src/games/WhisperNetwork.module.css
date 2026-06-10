@@ -1,0 +1,126 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Audiowide', 'Orbitron', sans-serif;
+  font-size: clamp(1.5rem, 5vw, 2.4rem);
+  margin: 0;
+  background: linear-gradient(90deg, #4f8cff 0%, #c9d4e8 50%, #ff5a6e 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  letter-spacing: 1px;
+}
+.round { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; }
+.timer { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; margin: 0.2rem 0 0; }
+
+/* ---- shared meter gauge ---- */
+.meterWrap {
+  width: 100%; max-width: 480px;
+  background: linear-gradient(135deg, #10131f, #1a1f33);
+  border: 2px solid #2c3658; border-radius: 14px; padding: 0.7rem 0.9rem;
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.5);
+}
+.meterLabels { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.blueLabel { color: #4f8cff; font-weight: 800; font-size: 0.9rem; }
+.redLabel { color: #ff5a6e; font-weight: 800; font-size: 0.9rem; }
+.meterValue { color: #f3e9d2; font-weight: 900; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.meterTrack {
+  position: relative; height: 18px; border-radius: 999px;
+  background: linear-gradient(90deg, #1f4fd0 0%, #2a3050 50%, #d0203a 100%);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+}
+.meterCenter {
+  position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px;
+  background: rgba(255,255,255,0.6); transform: translateX(-50%);
+}
+.meterNeedle {
+  position: absolute; top: -5px; width: 10px; height: 28px; border-radius: 4px;
+  background: #fdfaf3; box-shadow: 0 0 8px rgba(255,255,255,0.8);
+  transform: translateX(-50%); transition: left 0.6s cubic-bezier(0.25,1.2,0.5,1);
+}
+
+/* ---- reveal: faction card ---- */
+.revealBox { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.secretHint { color: var(--text-secondary, #b8a88a); font-size: 0.9rem; margin: 0; }
+.factionCard {
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  width: 100%; max-width: 360px; padding: 1.6rem 1rem; border-radius: 18px;
+  border: 3px solid; box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+.redCard { background: linear-gradient(135deg, #3a0d14, #6e1622); border-color: #ff5a6e; }
+.blueCard { background: linear-gradient(135deg, #0d1f3a, #16386e); border-color: #4f8cff; }
+.factionName { font-family: 'Audiowide', sans-serif; font-size: 2.6rem; font-weight: 900; color: #fff; letter-spacing: 2px; }
+.factionGoal { color: #f3e9d2; font-size: 1rem; text-align: center; }
+
+/* ---- round: push selector ---- */
+.pushBox, .accuseBox, .waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; width: 100%; }
+.pushPrompt { color: var(--text-primary, #f3e9d2); font-size: 1.1rem; font-weight: 700; margin: 0; text-align: center; }
+.pushRow { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+.pushBtn {
+  min-width: 56px; min-height: 56px; border-radius: 12px; font-size: 1.4rem; font-weight: 900;
+  border: 2px solid var(--gold-dim, #8a6d2f); background: var(--bg-panel, #2a1518);
+  color: var(--text-primary, #f3e9d2); cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.pushBlue { border-color: #3a5fb0; }
+.pushRed { border-color: #b03a4a; }
+.pushZero { border-color: #6a6a6a; }
+.pushSel { box-shadow: 0 0 0 3px var(--gold, #d4a843); transform: translateY(-2px); }
+.pushKey { color: var(--text-secondary, #b8a88a); font-size: 0.8rem; margin: 0; }
+
+/* ---- accusation ---- */
+.accuseRow {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+  width: 100%; background: rgba(0,0,0,0.25); border-radius: 10px; padding: 0.5rem 0.7rem;
+}
+.tagBtns { display: flex; gap: 0.4rem; }
+.tagBtn {
+  min-width: 64px; min-height: 44px; border-radius: 9px; font-weight: 800; font-size: 0.9rem;
+  border: 2px solid transparent; cursor: pointer; color: #fff; opacity: 0.55;
+}
+.tagRed { background: #6e1622; border-color: #ff5a6e; }
+.tagBlue { background: #16386e; border-color: #4f8cff; }
+.tagSel { opacity: 1; box-shadow: 0 0 0 2px var(--gold, #d4a843); }
+
+/* ---- shared buttons / waiting ---- */
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.7rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+.waitMsg { font-size: 1.2rem; color: var(--gold, #d4a843); font-weight: 700; margin: 0; }
+
+/* ---- finished ---- */
+.resultBox { display: flex; flex-direction: column; gap: 0.6rem; width: 100%; }
+.outcome {
+  text-align: center; font-size: 1.15rem; color: var(--text-primary, #f3e9d2);
+  background: rgba(0,0,0,0.25); border-radius: 12px; padding: 0.8rem; margin: 0;
+}
+.redText { color: #ff5a6e; font-weight: 900; }
+.blueText { color: #4f8cff; font-weight: 900; }
+.factionGrid { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; }
+.resultRow {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;
+  border-radius: 10px; padding: 0.5rem 0.7rem; border-left: 4px solid transparent;
+}
+.redRow { background: rgba(110,22,34,0.35); border-left-color: #ff5a6e; }
+.blueRow { background: rgba(22,56,110,0.35); border-left-color: #4f8cff; }
+.resultWho { display: flex; align-items: center; gap: 0.5rem; }
+.factionTag { font-size: 0.7rem; font-weight: 800; letter-spacing: 1px; opacity: 0.85; }
+.resultScore { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+.breakdown { display: block; color: var(--text-secondary, #b8a88a); font-size: 0.72rem; font-weight: 600; }
+
+@media (max-width: 520px) {
+  .factionName { font-size: 2rem; }
+  .pushBtn { min-width: 48px; min-height: 48px; font-size: 1.2rem; }
+}

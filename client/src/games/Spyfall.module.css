@@ -1,0 +1,96 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.9rem; }
+.title {
+  font-family: 'Special Elite', 'Courier New', monospace;
+  font-size: clamp(1.9rem, 5.5vw, 2.8rem);
+  letter-spacing: 0.18em; color: #e8e2d2; margin: 0;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.45);
+}
+.timer {
+  font-family: 'Special Elite', monospace; font-weight: 700;
+  color: #1a1410; background: var(--gold, #d4a843);
+  border-radius: 8px; padding: 0.1rem 0.6rem; font-variant-numeric: tabular-nums;
+}
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; text-align: center; }
+.prompt {
+  font-size: clamp(1rem, 3vw, 1.25rem); line-height: 1.4; text-align: center;
+  color: var(--text-primary, #f3e9d2); margin: 0 0 0.3rem;
+}
+
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.65rem 1.9rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 46px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+
+/* ---------- REVEAL CARD ---------- */
+.revealWrap { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; width: 100%; }
+.card {
+  width: 100%; max-width: 460px; padding: 1.4rem 1.2rem; border-radius: 16px; text-align: center;
+  background: linear-gradient(150deg, #2b2620, #161310);
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.45), inset 0 0 30px rgba(0,0,0,0.5);
+}
+.cardSpy { border-color: #c0392b; background: linear-gradient(150deg, #3a1714, #1a0c0a); }
+.cardKicker { text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.72rem; color: var(--text-secondary, #b8a88a); margin-top: 0.5rem; }
+.locName { font-family: 'Special Elite', monospace; font-size: clamp(1.6rem, 5vw, 2.2rem); color: var(--gold, #d4a843); margin: 0.2rem 0 0.4rem; }
+.roleName { font-size: clamp(1.2rem, 4vw, 1.6rem); color: var(--text-primary, #f3e9d2); font-weight: 700; margin: 0.2rem 0; }
+.spyTitle { font-family: 'Special Elite', monospace; font-size: clamp(1.7rem, 6vw, 2.4rem); color: #ff6f61; margin: 0.4rem 0; letter-spacing: 0.08em; }
+.cardHint { font-size: 0.92rem; color: var(--text-secondary, #b8a88a); line-height: 1.4; margin: 0.7rem 0 0.2rem; }
+
+/* ---------- VOTING ---------- */
+.voteWrap, .guessWrap { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; width: 100%; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; width: 100%; }
+.suspect {
+  display: flex; align-items: center; gap: 0.4rem; padding: 0.7rem 0.8rem; min-height: 52px;
+  background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2);
+  border: 2px solid var(--gold-dim, #8a6d2f); border-radius: 12px; cursor: pointer; text-align: left;
+}
+.suspectSel { border-color: var(--gold, #d4a843); box-shadow: 0 0 0 2px var(--gold, #d4a843); }
+
+.waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: 1rem; }
+.waitMsg { font-size: 1.25rem; color: var(--gold, #d4a843); font-weight: 700; margin: 0; text-align: center; }
+
+/* ---------- SPY GUESS ---------- */
+.locGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.45rem; width: 100%; }
+.locOption {
+  padding: 0.7rem 0.6rem; min-height: 48px; font-size: 0.98rem;
+  background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2);
+  border: 2px solid var(--gold-dim, #8a6d2f); border-radius: 10px; cursor: pointer;
+}
+.locSel { border-color: var(--gold, #d4a843); box-shadow: 0 0 0 2px var(--gold, #d4a843); background: rgba(212,168,67,0.14); }
+
+/* ---------- FINISHED ---------- */
+.finishWrap { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; width: 100%; }
+.banner {
+  width: 100%; text-align: center; font-family: 'Special Elite', monospace;
+  font-size: clamp(1.4rem, 5vw, 2rem); letter-spacing: 0.1em; padding: 0.8rem; border-radius: 12px; font-weight: 800;
+}
+.bannerSpy { background: linear-gradient(135deg, #c0392b, #6e1d15); color: #fff; }
+.bannerGroup { background: linear-gradient(135deg, #1e8449, #0e5631); color: #fff; }
+
+.summary { width: 100%; display: flex; flex-direction: column; gap: 0.35rem; }
+.sumRow {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.6rem;
+  background: rgba(0,0,0,0.22); border-radius: 8px; padding: 0.45rem 0.7rem;
+}
+.sumRow span { color: var(--text-secondary, #b8a88a); }
+.sumRow strong { color: var(--text-primary, #f3e9d2); display: inline-flex; align-items: center; gap: 0.3rem; text-align: right; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; margin-top: 0.3rem; }
+.scoreRow { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.35rem 0.6rem; }
+.scoreWho { display: inline-flex; align-items: center; gap: 0.3rem; }
+.spyTag { font-size: 0.7rem; background: #c0392b; color: #fff; border-radius: 999px; padding: 0.05rem 0.5rem; font-weight: 800; letter-spacing: 0.06em; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; }
