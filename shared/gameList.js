@@ -763,6 +763,78 @@ export const GAMES = {
       'Highest total over 3 rounds wins; ties share a placement.',
     ],
   },
+  whackAPharaoh: {
+    id: 'whackAPharaoh', name: 'Whack-a-Pharaoh', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Real-time whack-a-mole — smack pharaohs, dodge mummies. Most points in 25s wins.',
+    instructions: [
+      'Pharaohs and mummies pop out of nine holes for about a second each.',
+      'Whack a pharaoh for +100; whack a mummy and you lose 60 (never below 0).',
+      'Everyone races the SAME pop-ups at once and scores independently — speed is everything.',
+      'Tapping an empty or cleared hole does nothing; each target scores once.',
+      'Highest score after the 25-second flurry wins; ties share a placement.',
+    ],
+  },
+  coinCascade: {
+    id: 'coinCascade', name: 'Coin Cascade', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Slide your basket across 5 lanes to catch coins and gems, dodge bombs. Most points wins.',
+    instructions: [
+      'Coins, gems, and bombs rain down 5 lanes from a shared stream.',
+      'Tap a lane to slide your basket (it starts in the middle).',
+      'Catch coins (+10) and gems (+25) when they reach the catch line in your lane.',
+      'Bombs are −15 — slide out of the way. Score never drops below 0.',
+      'Highest score after ~30 seconds wins; ties share a placement.',
+    ],
+  },
+  balloonBrinkmanship: {
+    id: 'balloonBrinkmanship', name: 'Balloon Brinkmanship', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Pump your balloon for air — but a hidden burst threshold means one pump too many pops it.',
+    instructions: [
+      'Each round your balloon starts empty and has a SECRET burst threshold you can\'t see.',
+      'Tap PUMP to add air — more air scores more, but inches you toward the pop.',
+      'Tap BANK to lock your current air into your score and sit out safely.',
+      'Pump over the hidden threshold and it POPS — you bank nothing that round.',
+      'Highest total air after 4 rounds wins; ties share a placement.',
+    ],
+  },
+  pulseTap: {
+    id: 'pulseTap', name: 'Pulse Tap', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Rhythm tapping — nail the beat for Perfects and build a combo across 3 tightening rounds.',
+    instructions: [
+      'Beats sweep toward a hit-line; tap right on the beat.',
+      'Perfect timing scores most, a near-miss less, way off is a Miss.',
+      'Consecutive hits build a combo multiplier.',
+      'Each round\'s beat gets tighter and faster.',
+      'Highest score over 3 rounds wins; ties share a placement.',
+    ],
+  },
+  bullseyeDrop: {
+    id: 'bullseyeDrop', name: 'Bullseye Drop', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Timing-precision darts — release as the reticle hits the bullseye. Most points over 5 darts wins.',
+    instructions: [
+      'A reticle pulses in and out across concentric rings.',
+      'Tap RELEASE the instant it\'s smallest to hit the bullseye (+100).',
+      'Outer rings score less; the timing is server-judged so it\'s fair.',
+      'You get 5 darts, and the reticle speeds up each throw.',
+      'Highest total wins; ties share a placement.',
+    ],
+  },
+  hotPotatoRelay: {
+    id: 'hotPotatoRelay', name: 'Hot Potato Relay', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Pass the bomb before its hidden fuse blows — whoever holds it when it goes is out.',
+    instructions: [
+      'A bomb with a HIDDEN fuse starts with one player.',
+      'If you hold it, tap PASS to hand it to the next player — fast.',
+      'When the fuse blows, whoever holds the bomb is eliminated.',
+      'A new hidden fuse starts and play continues among the survivors.',
+      'Last player standing wins; elimination order (reversed) sets the placements.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

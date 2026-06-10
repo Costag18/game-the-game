@@ -90,6 +90,12 @@ import DutchDropGame from './games/DutchDrop.jsx';
 import SealedVaultGame from './games/SealedVault.jsx';
 import LastBidStandingGame from './games/LastBidStanding.jsx';
 import TokenTussleGame from './games/TokenTussle.jsx';
+import WhackAPharaohGame from './games/WhackAPharaoh.jsx';
+import CoinCascadeGame from './games/CoinCascade.jsx';
+import BalloonBrinkmanshipGame from './games/BalloonBrinkmanship.jsx';
+import PulseTapGame from './games/PulseTap.jsx';
+import BullseyeDropGame from './games/BullseyeDrop.jsx';
+import HotPotatoRelayGame from './games/HotPotatoRelay.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -164,6 +170,12 @@ const GAME_COMPONENTS = {
   sealedVault: SealedVaultGame,
   lastBidStanding: LastBidStandingGame,
   tokenTussle: TokenTussleGame,
+  whackAPharaoh: WhackAPharaohGame,
+  coinCascade: CoinCascadeGame,
+  balloonBrinkmanship: BalloonBrinkmanshipGame,
+  pulseTap: PulseTapGame,
+  bullseyeDrop: BullseyeDropGame,
+  hotPotatoRelay: HotPotatoRelayGame,
 };
 
 function GameRouter() {

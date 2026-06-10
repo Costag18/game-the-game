@@ -1,0 +1,145 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.title {
+  font-family: 'Wallpoet', 'Teko', sans-serif;
+  font-size: clamp(1.5rem, 4.8vw, 2.5rem);
+  color: #f4e04d;
+  letter-spacing: 3px;
+  margin: 0;
+  text-shadow: 0 0 14px rgba(244, 224, 77, 0.45), 0 2px 0 #7a1010;
+}
+
+.hud { display: flex; gap: 1.8rem; }
+.hudItem { display: flex; flex-direction: column; align-items: center; }
+.hudLabel { font-family: 'Wallpoet', sans-serif; font-size: 0.7rem; color: var(--text-secondary, #b8a88a); letter-spacing: 2px; }
+.hudBig { font-family: 'Wallpoet', 'Teko', sans-serif; font-size: 1.6rem; color: var(--gold, #d4a843); font-variant-numeric: tabular-nums; }
+
+.boardWrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.board {
+  position: relative;
+  width: min(82vw, 56vh);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #0c1b12;
+  border: 6px solid #2a160a;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7), 0 6px 18px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* concentric rings, all centered, painted outer (low z) -> inner (high z) */
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+.ringPoints {
+  position: relative;
+  margin-top: 2px;
+  font-family: 'Wallpoet', sans-serif;
+  font-size: 0.62rem;
+  color: rgba(0, 0, 0, 0.55);
+  font-weight: 700;
+}
+
+/* the live reticle — a bright pulsing outline whose size is driven by JS each frame */
+.reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 14px 3px rgba(255, 255, 255, 0.85), inset 0 0 10px rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* score pop */
+.pop {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  font-family: 'Wallpoet', 'Teko', sans-serif;
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: popUp 0.9s ease-out forwards;
+  pointer-events: none;
+}
+.popBull { color: #f4e04d; font-size: 2.6rem; }
+.popLabel { font-size: 0.9rem; letter-spacing: 2px; }
+@keyframes popUp {
+  0% { opacity: 0; transform: translate(-50%, -10%) scale(0.6); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  80% { opacity: 1; transform: translate(-50%, -80%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -120%) scale(1); }
+}
+
+.releaseBtn {
+  min-height: 56px;
+  min-width: 220px;
+  padding: 0.7rem 2rem;
+  font-family: 'Wallpoet', 'Teko', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  color: #1a0a0a;
+  background: linear-gradient(180deg, #f4e04d, #d4a020);
+  border: 3px solid #fff3b0;
+  border-radius: 14px;
+  box-shadow: 0 5px 0 #8a6a0a, 0 8px 14px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform 0.05s ease;
+}
+.releaseBtn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 #8a6a0a; }
+.releaseBtn:disabled { opacity: 0.5; cursor: default; filter: grayscale(0.5); }
+
+.waitNote { color: var(--text-secondary, #b8a88a); font-size: 0.95rem; margin: 0; text-align: center; }
+
+.finishCard { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+.finishTitle { font-family: 'Wallpoet', sans-serif; font-size: 1.8rem; color: #f4e04d; margin: 0; letter-spacing: 2px; }
+.finishStat { color: var(--text-primary, #f3e9d2); font-size: 1.2rem; margin: 0; }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; max-width: 380px; }
+.sbRow {
+  display: grid; grid-template-columns: 24px 1fr auto auto; align-items: center; gap: 0.5rem;
+  background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 8px; padding: 0.28rem 0.6rem;
+}
+.sbMe { border-color: #f4e04d; box-shadow: 0 0 8px rgba(244, 224, 77, 0.35); }
+.sbRank { color: #f4e04d; font-weight: 800; font-family: 'Wallpoet', sans-serif; }
+.sbName { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sbDarts { color: var(--text-secondary, #b8a88a); font-size: 0.85rem; }
+.sbScore { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (69)
+## Mini-Games (75)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -154,6 +154,12 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Sealed Vault | 2-8 | Sealed-bid auction, private bids until reveal, highest pays, most loot wins |
 | Last Bid Standing | 3-8 | All-pay attrition, everyone in pays each tick, last standing takes the jackpot (reverse-elim) |
 | Token Tussle | 2-8 | Colonel Blotto — secretly split 20 tokens over 5 fronts, most-per-front wins it |
+| Whack-a-Pharaoh | 2-8 | Real-time whack-a-mole, server-scheduled pop-ups, live-occupant-validated taps |
+| Coin Cascade | 2-8 | 5-lane falling-objects catch, server-tracked basket lane, arrival resolved server-side |
+| Balloon Brinkmanship | 2-8 | Simultaneous pump/bank, hidden server burst threshold, 4 rounds |
+| Pulse Tap | 2-8 | Rhythm tap, server beat schedule, offset-graded Perfect/Good/Miss + combo |
+| Bullseye Drop | 2-8 | Timing darts, server reticle path, radius-at-release scoring |
+| Hot Potato Relay | 3-8 | Real-time pass ring with a hidden server fuse, reverse-elimination ranking |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -581,6 +587,12 @@ The owner cares about:
 | Sealed Vault | Playfair Display |
 | Last Bid Standing | Black Ops One |
 | Token Tussle | Orbitron |
+| Whack-a-Pharaoh | Luckiest Guy |
+| Coin Cascade | Fredoka |
+| Balloon Brinkmanship | Bangers |
+| Pulse Tap | Audiowide |
+| Bullseye Drop | Wallpoet |
+| Hot Potato Relay | Bungee |
 
 ## Versioning & Commits
 

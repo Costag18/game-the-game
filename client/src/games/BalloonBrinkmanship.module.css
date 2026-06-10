@@ -1,0 +1,316 @@
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 18px 14px 36px;
+  color: #fff5e6;
+  box-sizing: border-box;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(255, 120, 140, 0.25), transparent 60%),
+    linear-gradient(180deg, #2a1733 0%, #1b1020 100%);
+  border-radius: 14px;
+  min-height: 70vh;
+}
+
+.loading { font-family: 'Bangers', cursive; font-size: 1.6rem; letter-spacing: 1px; }
+
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.title {
+  font-family: 'Bangers', cursive;
+  font-size: clamp(2rem, 6vw, 3.2rem);
+  letter-spacing: 2px;
+  margin: 0;
+  text-align: center;
+  color: #ffd166;
+  text-shadow: 2px 3px 0 #c1121f, 4px 6px 0 rgba(0, 0, 0, 0.35);
+}
+
+.round {
+  font-family: 'Bangers', cursive;
+  letter-spacing: 1.5px;
+  font-size: 1.1rem;
+  color: #ffe9b0;
+}
+
+/* ---------- play area ---------- */
+.playArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+}
+
+.balloonStage {
+  height: 220px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+}
+
+.balloon {
+  position: relative;
+  width: 120px;
+  height: 150px;
+  border-radius: 50% 50% 50% 50% / 46% 46% 54% 54%;
+  background: radial-gradient(circle at 35% 30%, #ff8fa3, #e5384f 70%, #b00020);
+  box-shadow: inset -8px -10px 18px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.4);
+  transform-origin: bottom center;
+  transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), background 200ms, opacity 200ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 12px solid #b00020;
+}
+
+.airNum {
+  font-family: 'Bangers', cursive;
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 1px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.balloon.banked {
+  background: radial-gradient(circle at 35% 30%, #8be58b, #2e9e3f 70%, #1d7a2c);
+}
+.balloon.banked::after { border-top-color: #1d7a2c; }
+
+.balloon.popped {
+  animation: pop 320ms ease-out forwards;
+}
+@keyframes pop {
+  0% { transform: scale(1.15); }
+  40% { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(0.2); opacity: 0; }
+}
+
+/* ---------- nervous meter ---------- */
+.nervousWrap {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.nervousLabel {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffd9a0;
+}
+.nervousTrack {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.nervousFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #facc15 55%, #ef4444);
+  transition: width 160ms ease-out;
+  z-index: 2;
+}
+.dangerZone {
+  position: absolute;
+  inset: 0 0 0 60%;
+  background: repeating-linear-gradient(45deg, rgba(239, 68, 68, 0.25) 0 8px, rgba(239, 68, 68, 0.1) 8px 16px);
+  z-index: 1;
+}
+.nervousHint {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffe9b0;
+  min-height: 1.1em;
+}
+
+/* ---------- controls ---------- */
+.controls {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+  justify-content: center;
+}
+.pumpBtn, .bankBtn {
+  flex: 1;
+  min-height: 64px;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Bangers', cursive;
+  letter-spacing: 1.5px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #fff;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 80ms, box-shadow 80ms, opacity 120ms;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.pumpBtn { background: linear-gradient(180deg, #ff6b6b, #d6336c); }
+.bankBtn { background: linear-gradient(180deg, #38b000, #2b8a3e); }
+.pumpBtn:active:not(:disabled), .bankBtn:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+.pumpBtn:disabled, .bankBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pumpSub, .bankSub {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+}
+
+/* ---------- status row ---------- */
+.statusRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.scorePill, .pumpPill, .statusPill {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.statusPill { color: #ffd166; }
+
+/* ---------- others ---------- */
+.others {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 560px;
+}
+.otherChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.85rem;
+}
+.otherChip.st_banked { border-color: rgba(74, 222, 128, 0.5); }
+.otherChip.st_popped { border-color: rgba(239, 68, 68, 0.5); opacity: 0.75; }
+.otherStatus { font-size: 1rem; }
+.otherScore { font-weight: 700; color: #ffd166; }
+
+/* ---------- reveal ---------- */
+.reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 560px;
+}
+.revealTitle {
+  font-family: 'Bangers', cursive;
+  letter-spacing: 1px;
+  font-size: 1.5rem;
+  color: #ffd166;
+  margin: 4px 0;
+  text-align: center;
+}
+.revealList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.revealRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  border-left: 5px solid rgba(255, 255, 255, 0.2);
+}
+.revealRow.st_banked { border-left-color: #4ade80; }
+.revealRow.st_popped { border-left-color: #ef4444; }
+.revealStatus { font-size: 0.85rem; color: #ffe9b0; white-space: nowrap; }
+.revealScore { font-family: 'Bangers', cursive; font-size: 1.3rem; color: #ffd166; }
+
+.ackBox { margin-top: 6px; }
+.contBtn {
+  font-family: 'Bangers', cursive;
+  letter-spacing: 1px;
+  font-size: 1.25rem;
+  padding: 12px 28px;
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffd166, #f59f00);
+  color: #2a1733;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+}
+.contBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3); }
+.waitMsg { font-size: 0.95rem; color: #ffe9b0; }
+
+/* ---------- final board ---------- */
+.finalBoard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.finalRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.finalRow.finalMine { background: rgba(255, 209, 102, 0.18); border: 1px solid rgba(255, 209, 102, 0.4); }
+.finalPlace { font-family: 'Bangers', cursive; font-size: 1.2rem; color: #ffd166; min-width: 32px; }
+.finalScore { font-family: 'Bangers', cursive; font-size: 1.3rem; color: #ffd166; }
+
+@media (max-width: 600px) {
+  .controls { gap: 10px; }
+  .pumpBtn, .bankBtn { font-size: 1.25rem; min-height: 58px; }
+  .balloonStage { height: 180px; }
+}

@@ -68,6 +68,12 @@ import { DutchDrop } from './DutchDrop.js';
 import { SealedVault } from './SealedVault.js';
 import { LastBidStanding } from './LastBidStanding.js';
 import { TokenTussle } from './TokenTussle.js';
+import { WhackAPharaoh } from './WhackAPharaoh.js';
+import { CoinCascade } from './CoinCascade.js';
+import { BalloonBrinkmanship } from './BalloonBrinkmanship.js';
+import { PulseTap } from './PulseTap.js';
+import { BullseyeDrop } from './BullseyeDrop.js';
+import { HotPotatoRelay } from './HotPotatoRelay.js';
 
 const gameEngines = {};
 
@@ -159,3 +165,9 @@ registerGame('dutchDrop', DutchDrop);
 registerGame('sealedVault', SealedVault);
 registerGame('lastBidStanding', LastBidStanding);
 registerGame('tokenTussle', TokenTussle);
+registerGame('whackAPharaoh', WhackAPharaoh);
+registerGame('coinCascade', CoinCascade);
+registerGame('balloonBrinkmanship', BalloonBrinkmanship);
+registerGame('pulseTap', PulseTap);
+registerGame('bullseyeDrop', BullseyeDrop);
+registerGame('hotPotatoRelay', HotPotatoRelay);

@@ -79,6 +79,12 @@ import previewDutchDrop from '../assets/gamepreviews/dutchDrop.png';
 import previewSealedVault from '../assets/gamepreviews/sealedVault.png';
 import previewLastBidStanding from '../assets/gamepreviews/lastBidStanding.png';
 import previewTokenTussle from '../assets/gamepreviews/tokenTussle.png';
+import previewWhackAPharaoh from '../assets/gamepreviews/whackAPharaoh.png';
+import previewCoinCascade from '../assets/gamepreviews/coinCascade.png';
+import previewBalloonBrinkmanship from '../assets/gamepreviews/balloonBrinkmanship.png';
+import previewPulseTap from '../assets/gamepreviews/pulseTap.png';
+import previewBullseyeDrop from '../assets/gamepreviews/bullseyeDrop.png';
+import previewHotPotatoRelay from '../assets/gamepreviews/hotPotatoRelay.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -150,6 +156,12 @@ const GAME_PREVIEWS = {
   sealedVault: previewSealedVault,
   lastBidStanding: previewLastBidStanding,
   tokenTussle: previewTokenTussle,
+  whackAPharaoh: previewWhackAPharaoh,
+  coinCascade: previewCoinCascade,
+  balloonBrinkmanship: previewBalloonBrinkmanship,
+  pulseTap: previewPulseTap,
+  bullseyeDrop: previewBullseyeDrop,
+  hotPotatoRelay: previewHotPotatoRelay,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {
