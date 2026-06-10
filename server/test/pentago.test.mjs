@@ -30,6 +30,21 @@ test('out-of-turn, occupied-cell, and bad move shapes are rejected', () => {
   eq(m.turn, 'b'); // still b's turn — nothing applied
 });
 
+test('malformed client cell/quadrant (null / empty / boolean) is rejected, not coerced to 0/1', () => {
+  // Number(null)===0, Number('')===0, Number(false)===0, Number(true)===1 would all
+  // sneak past a naive Number()+isInteger guard and silently land an unintended move.
+  for (const bad of [null, '', false, true, '  ', {}, []]) {
+    const m = new PentagoMatch('a', 'b');
+    eq(m.applyMove('a', { cell: bad, quadrant: 3, dir: 'cw' }), false);
+    eq(m.applyMove('a', { cell: idx(1, 1), quadrant: bad, dir: 'cw' }), false);
+    eq(m.board.every((c) => c === null), true); // nothing placed
+    eq(m.turn, 'a'); // turn untouched
+  }
+  // but a legit numeric STRING (JSON round-trip) is still accepted
+  const m2 = new PentagoMatch('a', 'b');
+  eq(m2.applyMove('a', { cell: '7', quadrant: '3', dir: 'cw' }), true);
+});
+
 test('quadrant rotation moves marbles in place (cw and ccw)', () => {
   const m = new PentagoMatch('a', 'b');
   // place a marble at q0 top-left corner (0,0), then rotate q0 cw → should land at (0,2)

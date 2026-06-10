@@ -3,6 +3,15 @@ export const QUAD = 3;       // each quadrant is 3x3
 // quadrant top-left origins: q0 top-left, q1 top-right, q2 bottom-left, q3 bottom-right
 const QUAD_ORIGIN = [[0, 0], [0, 3], [3, 0], [3, 3]];
 
+// Coerce a client-supplied index, tolerating the JSON numeric-string round-trip
+// ('12' -> 12) but REJECTING null / '' / booleans / objects, which Number() would
+// otherwise silently turn into 0 or 1 (server-authoritative: never trust the client).
+function coerceIndex(v) {
+  if (typeof v === 'number') return v;
+  if (typeof v === 'string' && v.trim() !== '') return Number(v);
+  return NaN;
+}
+
 /**
  * PentagoMatch — a single 1v1 Pentago board (plain object, NOT a BaseGame). The
  * PairingEngine owns all timers, ranking, byes and leave handling; this only owns
@@ -81,8 +90,8 @@ export class PentagoMatch {
   applyMove(playerId, move) {
     if (this._over) return false;
     if (playerId !== this.turn) return false;
-    const cell = move && Number(move.cell);
-    const quadrant = move && Number(move.quadrant);
+    const cell = move ? coerceIndex(move.cell) : NaN;
+    const quadrant = move ? coerceIndex(move.quadrant) : NaN;
     const dir = move && move.dir;
     if (!Number.isInteger(cell) || cell < 0 || cell >= SIZE * SIZE) return false;
     if (this.board[cell] !== null) return false;
