@@ -42,6 +42,14 @@ import previewGomoku from '../assets/gamepreviews/gomoku.png';
 import previewHex from '../assets/gamepreviews/hex.png';
 import previewOrderChaos from '../assets/gamepreviews/orderChaos.png';
 import previewNim from '../assets/gamepreviews/nim.png';
+import previewBuzzerRoyale from '../assets/gamepreviews/buzzerRoyale.png';
+import previewHigherLower from '../assets/gamepreviews/higherLower.png';
+import previewPriceIsWrong from '../assets/gamepreviews/priceIsWrong.png';
+import previewTimeline from '../assets/gamepreviews/timeline.png';
+import previewGuesstimate from '../assets/gamepreviews/guesstimate.png';
+import previewOddOneOut from '../assets/gamepreviews/oddOneOut.png';
+import previewRankIt from '../assets/gamepreviews/rankIt.png';
+import previewThisOrThat from '../assets/gamepreviews/thisOrThat.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -76,6 +84,14 @@ const GAME_PREVIEWS = {
   hex: previewHex,
   orderChaos: previewOrderChaos,
   nim: previewNim,
+  buzzerRoyale: previewBuzzerRoyale,
+  higherLower: previewHigherLower,
+  priceIsWrong: previewPriceIsWrong,
+  timeline: previewTimeline,
+  guesstimate: previewGuesstimate,
+  oddOneOut: previewOddOneOut,
+  rankIt: previewRankIt,
+  thisOrThat: previewThisOrThat,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

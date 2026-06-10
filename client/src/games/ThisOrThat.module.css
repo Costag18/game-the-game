@@ -1,0 +1,102 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Black Ops One', 'Cinzel', sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  color: #f2c14e; margin: 0; letter-spacing: 1px;
+  text-shadow: 3px 3px 0 rgba(0,0,0,0.45);
+}
+.meta { color: var(--text-secondary, #b8a88a); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.statusBar { display: flex; gap: 1rem; align-items: center; width: 100%; justify-content: center; }
+.survivors { color: #6fd08c; font-weight: 800; }
+.clock {
+  font-variant-numeric: tabular-nums; font-weight: 800; color: #f2c14e;
+  background: rgba(0,0,0,0.3); border-radius: 999px; padding: 0.15rem 0.7rem; min-width: 48px; text-align: center;
+}
+
+.outBanner {
+  width: 100%; text-align: center; font-weight: 800; color: #ffb4b4;
+  background: rgba(120,20,20,0.4); border: 2px solid #7a2222; border-radius: 12px; padding: 0.6rem 1rem;
+}
+
+.qArea { display: flex; flex-direction: column; align-items: center; gap: 1rem; width: 100%; }
+.prompt {
+  font-size: clamp(1.2rem, 3.4vw, 1.7rem); line-height: 1.35; text-align: center; font-weight: 800;
+  color: var(--text-primary, #f3e9d2);
+  background: linear-gradient(135deg, #232a4d, #12152e);
+  border: 2px solid #3d4a8a; border-radius: 14px; padding: 1rem 1.2rem; width: 100%;
+  box-shadow: inset 0 0 24px rgba(0,0,0,0.45);
+  margin: 0;
+}
+
+.choices { display: flex; align-items: stretch; gap: 0.8rem; width: 100%; }
+.choiceBtn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
+  min-height: 120px; padding: 1rem 0.8rem; border-radius: 16px; cursor: pointer;
+  border: 3px solid transparent; color: #fff; font-weight: 800;
+  transition: transform 0.08s ease, box-shadow 0.15s ease;
+}
+.choiceBtn:disabled { cursor: default; opacity: 0.6; }
+.choiceBtn:active:not(:disabled) { transform: scale(0.97); }
+.choiceA { background: linear-gradient(160deg, #1e6fd6, #0d3f86); border-color: #4f97e8; }
+.choiceB { background: linear-gradient(160deg, #d6431e, #8a2510); border-color: #e8754f; }
+.choiceSel { box-shadow: 0 0 0 4px #f2c14e, 0 6px 18px rgba(0,0,0,0.4); }
+.choiceTag {
+  font-family: 'Black Ops One', sans-serif; font-size: 1.4rem;
+  width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.3);
+}
+.choiceText { font-size: clamp(1rem, 3vw, 1.3rem); text-align: center; text-shadow: 1px 1px 0 rgba(0,0,0,0.4); }
+.vs { align-self: center; color: var(--text-secondary, #b8a88a); font-weight: 800; font-style: italic; }
+
+.waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; width: 100%; }
+.waitMsg { font-size: 1.3rem; color: #f2c14e; font-weight: 800; margin: 0; text-align: center; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; text-align: center; }
+.spectate { color: var(--text-secondary, #b8a88a); text-align: center; }
+
+.reveal { display: flex; flex-direction: column; gap: 0.7rem; width: 100%; align-items: center; }
+.revPrompt { font-size: 1.1rem; font-weight: 800; text-align: center; color: var(--text-primary, #f3e9d2); margin: 0; }
+.revChoices { display: flex; gap: 0.8rem; width: 100%; }
+.revChoice {
+  flex: 1; padding: 0.9rem; border-radius: 14px; font-weight: 800; text-align: center; font-size: 1.05rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem; min-height: 56px;
+}
+.revRight { background: rgba(40,140,70,0.35); border: 3px solid #4caf6a; color: #d6ffe0; }
+.revWrong { background: rgba(100,30,30,0.3); border: 2px solid #7a2222; color: #ffc8c8; opacity: 0.8; }
+.revTag {
+  font-family: 'Black Ops One', sans-serif;
+  width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.3);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem;
+}
+.check { color: #6fd08c; font-size: 1.3rem; }
+
+.elimBox, .survBox { width: 100%; display: flex; flex-direction: column; gap: 0.4rem; align-items: center; }
+.elimTitle { color: #ffb4b4; font-weight: 800; margin: 0; }
+.survTitle { color: #6fd08c; font-weight: 800; margin: 0; }
+.allSafe { color: #6fd08c; font-weight: 800; text-align: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.chip { border-radius: 999px; padding: 0.2rem 0.6rem; font-size: 0.85rem; }
+.chipOut { background: rgba(120,20,20,0.4); border: 1px solid #7a2222; opacity: 0.85; }
+.chipAlive { background: rgba(40,120,70,0.3); border: 1px solid #4caf6a; }
+
+.contBtn {
+  background: #f2c14e; color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px; margin-top: 0.3rem;
+}
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+
+@media (max-width: 520px) {
+  .choices { flex-direction: column; }
+  .vs { padding: 0.2rem 0; }
+}

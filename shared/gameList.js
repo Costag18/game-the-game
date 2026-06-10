@@ -319,6 +319,102 @@ export const GAMES = {
       'Win your 1v1 matches across the mini-rounds to climb the Swiss standings.',
     ],
   },
+  buzzerRoyale: {
+    id: 'buzzerRoyale', name: 'Buzzer Royale', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Multiple-choice buzzer trivia — lock the right answer fastest to score the most.',
+    instructions: [
+      'Each question shows 4 choices (A/B/C/D) to everyone at the same time.',
+      'Tap a choice to buzz in and lock it — you get one lock per question.',
+      'Speed matters: the first to lock the correct answer scores most, decaying for each later correct buzz.',
+      'A wrong buzz scores 0 and locks you out of that question, so don\'t guess blindly.',
+      'Highest cumulative score across 8 questions wins.',
+    ],
+  },
+  higherLower: {
+    id: 'higherLower', name: 'Higher or Lower', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Is the next quantity higher or lower? Build a survival streak — miss and you\'re out.',
+    instructions: [
+      'A CURRENT card shows a quantity and its value; a NEXT card shows only a label, value hidden.',
+      'Everyone still in simultaneously taps HIGHER or LOWER for the next value vs the current one.',
+      'Correct callers survive and their streak grows; wrong callers are eliminated.',
+      'Equal values are a push — nobody is out. The revealed item becomes the new anchor.',
+      'Longest streak ranks first; ties share a placement.',
+    ],
+  },
+  priceIsWrong: {
+    id: 'priceIsWrong', name: 'Price Is Wrong', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Guess the real number — closest WITHOUT going over wins the round.',
+    instructions: [
+      'Each round shows a fact prompt and the unit to answer in.',
+      'Privately type one numeric guess and lock it in.',
+      'Closest guess without going over the true answer scores the most; ties share the payout.',
+      'Go over the real answer and you score 0 that round.',
+      'Highest cumulative score across 5 rounds wins.',
+    ],
+  },
+  timeline: {
+    id: 'timeline', name: 'Timeline', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Guess the year of historical events on a slider — closer is more points.',
+    instructions: [
+      'Each round shows a historical event.',
+      'Drag the slider (1400–2025) to your best guess for the year and lock it in.',
+      'Score is higher the closer you are; an exact hit is worth the most.',
+      'Guesses are private until the reveal, which shows the true year and everyone\'s markers.',
+      'Highest cumulative score over 6 events wins; ties share a placement.',
+    ],
+  },
+  guesstimate: {
+    id: 'guesstimate', name: 'Guesstimate', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Order-of-magnitude estimation — being within a factor still scores big.',
+    instructions: [
+      'Each round shows a numeric prompt (e.g. "Height of the Eiffel Tower").',
+      'Privately type your best positive-number guess and lock it in.',
+      'Scoring is log-relative: an exact guess is best, a 10× miss still scores decently.',
+      'Only wild order-of-magnitude misses are punished, and gently.',
+      'Highest cumulative total across 5 rounds wins; ties share a placement.',
+    ],
+  },
+  oddOneOut: {
+    id: 'oddOneOut', name: 'Odd One Out', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Spot the item that breaks the hidden rule — fastest correct tap scores most.',
+    instructions: [
+      'Each round shows 4 items; one breaks a hidden rule.',
+      'Tap the odd one out — the faster you\'re correct, the more you score.',
+      'A wrong tap scores 0 and locks you out of that round.',
+      'The reveal shows the odd item and the rule.',
+      'Highest cumulative score across 6 rounds wins.',
+    ],
+  },
+  rankIt: {
+    id: 'rankIt', name: 'Rank It', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Put the shuffled items into the correct order — accuracy scores.',
+    instructions: [
+      'Each round shows a category and a set of items in shuffled order.',
+      'Privately reorder them (tap to swap, or use arrows) into the order you think is correct.',
+      'Score is based on how many adjacent pairs you got in the right order.',
+      'The reveal shows the true order beside yours.',
+      'Highest cumulative score across 4 rounds wins; ties share a placement.',
+    ],
+  },
+  thisOrThat: {
+    id: 'thisOrThat', name: 'This or That', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Binary trivia survival — answer wrong and you\'re eliminated.',
+    instructions: [
+      'Each round shows a fact with two options, A and B.',
+      'Everyone still in simultaneously taps A or B.',
+      'Answer wrong and you\'re eliminated; correct players survive to the next question.',
+      'Players knocked out in the same round share a placement.',
+      'Last survivor ranks first (reverse-elimination order).',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

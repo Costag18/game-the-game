@@ -53,6 +53,14 @@ import GomokuGame from './games/Gomoku.jsx';
 import HexGame from './games/Hex.jsx';
 import OrderAndChaosGame from './games/OrderAndChaos.jsx';
 import NimHeistGame from './games/NimHeist.jsx';
+import BuzzerRoyaleGame from './games/BuzzerRoyale.jsx';
+import HigherLowerGame from './games/HigherLower.jsx';
+import PriceIsWrongGame from './games/PriceIsWrong.jsx';
+import TimelineGame from './games/Timeline.jsx';
+import GuesstimateGame from './games/Guesstimate.jsx';
+import OddOneOutGame from './games/OddOneOut.jsx';
+import RankItGame from './games/RankIt.jsx';
+import ThisOrThatGame from './games/ThisOrThat.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -90,6 +98,14 @@ const GAME_COMPONENTS = {
   hex: HexGame,
   orderChaos: OrderAndChaosGame,
   nim: NimHeistGame,
+  buzzerRoyale: BuzzerRoyaleGame,
+  higherLower: HigherLowerGame,
+  priceIsWrong: PriceIsWrongGame,
+  timeline: TimelineGame,
+  guesstimate: GuesstimateGame,
+  oddOneOut: OddOneOutGame,
+  rankIt: RankItGame,
+  thisOrThat: ThisOrThatGame,
 };
 
 function GameRouter() {

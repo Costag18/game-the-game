@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (32)
+## Mini-Games (40)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -117,6 +117,14 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Hex | 2-8 | 1v1 board (Pairing Engine), 11×11 connect-your-edges, never draws |
 | Order & Chaos | 2-8 | 1v1 board (Pairing Engine), 6×6, Order wants 5-in-a-row, Chaos blocks |
 | Nim Heist | 2-8 | 1v1 (Pairing Engine), misère take-away — take the last gem and you lose |
+| Buzzer Royale | 2-8 | Multiple-choice buzzer trivia, server arrival-order speed scoring, answer hidden pre-reveal |
+| Higher or Lower | 2-8 | Simultaneous higher/lower survival streak on hidden quantities |
+| Price Is Wrong | 2-8 | Closest-without-going-over numeric guess, 5 rounds, private guesses |
+| Timeline | 2-8 | Place the year of events on a slider, distance scoring, year hidden pre-reveal |
+| Guesstimate | 2-8 | Log-closeness numeric estimation, within-a-factor still scores |
+| Odd One Out | 2-8 | Tap the rule-breaker, arrival-order speed scoring, rule hidden pre-reveal |
+| Rank It | 2-8 | Reorder shuffled items, adjacent-pair accuracy scoring |
+| This or That | 2-8 | Binary trivia survival, wrong = eliminated, reverse-elimination ranking |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -507,6 +515,14 @@ The owner cares about:
 | Hex | Orbitron |
 | Order & Chaos | Audiowide |
 | Nim Heist | Wallpoet |
+| Buzzer Royale | Bungee |
+| Higher or Lower | Russo One |
+| Price Is Wrong | Shrikhand |
+| Timeline | Cinzel |
+| Guesstimate | Orbitron |
+| Odd One Out | Luckiest Guy |
+| Rank It | Audiowide |
+| This or That | Black Ops One |
 
 ## Versioning & Commits
 

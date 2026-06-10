@@ -31,6 +31,14 @@ import { Gomoku } from './Gomoku.js';
 import { Hex } from './Hex.js';
 import { OrderAndChaos } from './OrderAndChaos.js';
 import { NimHeist } from './NimHeist.js';
+import { BuzzerRoyale } from './BuzzerRoyale.js';
+import { HigherLower } from './HigherLower.js';
+import { PriceIsWrong } from './PriceIsWrong.js';
+import { Timeline } from './Timeline.js';
+import { Guesstimate } from './Guesstimate.js';
+import { OddOneOut } from './OddOneOut.js';
+import { RankIt } from './RankIt.js';
+import { ThisOrThat } from './ThisOrThat.js';
 
 const gameEngines = {};
 
@@ -85,3 +93,11 @@ registerGame('gomoku', Gomoku);
 registerGame('hex', Hex);
 registerGame('orderChaos', OrderAndChaos);
 registerGame('nim', NimHeist);
+registerGame('buzzerRoyale', BuzzerRoyale);
+registerGame('higherLower', HigherLower);
+registerGame('priceIsWrong', PriceIsWrong);
+registerGame('timeline', Timeline);
+registerGame('guesstimate', Guesstimate);
+registerGame('oddOneOut', OddOneOut);
+registerGame('rankIt', RankIt);
+registerGame('thisOrThat', ThisOrThat);
