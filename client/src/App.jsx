@@ -110,6 +110,10 @@ import CaptionClashGame from './games/CaptionClash.jsx';
 import ExquisiteCorpseGame from './games/ExquisiteCorpse.jsx';
 import TraceRaceGame from './games/TraceRace.jsx';
 import RansomNoteGame from './games/RansomNote.jsx';
+import PentagoGame from './games/Pentago.jsx';
+import QuoridorGame from './games/Quoridor.jsx';
+import LightsOutGame from './games/LightsOut.jsx';
+import LiarsMarketGame from './games/LiarsMarket.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -204,6 +208,10 @@ const GAME_COMPONENTS = {
   exquisiteCorpse: ExquisiteCorpseGame,
   traceRace: TraceRaceGame,
   ransomNote: RansomNoteGame,
+  pentago: PentagoGame,
+  quoridor: QuoridorGame,
+  lightsOut: LightsOutGame,
+  liarsMarket: LiarsMarketGame,
 };
 
 function GameRouter() {

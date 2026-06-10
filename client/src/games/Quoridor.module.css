@@ -1,0 +1,97 @@
+.boardWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 460px;
+}
+
+.wallCounts {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary, #f3e9d2);
+}
+.countMe { color: #6ec6ff; }
+.countOpp { color: #ff9e6e; }
+
+.grid {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #5a3a1e;
+  background: linear-gradient(135deg, #6b4423, #4a2f17);
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 2px 8px rgba(255, 255, 255, 0.12);
+  box-sizing: border-box;
+}
+
+/* cells */
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8d4a8;
+  background: radial-gradient(circle at 40% 35%, #f0e0bc, #d8bd8a);
+  border-radius: 4px;
+  cursor: default;
+  position: relative;
+}
+.goalCell { box-shadow: inset 0 0 0 2px rgba(110, 198, 255, 0.55); }
+.legal {
+  cursor: pointer;
+  background: radial-gradient(circle at 50% 50%, #9be19b, #5fae5f);
+  box-shadow: inset 0 0 0 2px #2e7d32;
+}
+.ghostCell { box-shadow: inset 0 0 0 3px #1b5e20, 0 0 10px 2px rgba(46, 125, 50, 0.7); }
+
+.pawn {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.5), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+.pawnMe { background: radial-gradient(circle at 35% 30%, #8fd6ff, #1565c0); }
+.pawnOpp { background: radial-gradient(circle at 35% 30%, #ffc08f, #d84315); }
+
+/* wall slots (gutters) */
+.hSlot, .vSlot {
+  border-radius: 4px;
+  background: transparent;
+  align-self: stretch;
+  justify-self: stretch;
+}
+.slotLive { cursor: pointer; }
+.slotLive:hover { background: rgba(212, 168, 67, 0.28); }
+.wallSel { background: var(--gold, #d4a843) !important; box-shadow: 0 0 8px 2px rgba(212, 168, 67, 0.8); }
+.wallOn {
+  background: #3a2410 !important;
+  background: linear-gradient(180deg, #5a3a1e, #2e1c0e) !important;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.25), 0 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  min-height: 1.1em;
+  color: var(--text-secondary, #cbb98f);
+  text-align: center;
+}
+
+.confirmBtn {
+  background: var(--gold, #d4a843);
+  color: #1a0e10;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.8rem;
+  font-weight: 800;
+  font-size: 1rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+.confirmBtn:disabled { opacity: 0.4; cursor: default; }

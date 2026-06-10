@@ -99,6 +99,10 @@ import previewCaptionClash from '../assets/gamepreviews/captionClash.png';
 import previewExquisiteCorpse from '../assets/gamepreviews/exquisiteCorpse.png';
 import previewTraceRace from '../assets/gamepreviews/traceRace.png';
 import previewRansomNote from '../assets/gamepreviews/ransomNote.png';
+import previewPentago from '../assets/gamepreviews/pentago.png';
+import previewQuoridor from '../assets/gamepreviews/quoridor.png';
+import previewLightsOut from '../assets/gamepreviews/lightsOut.png';
+import previewLiarsMarket from '../assets/gamepreviews/liarsMarket.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -190,6 +194,10 @@ const GAME_PREVIEWS = {
   exquisiteCorpse: previewExquisiteCorpse,
   traceRace: previewTraceRace,
   ransomNote: previewRansomNote,
+  pentago: previewPentago,
+  quoridor: previewQuoridor,
+  lightsOut: previewLightsOut,
+  liarsMarket: previewLiarsMarket,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

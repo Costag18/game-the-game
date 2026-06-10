@@ -1003,6 +1003,54 @@ export const GAMES = {
       'Most votes over the rounds wins; ties share a placement.',
     ],
   },
+  pentago: {
+    id: 'pentago', name: 'Pentago', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Place a marble, then twist a quadrant — first to five in a row wins. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'On your turn, first place one marble on any empty cell of the 6x6 board.',
+      'Then you MUST rotate one of the four 3x3 quadrants 90° clockwise or counter-clockwise.',
+      'Five of your marbles in a row (after the twist) wins; if the twist makes only your opponent five, they win.',
+      'Win matches across 3 mini-rounds to rank first.',
+    ],
+  },
+  quoridor: {
+    id: 'quoridor', name: 'Quoridor', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Race your pawn to the far side while fencing your rival in with walls. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'Each turn, EITHER step your pawn one square OR place one of your 10 walls.',
+      'Walls block movement but can never fully seal a player off from their goal.',
+      'First to reach the opposite side of the 9x9 board wins the match.',
+      'Win matches across 3 mini-rounds to rank first.',
+    ],
+  },
+  lightsOut: {
+    id: 'lightsOut', name: 'Lights Out Duel', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Take turns pressing cells on a shared grid — turn out the last light to win. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'You and your opponent share one 5x5 grid that starts with some lights on.',
+      'Pressing a cell toggles that cell plus its up/down/left/right neighbours.',
+      'Whoever makes the board completely dark on their move wins instantly.',
+      'Win matches across 3 mini-rounds to rank first.',
+    ],
+  },
+  liarsMarket: {
+    id: 'liarsMarket', name: "Liar's Market", minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Name a price for your secret stock (bluff allowed); your rival decides to buy or pass. 1v1 best-of-3 ladder.',
+    instructions: [
+      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
+      'You are secretly dealt a true stock value from 1 to 20 — only you can see it.',
+      'Over 6 rounds the seller role alternates: announce a price (possibly a bluff).',
+      'The buyer chooses BUY (pay the price, receive the true value) or PASS; the seller always pockets the price.',
+      'Higher net profit after 6 rounds wins the duel — win matches across 3 mini-rounds to rank first.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

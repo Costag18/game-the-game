@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (89)
+## Mini-Games (93)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -174,10 +174,14 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Exquisite Corpse | 3-8 | Draw one server-clamped band of a shared monster, vote best band |
 | Trace Race | 2-8 | Trace a target path, server coverage-minus-spillover scoring (no voting) |
 | Ransom Note | 3-8 | Convey a secret word with emoji from your hand, vote cleverest |
+| Pentago | 2-8 | 1v1 board (Pairing Engine), place a marble then twist a 3×3 quadrant, five-in-a-row on 6×6 |
+| Quoridor | 2-8 | 1v1 board (Pairing Engine), race a pawn across 9×9 while placing path-preserving walls (BFS-validated) |
+| Lights Out Duel | 2-8 | 1v1 (Pairing Engine), shared solvable 5×5, press toggles a cross — turn out the last light to win |
+| Liar's Market | 2-8 | 1v1 (Pairing Engine), hidden-value bluff: announce a price, opponent buys/passes, most profit over 6 rounds |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
-Inherently-1v1 games (Connect 4, more to come) can't natively produce a 1..N round ranking. `server/src/games/PairingEngine.js` solves this once: `class PairingEngine extends BaseGame` wraps N players in a Swiss mini-tournament (K=3 mini-rounds; odd count → one **bye** = free win), runs all pairings **simultaneously** as parallel 1v1 matches, re-pairs by record between mini-rounds, and `getResults()` ranks everyone by (wins → head-to-head → score differential).
+Inherently-1v1 games (Connect 4, Ultimate Tic-Tac-Toe, Othello, Dots & Boxes, Gomoku, Hex, Order & Chaos, Nim Heist, Pentago, Quoridor, Lights Out Duel, Liar's Market) can't natively produce a 1..N round ranking. `server/src/games/PairingEngine.js` solves this once: `class PairingEngine extends BaseGame` wraps N players in a Swiss mini-tournament (K=3 mini-rounds; odd count → one **bye** = free win), runs all pairings **simultaneously** as parallel 1v1 matches, re-pairs by record between mini-rounds, and `getResults()` ranks everyone by (wins → head-to-head → score differential).
 
 - **MatchEngine contract** (a plain object, NOT a BaseGame): `applyMove(pid, move)→bool`, `getView(pid)`, `isOver()`, `winner()`, `isDraw()`, optional `scoreDiff(pid)` (final tiebreak) and `autoMove()` (per-turn-timeout auto-play instead of forfeit). The match owns ONE board; it never touches ranking, byes, timers, the barrier, or leave handling.
 - **Thin wrapper** per game: `class Connect4 extends PairingEngine` just passes `matchFactory`, `miniRounds`, `matchTimerSec`, `matchHardCapSec`, `title`. Registered as a normal game; the PairingEngine itself is NOT registered and has no gameList entry.
@@ -629,6 +633,10 @@ The owner cares about:
 | Exquisite Corpse | Permanent Marker |
 | Trace Race | Audiowide |
 | Ransom Note | Special Elite |
+| Pentago | Audiowide |
+| Quoridor | Russo One |
+| Lights Out Duel | Orbitron |
+| Liar's Market | Playfair Display |
 
 ## Versioning & Commits
 

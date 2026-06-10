@@ -1,0 +1,65 @@
+.wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
+  width: 100%; max-width: 420px; margin: 0 auto;
+}
+
+.scoreRow { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 0.5rem; }
+.score { display: flex; flex-direction: column; align-items: center; min-width: 64px; }
+.scoreLabel { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; }
+.scoreVal { font-size: 1.5rem; font-weight: 800; color: var(--gold, #d4a843); font-variant-numeric: tabular-nums; }
+.roundPill {
+  background: rgba(255,255,255,0.08); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px; padding: 0.25rem 0.8rem; font-size: 0.8rem; white-space: nowrap;
+}
+
+.secret {
+  display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
+  width: 100%; padding: 0.55rem 0.5rem; border-radius: 12px;
+  background: linear-gradient(160deg, #14342b, #0c2019);
+  border: 1px solid #2f6f57; box-shadow: inset 0 2px 8px rgba(0,0,0,0.45);
+}
+.secretLabel { font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.8; }
+.secretVal { font-size: 2.1rem; font-weight: 900; color: #79f0c0; line-height: 1; }
+
+.panel {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  width: 100%; padding: 0.7rem; border-radius: 14px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--gold-dim, #8a6d2f);
+}
+.role { margin: 0; font-size: 0.85rem; text-align: center; opacity: 0.95; }
+.hint { margin: 0; font-size: 0.78rem; text-align: center; opacity: 0.7; }
+
+.bigPrice { font-size: 2.6rem; font-weight: 900; color: var(--gold, #d4a843); line-height: 1; }
+.slider { width: 100%; height: 28px; cursor: pointer; accent-color: var(--gold, #d4a843); }
+.slider:disabled { opacity: 0.4; cursor: default; }
+.sliderEnds { display: flex; justify-content: space-between; width: 100%; font-size: 0.72rem; opacity: 0.6; }
+
+.bigBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.6rem; font-weight: 800; font-size: 1rem; cursor: pointer;
+  min-height: 48px; width: 100%;
+}
+.bigBtn:disabled { opacity: 0.4; cursor: default; }
+
+.askPrice { color: var(--gold, #d4a843); font-weight: 800; }
+
+.choiceRow { display: flex; gap: 0.6rem; width: 100%; }
+.choiceBtn {
+  flex: 1; border: none; border-radius: 10px; padding: 0.7rem 0.5rem;
+  font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 52px; color: #1a0e10;
+}
+.choiceBtn:disabled { opacity: 0.4; cursor: default; }
+.buy { background: radial-gradient(circle at 35% 30%, #7be38f, #2e9e4f); color: #07210f; }
+.pass { background: radial-gradient(circle at 35% 30%, #ff9a8b, #d04545); color: #2a0a0a; }
+
+.waiting {
+  width: 100%; text-align: center; padding: 1rem 0.5rem; opacity: 0.8;
+  font-size: 0.9rem; border-radius: 12px; background: rgba(255,255,255,0.04);
+}
+
+.reveal {
+  width: 100%; text-align: center; padding: 0.8rem 0.5rem; border-radius: 12px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--gold-dim, #8a6d2f);
+}
+.revealLine { margin: 0; font-size: 1rem; }
+.revealLine strong { color: #79f0c0; font-size: 1.3rem; }

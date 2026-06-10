@@ -88,6 +88,10 @@ import { CaptionClash } from './CaptionClash.js';
 import { ExquisiteCorpse } from './ExquisiteCorpse.js';
 import { TraceRace } from './TraceRace.js';
 import { RansomNote } from './RansomNote.js';
+import { Pentago } from './Pentago.js';
+import { Quoridor } from './Quoridor.js';
+import { LightsOut } from './LightsOut.js';
+import { LiarsMarket } from './LiarsMarket.js';
 
 const gameEngines = {};
 
@@ -199,3 +203,7 @@ registerGame('captionClash', CaptionClash);
 registerGame('exquisiteCorpse', ExquisiteCorpse);
 registerGame('traceRace', TraceRace);
 registerGame('ransomNote', RansomNote);
+registerGame('pentago', Pentago);
+registerGame('quoridor', Quoridor);
+registerGame('lightsOut', LightsOut);
+registerGame('liarsMarket', LiarsMarket);
