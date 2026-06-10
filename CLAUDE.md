@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (61)
+## Mini-Games (64)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -146,6 +146,9 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Yahtzee | 2-8 | Lockstep 5-dice, keep + re-roll, 13-category scorecard, server RNG + scoring |
 | Domino Drift | 2-8 | Mexican-Train-lite dominoes, match pips, empty hand wins, pip-sum ranks the rest |
 | Bingo Brawl | 2-8 | Real-time 5×5 Bingo, server-called numbers, validated daubs, finish order ranks |
+| Twenty-Four | 2-8 | Make 24 from 4 numbers, safe server-side expression evaluator, speed scoring |
+| Target Locked | 2-8 | Countdown numbers — closest to target, whole-positive intermediates, server-validated |
+| Factor Frenzy | 2-8 | Tap every true divisor of the target, speed + streak, wrong taps penalised |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -565,6 +568,9 @@ The owner cares about:
 | Yahtzee | Bungee |
 | Domino Drift | Russo One |
 | Bingo Brawl | Luckiest Guy |
+| Twenty-Four | Orbitron |
+| Target Locked | Wallpoet |
+| Factor Frenzy | Russo One |
 
 ## Versioning & Commits
 

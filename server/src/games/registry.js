@@ -60,6 +60,9 @@ import { Qwixx } from './Qwixx.js';
 import { Yahtzee } from './Yahtzee.js';
 import { DominoDrift } from './DominoDrift.js';
 import { BingoBrawl } from './BingoBrawl.js';
+import { TwentyFour } from './TwentyFour.js';
+import { TargetLocked } from './TargetLocked.js';
+import { FactorFrenzy } from './FactorFrenzy.js';
 
 const gameEngines = {};
 
@@ -143,3 +146,6 @@ registerGame('qwixx', Qwixx);
 registerGame('yahtzee', Yahtzee);
 registerGame('dominoDrift', DominoDrift);
 registerGame('bingoBrawl', BingoBrawl);
+registerGame('twentyFour', TwentyFour);
+registerGame('targetLocked', TargetLocked);
+registerGame('factorFrenzy', FactorFrenzy);

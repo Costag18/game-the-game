@@ -667,6 +667,42 @@ export const GAMES = {
       'Finish order is your placement; daub count breaks ties.',
     ],
   },
+  twentyFour: {
+    id: 'twentyFour', name: 'Twenty-Four', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Race to make 24 from four numbers using + − × ÷ and parentheses.',
+    instructions: [
+      'Each deal shows the same four numbers (1–9) — a way to make 24 always exists.',
+      'Build an expression using each number exactly once that equals 24.',
+      'Tap the number/operator pad or type it, then submit — the server checks your math.',
+      'Faster correct answers score more; wrong tries don\'t lock you out.',
+      'Highest total over 4 deals wins; ties share a placement.',
+    ],
+  },
+  targetLocked: {
+    id: 'targetLocked', name: 'Target Locked', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Countdown numbers — combine six numbers to land as close to the target as you can.',
+    instructions: [
+      'Each round deals six source numbers and a random 3-digit target.',
+      'Build an expression (+ − × ÷ and parentheses) using each number at most once.',
+      'Every intermediate result must be a positive whole number.',
+      'Submit as often as you like — only your closest attempt counts.',
+      'Closer is worth more; highest total over 3 rounds wins.',
+    ],
+  },
+  factorFrenzy: {
+    id: 'factorFrenzy', name: 'Factor Frenzy', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Tap every true divisor of the target before the window closes — wrong taps cost you.',
+    instructions: [
+      'Each window shows a big target number and a grid of candidate numbers.',
+      'Tap every number that divides the target evenly for points + a streak bonus.',
+      'Tapping a non-divisor costs points and breaks your streak.',
+      'Each grid number can be tapped once; the window is short.',
+      'Highest cumulative score over 8 windows wins; ties share a placement.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

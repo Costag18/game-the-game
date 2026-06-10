@@ -82,6 +82,9 @@ import QwixxGame from './games/Qwixx.jsx';
 import YahtzeeGame from './games/Yahtzee.jsx';
 import DominoDriftGame from './games/DominoDrift.jsx';
 import BingoBrawlGame from './games/BingoBrawl.jsx';
+import TwentyFourGame from './games/TwentyFour.jsx';
+import TargetLockedGame from './games/TargetLocked.jsx';
+import FactorFrenzyGame from './games/FactorFrenzy.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -148,6 +151,9 @@ const GAME_COMPONENTS = {
   yahtzee: YahtzeeGame,
   dominoDrift: DominoDriftGame,
   bingoBrawl: BingoBrawlGame,
+  twentyFour: TwentyFourGame,
+  targetLocked: TargetLockedGame,
+  factorFrenzy: FactorFrenzyGame,
 };
 
 function GameRouter() {

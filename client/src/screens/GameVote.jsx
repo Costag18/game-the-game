@@ -71,6 +71,9 @@ import previewQwixx from '../assets/gamepreviews/qwixx.png';
 import previewYahtzee from '../assets/gamepreviews/yahtzee.png';
 import previewDominoDrift from '../assets/gamepreviews/dominoDrift.png';
 import previewBingoBrawl from '../assets/gamepreviews/bingoBrawl.png';
+import previewTwentyFour from '../assets/gamepreviews/twentyFour.png';
+import previewTargetLocked from '../assets/gamepreviews/targetLocked.png';
+import previewFactorFrenzy from '../assets/gamepreviews/factorFrenzy.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -134,6 +137,9 @@ const GAME_PREVIEWS = {
   yahtzee: previewYahtzee,
   dominoDrift: previewDominoDrift,
   bingoBrawl: previewBingoBrawl,
+  twentyFour: previewTwentyFour,
+  targetLocked: previewTargetLocked,
+  factorFrenzy: previewFactorFrenzy,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {
