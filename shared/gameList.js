@@ -703,6 +703,66 @@ export const GAMES = {
       'Highest cumulative score over 8 windows wins; ties share a placement.',
     ],
   },
+  goingOnce: {
+    id: 'goingOnce', name: 'Going Once', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Live ascending auction — bid up 6 face-up lots, win the most value before your cash runs out.',
+    instructions: [
+      'Everyone starts with 100 coins. Six face-up lots (worth 5–40) come up one at a time.',
+      'Tap RAISE to become the high bidder; the price climbs +5 each time (only if you can afford it).',
+      'A 6-second "going once" countdown resets on every raise.',
+      'When it runs out, the high bidder pays their bid and wins the lot\'s value.',
+      'Most total value after 6 lots wins; leftover cash breaks ties — cheap wins beat overpaying.',
+    ],
+  },
+  dutchDrop: {
+    id: 'dutchDrop', name: 'Dutch Drop', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Descending auction — grab a mystery lot before the price drops too far, or a rival snaps it.',
+    instructions: [
+      'You start with 100 coins; six mystery lots are auctioned one at a time.',
+      'Each lot\'s price starts high and ticks DOWN every second.',
+      'Hit BUY to claim it at the current price — the first affordable buyer wins.',
+      'The hidden value is revealed only after it sells; profit = value − price.',
+      'Highest total profit after 6 lots wins; ties share a placement.',
+    ],
+  },
+  sealedVault: {
+    id: 'sealedVault', name: 'Sealed Vault', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Sealed-bid auction — secretly bid on mystery lots; highest bidder pays and pockets the loot.',
+    instructions: [
+      'You start with 100 coins. Each of 5 rounds puts a mystery lot (worth a hidden 20–80) on the block.',
+      'Everyone secretly submits one sealed bid (up to your bankroll).',
+      'Bids resolve together; the highest bidder pays their bid and wins the lot\'s value.',
+      'You can never bid more than you hold, and bids stay hidden until the reveal.',
+      'Most total loot after 5 lots wins; leftover bankroll breaks ties.',
+    ],
+  },
+  lastBidStanding: {
+    id: 'lastBidStanding', name: 'Last Bid Standing', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'All-pay war of attrition — everyone who stays in pays each tick; last one standing takes the jackpot.',
+    instructions: [
+      'One jackpot is up for grabs; everyone starts with a bankroll.',
+      'Each tick, choose RAISE or DROP — everyone who raises PAYS the tick cost (even if they lose).',
+      'Once you drop, you\'re out for good; can\'t afford the tick = auto-drop.',
+      'The last player still in wins the jackpot.',
+      'Drop order (reversed) is your placement — last standing ranks first.',
+    ],
+  },
+  tokenTussle: {
+    id: 'tokenTussle', name: 'Token Tussle', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Colonel Blotto — secretly split 20 tokens across 5 fronts; win each front by committing the most.',
+    instructions: [
+      'Each round there are 5 fronts, each worth a prize.',
+      'Privately distribute up to 20 tokens across the fronts.',
+      'For each front, whoever committed the most tokens wins its prize (ties split it).',
+      'Allocations are secret until the reveal.',
+      'Highest total over 3 rounds wins; ties share a placement.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

@@ -63,6 +63,11 @@ import { BingoBrawl } from './BingoBrawl.js';
 import { TwentyFour } from './TwentyFour.js';
 import { TargetLocked } from './TargetLocked.js';
 import { FactorFrenzy } from './FactorFrenzy.js';
+import { GoingOnce } from './GoingOnce.js';
+import { DutchDrop } from './DutchDrop.js';
+import { SealedVault } from './SealedVault.js';
+import { LastBidStanding } from './LastBidStanding.js';
+import { TokenTussle } from './TokenTussle.js';
 
 const gameEngines = {};
 
@@ -149,3 +154,8 @@ registerGame('bingoBrawl', BingoBrawl);
 registerGame('twentyFour', TwentyFour);
 registerGame('targetLocked', TargetLocked);
 registerGame('factorFrenzy', FactorFrenzy);
+registerGame('goingOnce', GoingOnce);
+registerGame('dutchDrop', DutchDrop);
+registerGame('sealedVault', SealedVault);
+registerGame('lastBidStanding', LastBidStanding);
+registerGame('tokenTussle', TokenTussle);

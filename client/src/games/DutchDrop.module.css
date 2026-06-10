@@ -1,0 +1,117 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.loading { color: var(--text-secondary, #b8a88a); font-size: 1.1rem; }
+
+.head { display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+.title {
+  font-family: 'Bungee', 'Fredoka', sans-serif;
+  font-size: clamp(1.7rem, 5.5vw, 2.6rem);
+  color: #ffd66b; margin: 0; letter-spacing: 1px;
+  text-shadow: 2px 2px 0 #5a2a00, 0 0 18px rgba(255,170,40,0.35);
+}
+.round { color: var(--text-secondary, #d8c79a); font-weight: 800; letter-spacing: 0.5px; }
+
+/* wallet strip */
+.wallet {
+  display: flex; gap: 0.8rem; width: 100%; justify-content: center;
+}
+.walletItem {
+  flex: 1; max-width: 200px; display: flex; flex-direction: column; align-items: center;
+  background: linear-gradient(135deg, #163a2a, #0c241a);
+  border: 2px solid #2f7d52; border-radius: 12px; padding: 0.5rem 0.6rem;
+}
+.walletLabel { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #9fd3b5; }
+.walletBank { font-size: 1.6rem; font-weight: 900; color: #ffd66b; }
+.walletProfit { font-size: 1.6rem; font-weight: 900; color: #f3e9d2; }
+.pos { color: #5ee08a !important; }
+.neg { color: #ff7a7a !important; }
+
+/* live lot card */
+.lotCard {
+  width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  background: radial-gradient(circle at 50% 0%, #1d4d39, #0a1f17);
+  border: 3px solid #d4a843; border-radius: 18px; padding: 1.1rem 1rem 1.3rem;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.45), 0 6px 20px rgba(0,0,0,0.4);
+}
+.lotName { font-size: clamp(1.2rem, 4vw, 1.7rem); font-weight: 800; color: #f3e9d2; text-align: center; }
+.askLabel { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 2px; color: #c9b07a; }
+.price {
+  font-family: 'Bungee', sans-serif;
+  font-size: clamp(3rem, 14vw, 5rem); line-height: 1; color: #ffd66b;
+  text-shadow: 0 0 24px rgba(255,180,40,0.5); margin: 0.1rem 0;
+}
+.priceBar {
+  width: 100%; max-width: 360px; height: 10px; border-radius: 6px;
+  background: #0a1f17; border: 1px solid #2f7d52; overflow: hidden;
+}
+.priceFill {
+  height: 100%; background: linear-gradient(90deg, #ffd66b, #ff8a3d);
+  transition: width 0.4s linear;
+}
+.tickRow {
+  width: 100%; max-width: 360px; display: flex; justify-content: space-between;
+  font-size: 0.8rem; color: #c9b07a;
+}
+.buyBtn {
+  margin-top: 0.4rem;
+  background: linear-gradient(135deg, #ffd66b, #f0a93c); color: #3a1c00;
+  border: none; border-radius: 12px; padding: 0.85rem 2.2rem;
+  font-family: 'Bungee', sans-serif; font-size: 1.15rem; cursor: pointer;
+  min-height: 52px; min-width: 200px; box-shadow: 0 4px 0 #a86a1c;
+}
+.buyBtn:active { transform: translateY(2px); box-shadow: 0 2px 0 #a86a1c; }
+.buyBtn:disabled { opacity: 0.45; cursor: default; box-shadow: none; filter: grayscale(0.4); }
+.hint { font-size: 0.82rem; color: #9fb8a8; text-align: center; max-width: 380px; margin: 0.3rem 0 0; }
+
+/* reveal */
+.reveal { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 0.55rem; }
+.revealName { font-size: 1.3rem; font-weight: 800; color: #f3e9d2; }
+.soldTo {
+  font-size: 1.1rem; color: #ffd66b; font-weight: 700; display: flex; align-items: center; gap: 0.35rem;
+  flex-wrap: wrap; justify-content: center;
+}
+.passed { font-size: 1.2rem; font-weight: 800; color: #ff9a6b; letter-spacing: 1px; }
+.valueRow {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: #0c241a; border: 2px solid #2f7d52; border-radius: 12px; padding: 0.4rem 1.1rem;
+}
+.valueLabel { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: #9fd3b5; }
+.valueNum { font-family: 'Bungee', sans-serif; font-size: 1.8rem; color: #ffd66b; }
+.profitTag { font-size: 1.1rem; font-weight: 800; color: #f3e9d2; }
+.finTitle { font-family: 'Bungee', sans-serif; color: #ffd66b; margin: 0.2rem 0; font-size: 1.5rem; }
+
+/* finished history */
+.history { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.3rem; }
+.histRow {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+  font-size: 0.85rem; padding: 0.35rem 0.6rem; border-radius: 8px;
+  background: rgba(255,255,255,0.04); color: #d8c79a;
+}
+.histName { font-weight: 700; color: #f3e9d2; flex: 1 1 auto; }
+.histVal { color: #9fd3b5; }
+.histRes { display: flex; align-items: center; gap: 0.3rem; }
+
+/* scoreboard */
+.scoreboard {
+  width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.4rem;
+  background: rgba(0,0,0,0.25); border-radius: 12px; padding: 0.6rem;
+}
+.scoreHead { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px; color: #c9b07a; text-align: center; }
+.scoreRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  padding: 0.35rem 0.5rem; border-radius: 8px;
+}
+.meRow { background: rgba(255,214,107,0.12); }
+.scoreMeta { display: flex; align-items: center; gap: 0.7rem; }
+.scoreBank { color: #d8c79a; font-size: 0.9rem; }
+.scoreProfit { font-weight: 800; min-width: 38px; text-align: right; color: #f3e9d2; }

@@ -74,6 +74,11 @@ import previewBingoBrawl from '../assets/gamepreviews/bingoBrawl.png';
 import previewTwentyFour from '../assets/gamepreviews/twentyFour.png';
 import previewTargetLocked from '../assets/gamepreviews/targetLocked.png';
 import previewFactorFrenzy from '../assets/gamepreviews/factorFrenzy.png';
+import previewGoingOnce from '../assets/gamepreviews/goingOnce.png';
+import previewDutchDrop from '../assets/gamepreviews/dutchDrop.png';
+import previewSealedVault from '../assets/gamepreviews/sealedVault.png';
+import previewLastBidStanding from '../assets/gamepreviews/lastBidStanding.png';
+import previewTokenTussle from '../assets/gamepreviews/tokenTussle.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -140,6 +145,11 @@ const GAME_PREVIEWS = {
   twentyFour: previewTwentyFour,
   targetLocked: previewTargetLocked,
   factorFrenzy: previewFactorFrenzy,
+  goingOnce: previewGoingOnce,
+  dutchDrop: previewDutchDrop,
+  sealedVault: previewSealedVault,
+  lastBidStanding: previewLastBidStanding,
+  tokenTussle: previewTokenTussle,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

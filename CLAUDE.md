@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (64)
+## Mini-Games (69)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -149,6 +149,11 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Twenty-Four | 2-8 | Make 24 from 4 numbers, safe server-side expression evaluator, speed scoring |
 | Target Locked | 2-8 | Countdown numbers — closest to target, whole-positive intermediates, server-validated |
 | Factor Frenzy | 2-8 | Tap every true divisor of the target, speed + streak, wrong taps penalised |
+| Going Once | 2-8 | Live ascending auction, server-validated bankrolls, going-once timer, most value wins |
+| Dutch Drop | 2-8 | Descending-price auction, first-to-buy by server arrival, hidden lot value, profit race |
+| Sealed Vault | 2-8 | Sealed-bid auction, private bids until reveal, highest pays, most loot wins |
+| Last Bid Standing | 3-8 | All-pay attrition, everyone in pays each tick, last standing takes the jackpot (reverse-elim) |
+| Token Tussle | 2-8 | Colonel Blotto — secretly split 20 tokens over 5 fronts, most-per-front wins it |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -571,6 +576,11 @@ The owner cares about:
 | Twenty-Four | Orbitron |
 | Target Locked | Wallpoet |
 | Factor Frenzy | Russo One |
+| Going Once | Cinzel |
+| Dutch Drop | Bungee |
+| Sealed Vault | Playfair Display |
+| Last Bid Standing | Black Ops One |
+| Token Tussle | Orbitron |
 
 ## Versioning & Commits
 

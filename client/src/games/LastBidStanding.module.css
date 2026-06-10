@@ -1,0 +1,125 @@
+/* Last Bid Standing — all-pay attrition auction. NO margin-left (the .gameMainArea
+   wrapper already applies the pet-sidebar offset). Center via max-width + auto. */
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { text-align: center; }
+.title {
+  font-family: 'Black Ops One', 'Archivo Black', sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2.5rem);
+  color: #ffd24a;
+  margin: 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 0 #6a3b00, 0 0 18px rgba(255,180,40,0.35);
+}
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+
+/* banner: jackpot + tick cost */
+.banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.8rem;
+  width: 100%; flex-wrap: wrap;
+  background: linear-gradient(135deg, #1d1206, #2c1a08);
+  border: 2px solid #c98a1e; border-radius: 14px; padding: 0.7rem 1rem;
+  box-shadow: inset 0 0 22px rgba(0,0,0,0.5);
+}
+.jackpot { display: flex; flex-direction: column; align-items: flex-start; }
+.jackLabel { font-family: 'Black Ops One', sans-serif; font-size: 0.7rem; letter-spacing: 2px; color: #e7b850; }
+.jackVal { font-family: 'Black Ops One', sans-serif; font-size: clamp(1.4rem, 4vw, 2rem); color: #ffd24a; text-shadow: 0 0 12px rgba(255,200,60,0.5); }
+.tickInfo { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; text-align: right; }
+.tickCost { font-size: 0.85rem; color: var(--text-primary, #f3e9d2); }
+.tickCost b { color: #ff8a5e; }
+.tickNo { font-size: 0.8rem; color: var(--text-secondary, #b8a88a); font-weight: 700; }
+
+/* wallet */
+.wallet { display: flex; gap: 0.6rem; width: 100%; }
+.walletCell {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  background: rgba(0,0,0,0.28); border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 12px; padding: 0.5rem 0.6rem;
+}
+.wLabel { font-size: 0.72rem; letter-spacing: 1px; color: var(--text-secondary, #b8a88a); text-transform: uppercase; }
+.wBig { font-family: 'Black Ops One', sans-serif; font-size: 1.7rem; color: #7CFC9B; font-variant-numeric: tabular-nums; }
+.wSunk { font-family: 'Black Ops One', sans-serif; font-size: 1.7rem; color: #ff8a5e; font-variant-numeric: tabular-nums; }
+
+/* decision */
+.decision { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; width: 100%; }
+.countdown { display: flex; flex-direction: column; align-items: center; }
+.cdNum { font-family: 'Black Ops One', sans-serif; font-size: 2.6rem; color: #ffd24a; line-height: 1; font-variant-numeric: tabular-nums; }
+.cdLabel { font-size: 0.8rem; color: var(--text-secondary, #b8a88a); letter-spacing: 1px; }
+.choices { display: flex; gap: 0.8rem; width: 100%; max-width: 460px; }
+.raiseBtn, .dropBtn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
+  border: none; border-radius: 14px; padding: 0.9rem 0.6rem; cursor: pointer;
+  font-family: 'Black Ops One', sans-serif; font-size: 1.3rem; letter-spacing: 1px;
+  min-height: 64px; color: #1a0e10;
+}
+.raiseBtn { background: linear-gradient(160deg, #7CFC9B, #2fae5c); box-shadow: 0 4px 0 #1c7a3d; }
+.raiseBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #1c7a3d; }
+.raiseBtn:disabled { opacity: 0.4; cursor: default; box-shadow: none; transform: none; }
+.dropBtn { background: linear-gradient(160deg, #ff9a76, #e0552e); box-shadow: 0 4px 0 #a23612; color: #2a0c05; }
+.dropBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #a23612; }
+.btnSub { font-family: 'Raleway', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0; opacity: 0.85; text-transform: none; }
+.broke { color: #ff8a8a; font-size: 0.88rem; margin: 0; text-align: center; }
+
+/* waiting / out */
+.waitBox { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; width: 100%; padding: 0.6rem 0; }
+.waitMsg { font-family: 'Black Ops One', sans-serif; font-size: 1.3rem; color: var(--gold, #d4a843); margin: 0; }
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; font-size: 0.9rem; }
+
+/* reveal */
+.reveal { width: 100%; text-align: center; }
+.revHead { font-size: 1.05rem; color: var(--text-primary, #f3e9d2); margin: 0.2rem 0; }
+.winLine { font-family: 'Black Ops One', sans-serif; font-size: clamp(1.1rem, 3.5vw, 1.5rem); color: #ffd24a; margin: 0.4rem 0; display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+
+/* table of seats */
+.table {
+  width: 100%; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+.seat {
+  background: var(--bg-panel, #2a1518); border: 2px solid transparent; border-radius: 12px;
+  padding: 0.5rem 0.6rem; display: flex; flex-direction: column; gap: 0.3rem;
+}
+.seatIn { border-color: var(--gold-dim, #8a6d2f); }
+.seatOut { opacity: 0.5; }
+.seatMe { box-shadow: 0 0 0 2px rgba(255,210,74,0.4); }
+.seatTop { display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
+.seatStats { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+.seatBank { font-size: 0.85rem; color: #7CFC9B; font-weight: 700; }
+.seatSunk { font-size: 0.78rem; color: #ff8a5e; }
+.lockChip { font-size: 0.68rem; background: rgba(124,252,155,0.18); color: #7CFC9B; border-radius: 999px; padding: 0.1rem 0.5rem; font-weight: 700; }
+.thinkChip { font-size: 0.68rem; background: rgba(255,255,255,0.08); color: var(--text-secondary, #b8a88a); border-radius: 999px; padding: 0.1rem 0.5rem; }
+.outChip { font-size: 0.68rem; background: rgba(224,85,46,0.2); color: #ff9a76; border-radius: 999px; padding: 0.1rem 0.5rem; font-weight: 700; letter-spacing: 1px; }
+
+/* scoreboard */
+.scoreboard { width: 100%; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.3rem; }
+.scoreRow {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: rgba(0,0,0,0.25); border-radius: 10px; padding: 0.4rem 0.7rem;
+}
+.scoreWin { background: rgba(255,210,74,0.16); box-shadow: inset 0 0 0 1px var(--gold, #d4a843); }
+.place { font-family: 'Black Ops One', sans-serif; color: var(--gold, #d4a843); min-width: 2rem; }
+.scoreVal { margin-left: auto; font-weight: 800; color: #ffd24a; font-variant-numeric: tabular-nums; }
+
+/* ack */
+.ackWrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: 100%; }
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+
+@media (max-width: 560px) {
+  .choices { flex-direction: column; }
+  .banner { flex-direction: column; align-items: flex-start; }
+  .tickInfo { align-items: flex-start; text-align: left; }
+}

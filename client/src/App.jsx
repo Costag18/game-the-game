@@ -85,6 +85,11 @@ import BingoBrawlGame from './games/BingoBrawl.jsx';
 import TwentyFourGame from './games/TwentyFour.jsx';
 import TargetLockedGame from './games/TargetLocked.jsx';
 import FactorFrenzyGame from './games/FactorFrenzy.jsx';
+import GoingOnceGame from './games/GoingOnce.jsx';
+import DutchDropGame from './games/DutchDrop.jsx';
+import SealedVaultGame from './games/SealedVault.jsx';
+import LastBidStandingGame from './games/LastBidStanding.jsx';
+import TokenTussleGame from './games/TokenTussle.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -154,6 +159,11 @@ const GAME_COMPONENTS = {
   twentyFour: TwentyFourGame,
   targetLocked: TargetLockedGame,
   factorFrenzy: FactorFrenzyGame,
+  goingOnce: GoingOnceGame,
+  dutchDrop: DutchDropGame,
+  sealedVault: SealedVaultGame,
+  lastBidStanding: LastBidStandingGame,
+  tokenTussle: TokenTussleGame,
 };
 
 function GameRouter() {

@@ -151,6 +151,25 @@ export class LastBidStanding extends BaseGame {
     }
   }
 
+  // A lone survivor (everyone else left) wins outright — no all-pay charge, no
+  // forced drop. Used by the leave path so the last person standing isn't punished.
+  _walkoverWin(pid) {
+    if (this.state !== 'tick') return;
+    this._clearTimer('_tickTimer');
+    this.winner = pid;
+    this.bankroll[pid] += this.jackpot;
+    this.lastReveal = {
+      tickNumber: this.tickNumber,
+      raisers: [pid],
+      droppers: [],
+      payments: {},
+      remainingIn: [pid],
+      tickCost: this.tickCost,
+      walkover: true,
+    };
+    this.transition('resolve'); // -> onEnterReveal (final)
+  }
+
   // ---------- REVEAL (intermission between ticks / final) ----------
   onEnterReveal() {
     this.acknowledged = new Set();
@@ -251,10 +270,11 @@ export class LastBidStanding extends BaseGame {
     }
 
     if (this.state === 'tick' && wasIn) {
-      // One fewer racer — if everyone still IN has chosen, resolve now.
+      // One fewer racer.
       if (this.inPlayers.length === 1) {
-        // Only one left IN: they win by walkover.
-        this._resolveTick();
+        // Only one left IN: they win by walkover (no forced-drop — they keep their
+        // pending choice if any, but a lone survivor wins regardless).
+        this._walkoverWin(this.inPlayers[0]);
       } else {
         this._maybeResolveEarly();
       }
