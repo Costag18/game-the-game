@@ -43,6 +43,48 @@ export const MULTIPLE_CHOICE = [
   { q: 'What is the closest planet to the Sun?', choices: ['Venus', 'Earth', 'Mercury', 'Mars'], answer: 2 },
   { q: 'Which instrument has black and white keys?', choices: ['Violin', 'Piano', 'Flute', 'Drums'], answer: 1 },
   { q: 'How many degrees are in a right angle?', choices: ['45', '90', '180', '360'], answer: 1 },
+  { q: 'What is the capital of Australia?', choices: ['Sydney', 'Melbourne', 'Canberra', 'Perth'], answer: 2 },
+  { q: 'What is the capital of Canada?', choices: ['Toronto', 'Ottawa', 'Vancouver', 'Montreal'], answer: 1 },
+  { q: 'Which country is the largest by land area?', choices: ['Canada', 'China', 'USA', 'Russia'], answer: 3 },
+  { q: 'What is the chemical symbol for oxygen?', choices: ['Ox', 'O', 'Om', 'On'], answer: 1 },
+  { q: 'Who wrote Romeo and Juliet?', choices: ['Charles Dickens', 'William Shakespeare', 'Mark Twain', 'Leo Tolstoy'], answer: 1 },
+  { q: 'Which of these is a noble gas?', choices: ['Oxygen', 'Helium', 'Hydrogen', 'Nitrogen'], answer: 1 },
+  { q: 'What is the chemical symbol for hydrogen?', choices: ['He', 'H', 'Hy', 'Hg'], answer: 1 },
+  { q: 'Which is the smallest ocean?', choices: ['Indian', 'Arctic', 'Atlantic', 'Southern'], answer: 1 },
+  { q: 'What is the fastest land animal?', choices: ['Lion', 'Cheetah', 'Horse', 'Pronghorn'], answer: 1 },
+  { q: 'What is the currency of Japan?', choices: ['Won', 'Yuan', 'Yen', 'Ringgit'], answer: 2 },
+  { q: 'How many degrees are in a circle?', choices: ['180', '270', '360', '90'], answer: 2 },
+  { q: 'What is the longest bone in the human body?', choices: ['Femur', 'Tibia', 'Humerus', 'Spine'], answer: 0 },
+  { q: 'Which vitamin does sunlight help the body produce?', choices: ['Vitamin A', 'Vitamin B12', 'Vitamin C', 'Vitamin D'], answer: 3 },
+  { q: 'Which galaxy is Earth located in?', choices: ['Andromeda', 'Milky Way', 'Whirlpool', 'Sombrero'], answer: 1 },
+  { q: 'The Great Barrier Reef is off the coast of which country?', choices: ['Brazil', 'Australia', 'Mexico', 'Thailand'], answer: 1 },
+  { q: 'What is the tallest land animal?', choices: ['Elephant', 'Giraffe', 'Ostrich', 'Camel'], answer: 1 },
+  { q: 'Which language has the most native speakers?', choices: ['English', 'Hindi', 'Mandarin Chinese', 'Spanish'], answer: 2 },
+  { q: 'In which museum is the Mona Lisa displayed?', choices: ['The Louvre', 'The Met', 'Uffizi Gallery', 'Prado'], answer: 0 },
+  { q: 'Who developed the theory of general relativity?', choices: ['Isaac Newton', 'Albert Einstein', 'Niels Bohr', 'Galileo'], answer: 1 },
+  { q: 'Which sea creature has three hearts?', choices: ['Octopus', 'Shark', 'Tuna', 'Crab'], answer: 0 },
+  { q: 'On which continent is the Sahara Desert?', choices: ['Asia', 'Africa', 'Australia', 'South America'], answer: 1 },
+  { q: 'Which is the smallest planet in our solar system?', choices: ['Mercury', 'Mars', 'Venus', 'Earth'], answer: 0 },
+  { q: 'Which country gifted the Statue of Liberty to the USA?', choices: ['United Kingdom', 'France', 'Spain', 'Italy'], answer: 1 },
+  { q: "Which gas makes up most of Earth's atmosphere?", choices: ['Oxygen', 'Nitrogen', 'Carbon dioxide', 'Argon'], answer: 1 },
+  { q: 'What is the largest organ of the human body?', choices: ['Skin', 'Liver', 'Brain', 'Heart'], answer: 0 },
+  { q: 'What does the chemical symbol Na stand for?', choices: ['Sodium', 'Nitrogen', 'Nickel', 'Neon'], answer: 0 },
+  { q: 'Which planet is famous for its prominent ring system?', choices: ['Jupiter', 'Saturn', 'Uranus', 'Neptune'], answer: 1 },
+  { q: 'Who is credited with the laws of motion and gravity?', choices: ['Einstein', 'Isaac Newton', 'Galileo', 'Tesla'], answer: 1 },
+  { q: 'What is the fear of spiders called?', choices: ['Claustrophobia', 'Arachnophobia', 'Acrophobia', 'Agoraphobia'], answer: 1 },
+  { q: 'What is the largest species of fish?', choices: ['Great white shark', 'Whale shark', 'Tiger shark', 'Manta ray'], answer: 1 },
+  { q: 'In which country is the city of Istanbul?', choices: ['Greece', 'Turkey', 'Egypt', 'Iran'], answer: 1 },
+  { q: 'Sound travels fastest through which medium?', choices: ['Air', 'Water', 'Steel', 'A vacuum'], answer: 2 },
+  { q: 'Which planet rotates on its side?', choices: ['Mars', 'Uranus', 'Venus', 'Saturn'], answer: 1 },
+  { q: 'Which part of the cell is called the powerhouse?', choices: ['Nucleus', 'Mitochondria', 'Ribosome', 'Membrane'], answer: 1 },
+  { q: "Which planet is known as Earth's twin in size?", choices: ['Mars', 'Venus', 'Mercury', 'Neptune'], answer: 1 },
+  { q: 'Which ancient wonder of the world still stands today?', choices: ['Hanging Gardens', 'Great Pyramid of Giza', 'Colossus of Rhodes', 'Lighthouse of Alexandria'], answer: 1 },
+  { q: 'What is the universal blood donor type?', choices: ['AB positive', 'O negative', 'A positive', 'B negative'], answer: 1 },
+  { q: 'What is the currency of the United Kingdom?', choices: ['Euro', 'Pound sterling', 'Dollar', 'Franc'], answer: 1 },
+  { q: 'How many chambers does the human heart have?', choices: ['2', '3', '4', '5'], answer: 2 },
+  { q: 'Which is the deepest ocean?', choices: ['Atlantic', 'Indian', 'Pacific', 'Arctic'], answer: 2 },
+  { q: 'What is the main ingredient in traditional guacamole?', choices: ['Avocado', 'Pea', 'Cucumber', 'Broccoli'], answer: 0 },
+  { q: 'Which planet has the Great Red Spot?', choices: ['Mars', 'Jupiter', 'Saturn', 'Neptune'], answer: 1 },
 ];
 
 // ---- Quantities: { label, value, unit }. Used by Higher/Lower & Rank It — correct
@@ -76,6 +118,27 @@ export const QUANTITIES = [
   { label: 'Length of a marathon', value: 42, unit: 'km' },
   { label: 'Number of moons of Mars', value: 2, unit: 'moons' },
   { label: 'Number of planets in the solar system', value: 8, unit: 'planets' },
+  { label: 'Speed of sound in air', value: 1235, unit: 'km/h' },
+  { label: 'Cruising speed of a passenger jet', value: 900, unit: 'km/h' },
+  { label: 'Speed of a three-toed sloth', value: 0.24, unit: 'km/h' },
+  { label: 'Average human walking speed', value: 5, unit: 'km/h' },
+  { label: 'Distance from the Earth to the Moon', value: 384400, unit: 'km' },
+  { label: 'Diameter of the Sun', value: 1391000, unit: 'km' },
+  { label: 'Diameter of Venus', value: 12104, unit: 'km' },
+  { label: 'Diameter of Mercury', value: 4879, unit: 'km' },
+  { label: 'Height of the CN Tower', value: 553, unit: 'm' },
+  { label: 'Height of the Great Pyramid of Giza', value: 139, unit: 'm' },
+  { label: 'Number of US states', value: 50, unit: 'states' },
+  { label: 'Letters in the English alphabet', value: 26, unit: 'letters' },
+  { label: 'Holes on a standard golf course', value: 18, unit: 'holes' },
+  { label: 'Weeks in a year', value: 52, unit: 'weeks' },
+  { label: 'Hours in a week', value: 168, unit: 'hours' },
+  { label: 'Bones a human is born with', value: 270, unit: 'bones' },
+  { label: 'Countries in Africa', value: 54, unit: 'countries' },
+  { label: 'Chromosomes in a human cell', value: 46, unit: 'chromosomes' },
+  { label: 'Elements in the periodic table', value: 118, unit: 'elements' },
+  { label: 'Players on an American football team (on field)', value: 11, unit: 'players' },
+  { label: 'Length of the Great Wall of China', value: 21196, unit: 'km' },
 ];
 
 // ---- Numeric facts: { prompt, answer, unit }. Used by Price Is Wrong (closest-without-over)
@@ -99,6 +162,28 @@ export const NUMERIC_FACTS = [
   { prompt: 'Number of players on a soccer team on the field', answer: 11, unit: 'players' },
   { prompt: 'Number of minutes in a day', answer: 1440, unit: 'minutes' },
   { prompt: 'Freezing point of water in Fahrenheit', answer: 32, unit: '°F' },
+  { prompt: 'Number of US states', answer: 50, unit: 'states' },
+  { prompt: 'Number of bones a human is born with', answer: 270, unit: 'bones' },
+  { prompt: 'Number of chromosomes in a human cell', answer: 46, unit: 'chromosomes' },
+  { prompt: 'Number of countries in Africa', answer: 54, unit: 'countries' },
+  { prompt: 'Number of elements in the periodic table', answer: 118, unit: 'elements' },
+  { prompt: 'Distance from the Earth to the Moon', answer: 384400, unit: 'km' },
+  { prompt: 'Diameter of the Sun', answer: 1391000, unit: 'km' },
+  { prompt: 'Boiling point of water in Fahrenheit', answer: 212, unit: '°F' },
+  { prompt: 'Number of seconds in an hour', answer: 3600, unit: 'seconds' },
+  { prompt: 'Number of minutes in a week', answer: 10080, unit: 'minutes' },
+  { prompt: 'Average human body temperature', answer: 37, unit: '°C' },
+  { prompt: 'Number of vertebrae in the human spine', answer: 33, unit: 'vertebrae' },
+  { prompt: 'Number of ribs in the human body', answer: 24, unit: 'ribs' },
+  { prompt: 'Atomic number of carbon', answer: 6, unit: '' },
+  { prompt: 'Number of stars on the United States flag', answer: 50, unit: 'stars' },
+  { prompt: 'Number of stripes on the United States flag', answer: 13, unit: 'stripes' },
+  { prompt: 'Height of the CN Tower', answer: 553, unit: 'metres' },
+  { prompt: 'Number of legs on a lobster', answer: 10, unit: 'legs' },
+  { prompt: 'Number of players on a baseball team on the field', answer: 9, unit: 'players' },
+  { prompt: 'Number of time zones in the world', answer: 24, unit: 'time zones' },
+  { prompt: 'Speed of sound in air', answer: 343, unit: 'm/s' },
+  { prompt: 'Number of weeks in a year', answer: 52, unit: 'weeks' },
 ];
 
 // ---- Timeline events: { event, year }. Well-known, uncontroversial dates. ----
@@ -121,6 +206,29 @@ export const EVENTS = [
   { event: 'The signing of the Magna Carta', year: 1215 },
   { event: 'The first email is sent', year: 1971 },
   { event: 'The first photograph is taken', year: 1826 },
+  { event: 'World War I begins', year: 1914 },
+  { event: 'The American Civil War begins', year: 1861 },
+  { event: 'Sputnik, the first artificial satellite, is launched', year: 1957 },
+  { event: 'The fall of Constantinople', year: 1453 },
+  { event: 'The United States Constitution is signed', year: 1787 },
+  { event: 'Alexander Graham Bell patents the telephone', year: 1876 },
+  { event: 'The first human heart transplant', year: 1967 },
+  { event: 'The Chernobyl nuclear disaster', year: 1986 },
+  { event: 'The Hubble Space Telescope is launched', year: 1990 },
+  { event: 'Nelson Mandela becomes President of South Africa', year: 1994 },
+  { event: 'The Spanish Armada is defeated', year: 1588 },
+  { event: 'Watson and Crick describe the structure of DNA', year: 1953 },
+  { event: 'Mount Vesuvius destroys Pompeii', year: 79 },
+  { event: 'The Battle of Hastings', year: 1066 },
+  { event: 'Yuri Gagarin becomes the first human in space', year: 1961 },
+  { event: 'Abraham Lincoln is assassinated', year: 1865 },
+  { event: 'The first Star Wars film is released', year: 1977 },
+  { event: 'The Soviet Union dissolves', year: 1991 },
+  { event: 'Wikipedia is launched', year: 2001 },
+  { event: 'The Wall Street Crash triggers the Great Depression', year: 1929 },
+  { event: 'The Eiffel Tower is completed', year: 1889 },
+  { event: 'The Panama Canal opens', year: 1914 },
+  { event: 'The Black Death reaches Europe', year: 1347 },
 ];
 
 // ---- Odd one out: { items: [4], oddIndex, rule } (one item breaks a hidden rule) ----
@@ -137,6 +245,24 @@ export const ODD_ONE_OUT = [
   { items: ['Spain', 'France', 'Brazil', 'Italy'], oddIndex: 2, rule: 'the others are in Europe' },
   { items: ['Spring', 'Summer', 'Monday', 'Winter'], oddIndex: 2, rule: 'the others are seasons' },
   { items: ['Oak', 'Pine', 'Rose', 'Maple'], oddIndex: 2, rule: 'the others are trees' },
+  { items: ['Snake', 'Lizard', 'Frog', 'Crocodile'], oddIndex: 2, rule: 'the others are reptiles, the frog is an amphibian' },
+  { items: ['Eagle', 'Bat', 'Sparrow', 'Owl'], oddIndex: 1, rule: 'the others are birds, the bat is a mammal' },
+  { items: ['Whale', 'Dolphin', 'Shark', 'Seal'], oddIndex: 2, rule: 'the others are mammals, the shark is a fish' },
+  { items: ['Square', 'Cube', 'Triangle', 'Circle'], oddIndex: 1, rule: 'the others are 2D shapes, the cube is 3D' },
+  { items: ['Copper', 'Gold', 'Plastic', 'Silver'], oddIndex: 2, rule: 'the others are metals' },
+  { items: ['Coffee', 'Tea', 'Cola', 'Bread'], oddIndex: 3, rule: 'the others are drinks' },
+  { items: ['11', '17', '23', '24'], oddIndex: 3, rule: 'the others are odd numbers' },
+  { items: ['Mars', 'Saturn', 'Pluto', 'Neptune'], oddIndex: 2, rule: 'the others are planets, Pluto is a dwarf planet' },
+  { items: ['Banana', 'Lemon', 'Sun', 'Grass'], oddIndex: 3, rule: 'the others are yellow' },
+  { items: ['Penguin', 'Ostrich', 'Eagle', 'Emu'], oddIndex: 2, rule: 'the others are flightless birds' },
+  { items: ['London', 'Paris', 'Tokyo', 'Sydney'], oddIndex: 3, rule: 'the others are capital cities' },
+  { items: ['Carrot', 'Potato', 'Onion', 'Apple'], oddIndex: 3, rule: 'the others grow underground' },
+  { items: ['Mercury', 'Venus', 'Earth', 'Saturn'], oddIndex: 3, rule: 'the others are rocky planets, Saturn is a gas giant' },
+  { items: ['Trumpet', 'Trombone', 'Tuba', 'Violin'], oddIndex: 3, rule: 'the others are brass instruments' },
+  { items: ['Pacific', 'Atlantic', 'Mediterranean', 'Indian'], oddIndex: 2, rule: 'the others are oceans, the Mediterranean is a sea' },
+  { items: ['Rose', 'Tulip', 'Daisy', 'Oak'], oddIndex: 3, rule: 'the others are flowers, the oak is a tree' },
+  { items: ['Square', 'Rectangle', 'Rhombus', 'Triangle'], oddIndex: 3, rule: 'the others have four sides' },
+  { items: ['Violet', 'Indigo', 'Brown', 'Blue'], oddIndex: 2, rule: 'the others are colours of the rainbow' },
 ];
 
 // ---- Rank It: { category, ordered: [...] } in the CORRECT order (largest/first to smallest/last) ----
@@ -149,9 +275,22 @@ export const RANK_SETS = [
   { category: 'Number of sides (fewest first)', ordered: ['Triangle', 'Square', 'Pentagon', 'Hexagon', 'Octagon'] },
   { category: 'Months of the year (in order)', ordered: ['January', 'March', 'June', 'September', 'December'] },
   { category: 'Heaviest land animals (heaviest first)', ordered: ['Elephant', 'Rhino', 'Horse', 'Human', 'Cat'] },
+  { category: 'Planets by size (largest first)', ordered: ['Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Earth'] },
+  { category: 'Rivers by length (longest first)', ordered: ['Nile', 'Amazon', 'Yangtze', 'Mississippi', 'Danube'] },
+  { category: 'Events in history (earliest first)', ordered: ['Pyramids of Giza', 'Roman Empire', 'Magna Carta', 'US Independence', 'First Moon landing'] },
+  { category: 'Speeds (slowest first)', ordered: ['Snail', 'Walking human', 'Sprinter', 'Cheetah', 'Falcon dive'] },
+  { category: 'Animals by size (largest first)', ordered: ['Blue whale', 'Elephant', 'Horse', 'Dog', 'Mouse'] },
+  { category: 'Planets by distance from the Sun (farthest first)', ordered: ['Neptune', 'Uranus', 'Saturn', 'Jupiter', 'Mars'] },
+  { category: 'Temperatures (coldest first)', ordered: ['Freezing water', 'Room temperature', 'Human body', 'Boiling water'] },
+  { category: 'US coins by value (lowest first)', ordered: ['Penny', 'Nickel', 'Dime', 'Quarter'] },
+  { category: 'Mountains by height (tallest first)', ordered: ['Everest', 'K2', 'Kangchenjunga', 'Lhotse'] },
+  { category: 'Numbers (smallest first)', ordered: ['2', '7', '15', '40', '99'] },
+  { category: 'Time units (shortest first)', ordered: ['Second', 'Minute', 'Hour', 'Day', 'Week'] },
+  { category: 'Continents by area (largest first)', ordered: ['Asia', 'Africa', 'North America', 'South America', 'Antarctica'] },
 ];
 
-// ---- This or That: { prompt, a, b, correct: 'a'|'b' } binary fact ----
+// ---- This or That: { prompt, a, b, correct: 'a'|'b' } binary fact. The picker randomly
+// swaps which side a fact sits on (see pickThisOrThat) so there is no positional A/B bias. ----
 export const THIS_OR_THAT = [
   { prompt: 'Larger by land area?', a: 'Russia', b: 'Canada', correct: 'a' },
   { prompt: 'Closer to the Sun?', a: 'Earth', b: 'Mars', correct: 'a' },
@@ -169,6 +308,36 @@ export const THIS_OR_THAT = [
   { prompt: 'More sides?', a: 'Octagon', b: 'Hexagon', correct: 'a' },
   { prompt: 'Bigger country by area?', a: 'Brazil', b: 'France', correct: 'a' },
   { prompt: 'Came first?', a: 'Dinosaurs', b: 'Humans', correct: 'a' },
+  { prompt: 'Larger population?', a: 'Russia', b: 'China', correct: 'b' },
+  { prompt: 'Taller building?', a: 'Burj Khalifa', b: 'Empire State Building', correct: 'a' },
+  { prompt: 'Faster?', a: 'Sound', b: 'Light', correct: 'b' },
+  { prompt: 'Bigger?', a: 'The Sun', b: 'Jupiter', correct: 'a' },
+  { prompt: 'Denser metal?', a: 'Lead', b: 'Aluminium', correct: 'a' },
+  { prompt: 'Built earlier?', a: 'Pyramids of Giza', b: 'The Colosseum', correct: 'a' },
+  { prompt: 'Larger ocean?', a: 'Indian', b: 'Arctic', correct: 'a' },
+  { prompt: 'More native speakers?', a: 'English', b: 'Mandarin Chinese', correct: 'b' },
+  { prompt: 'Hotter surface?', a: 'Venus', b: 'Mercury', correct: 'a' },
+  { prompt: 'Bigger?', a: 'The Moon', b: 'Pluto', correct: 'a' },
+  { prompt: 'More legs?', a: 'Crab', b: 'Insect', correct: 'a' },
+  { prompt: 'Heavier animal?', a: 'Elephant', b: 'Hippo', correct: 'a' },
+  { prompt: 'Older invention?', a: 'The wheel', b: 'The telescope', correct: 'a' },
+  { prompt: 'Came first?', a: 'World War I', b: 'World War II', correct: 'a' },
+  { prompt: 'Larger by area?', a: 'Canada', b: 'United States', correct: 'a' },
+  { prompt: 'Taller animal?', a: 'Giraffe', b: 'Elephant', correct: 'a' },
+  { prompt: 'Deeper ocean?', a: 'Pacific', b: 'Atlantic', correct: 'a' },
+  { prompt: 'Closer to the Sun?', a: 'Venus', b: 'Mars', correct: 'a' },
+  { prompt: 'Larger continent?', a: 'Africa', b: 'Antarctica', correct: 'a' },
+  { prompt: 'Smaller planet?', a: 'Mercury', b: 'Mars', correct: 'a' },
+  { prompt: 'Hotter?', a: 'Boiling water', b: 'Human body', correct: 'a' },
+  { prompt: 'Faster?', a: 'Passenger jet', b: 'Bullet train', correct: 'a' },
+  { prompt: 'More moons?', a: 'Saturn', b: 'Earth', correct: 'a' },
+  { prompt: 'Larger by area?', a: 'Greenland', b: 'Australia', correct: 'b' },
+  { prompt: 'Heavier?', a: 'Blue whale', b: 'African elephant', correct: 'a' },
+  { prompt: 'More abundant in air?', a: 'Nitrogen', b: 'Oxygen', correct: 'a' },
+  { prompt: 'Built earlier?', a: 'The Great Wall of China', b: 'The Eiffel Tower', correct: 'a' },
+  { prompt: 'Lives longer (typically)?', a: 'Tortoise', b: 'Mouse', correct: 'a' },
+  { prompt: 'Faster?', a: 'Cheetah', b: 'Diving falcon', correct: 'b' },
+  { prompt: 'More sides?', a: 'Hexagon', b: 'Pentagon', correct: 'a' },
 ];
 
 function pick(list, n, exclude = []) {
@@ -182,6 +351,16 @@ export function pickNumericFacts(n = 1, exclude = []) { return pick(NUMERIC_FACT
 export function pickEvents(n = 1, exclude = []) { return pick(EVENTS, n, exclude); }
 export function pickOddOneOut(n = 1, exclude = []) { return pick(ODD_ONE_OUT, n, exclude); }
 export function pickRankSets(n = 1, exclude = []) { return pick(RANK_SETS, n, exclude); }
-export function pickThisOrThat(n = 1, exclude = []) { return pick(THIS_OR_THAT, n, exclude); }
+
+// Randomly flips each picked fact's A/B sides (and its correct key) so there is no
+// positional bias — a player can't just "always pick A" to win.
+export function pickThisOrThat(n = 1, exclude = []) {
+  return pick(THIS_OR_THAT, n, exclude).map((q) => (
+    Math.random() < 0.5
+      ? { ...q, a: q.b, b: q.a, correct: q.correct === 'a' ? 'b' : 'a' }
+      : { ...q }
+  ));
+}
+
 export function shuffledQuantities() { return shuffle(QUANTITIES); }
 export { shuffle };

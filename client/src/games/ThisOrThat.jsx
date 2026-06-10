@@ -33,12 +33,16 @@ export default function ThisOrThatGame({ gameState, onAction, nicknames, avatars
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Loading…</p></div>;
 
   const {
-    myId, qNumber, total, prompt, a, b, iAmAlive, myAnswer, hasAnswered,
-    submittedCount, survivorsCount, eliminatedRound, acknowledged = [], survivorIds = [], reveal,
+    myId, qNumber, total, prompt, a, b, myAnswer, hasAnswered, myScore = 0, myStreak = 0,
+    submittedCount, playerCount, scores = {}, acknowledged = [], reveal,
   } = gameState;
 
+  const allIds = Object.keys(scores);
+  const standings = [...allIds].sort((p, q) => (scores[q] || 0) - (scores[p] || 0));
+  const myReveal = reveal && reveal.results ? reveal.results.find((r) => r.playerId === myId) : null;
+
   function answer(choice) {
-    if (!iAmAlive || hasAnswered || phase !== 'question') return;
+    if (hasAnswered || phase !== 'question') return;
     setPick(choice);
     onAction({ type: 'answer', choice });
     playSound('click');
@@ -51,54 +55,44 @@ export default function ThisOrThatGame({ gameState, onAction, nicknames, avatars
     <div className={styles.arena}>
       <div className={styles.head}>
         <h1 className={styles.title}>THIS OR THAT</h1>
-        <span className={styles.meta}>Q{qNumber} / {total}</span>
+        <span className={styles.meta}>Round {qNumber} / {total}</span>
       </div>
 
       <div className={styles.statusBar}>
-        <span className={styles.survivors}>🛡️ {survivorsCount} alive</span>
+        <span className={styles.scoreBadge}>⭐ {myScore} pts</span>
+        {myStreak >= 2 && <span className={styles.streakBadge}>🔥 {myStreak} streak</span>}
         {phase === 'question' && remaining != null && <span className={styles.clock}>{remaining}s</span>}
       </div>
-
-      {/* eliminated spectator banner */}
-      {!iAmAlive && phase !== 'finished' && (
-        <div className={styles.outBanner}>
-          You're out{eliminatedRound ? ` (Q${eliminatedRound})` : ''} — watching 👀
-        </div>
-      )}
 
       {/* QUESTION */}
       {phase === 'question' && (
         <div className={styles.qArea}>
           <p className={styles.prompt}>{prompt}</p>
-          {iAmAlive ? (
-            hasAnswered ? (
-              <div className={styles.waitBox}>
-                <p className={styles.waitMsg}>Locked: {chosen === 'a' ? a : b} 🔒</p>
-                <p className={styles.sub}>Waiting… {submittedCount}/{survivorsCount} answered</p>
-              </div>
-            ) : (
-              <div className={styles.choices}>
-                <button
-                  className={`${styles.choiceBtn} ${styles.choiceA} ${chosen === 'a' ? styles.choiceSel : ''}`}
-                  onClick={() => answer('a')}
-                  disabled={hasAnswered}
-                >
-                  <span className={styles.choiceTag}>A</span>
-                  <span className={styles.choiceText}>{a}</span>
-                </button>
-                <span className={styles.vs}>or</span>
-                <button
-                  className={`${styles.choiceBtn} ${styles.choiceB} ${chosen === 'b' ? styles.choiceSel : ''}`}
-                  onClick={() => answer('b')}
-                  disabled={hasAnswered}
-                >
-                  <span className={styles.choiceTag}>B</span>
-                  <span className={styles.choiceText}>{b}</span>
-                </button>
-              </div>
-            )
+          {hasAnswered ? (
+            <div className={styles.waitBox}>
+              <p className={styles.waitMsg}>Locked: {chosen === 'a' ? a : b} 🔒</p>
+              <p className={styles.sub}>Waiting… {submittedCount}/{playerCount} answered</p>
+            </div>
           ) : (
-            <p className={styles.spectate}>Survivors are answering… {submittedCount}/{survivorsCount}</p>
+            <div className={styles.choices}>
+              <button
+                className={`${styles.choiceBtn} ${styles.choiceA} ${chosen === 'a' ? styles.choiceSel : ''}`}
+                onClick={() => answer('a')}
+                disabled={hasAnswered}
+              >
+                <span className={styles.choiceTag}>A</span>
+                <span className={styles.choiceText}>{a}</span>
+              </button>
+              <span className={styles.vs}>or</span>
+              <button
+                className={`${styles.choiceBtn} ${styles.choiceB} ${chosen === 'b' ? styles.choiceSel : ''}`}
+                onClick={() => answer('b')}
+                disabled={hasAnswered}
+              >
+                <span className={styles.choiceTag}>B</span>
+                <span className={styles.choiceText}>{b}</span>
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -118,39 +112,39 @@ export default function ThisOrThatGame({ gameState, onAction, nicknames, avatars
             </div>
           </div>
 
-          {reveal.eliminated.length > 0 ? (
-            <div className={styles.elimBox}>
-              <p className={styles.elimTitle}>Eliminated this round:</p>
-              <div className={styles.chips}>
-                {reveal.eliminated.map((p) => (
-                  <span key={p} className={`${styles.chip} ${styles.chipOut}`}>
+          {/* my own result for the round */}
+          {myReveal && (
+            myReveal.correct ? (
+              <p className={styles.correctMsg}>✓ Correct! +{myReveal.gained} pts{myReveal.streak >= 2 ? ` · 🔥 ${myReveal.streak} streak` : ''}</p>
+            ) : (
+              <p className={styles.wrongMsg}>{myReveal.answered ? '✗ Wrong — 0 pts' : '⏱️ No answer — 0 pts'}</p>
+            )
+          )}
+
+          {/* live leaderboard */}
+          <div className={styles.lb}>
+            <p className={styles.lbTitle}>{phase === 'finished' ? '🏆 Final Standings' : 'Standings'}</p>
+            {standings.map((p, i) => {
+              const r = reveal.results ? reveal.results.find((x) => x.playerId === p) : null;
+              return (
+                <div key={p} className={`${styles.lbRow} ${p === myId ? styles.lbMe : ''}`}>
+                  <span className={styles.lbRank}>{i + 1}</span>
+                  <span className={styles.lbName}>
                     <PlayerName playerId={p} nicknames={nicknames} avatars={avatars} />
                   </span>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className={styles.allSafe}>Everyone survived! 🎉</p>
-          )}
-
-          <div className={styles.survBox}>
-            <p className={styles.survTitle}>Survivors ({reveal.survived.length}):</p>
-            <div className={styles.chips}>
-              {reveal.survived.map((p) => (
-                <span key={p} className={`${styles.chip} ${styles.chipAlive}`}>
-                  <PlayerName playerId={p} nicknames={nicknames} avatars={avatars} />
-                </span>
-              ))}
-            </div>
+                  {r && r.correct && <span className={styles.gain}>+{r.gained}</span>}
+                  <span className={styles.lbPts}>{scores[p] || 0}</span>
+                </div>
+              );
+            })}
           </div>
 
-          {phase === 'reveal' && iAmAlive && (
+          {phase === 'reveal' && (
             <>
               {!iAcked && <button className={styles.contBtn} onClick={ack}>Continue →</button>}
-              <AckStatus players={survivorIds} acknowledged={acknowledged} me={myId} iActed={iAcked} nicknames={nicknames} avatars={avatars} />
+              <AckStatus players={allIds} acknowledged={acknowledged} me={myId} iActed={iAcked} nicknames={nicknames} avatars={avatars} />
             </>
           )}
-          {phase === 'reveal' && !iAmAlive && <p className={styles.sub}>Waiting for survivors to continue…</p>}
         </div>
       )}
     </div>

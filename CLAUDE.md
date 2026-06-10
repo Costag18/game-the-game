@@ -124,7 +124,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Guesstimate | 2-8 | Log-closeness numeric estimation, within-a-factor still scores |
 | Odd One Out | 2-8 | Tap the rule-breaker, arrival-order speed scoring, rule hidden pre-reveal |
 | Rank It | 2-8 | Reorder shuffled items, adjacent-pair accuracy scoring |
-| This or That | 2-8 | Binary trivia survival, wrong = eliminated, reverse-elimination ranking |
+| This or That | 2-8 | Binary trivia, 10 rounds (no elimination), speed + streak scoring, cumulative ranking |
 | Definition Duel | 3-8 | Balderdash — fake definitions for a real word, vote the truth (Fibbage-shaped) |
 | Quiplash Clash | 3-8 | Head-to-head prompt duels, room votes funnier, points by vote share |
 | Caption This | 3-8 | Caption AI-generated scenes (client Pollinations URL), vote funniest |

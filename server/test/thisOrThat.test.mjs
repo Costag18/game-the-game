@@ -20,24 +20,23 @@ test('starts in question phase with a prompt + two options and an answer timer',
   const s = g.getStateForPlayer('a');
   assert(s.prompt && s.a && s.b, 'prompt + options exposed');
   eq(s.qNumber, 1);
+  eq(s.total, 10); // ten rounds
   assert(pendingTimers() >= 1, 'answer timer armed');
 });
 
 test('correct side is hidden during question, exposed in reveal', () => {
   const g = newGame(['a', 'b', 'c']);
   const c = correct(g);
-  // the literal 'correct' key must not leak; assert on the JSON shape
   const sQ = g.getStateForPlayer('a');
   assert(!('correct' in sQ), 'no correct key during question');
   eq(sQ.reveal, null);
-  // everyone answers correctly -> reveal
   for (const p of g.players) g.handleAction(p, { type: 'answer', choice: c });
   eq(g.state, 'reveal');
   const sR = g.getStateForPlayer('a');
   assert(sR.reveal && sR.reveal.correct === c, 'correct side present in reveal');
 });
 
-test('a wrong answer eliminates; a correct answer survives', () => {
+test('a correct answer scores points; a wrong answer scores 0 (no elimination)', () => {
   const g = newGame(['a', 'b', 'c', 'd']);
   const c = correct(g), w = wrong(g);
   g.handleAction('a', { type: 'answer', choice: c });
@@ -45,39 +44,50 @@ test('a wrong answer eliminates; a correct answer survives', () => {
   g.handleAction('c', { type: 'answer', choice: w });
   g.handleAction('d', { type: 'answer', choice: w });
   eq(g.state, 'reveal');
-  assert(g.survivors.includes('a') && g.survivors.includes('b'), 'correct players survive');
-  assert(!g.survivors.includes('c') && !g.survivors.includes('d'), 'wrong players eliminated');
-  eq(g.eliminationRound['c'], 1);
-  eq(g.eliminationRound['d'], 1);
-  assert(g.lastReveal.eliminated.includes('c'), 'reveal lists eliminated');
-  assert(g.lastReveal.survived.includes('a'), 'reveal lists survived');
+  assert(g.scores['a'] > 0 && g.scores['b'] > 0, 'correct players scored');
+  eq(g.scores['c'], 0);
+  eq(g.scores['d'], 0);
+  // everyone is still a player (nobody eliminated)
+  eq(g.players.length, 4);
 });
 
-test('eliminated player cannot answer in later questions', () => {
+test('faster correct answer scores at least as much as a slower one (speed bonus)', () => {
   const g = newGame(['a', 'b', 'c']);
-  const c = correct(g), w = wrong(g);
-  g.handleAction('a', { type: 'answer', choice: c });
-  g.handleAction('b', { type: 'answer', choice: c });
-  g.handleAction('c', { type: 'answer', choice: w }); // c out
-  eq(g.state, 'reveal');
-  for (const p of g.survivors) g.handleAction(p, { type: 'acknowledge' });
-  eq(g.state, 'question'); // next question
-  const c2 = correct(g);
-  g.handleAction('c', { type: 'answer', choice: c2 }); // ignored — c is out
-  eq(g.answers['c'], undefined);
+  const c = correct(g);
+  g.handleAction('a', { type: 'answer', choice: c }); // rank 0 -> 1000 (+0 streak bonus, first round)
+  g.handleAction('b', { type: 'answer', choice: c }); // rank 1 -> 920
+  assert(g.scores['a'] > g.scores['b'], `first faster (a=${g.scores['a']} b=${g.scores['b']})`);
 });
 
-test('not wiping everyone: all-wrong on a question eliminates no one', () => {
+test('wrong answer is still recorded and locks the round (one answer per round)', () => {
   const g = newGame(['a', 'b']);
   const w = wrong(g);
   g.handleAction('a', { type: 'answer', choice: w });
-  g.handleAction('b', { type: 'answer', choice: w });
-  eq(g.state, 'reveal');
-  eq(g.survivors.length, 2); // nobody knocked out
-  eq(g.lastReveal.eliminated.length, 0);
+  assert(g.answers['a'] && g.answers['a'].correct === false, 'wrong recorded');
+  // a second attempt is ignored
+  g.handleAction('a', { type: 'answer', choice: correct(g) });
+  eq(g.answers['a'].correct, false);
 });
 
-test('all-answered advances to reveal without timer', () => {
+test('consecutive correct answers build a streak; a wrong answer resets it', () => {
+  const g = newGame(['a', 'b']);
+  // round 1: both correct
+  let c = correct(g);
+  g.handleAction('a', { type: 'answer', choice: c });
+  g.handleAction('b', { type: 'answer', choice: c });
+  eq(g.streaks['a'], 1);
+  for (const p of g.players) g.handleAction(p, { type: 'acknowledge' });
+  // round 2: a correct (streak 2), b wrong (streak reset)
+  c = correct(g);
+  const w = wrong(g);
+  g.handleAction('a', { type: 'answer', choice: c });
+  g.handleAction('b', { type: 'answer', choice: w });
+  eq(g.streaks['a'], 2);
+  eq(g.streaks['b'], 0);
+  eq(g.bestStreak['a'], 2);
+});
+
+test('all-answered advances to reveal without the timer', () => {
   const g = newGame(['a', 'b', 'c']);
   const c = correct(g);
   for (const p of g.players) g.handleAction(p, { type: 'answer', choice: c });
@@ -92,58 +102,62 @@ test('answer timeout auto-advances to reveal and broadcasts', () => {
   assert(g.emitCount > before, 'broadcast on answer timeout');
 });
 
-test('reveal timeout auto-advances to next question / finished', () => {
+test('reveal timeout auto-advances to next round / finished and broadcasts', () => {
   const g = newGame(['a', 'b', 'c']);
   const c = correct(g);
   for (const p of g.players) g.handleAction(p, { type: 'answer', choice: c });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(6_000);
+  advance(5_000);
   assert(g.state === 'question' || g.state === 'finished', `advanced (got ${g.state})`);
   assert(g.emitCount > before, 'broadcast on reveal timeout');
 });
 
 for (const N of [2, 3, 4]) {
-  test(`full game with ${N} players runs to finished; results length ${N}, placement 1 first`, () => {
+  test(`full game with ${N} players runs all 10 rounds to finished; results length ${N}, placement 1 first`, () => {
     const players = ['a', 'b', 'c', 'd'].slice(0, N);
     const g = newGame(players);
     let guard = 0;
-    while (g.state !== 'finished' && guard++ < 50) {
+    let rounds = 0;
+    while (g.state !== 'finished' && guard++ < 200) {
       if (g.state === 'question') {
-        // everyone answers correctly each round -> all survive to the end
         const c = correct(g);
-        for (const p of g.survivors) g.handleAction(p, { type: 'answer', choice: c });
+        for (const p of g.players) g.handleAction(p, { type: 'answer', choice: c });
       } else if (g.state === 'reveal') {
-        for (const p of g.survivors) g.handleAction(p, { type: 'acknowledge' });
+        rounds++;
+        for (const p of g.players) g.handleAction(p, { type: 'acknowledge' });
       }
     }
     eq(g.state, 'finished');
+    eq(rounds, 10); // every round played; nobody eliminated early
     const res = g.getResults();
     eq(res.length, N);
     eq(res[0].placement, 1);
-    // all survived every question -> all tie at placement 1
-    eq(res.every((r) => r.placement === 1), true);
+    assert(res[0].score > 0, 'winner accumulated points across rounds');
+    // scores are non-increasing down the standings
+    for (let i = 1; i < res.length; i++) assert(res[i].score <= res[i - 1].score, 'sorted by score');
   });
 }
 
-test('tie: players eliminated in the same round share a placement; survivor ranks 1', () => {
-  const g = newGame(['a', 'b', 'c']);
-  const c = correct(g), w = wrong(g);
-  // a survives; b and c eliminated together in round 1
-  g.handleAction('a', { type: 'answer', choice: c });
-  g.handleAction('b', { type: 'answer', choice: w });
-  g.handleAction('c', { type: 'answer', choice: w });
-  eq(g.state, 'reveal');
-  g.handleAction('a', { type: 'acknowledge' }); // sole survivor acks -> finish
-  eq(g.state, 'finished'); // only 1 survivor -> game over
+test('tie: equal cumulative scores share a placement', () => {
+  // both players answer WRONG every round -> both finish on 0 -> tie at placement 1
+  const g = newGame(['a', 'b']);
+  let guard = 0;
+  while (g.state !== 'finished' && guard++ < 200) {
+    if (g.state === 'question') {
+      const w = wrong(g);
+      for (const p of g.players) g.handleAction(p, { type: 'answer', choice: w });
+    } else if (g.state === 'reveal') {
+      for (const p of g.players) g.handleAction(p, { type: 'acknowledge' });
+    }
+  }
+  eq(g.state, 'finished');
   const res = g.getResults();
-  eq(res.length, 3);
-  const ra = res.find((r) => r.playerId === 'a');
-  const rb = res.find((r) => r.playerId === 'b');
-  const rc = res.find((r) => r.playerId === 'c');
-  eq(ra.placement, 1);
-  eq(rb.placement, rc.placement); // tie shares placement
-  assert(rb.placement > 1, 'eliminees rank below survivor');
+  eq(res.length, 2);
+  eq(res[0].score, 0);
+  eq(res[1].score, 0);
+  eq(res[0].placement, 1);
+  eq(res[1].placement, 1); // tie shares placement
 });
 
 test('removePlayer mid-question advances (no deadlock) and prunes leaver from results', () => {
@@ -151,12 +165,12 @@ test('removePlayer mid-question advances (no deadlock) and prunes leaver from re
   const c = correct(g);
   g.handleAction('a', { type: 'answer', choice: c });
   g.handleAction('b', { type: 'answer', choice: c });
-  g.removePlayer('c'); // c was the last owed -> should advance
+  g.removePlayer('c'); // c was the last owed -> should advance to reveal
   eq(g.state, 'reveal');
   assert(!g.getResults().some((r) => r.playerId === 'c'), 'leaver not ranked');
 });
 
-test('removePlayer mid-reveal re-checks ack barrier', () => {
+test('removePlayer mid-reveal re-checks the ack barrier', () => {
   const g = newGame(['a', 'b', 'c']);
   const c = correct(g);
   for (const p of g.players) g.handleAction(p, { type: 'answer', choice: c });

@@ -406,13 +406,13 @@ export const GAMES = {
   thisOrThat: {
     id: 'thisOrThat', name: 'This or That', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME,
-    description: 'Binary trivia survival — answer wrong and you\'re eliminated.',
+    description: 'Binary trivia across 10 rounds — be right and be fast.',
     instructions: [
-      'Each round shows a fact with two options, A and B.',
-      'Everyone still in simultaneously taps A or B.',
-      'Answer wrong and you\'re eliminated; correct players survive to the next question.',
-      'Players knocked out in the same round share a placement.',
-      'Last survivor ranks first (reverse-elimination order).',
+      'Across 10 rounds, each shows a fact with two options, A and B.',
+      'Everyone taps A or B every round — nobody is eliminated.',
+      'Correct answers score points; answering faster scores more.',
+      'A run of consecutive correct answers earns a growing streak bonus.',
+      'Highest cumulative score after 10 rounds wins; ties share a placement.',
     ],
   },
   definitionDuel: {
