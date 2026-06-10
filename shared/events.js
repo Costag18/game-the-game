@@ -76,4 +76,8 @@ export const EVENTS = {
   CANVAS_UNDO_SEND: 'draw:undoSend',
   CANVAS_UNDO: 'draw:undo',
   CANVAS_SNAPSHOT: 'draw:snapshot',
+  // Unanimous vote to skip the current game and return everyone to the lobby
+  SKIP_VOTE: 'tournament:skipVote',
+  SKIP_UPDATE: 'tournament:skipUpdate',
+  RETURN_TO_LOBBY: 'tournament:returnToLobby',
 };

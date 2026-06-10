@@ -81,6 +81,29 @@
   width: 46px;
 }
 
+/* ─── Skip-to-lobby vote ─── */
+.skipBtn {
+  flex: 1 1 auto;
+  min-height: 36px;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--gold-dim, #8a7230);
+  background: var(--bg-panel, #2a1518);
+  color: var(--text-primary, #f3e9d2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.skipBtn:hover { border-color: var(--gold, #d4a843); }
+.skipVoted { background: #7a2230; border-color: #c0485a; color: #fff; }
+.skipCount {
+  flex-basis: 100%;
+  font-size: 0.68rem;
+  color: var(--text-secondary, #b8a88a);
+  text-align: right;
+}
+
 /* ─── Mute Toggle ─── */
 .muteToggle {
   width: 34px;

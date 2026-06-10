@@ -220,6 +220,7 @@ function GameRouter() {
     socket.on(EVENTS.WAGER_LOCKED, () => { setScreen('loadingGame'); playSound('wagerLock'); });
     socket.on(EVENTS.GAME_STATE, () => setScreen((prev) => prev === 'loadingGame' ? 'playing' : prev));
     socket.on(EVENTS.ROUND_RESULTS, () => setScreen('roundResults'));
+    socket.on(EVENTS.RETURN_TO_LOBBY, () => { setScreen('waitingRoom'); tournament.clearRoundResults(); });
     socket.on(EVENTS.TOURNAMENT_END, (data) => {
       setScreen('tournamentEnd');
       const winnerId = data?.winner?.playerId || data?.winner;
@@ -241,6 +242,7 @@ function GameRouter() {
       socket.off(EVENTS.WAGER_LOCKED);
       socket.off(EVENTS.GAME_STATE);
       socket.off(EVENTS.ROUND_RESULTS);
+      socket.off(EVENTS.RETURN_TO_LOBBY);
       socket.off(EVENTS.TOURNAMENT_END);
       socket.off(EVENTS.LOBBY_STATE);
       socket.off(EVENTS.EMOTE_BROADCAST);
@@ -345,7 +347,7 @@ function GameRouter() {
         />
       )}
       {['gameVote', 'wagerPhase', 'playing'].includes(screen) && <EmoteOverlay />}
-      {screen !== 'menu' && <SettingsGear />}
+      {screen !== 'menu' && <SettingsGear screen={screen} />}
       {screen === 'playing' && <TurnOverlay isMyTurn={tournament.gameState?.state?.isMyTurn} />}
       {showConfetti && <ConfettiOverlay />}
       {['playing', 'gameVote', 'wagerPhase'].includes(screen) && <StockTicker />}

@@ -5,7 +5,9 @@ import { useSocketContext } from '../context/SocketContext.jsx';
 import { EVENTS } from '../../../shared/events.js';
 import styles from './SettingsGear.module.css';
 
-export default function SettingsGear() {
+const SKIP_SCREENS = ['gameVote', 'wagerPhase', 'playing', 'roundResults'];
+
+export default function SettingsGear({ screen }) {
   const { muted, toggleMute, playSound } = useSound();
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
@@ -13,6 +15,38 @@ export default function SettingsGear() {
   const panelRef = useRef(null);
 
   const { socket } = useSocketContext();
+
+  // Unanimous skip-to-lobby vote
+  const [skipVotedCount, setSkipVotedCount] = useState(0);
+  const [skipTotal, setSkipTotal] = useState(0);
+  const [iVotedSkip, setIVotedSkip] = useState(false);
+  const showSkip = SKIP_SCREENS.includes(screen);
+
+  useEffect(() => {
+    if (!socket) return;
+    function onSkipUpdate(d) {
+      const voted = d?.voted || [];
+      setSkipVotedCount(voted.length);
+      setSkipTotal(d?.total || 0);
+      setIVotedSkip(voted.includes(socket.id));
+    }
+    function onReturn() { setSkipVotedCount(0); setSkipTotal(0); setIVotedSkip(false); }
+    socket.on(EVENTS.SKIP_UPDATE, onSkipUpdate);
+    socket.on(EVENTS.RETURN_TO_LOBBY, onReturn);
+    return () => { socket.off(EVENTS.SKIP_UPDATE, onSkipUpdate); socket.off(EVENTS.RETURN_TO_LOBBY, onReturn); };
+  }, [socket]);
+
+  // reset my vote view whenever we leave the active-game screens (server clears votes per game)
+  useEffect(() => {
+    if (!SKIP_SCREENS.includes(screen)) { setSkipVotedCount(0); setSkipTotal(0); setIVotedSkip(false); }
+  }, [screen]);
+
+  function toggleSkipVote() {
+    if (!socket) return;
+    socket.emit(EVENTS.SKIP_VOTE, { vote: !iVotedSkip });
+    setIVotedSkip((v) => !v); // optimistic; server confirms via SKIP_UPDATE
+    playSound('click');
+  }
   const [avatar, setAvatar] = useState(() => localStorage.getItem('gtg_avatar') || '');
   const [avatarTab, setAvatarTab] = useState('search');
 
@@ -142,6 +176,25 @@ export default function SettingsGear() {
         ref={panelRef}
         className={`${styles.panel} ${open ? styles.panelOpen : ''}`}
       >
+        {/* Unanimous skip-to-lobby (only during an active game) */}
+        {showSkip && (
+          <div className={styles.section}>
+            <span className={styles.label}>Skip game</span>
+            <button
+              className={`${styles.skipBtn} ${iVotedSkip ? styles.skipVoted : ''}`}
+              onClick={toggleSkipVote}
+              title="Everyone must agree to return to the lobby"
+            >
+              {iVotedSkip ? '✓ Voted to skip' : 'Vote to skip → Lobby'}
+            </button>
+            {skipTotal > 0 && (
+              <span className={styles.skipCount}>
+                {skipVotedCount}/{skipTotal} voted{skipVotedCount < skipTotal ? ' · all must agree' : ''}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* Sound toggle */}
         <div className={styles.section}>
           <span className={styles.label}>Sound</span>

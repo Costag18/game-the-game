@@ -495,6 +495,14 @@ A 49-agent audit found ~30 distinct mid-game leave/deadlock bugs. Root causes + 
 - Preset quick buttons for common values (5/10/15 rounds, 1000/2000/5000 points)
 - Server clamps values to safe ranges
 
+## Skip-to-Lobby Vote
+
+Any player can open the SettingsGear (during `gameVote`/`wagerPhase`/`playing`/`roundResults`) and "Vote to skip → Lobby". The vote is **unanimous-gated**: only when EVERY current tournament player has voted does the server abandon the active game + tournament and return everyone to the lobby (waiting room).
+
+- **Events:** `SKIP_VOTE` (client→server, `{vote:bool}` toggle), `SKIP_UPDATE` (server→room, `{voted:[ids], total}`), `RETURN_TO_LOBBY` (server→room) — in `shared/events.js`.
+- **Server (`index.js`):** votes tracked on `tm.skipVotes` (Set), reset per game in `startSelectedGame`. The `SKIP_VOTE` handler toggles the voter, prunes departed voters, and when `tm.players.every(p => skipVotes.has(p))` calls `returnToLobby()` — which `destroy()`s the active game, clears `tm._resultsTimer`, `tournaments.delete`s, sets lobby status `'waiting'`, and emits `LOBBY_STATE` + `RETURN_TO_LOBBY`. `handlePlayerLeave` prunes a departed player's vote so a gone player can't block the tally.
+- **Client:** `SettingsGear` (given a `screen` prop) shows the toggle + "X/Y voted · all must agree" only on active-game screens; `App.jsx` routes `RETURN_TO_LOBBY` → `waitingRoom`.
+
 ## Conventions
 
 - Server is always source of truth — never trust client state

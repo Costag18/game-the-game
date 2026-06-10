@@ -1115,6 +1115,30 @@ io.on(EVENTS.CONNECTION, (socket) => {
     advanceAfterResults(lobbyId, tm, lobby);
   });
 
+  // Unanimous "skip game → back to lobby". Each tournament player may toggle their
+  // vote; when EVERY current player has voted, the game/tournament is abandoned and
+  // everyone is returned to the lobby.
+  socket.on(EVENTS.SKIP_VOTE, (data) => {
+    const lobbyId = lobbyManager.getPlayerLobby(socket.id);
+    const tm = tournaments.get(lobbyId);
+    const lobby = lobbyManager.getLobby(lobbyId);
+    if (!tm || !lobby) return;
+    if (!tm.players.includes(socket.id)) return; // only real participants vote
+    if (!tm.skipVotes) tm.skipVotes = new Set();
+    const wantVote = data && data.vote === false ? false : !tm.skipVotes.has(socket.id);
+    if (wantVote) tm.skipVotes.add(socket.id);
+    else tm.skipVotes.delete(socket.id);
+
+    // prune any votes from players who are no longer present
+    for (const v of [...tm.skipVotes]) if (!tm.players.includes(v)) tm.skipVotes.delete(v);
+
+    if (tm.players.length > 0 && tm.players.every((p) => tm.skipVotes.has(p))) {
+      returnToLobby(lobbyId, tm, lobby);
+      return;
+    }
+    io.to(lobbyId).emit(EVENTS.SKIP_UPDATE, { voted: [...tm.skipVotes], total: tm.players.length });
+  });
+
   socket.on(EVENTS.GAME_ACTION, (action) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
@@ -1223,7 +1247,24 @@ function getTournamentState(tm) {
 // normal WAGER_SUBMIT path AND the wagering-leave path (where the last
 // outstanding wager belonged to a player who just left) so a leave can never
 // strand the remaining players on the "Loading game…" screen.
+// Abandon the active game + tournament and send everyone back to the lobby.
+// Triggered by a UNANIMOUS skip vote (see SKIP_VOTE handler).
+function returnToLobby(lobbyId, tm, lobby) {
+  if (tm) {
+    if (tm.activeGame) { try { tm.activeGame.destroy?.(); } catch { /* ignore */ } tm.activeGame = null; }
+    if (tm._resultsTimer) { clearTimeout(tm._resultsTimer); tm._resultsTimer = null; }
+  }
+  tournaments.delete(lobbyId);
+  if (lobby) {
+    lobbyManager.setStatus(lobbyId, 'waiting');
+    const updated = lobbyManager.getLobby(lobbyId);
+    if (updated) io.to(lobbyId).emit(EVENTS.LOBBY_STATE, updated);
+  }
+  io.to(lobbyId).emit(EVENTS.RETURN_TO_LOBBY, {});
+}
+
 function startSelectedGame(lobbyId, tm, lobby) {
+  if (tm) tm.skipVotes = new Set(); // fresh game → clear any stale skip votes
   tm.startPlaying();
   lobbyManager.setStatus(lobbyId, 'playing');
   io.to(lobbyId).emit(EVENTS.WAGER_LOCKED, { wagers: { ...tm.wagers } });
@@ -1370,6 +1411,12 @@ function handlePlayerLeave(socket) {
   if (tm) {
     // Remove from tournament player list
     tm.players = tm.players.filter((p) => p !== socket.id);
+
+    // Drop any skip vote from the departed player so it can't block the tally
+    if (tm.skipVotes) {
+      tm.skipVotes.delete(socket.id);
+      for (const v of [...tm.skipVotes]) if (!tm.players.includes(v)) tm.skipVotes.delete(v);
+    }
 
     // If an active game exists, remove from it
     if (tm.activeGame) {
