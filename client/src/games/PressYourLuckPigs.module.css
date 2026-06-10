@@ -1,0 +1,23 @@
+.arena { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; padding: 1rem; max-width: 560px; margin: 0 auto; }
+.title { font-family: 'Bangers', cursive; font-size: clamp(1.8rem, 5vw, 2.6rem); letter-spacing: 2px; color: #ff8da3; margin: 0; }
+.meta { color: var(--text-secondary, #b8a88a); margin: 0; font-weight: 600; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.scores { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.scoreChip { display: flex; align-items: center; gap: 0.4rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 999px; padding: 0.2rem 0.7rem; font-size: 0.82rem; }
+.scoreTurn { border-color: var(--gold, #d4a843); box-shadow: 0 0 10px rgba(212,168,67,0.4); }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; }
+.table { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; background: radial-gradient(circle at 50% 40%, #1f5130, #0d3119 80%); border-radius: 16px; padding: 1.4rem; width: 100%; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); }
+.die { width: 70px; height: 70px; background: #fff; color: #1a1a1a; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; font-weight: 900; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
+.pot { font-size: 1.2rem; color: var(--gold-light, #f0d896); margin: 0; }
+.pot strong { color: var(--gold, #d4a843); }
+.bust { font-size: 1.4rem; font-weight: 800; color: #ff6b6b; text-align: center; }
+.actions { display: flex; gap: 0.7rem; }
+.rollBtn, .bankBtn { border: none; border-radius: 10px; padding: 0.7rem 1.5rem; font-weight: 800; font-size: 1.05rem; cursor: pointer; min-height: 48px; }
+.rollBtn { background: var(--gold, #d4a843); color: #1a0e10; }
+.bankBtn { background: #2e7d32; color: #fff; }
+.bankBtn:disabled { opacity: 0.45; cursor: default; }
+.waiting { color: rgba(255,255,255,0.75); font-style: italic; margin: 0; }
+.results { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; max-width: 340px; }
+.resTitle { font-family: 'Bangers', cursive; color: var(--gold, #d4a843); margin: 0.3rem 0; text-align: center; }
+.resRow { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 0.5rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.3rem 0.6rem; }
+.rPlace { color: var(--gold, #d4a843); font-weight: 800; }

@@ -1,0 +1,23 @@
+.arena { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 1rem; max-width: 440px; margin: 0 auto; }
+.title { font-family: 'Luckiest Guy', cursive; font-size: clamp(1.7rem, 5vw, 2.4rem); color: #ff5e7e; margin: 0; letter-spacing: 1px; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.caller { display: flex; flex-direction: column; align-items: center; }
+.lastCalled { width: 70px; height: 70px; border-radius: 50%; background: var(--gold, #d4a843); color: #1a0e10; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+.callMeta { color: var(--text-secondary, #b8a88a); font-size: 0.78rem; margin-top: 0.2rem; }
+.cardWrap { width: 100%; }
+.bingoHeader { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 4px; }
+.bingoHeader span { text-align: center; font-family: 'Luckiest Guy', cursive; color: #5fb0e8; font-size: 1.2rem; }
+.card { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.cell { aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--gold-dim, #8a6d2f); background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2); font-weight: 800; font-size: 1.05rem; cursor: default; }
+.free { background: #4a3a1a; color: var(--gold, #d4a843); }
+.callable { border-color: var(--gold, #d4a843); box-shadow: 0 0 8px rgba(212,168,67,0.5); cursor: pointer; }
+.daubed { background: #e53935; color: #fff; }
+.bingoBtn { background: radial-gradient(circle at 40% 35%, #ffd66b, #d4a843); color: #2a1508; border: none; border-radius: 14px; padding: 0.8rem 2rem; font-size: 1.3rem; font-weight: 900; cursor: pointer; min-height: 56px; }
+.bingoBtn:disabled { opacity: 0.4; cursor: default; }
+.gotBingo { color: #5cd85c; font-weight: 800; font-size: 1.1rem; }
+.opponents { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
+.opp { display: flex; align-items: center; gap: 0.35rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 999px; padding: 0.2rem 0.6rem; font-size: 0.76rem; }
+.oppMeta { color: var(--text-secondary, #b8a88a); }
+.results { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; max-width: 340px; }
+.resRow { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 0.5rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.3rem 0.6rem; }
+.rPlace { color: var(--gold, #d4a843); font-weight: 800; }

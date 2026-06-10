@@ -1,0 +1,21 @@
+.arena { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 1rem; max-width: 520px; margin: 0 auto; }
+.title { font-family: 'Bungee', sans-serif; font-size: clamp(1.6rem, 5vw, 2.3rem); color: var(--gold, #d4a843); margin: 0; letter-spacing: 2px; }
+.meta { color: var(--text-secondary, #b8a88a); margin: 0; font-weight: 600; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.dice { display: flex; gap: 0.4rem; }
+.die { position: relative; width: 54px; height: 54px; border-radius: 12px; background: #fff; color: #1a1a1a; font-size: 1.6rem; font-weight: 900; border: 2px solid #d8cdb5; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.3); }
+.dieKept { background: var(--gold, #d4a843); color: #1a0e10; transform: translateY(-4px); }
+.keepTag { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); font-size: 0.5rem; font-weight: 800; background: #1a0e10; color: var(--gold, #d4a843); padding: 0 3px; border-radius: 3px; }
+.rollBtn { background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px; padding: 0.55rem 1.6rem; font-weight: 800; cursor: pointer; min-height: 44px; }
+.rollBtn:disabled { opacity: 0.45; cursor: default; }
+.hint { color: var(--text-secondary, #b8a88a); font-size: 0.82rem; margin: 0; }
+.waitMsg { color: var(--gold, #d4a843); font-weight: 700; }
+.card { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 100%; }
+.catRow { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0.6rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 7px; cursor: pointer; color: var(--text-primary, #f3e9d2); min-height: 40px; }
+.catRow:disabled { cursor: default; }
+.catUsed { opacity: 0.5; }
+.catName { font-size: 0.82rem; }
+.catScore { font-weight: 800; color: var(--gold, #d4a843); }
+.scoreboard { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
+.scoreRow { display: flex; align-items: center; gap: 0.4rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 999px; padding: 0.2rem 0.7rem; font-size: 0.8rem; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; }

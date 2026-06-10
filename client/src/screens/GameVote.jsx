@@ -65,6 +65,12 @@ import previewChameleon from '../assets/gamepreviews/chameleon.png';
 import previewTraitorsVault from '../assets/gamepreviews/traitorsVault.png';
 import previewWhisperNetwork from '../assets/gamepreviews/whisperNetwork.png';
 import previewSketchImpostor from '../assets/gamepreviews/sketchImpostor.png';
+import previewTakeSix from '../assets/gamepreviews/takeSix.png';
+import previewPressYourLuckPigs from '../assets/gamepreviews/pressYourLuckPigs.png';
+import previewQwixx from '../assets/gamepreviews/qwixx.png';
+import previewYahtzee from '../assets/gamepreviews/yahtzee.png';
+import previewDominoDrift from '../assets/gamepreviews/dominoDrift.png';
+import previewBingoBrawl from '../assets/gamepreviews/bingoBrawl.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -122,6 +128,12 @@ const GAME_PREVIEWS = {
   traitorsVault: previewTraitorsVault,
   whisperNetwork: previewWhisperNetwork,
   sketchImpostor: previewSketchImpostor,
+  takeSix: previewTakeSix,
+  pressYourLuckPigs: previewPressYourLuckPigs,
+  qwixx: previewQwixx,
+  yahtzee: previewYahtzee,
+  dominoDrift: previewDominoDrift,
+  bingoBrawl: previewBingoBrawl,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

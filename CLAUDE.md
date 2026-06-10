@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (55)
+## Mini-Games (61)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -140,6 +140,12 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Traitor's Vault | 4-8 | Co-op 5-stage crack with hidden traitors, sabotage counts + eject vote |
 | Whisper Network | 4-8 | Two hidden factions tug a shared meter, then tag everyone's side |
 | Sketch Impostor | 3-8 | Hidden impostor draws without the word (shared canvas, one stroke/turn), vote |
+| Take Six | 3-8 | 6 Nimmt! — simultaneous card pick, ascending row resolution, fewest bullheads wins |
+| Press Your Luck Pigs | 2-8 | Push-your-luck dice (Pig) — roll to build a pot, a 1 busts, bank before you lose it |
+| Qwixx | 2-8 | Roll-and-write across 4 colour rows (left-to-right only), triangular scoring |
+| Yahtzee | 2-8 | Lockstep 5-dice, keep + re-roll, 13-category scorecard, server RNG + scoring |
+| Domino Drift | 2-8 | Mexican-Train-lite dominoes, match pips, empty hand wins, pip-sum ranks the rest |
+| Bingo Brawl | 2-8 | Real-time 5×5 Bingo, server-called numbers, validated daubs, finish order ranks |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -553,6 +559,12 @@ The owner cares about:
 | Traitor's Vault | Cinzel |
 | Whisper Network | Audiowide |
 | Sketch Impostor | Permanent Marker |
+| Take Six | Bungee Shade |
+| Press Your Luck Pigs | Bangers |
+| Qwixx | Fredoka |
+| Yahtzee | Bungee |
+| Domino Drift | Russo One |
+| Bingo Brawl | Luckiest Guy |
 
 ## Versioning & Commits
 

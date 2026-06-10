@@ -54,6 +54,12 @@ import { ChameleonClues } from './ChameleonClues.js';
 import { TraitorsVault } from './TraitorsVault.js';
 import { WhisperNetwork } from './WhisperNetwork.js';
 import { SketchImpostor } from './SketchImpostor.js';
+import { TakeSix } from './TakeSix.js';
+import { PressYourLuckPigs } from './PressYourLuckPigs.js';
+import { Qwixx } from './Qwixx.js';
+import { Yahtzee } from './Yahtzee.js';
+import { DominoDrift } from './DominoDrift.js';
+import { BingoBrawl } from './BingoBrawl.js';
 
 const gameEngines = {};
 
@@ -131,3 +137,9 @@ registerGame('chameleon', ChameleonClues);
 registerGame('traitorsVault', TraitorsVault);
 registerGame('whisperNetwork', WhisperNetwork);
 registerGame('sketchImpostor', SketchImpostor);
+registerGame('takeSix', TakeSix);
+registerGame('pressYourLuckPigs', PressYourLuckPigs);
+registerGame('qwixx', Qwixx);
+registerGame('yahtzee', Yahtzee);
+registerGame('dominoDrift', DominoDrift);
+registerGame('bingoBrawl', BingoBrawl);

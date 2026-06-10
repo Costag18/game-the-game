@@ -595,6 +595,78 @@ export const GAMES = {
       'Catch the impostor to score as the crew; survive or guess the word to score as the impostor.',
     ],
   },
+  takeSix: {
+    id: 'takeSix', name: 'Take Six', minPlayers: 3, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Play cards into rows — get stuck with the 6th and you eat the bullheads. Fewest wins.',
+    instructions: [
+      'Everyone holds 10 cards. Four rows each start with one card.',
+      'Each round, everyone secretly picks one card; they resolve in ascending order.',
+      'A card joins the row whose end is the highest value still below it.',
+      'Place the 6th card in a row and you take the first 5 as penalty bullheads.',
+      'Lowest total bullheads after 10 rounds wins.',
+    ],
+  },
+  pressYourLuckPigs: {
+    id: 'pressYourLuckPigs', name: 'Press Your Luck Pigs', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Roll to build a pot — but roll a 1 and lose it all. Bank before you bust.',
+    instructions: [
+      'On your turn, roll the die to add to your turn pot — as many times as you dare.',
+      'Roll a 1 and you BUST: the whole turn pot is lost and your turn ends.',
+      'Bank any time to add the pot to your score and pass the dice.',
+      'The die is server-rolled — pure nerve, no skill in the roll.',
+      'First to 100 (after the round completes) wins; highest score ranks first.',
+    ],
+  },
+  qwixx: {
+    id: 'qwixx', name: 'Qwixx', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Roll-and-write — mark numbers across four colour rows, but only left to right.',
+    instructions: [
+      'You have four colour rows: red & yellow ascending, green & blue descending.',
+      'Each round the server rolls and offers a number.',
+      'Mark that number on one row — but only to the right of your last mark in it — or pass.',
+      'More marks in a row score triangularly (1, 3, 6, 10, 15…).',
+      'Highest total across the rows after 12 rounds wins.',
+    ],
+  },
+  yahtzee: {
+    id: 'yahtzee', name: 'Yahtzee', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Roll five dice, keep the best, and fill your scorecard across 13 turns.',
+    instructions: [
+      'Each turn, roll five dice, then re-roll any you don\'t keep up to twice.',
+      'Assign your final dice to one of 13 categories (each used once).',
+      'Chase three/four of a kind, full house, straights, and the 50-point Yahtzee.',
+      'A 63+ upper section earns a 35-point bonus.',
+      'Highest grand total after 13 turns wins.',
+    ],
+  },
+  dominoDrift: {
+    id: 'dominoDrift', name: 'Domino Drift', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Match pips to extend the train — first to empty their hand wins.',
+    instructions: [
+      'Everyone is dealt seven dominoes (kept private).',
+      'On your turn, play a tile matching an open end of the train, or draw from the boneyard.',
+      'If you still can\'t play (and the boneyard is empty), pass.',
+      'First to empty their hand ends the game.',
+      'Everyone else is ranked by the fewest pips left in hand.',
+    ],
+  },
+  bingoBrawl: {
+    id: 'bingoBrawl', name: 'Bingo Brawl', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Daub your card as numbers are called — first to a full line shouts BINGO.',
+    instructions: [
+      'You get a private 5x5 card with a free centre space.',
+      'The server calls a new number every few seconds.',
+      'Tap a cell to daub it — only numbers that were actually called count.',
+      'Complete any row, column, or diagonal and hit BINGO to claim it.',
+      'Finish order is your placement; daub count breaks ties.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

@@ -1,0 +1,17 @@
+.arena { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 1rem; max-width: 600px; margin: 0 auto; }
+.title { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: clamp(1.8rem, 5vw, 2.6rem); color: var(--gold, #d4a843); margin: 0; }
+.meta { color: var(--text-secondary, #b8a88a); margin: 0; font-weight: 600; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.board { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; }
+.row { border: 2px solid; border-radius: 10px; padding: 0.3rem; }
+.cells { display: flex; gap: 2px; overflow-x: auto; }
+.cell { flex: 1 0 auto; min-width: 30px; min-height: 38px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: var(--text-primary, #f3e9d2); font-weight: 800; cursor: default; }
+.cellMarked { opacity: 1; }
+.cellLegal { outline: 3px solid var(--gold, #d4a843); cursor: pointer; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { outline-color: var(--gold, #d4a843); } 50% { outline-color: #fff; } }
+.actions { min-height: 2.2rem; }
+.acted { color: #5cd85c; font-weight: 700; margin: 0; }
+.passBtn { background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.5rem 1.3rem; cursor: pointer; min-height: 44px; }
+.scoreboard { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; width: 100%; }
+.scoreRow { display: flex; align-items: center; gap: 0.4rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 999px; padding: 0.2rem 0.7rem; font-size: 0.8rem; }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; }

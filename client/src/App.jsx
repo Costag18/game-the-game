@@ -76,6 +76,12 @@ import ChameleonCluesGame from './games/ChameleonClues.jsx';
 import TraitorsVaultGame from './games/TraitorsVault.jsx';
 import WhisperNetworkGame from './games/WhisperNetwork.jsx';
 import SketchImpostorGame from './games/SketchImpostor.jsx';
+import TakeSixGame from './games/TakeSix.jsx';
+import PressYourLuckPigsGame from './games/PressYourLuckPigs.jsx';
+import QwixxGame from './games/Qwixx.jsx';
+import YahtzeeGame from './games/Yahtzee.jsx';
+import DominoDriftGame from './games/DominoDrift.jsx';
+import BingoBrawlGame from './games/BingoBrawl.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -136,6 +142,12 @@ const GAME_COMPONENTS = {
   traitorsVault: TraitorsVaultGame,
   whisperNetwork: WhisperNetworkGame,
   sketchImpostor: SketchImpostorGame,
+  takeSix: TakeSixGame,
+  pressYourLuckPigs: PressYourLuckPigsGame,
+  qwixx: QwixxGame,
+  yahtzee: YahtzeeGame,
+  dominoDrift: DominoDriftGame,
+  bingoBrawl: BingoBrawlGame,
 };
 
 function GameRouter() {

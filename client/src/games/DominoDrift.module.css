@@ -1,0 +1,25 @@
+.arena { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 1rem; max-width: 600px; margin: 0 auto; }
+.title { font-family: 'Russo One', sans-serif; font-size: clamp(1.6rem, 5vw, 2.3rem); color: var(--gold, #d4a843); margin: 0; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.train { display: flex; align-items: center; gap: 0.8rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 10px; padding: 0.5rem 1rem; }
+.end { font-size: 1.3rem; font-weight: 900; color: var(--gold, #d4a843); }
+.trainMid { color: var(--text-secondary, #b8a88a); font-size: 0.8rem; }
+.opponents { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.opp { display: flex; align-items: center; gap: 0.35rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 999px; padding: 0.2rem 0.6rem; font-size: 0.78rem; }
+.oppTurn { border-color: var(--gold, #d4a843); }
+.oppCount { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.turnLine { color: var(--text-primary, #f3e9d2); font-weight: 600; margin: 0; }
+.hand { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+.tile { display: flex; align-items: center; gap: 4px; background: #fdfaf3; border: 2px solid #d8cdb5; border-radius: 8px; padding: 0.4rem 0.5rem; cursor: pointer; min-height: 48px; }
+.tileSel { border-color: var(--gold, #d4a843); box-shadow: 0 0 0 2px var(--gold, #d4a843); }
+.tileDim { opacity: 0.4; cursor: default; }
+.pip { font-weight: 900; font-size: 1.2rem; color: #1a1a1a; min-width: 16px; text-align: center; }
+.tileDiv { width: 2px; height: 26px; background: #1a1a1a; }
+.endChoice { display: flex; gap: 0.6rem; }
+.endBtn { background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 8px; padding: 0.5rem 1.1rem; font-weight: 800; cursor: pointer; }
+.actions { display: flex; gap: 0.6rem; }
+.actBtn { background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.45rem 1.1rem; cursor: pointer; min-height: 44px; }
+.results { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; max-width: 340px; }
+.resRow { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 0.5rem; background: var(--bg-panel, #2a1518); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.3rem 0.6rem; }
+.rPlace { color: var(--gold, #d4a843); font-weight: 800; }
+.pips { color: var(--text-secondary, #b8a88a); font-size: 0.8rem; }
