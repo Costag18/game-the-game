@@ -1,0 +1,117 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.9rem; }
+.title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+  font-weight: 800; letter-spacing: 0.06em;
+  color: #6ee7ff; margin: 0;
+  text-shadow: 0 0 12px rgba(110,231,255,0.45), 2px 2px 0 rgba(0,0,0,0.4);
+}
+.timer {
+  font-family: 'Orbitron', sans-serif; font-weight: 700;
+  color: var(--text-secondary, #b8a88a); font-variant-numeric: tabular-nums;
+  min-width: 3ch; text-align: right;
+}
+.timerLow { color: #ff6b6b; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.5; } }
+
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; text-align: center; font-size: 0.92rem; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+
+.solvedBanner {
+  background: linear-gradient(135deg, #1d8f4e, #0d5a30);
+  color: #eafff1; font-weight: 800; border-radius: 10px;
+  padding: 0.5rem 1rem; border: 2px solid #46d586;
+}
+
+/* ---- puzzle board ---- */
+.board {
+  display: grid;
+  gap: 2px;
+  background: #0c1b24;
+  padding: 6px;
+  border-radius: 12px;
+  border: 2px solid #1f4d5e;
+  user-select: none;
+  touch-action: manipulation;
+}
+.corner { background: transparent; }
+
+.colClue {
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: 1px; padding-bottom: 2px;
+  font-family: 'Orbitron', sans-serif; font-size: 0.7rem; font-weight: 700;
+  color: #6ee7ff;
+}
+.rowClue {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 4px; padding-right: 4px;
+  font-family: 'Orbitron', sans-serif; font-size: 0.72rem; font-weight: 700;
+  color: #6ee7ff;
+}
+
+.cell {
+  aspect-ratio: 1 / 1;
+  min-width: 30px; min-height: 30px;
+  background: #15303c;
+  border: 1px solid #214a59;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #ff8a8a; font-weight: 800; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  transition: background 0.08s;
+}
+.cell:active { transform: scale(0.94); }
+.cellFilled { background: #6ee7ff; border-color: #aef2ff; box-shadow: inset 0 0 6px rgba(255,255,255,0.5); }
+.cellEmpty { background: #102029; color: #5a7886; }
+.cellLocked { cursor: default; opacity: 0.92; }
+
+.modeRow { display: flex; gap: 0.5rem; }
+.modeBtn {
+  background: var(--bg-panel, #14232c); color: var(--text-primary, #f3e9d2);
+  border: 2px solid #2c6276; border-radius: 10px;
+  padding: 0.5rem 1rem; font-weight: 700; cursor: pointer; min-height: 44px;
+}
+.modeOn { border-color: #6ee7ff; color: #6ee7ff; box-shadow: 0 0 0 2px rgba(110,231,255,0.4); }
+
+/* ---- opponents ---- */
+.oppList { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; margin-top: 0.3rem; }
+.oppRow { display: flex; align-items: center; gap: 0.5rem; }
+.bar { flex: 1; height: 10px; background: rgba(0,0,0,0.35); border-radius: 999px; overflow: hidden; }
+.barFill { height: 100%; background: linear-gradient(90deg, #2c8c93, #6ee7ff); border-radius: 999px; transition: width 0.3s; }
+.oppPct { font-variant-numeric: tabular-nums; color: var(--text-secondary, #b8a88a); min-width: 3ch; text-align: right; font-size: 0.85rem; }
+
+/* ---- reveal / standings ---- */
+.reveal { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.revealTitle { font-family: 'Orbitron', sans-serif; color: #6ee7ff; margin: 0; font-size: 1.2rem; }
+.solution {
+  display: grid; gap: 2px; background: #0c1b24; padding: 6px; border-radius: 10px; border: 2px solid #1f4d5e;
+  width: min(280px, 80vw);
+}
+.solCell { aspect-ratio: 1/1; background: #15303c; border-radius: 3px; }
+.solOn { background: #6ee7ff; box-shadow: inset 0 0 5px rgba(255,255,255,0.6); }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; }
+.scoreRow {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.5rem;
+  background: rgba(0,0,0,0.22); border-radius: 8px; padding: 0.4rem 0.7rem;
+}
+.meRow { background: rgba(110,231,255,0.14); border: 1px solid #2c8c93; }
+.place { font-family: 'Orbitron', sans-serif; font-weight: 800; color: #6ee7ff; min-width: 2.2ch; }
+.scoreVal { color: var(--text-secondary, #b8a88a); font-weight: 700; font-size: 0.85rem; }
+
+.primaryBtn {
+  background: #6ee7ff; color: #06222b; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }

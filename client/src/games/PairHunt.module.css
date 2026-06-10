@@ -1,0 +1,99 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 720px;
+  margin: 0 auto;
+  border-radius: 16px;
+  transition: box-shadow 0.18s ease, background 0.18s ease;
+}
+.flashOk { box-shadow: 0 0 0 3px #3fae6b, 0 0 40px rgba(63,174,107,0.5); }
+.flashBad { box-shadow: 0 0 0 3px #e8534b, 0 0 40px rgba(232,83,75,0.5); }
+
+.head {
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem; width: 100%;
+}
+.title {
+  font-family: 'Fredoka', 'Quicksand', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.8rem, 5vw, 2.7rem);
+  margin: 0;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #e8534b, #4c7df0, #3fae6b);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.18);
+}
+.meta { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+.timer, .deck, .mine {
+  font-weight: 800; font-variant-numeric: tabular-nums;
+  background: rgba(0,0,0,0.28); border-radius: 999px; padding: 0.2rem 0.7rem;
+  color: var(--text-primary, #f3e9d2); font-size: 0.95rem;
+}
+.timer { color: var(--gold, #d4a843); }
+.mine { color: #6fe09a; }
+
+.hint {
+  text-align: center; margin: 0; color: var(--text-secondary, #b8a88a);
+  font-size: clamp(0.85rem, 2.6vw, 1rem); line-height: 1.35;
+}
+.hint b { color: var(--gold, #d4a843); }
+.locked { color: #ff8a8a; font-weight: 700; margin: 0; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+  width: 100%;
+}
+@media (max-width: 520px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+.card {
+  aspect-ratio: 3 / 2;
+  min-height: 60px;
+  display: flex; align-items: center; justify-content: center;
+  background: #fdfaf3;
+  border: 3px solid #d8cbb0;
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 0.3rem;
+  transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
+  touch-action: manipulation;
+}
+.card:active { transform: scale(0.96); }
+.card:disabled { opacity: 0.55; cursor: default; }
+.cardSel {
+  border-color: var(--gold, #d4a843);
+  box-shadow: 0 0 0 3px var(--gold, #d4a843), 0 4px 12px rgba(0,0,0,0.35);
+  transform: translateY(-3px);
+}
+
+.cardFace { display: flex; gap: 0.25rem; align-items: center; justify-content: center; flex-wrap: wrap; }
+.glyph { width: clamp(20px, 6vw, 34px); height: clamp(20px, 6vw, 34px); }
+
+.scoreboard { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; margin-top: 0.4rem; max-width: 460px; }
+.scoreRow {
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(0,0,0,0.22); border-radius: 8px; padding: 0.3rem 0.7rem;
+}
+.scoreMine { background: rgba(212,168,67,0.18); box-shadow: inset 0 0 0 1px var(--gold-dim, #8a6d2f); }
+.scoreVal { color: var(--gold, #d4a843); font-weight: 800; font-variant-numeric: tabular-nums; font-size: 1.1rem; }
+
+.reveal { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.over { font-family: 'Fredoka', 'Quicksand', sans-serif; color: var(--gold, #d4a843); margin: 0.3rem 0; }
+.finalBoard { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; max-width: 460px; }
+.finalRow {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.6rem;
+  background: rgba(0,0,0,0.25); border-radius: 10px; padding: 0.45rem 0.8rem;
+}
+.finalMine { background: rgba(212,168,67,0.18); box-shadow: inset 0 0 0 1px var(--gold-dim, #8a6d2f); }
+.place { font-weight: 900; color: var(--gold, #d4a843); font-variant-numeric: tabular-nums; }
+.finalCount { font-weight: 800; color: var(--text-primary, #f3e9d2); font-variant-numeric: tabular-nums; }
+
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

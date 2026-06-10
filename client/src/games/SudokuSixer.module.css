@@ -1,0 +1,114 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.head { display: flex; align-items: baseline; gap: 0.9rem; }
+.title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
+  color: var(--gold, #d4a843);
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+}
+.timer {
+  font-weight: 800; font-variant-numeric: tabular-nums;
+  color: var(--text-secondary, #b8a88a);
+  background: rgba(0,0,0,0.3); border-radius: 8px; padding: 0.15rem 0.6rem;
+}
+.timerLow { color: #ff8a8a; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: 0.5; } }
+
+.sub { color: var(--text-secondary, #b8a88a); margin: 0; text-align: center; font-weight: 600; }
+
+/* GRID */
+.grid {
+  display: grid;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+  background: var(--gold-dim, #8a6d2f);
+  border: 3px solid var(--gold, #d4a843);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.cell {
+  border-style: solid;
+  border-color: rgba(212,168,67,0.35);
+  background: #1c2742;
+  color: #e8eefc;
+  font-size: clamp(1.1rem, 5vw, 1.7rem);
+  font-weight: 800;
+  font-family: 'Cinzel', serif;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  min-height: 44px;
+  aspect-ratio: 1 / 1;
+  -webkit-tap-highlight-color: transparent;
+}
+.cell:disabled { cursor: default; }
+.given { background: #0f1830; color: var(--gold, #d4a843); }
+.selected { background: #2d4a86; box-shadow: inset 0 0 0 3px var(--gold, #d4a843); }
+.correct { color: #7ee08a; }
+.wrong { color: #ff7a7a; text-decoration: line-through; }
+
+/* NUMBER PAD */
+.pad {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 420px;
+}
+.padBtn {
+  min-height: 52px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: 'Cinzel', serif;
+  border-radius: 10px;
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  background: var(--bg-panel, #2a1518);
+  color: var(--text-primary, #f3e9d2);
+  cursor: pointer;
+}
+.padBtn:active:not(:disabled) { transform: scale(0.94); }
+.padBtn:disabled { opacity: 0.4; cursor: default; }
+.eraseBtn { color: #ff8a8a; }
+
+/* OPPONENTS */
+.oppBox { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; max-width: 420px; margin-top: 0.2rem; }
+.oppRow { display: flex; align-items: center; gap: 0.5rem; }
+.bar { flex: 1; height: 10px; background: rgba(0,0,0,0.35); border-radius: 999px; overflow: hidden; }
+.barFill { height: 100%; background: linear-gradient(90deg, var(--gold-dim, #8a6d2f), var(--gold, #d4a843)); transition: width 0.3s ease; }
+.oppPct { color: var(--text-secondary, #b8a88a); font-size: 0.8rem; font-weight: 700; min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.solvedBanner {
+  background: linear-gradient(135deg, var(--gold, #d4a843), #b5862a);
+  color: #1a0e10; font-weight: 900; font-size: 1.2rem;
+  padding: 0.6rem 1.4rem; border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+
+/* STANDINGS */
+.standings { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; max-width: 420px; align-items: center; }
+.standTitle { font-family: 'Cinzel', serif; color: var(--gold, #d4a843); margin: 0.3rem 0; font-size: 1.4rem; }
+.standRow {
+  display: flex; align-items: center; gap: 0.6rem; width: 100%;
+  background: rgba(0,0,0,0.25); border-radius: 8px; padding: 0.4rem 0.7rem;
+}
+.standMe { box-shadow: 0 0 0 2px var(--gold, #d4a843); }
+.place { font-weight: 900; color: var(--gold, #d4a843); min-width: 28px; }
+.standVal { margin-left: auto; color: var(--text-secondary, #b8a88a); font-weight: 700; font-size: 0.85rem; }
+
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+  margin-top: 0.4rem;
+}
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

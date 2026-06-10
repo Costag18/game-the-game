@@ -835,6 +835,102 @@ export const GAMES = {
       'Last player standing wins; elimination order (reversed) sets the placements.',
     ],
   },
+  echoChamber: {
+    id: 'echoChamber', name: 'Echo Chamber', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Simon-style memory race — repeat the growing sequence; one wrong tap and you\'re out.',
+    instructions: [
+      'Four colour pads flash a sequence; one new step is added each round.',
+      'Watch during SHOW, then tap the pads back in the exact order during INPUT.',
+      'The sequence is never shown again while you tap — you must remember it.',
+      'One wrong tap eliminates you at your current depth.',
+      'Longest sequence reproduced ranks first; ties share a placement.',
+    ],
+  },
+  gridLock: {
+    id: 'gridLock', name: 'Grid Lock', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: '15-puzzle race — slide the tiles back into order before your rivals do.',
+    instructions: [
+      'Everyone starts from the same scrambled 4x4 grid (1–15 plus a gap).',
+      'Tap a tile next to the gap to slide it in.',
+      'Get the board to 1–15 in order with the gap bottom-right to solve.',
+      'First to solve places 1st, then the next, and so on.',
+      'At the timer, unsolved players rank by tiles in the correct spot.',
+    ],
+  },
+  nonogramDash: {
+    id: 'nonogramDash', name: 'Nonogram Dash', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Picross solve-race — fill the hidden 8×8 picture from the row and column clues.',
+    instructions: [
+      'Each number clue lists the lengths of the filled runs in that row or column.',
+      'Tap a cell to fill it; use Mark Empty to cross out blanks.',
+      'You solve when your filled cells exactly match the hidden picture.',
+      'First to solve places 1st; the server validates every solve.',
+      'At the timer, unsolved players rank by correct cells.',
+    ],
+  },
+  pairHunt: {
+    id: 'pairHunt', name: 'Pair Hunt', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'SET, real-time — spot a trio where every attribute is all-same or all-different.',
+    instructions: [
+      'Twelve attribute-cards are on the table (shape, colour, count, fill).',
+      'A valid SET is 3 cards where, for every attribute, the values are all same or all different.',
+      'Tap 3 cards and claim — a valid set scores and is replaced; an invalid one briefly locks you out.',
+      'The server checks every claim against the live tableau.',
+      'Most valid sets wins; ties share a placement.',
+    ],
+  },
+  crackTheVault: {
+    id: 'crackTheVault', name: 'Crack the Vault', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Numeric Mastermind race — crack the hidden 4-digit code from locked/loose feedback.',
+    instructions: [
+      'Everyone races to crack the same hidden 4-digit code.',
+      'Each guess returns how many digits are correct AND in place ("locked") and correct but misplaced ("loose").',
+      'Use the feedback to deduce the code.',
+      'First to get four locked cracks it and places 1st.',
+      'At the timer, non-crackers rank by best progress then fewest guesses.',
+    ],
+  },
+  sudokuSixer: {
+    id: 'sudokuSixer', name: 'Sudoku Sixer', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: '6×6 mini-sudoku race — fill the grid so every row, column and 2×3 box holds 1–6.',
+    instructions: [
+      'Everyone solves the same 6x6 puzzle (digits 1–6).',
+      'Tap a non-given cell and pick a digit; given cells are locked.',
+      'Each row, column, and 2x3 box must contain 1–6 exactly once.',
+      'First to match the full solution places 1st.',
+      'At the timer, unsolved players rank by correct cells.',
+    ],
+  },
+  flashFlood: {
+    id: 'flashFlood', name: 'Flash Flood', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Pattern-memory race — reproduce the flashed grid; the grid grows each round.',
+    instructions: [
+      'Each round a pattern of cells lights up, then hides.',
+      'Tap exactly the cells that were lit (and no extras) to bank the round.',
+      'A wrong or incomplete recall eliminates you at that round.',
+      'The grid grows bigger every round.',
+      'Most rounds banked ranks first; ties share a placement.',
+    ],
+  },
+  sequenceSleuth: {
+    id: 'sequenceSleuth', name: 'Sequence Sleuth', minPlayers: 2, maxPlayers: 8,
+    turnTimer: TIMERS.CARD_GAME,
+    description: 'Guess the next number — the fewer terms you need, the more you score.',
+    instructions: [
+      'A hidden number sequence reveals its terms one at a time.',
+      'Lock in your guess for the NEXT term whenever you\'re confident.',
+      'Guessing correctly with fewer terms shown scores more.',
+      'A wrong guess locks you out of that sequence.',
+      'Highest total across 5 sequences wins; ties share a placement.',
+    ],
+  },
 };
 
 export function getEligibleGames(playerCount) {

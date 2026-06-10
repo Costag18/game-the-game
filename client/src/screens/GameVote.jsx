@@ -85,6 +85,14 @@ import previewBalloonBrinkmanship from '../assets/gamepreviews/balloonBrinkmansh
 import previewPulseTap from '../assets/gamepreviews/pulseTap.png';
 import previewBullseyeDrop from '../assets/gamepreviews/bullseyeDrop.png';
 import previewHotPotatoRelay from '../assets/gamepreviews/hotPotatoRelay.png';
+import previewEchoChamber from '../assets/gamepreviews/echoChamber.png';
+import previewGridLock from '../assets/gamepreviews/gridLock.png';
+import previewNonogramDash from '../assets/gamepreviews/nonogramDash.png';
+import previewPairHunt from '../assets/gamepreviews/pairHunt.png';
+import previewCrackTheVault from '../assets/gamepreviews/crackTheVault.png';
+import previewSudokuSixer from '../assets/gamepreviews/sudokuSixer.png';
+import previewFlashFlood from '../assets/gamepreviews/flashFlood.png';
+import previewSequenceSleuth from '../assets/gamepreviews/sequenceSleuth.png';
 
 const GAME_PREVIEWS = {
   blackjack: previewBlackjack,
@@ -162,6 +170,14 @@ const GAME_PREVIEWS = {
   pulseTap: previewPulseTap,
   bullseyeDrop: previewBullseyeDrop,
   hotPotatoRelay: previewHotPotatoRelay,
+  echoChamber: previewEchoChamber,
+  gridLock: previewGridLock,
+  nonogramDash: previewNonogramDash,
+  pairHunt: previewPairHunt,
+  crackTheVault: previewCrackTheVault,
+  sudokuSixer: previewSudokuSixer,
+  flashFlood: previewFlashFlood,
+  sequenceSleuth: previewSequenceSleuth,
 };
 
 export default function GameVote({ eligibleGames, tournamentState, nicknames, avatars, onVote }) {

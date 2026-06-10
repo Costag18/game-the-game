@@ -96,6 +96,14 @@ import BalloonBrinkmanshipGame from './games/BalloonBrinkmanship.jsx';
 import PulseTapGame from './games/PulseTap.jsx';
 import BullseyeDropGame from './games/BullseyeDrop.jsx';
 import HotPotatoRelayGame from './games/HotPotatoRelay.jsx';
+import EchoChamberGame from './games/EchoChamber.jsx';
+import GridLockGame from './games/GridLock.jsx';
+import NonogramDashGame from './games/NonogramDash.jsx';
+import PairHuntGame from './games/PairHunt.jsx';
+import CrackTheVaultGame from './games/CrackTheVault.jsx';
+import SudokuSixerGame from './games/SudokuSixer.jsx';
+import FlashFloodGame from './games/FlashFlood.jsx';
+import SequenceSleuthGame from './games/SequenceSleuth.jsx';
 import './assets/styles/theme.css';
 import './assets/styles/global.css';
 
@@ -176,6 +184,14 @@ const GAME_COMPONENTS = {
   pulseTap: PulseTapGame,
   bullseyeDrop: BullseyeDropGame,
   hotPotatoRelay: HotPotatoRelayGame,
+  echoChamber: EchoChamberGame,
+  gridLock: GridLockGame,
+  nonogramDash: NonogramDashGame,
+  pairHunt: PairHuntGame,
+  crackTheVault: CrackTheVaultGame,
+  sudokuSixer: SudokuSixerGame,
+  flashFlood: FlashFloodGame,
+  sequenceSleuth: SequenceSleuthGame,
 };
 
 function GameRouter() {

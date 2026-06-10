@@ -1,0 +1,132 @@
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.head { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+.title {
+  font-family: 'Audiowide', 'Orbitron', sans-serif;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  letter-spacing: 0.06em;
+  margin: 0;
+  color: #b388ff;
+  text-shadow: 0 0 12px rgba(124, 77, 255, 0.7), 2px 2px 0 rgba(0,0,0,0.4);
+}
+.round { color: var(--text-secondary, #b8a88a); font-weight: 700; font-size: 0.9rem; }
+
+.banner {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  color: var(--text-primary, #f3e9d2);
+  background: linear-gradient(135deg, #241a40, #120c24);
+  border: 2px solid #4d3b8a;
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  width: 100%;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+.banner.good { border-color: #3ddc84; color: #b6ffd8; }
+.banner.bad { border-color: #ff5a5f; color: #ffc2c4; }
+.banner.dim { opacity: 0.7; }
+
+/* PADS — 2x2 grid, big touch targets */
+.padGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 1 / 1;
+}
+.pad {
+  border: none;
+  border-radius: 18px;
+  background: var(--pad-color, #888);
+  filter: brightness(0.45) saturate(0.8);
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  width: 100%;
+  height: 100%;
+  transition: filter 90ms ease, transform 90ms ease, box-shadow 90ms ease;
+  position: relative;
+  overflow: hidden;
+}
+.pad:disabled { cursor: default; }
+.pad:not(:disabled):active { transform: scale(0.96); filter: brightness(1) saturate(1.2); }
+.padLit {
+  filter: brightness(1.25) saturate(1.3);
+  box-shadow: 0 0 28px 6px var(--pad-color, #fff), inset 0 0 24px rgba(255,255,255,0.5);
+  transform: scale(1.02);
+}
+.padInner {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.45), rgba(255,255,255,0) 60%);
+  pointer-events: none;
+}
+
+/* progress dots for my own taps */
+.progressDots { display: flex; gap: 0.35rem; flex-wrap: wrap; justify-content: center; }
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.dotOn { background: #b388ff; box-shadow: 0 0 8px #7c4dff; border-color: #b388ff; }
+
+/* opponents — counts only */
+.oppStrip { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; width: 100%; }
+.oppChip {
+  display: flex; align-items: center; gap: 0.35rem;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+}
+.oppOut { opacity: 0.5; border-color: #6b4a4a; }
+.oppMeta { font-variant-numeric: tabular-nums; color: var(--gold, #d4a843); font-weight: 700; }
+
+/* reveal */
+.reveal { display: flex; flex-direction: column; align-items: center; gap: 0.7rem; width: 100%; }
+.seqReveal { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.seqLabel { color: var(--text-secondary, #b8a88a); font-size: 0.85rem; letter-spacing: 0.04em; }
+.seqPads { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; }
+.seqPad {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: rgba(0,0,0,0.6); font-size: 0.85rem;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+
+.standings { display: flex; flex-direction: column; gap: 0.3rem; width: 100%; }
+.standRow {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.25);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+}
+.standMine { background: rgba(124,77,255,0.18); border: 1px solid #7c4dff; }
+.place { font-weight: 800; color: var(--gold, #d4a843); font-variant-numeric: tabular-nums; }
+.depthVal { color: #b388ff; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.primaryBtn {
+  background: var(--gold, #d4a843); color: #1a0e10; border: none; border-radius: 10px;
+  padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
+}
+.primaryBtn:disabled { opacity: 0.45; cursor: default; }
+
+.loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

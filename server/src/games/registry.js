@@ -74,6 +74,14 @@ import { BalloonBrinkmanship } from './BalloonBrinkmanship.js';
 import { PulseTap } from './PulseTap.js';
 import { BullseyeDrop } from './BullseyeDrop.js';
 import { HotPotatoRelay } from './HotPotatoRelay.js';
+import { EchoChamber } from './EchoChamber.js';
+import { GridLock } from './GridLock.js';
+import { NonogramDash } from './NonogramDash.js';
+import { PairHunt } from './PairHunt.js';
+import { CrackTheVault } from './CrackTheVault.js';
+import { SudokuSixer } from './SudokuSixer.js';
+import { FlashFlood } from './FlashFlood.js';
+import { SequenceSleuth } from './SequenceSleuth.js';
 
 const gameEngines = {};
 
@@ -171,3 +179,11 @@ registerGame('balloonBrinkmanship', BalloonBrinkmanship);
 registerGame('pulseTap', PulseTap);
 registerGame('bullseyeDrop', BullseyeDrop);
 registerGame('hotPotatoRelay', HotPotatoRelay);
+registerGame('echoChamber', EchoChamber);
+registerGame('gridLock', GridLock);
+registerGame('nonogramDash', NonogramDash);
+registerGame('pairHunt', PairHunt);
+registerGame('crackTheVault', CrackTheVault);
+registerGame('sudokuSixer', SudokuSixer);
+registerGame('flashFlood', FlashFlood);
+registerGame('sequenceSleuth', SequenceSleuth);

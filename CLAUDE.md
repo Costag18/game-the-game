@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (75)
+## Mini-Games (83)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -160,6 +160,14 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Pulse Tap | 2-8 | Rhythm tap, server beat schedule, offset-graded Perfect/Good/Miss + combo |
 | Bullseye Drop | 2-8 | Timing darts, server reticle path, radius-at-release scoring |
 | Hot Potato Relay | 3-8 | Real-time pass ring with a hidden server fuse, reverse-elimination ranking |
+| Echo Chamber | 2-8 | Simon sequence-memory race, server-only sequence, depth ranking |
+| Grid Lock | 2-8 | 15-puzzle slide race, server-validated slides, finish order + tiles-correct |
+| Nonogram Dash | 2-8 | Picross race, hidden bitmap (clues only sent), solve validated server-side |
+| Pair Hunt | 2-8 | SET — claim all-same/all-different trios from a public tableau, server-validated |
+| Crack the Vault | 2-8 | Numeric Mastermind race, hidden code, locked/loose feedback, crack order ranks |
+| Sudoku Sixer | 2-8 | 6×6 sudoku race, server-generated solution + givens, finish order + correct cells |
+| Flash Flood | 2-8 | Flashed-pattern memory race, growing grid, server-only pattern, rounds-banked ranking |
+| Sequence Sleuth | 2-8 | Guess the next term, fewer-terms-shown scores more, rule hidden server-side |
 
 ## 1v1 Pairing Engine (Swiss layer)
 
@@ -593,6 +601,14 @@ The owner cares about:
 | Pulse Tap | Audiowide |
 | Bullseye Drop | Wallpoet |
 | Hot Potato Relay | Bungee |
+| Echo Chamber | Audiowide |
+| Grid Lock | Russo One |
+| Nonogram Dash | Orbitron |
+| Pair Hunt | Fredoka |
+| Crack the Vault | Wallpoet |
+| Sudoku Sixer | Cinzel |
+| Flash Flood | Bungee |
+| Sequence Sleuth | Orbitron |
 
 ## Versioning & Commits
 
