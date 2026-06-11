@@ -1,20 +1,19 @@
 import { PairingEngine } from './PairingEngine.js';
 import { DotsAndBoxesMatch } from './DotsAndBoxesMatch.js';
-import { TIMERS } from '../../../shared/constants.js';
 
 /**
- * Dots And Boxes — inherently 1v1, wrapped by the PairingEngine into a Swiss best-of-3
- * across all N tournament players. This wrapper is intentionally thin: it only supplies
- * the match factory + config; all ranking/byes/timers/leave live in PairingEngine, and
- * one board lives in DotsAndBoxesMatch.
+ * Dots And Boxes — inherently 1v1, wrapped by the PairingEngine. Tuned to be a single,
+ * relaxed match: ONE mini-round (each player plays one 1v1, ranked by win/loss) and NO
+ * per-turn countdown (`noTurnTimer`) so players can think — a generous 5-minute hard cap
+ * is the only safety against an abandoned game stalling the barrier.
  */
 export class DotsAndBoxes extends PairingEngine {
   constructor(players) {
     super(players, {
       matchFactory: (p1, p2) => new DotsAndBoxesMatch(p1, p2),
-      miniRounds: 3,
-      matchTimerSec: TIMERS.CARD_GAME,
-      matchHardCapSec: 120,
+      miniRounds: 1,
+      noTurnTimer: true,
+      matchHardCapSec: 300,
       title: 'Dots And Boxes',
     });
   }

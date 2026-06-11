@@ -63,6 +63,20 @@
   font-variant-numeric: tabular-nums;
   text-shadow: 2px 2px 0 rgba(0,0,0,0.35);
 }
+.typeRow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+.typeLabel { color: var(--text-secondary, #b8a88a); font-weight: 700; font-size: 0.95rem; }
+.yearInput {
+  width: 110px; height: 44px; padding: 0 0.6rem; border-radius: 10px;
+  border: 2px solid #5a4a8a; background: rgba(0,0,0,0.3); color: #e8c87a;
+  font-size: 1.3rem; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums;
+}
+.eraBtn {
+  height: 44px; min-width: 56px; padding: 0 0.8rem; border-radius: 10px; cursor: pointer;
+  border: 2px solid #5a4a8a; font-weight: 800; font-size: 1rem; color: #f3e9d2;
+}
+.eraAd { background: #2b4a86; }
+.eraBc { background: #7a3a2a; }
+
 .slider {
   width: 100%;
   max-width: 480px;

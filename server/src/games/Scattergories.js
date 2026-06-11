@@ -3,7 +3,9 @@ import { TIMERS } from '../../../shared/constants.js';
 
 const TOTAL_ROUNDS = 3;
 const WRITE_TIMER_MS = TIMERS.SCATTERGORIES * 1000; // 75_000
-const ACK_TIMER_MS = 10_000;
+// The reveal advances when everyone taps Continue; this is just a generous safety net so a
+// lingering player can't deadlock the room (no visible countdown — read the answers in peace).
+const ACK_TIMER_MS = 60_000;
 const CATEGORIES_PER_ROUND = 10;
 const LETTERS = 'ABCDEFGHIKLMNPRSTW'.split(''); // drop hard letters Q/U/V/X/Y/Z/J/O
 

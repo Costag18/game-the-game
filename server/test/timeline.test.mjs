@@ -63,7 +63,7 @@ test('year is clamped to [min,max]', () => {
   g.handleAction('a', { type: 'submitYear', year: 99999 });
   g.handleAction('b', { type: 'submitYear', year: -99999 });
   eq(g.guesses['a'], 2100);
-  eq(g.guesses['b'], -3000);
+  eq(g.guesses['b'], -4000);
 });
 
 test('cannot lock twice; ignores non-players', () => {

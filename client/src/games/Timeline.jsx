@@ -53,6 +53,15 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
   const span = yearMax - yearMin;
   const pctFor = (y) => `${((Math.max(yearMin, Math.min(yearMax, y)) - yearMin) / span) * 100}%`;
   const fmtYear = (y) => (y == null ? '' : y < 0 ? `${-y} BC` : `${y}`);
+  // typed entry: a magnitude + BC/AD era, kept in sync with the slider via the signed `year`
+  const era = year < 0 ? 'BC' : 'AD';
+  const mag = Math.abs(year);
+  const maxMag = Math.max(Math.abs(yearMin), Math.abs(yearMax));
+  function setFromInput(rawMag, rawEra) {
+    const m = Math.max(0, Math.floor(Number(rawMag) || 0));
+    const signed = rawEra === 'BC' ? -m : m;
+    setYear(Math.max(yearMin, Math.min(yearMax, signed)));
+  }
 
   return (
     <div className={styles.arena}>
@@ -82,6 +91,26 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
         ) : (
           <div className={styles.guessBox}>
             <div className={styles.readout}>{fmtYear(year)}</div>
+            <div className={styles.typeRow}>
+              <span className={styles.typeLabel}>Type:</span>
+              <input
+                className={styles.yearInput}
+                type="number"
+                inputMode="numeric"
+                value={mag}
+                min={0}
+                max={maxMag}
+                step={1}
+                onChange={(e) => setFromInput(e.target.value, era)}
+                aria-label="Type a year"
+              />
+              <button
+                type="button"
+                className={`${styles.eraBtn} ${era === 'BC' ? styles.eraBc : styles.eraAd}`}
+                onClick={() => setFromInput(mag, era === 'BC' ? 'AD' : 'BC')}
+                aria-label="Toggle BC or AD"
+              >{era}</button>
+            </div>
             <input
               className={styles.slider}
               type="range"

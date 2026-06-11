@@ -142,14 +142,27 @@ for (const n of [2, 3, 4]) {
   });
 }
 
-test('per-turn timeout auto-plays (does not forfeit)', () => {
+test('no per-turn timer: a slow turn neither auto-plays nor forfeits; hard cap still ends an abandoned match', () => {
   const g = new DotsAndBoxes(['a', 'b']);
   g.setOnStateChange(() => {});
   g.startGame();
   const m = g.matches[0];
+  // no per-turn countdown is exposed to the client (noTurnTimer)
+  eq(g.getStateForPlayer(m.p1).myMatch.turnEndsAt, null);
   const legalBefore = m.engine._legalEdges().length;
-  advance(30_000); // per-turn timer → autoMove
-  assert((m.engine && m.engine._legalEdges().length < legalBefore) || g.state === 'miniRoundSummary', 'auto-played, not forfeited');
+  advance(60_000); // a full minute of "thinking" — nothing should change
+  eq(m.engine._legalEdges().length, legalBefore); // board untouched, no auto-play
+  assert(!m.over, 'match still live after a long think');
+  // the generous 300s hard cap is the only safety against a truly abandoned match
+  advance(300_000);
+  assert(m.over || g.state !== 'match', 'hard cap eventually ends an abandoned match');
+});
+
+test('single mini-round (one game per player), no best-of-3', () => {
+  const g = new DotsAndBoxes(['a', 'b', 'c', 'd']);
+  g.setOnStateChange(() => {});
+  g.startGame();
+  eq(g.totalMiniRounds, 1);
 });
 
 uninstallClock();

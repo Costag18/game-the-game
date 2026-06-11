@@ -45,7 +45,7 @@ export default function PairingShell({ gameState, nicknames, avatars, onAction, 
     <div className={shell.shell}>
       <div className={shell.header}>
         <h1 className={shell.title} style={titleFont ? { fontFamily: titleFont } : undefined}>{title}</h1>
-        <span className={shell.miniRound}>Mini-round {miniRound} / {totalMiniRounds}</span>
+        {totalMiniRounds > 1 && <span className={shell.miniRound}>Mini-round {miniRound} / {totalMiniRounds}</span>}
       </div>
 
       {/* live standings */}
@@ -95,7 +95,7 @@ export default function PairingShell({ gameState, nicknames, avatars, onAction, 
 
       {phase === 'miniRoundSummary' && lastMiniRound && (
         <div className={shell.summary}>
-          <h2 className={shell.summaryTitle}>Mini-round {miniRound} results</h2>
+          <h2 className={shell.summaryTitle}>{totalMiniRounds > 1 ? `Mini-round ${miniRound} results` : 'Results'}</h2>
           {lastMiniRound.pairings.map((pr, i) => (
             <div key={i} className={shell.pairRow}>
               {pr.isBye ? (

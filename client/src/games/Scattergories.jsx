@@ -12,6 +12,9 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
   const roundRef = useRef(-1);
   const ackedRound = useRef(-1);
   const pinged = useRef(false);
+  const autoSubmitted = useRef(false);
+  const draftRef = useRef({});
+  draftRef.current = draft; // keep the latest draft reachable from the countdown closure
 
   const phase = gameState?.phase;
   const round = gameState?.round;
@@ -23,6 +26,7 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
       roundRef.current = round;
       setDraft({});
       pinged.current = false;
+      autoSubmitted.current = false;
     }
   }, [phase, round]);
 
@@ -35,6 +39,8 @@ export default function Scattergories({ gameState, onAction, nicknames, avatars 
     const tick = () => {
       const rem = Math.max(0, Math.ceil((writeEndTime - Date.now()) / 1000));
       setRemaining(rem);
+      // auto-submit whatever's typed ~1s before the deadline so nothing is lost on timeout
+      if (rem <= 1 && !autoSubmitted.current) { autoSubmitted.current = true; onAction({ type: 'submit', answers: draftRef.current }); }
       if (rem === 0 && !pinged.current) { pinged.current = true; onAction({ type: 'ping' }); }
     };
     tick();

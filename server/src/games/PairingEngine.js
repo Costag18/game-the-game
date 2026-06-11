@@ -29,6 +29,9 @@ export class PairingEngine extends BaseGame {
     this._miniRoundsOpt = opts.miniRounds != null ? opts.miniRounds : 'auto';
     this.matchTimerSec = opts.matchTimerSec || TIMERS.CARD_GAME;
     this.matchHardCapSec = opts.matchHardCapSec || 90;
+    // noTurnTimer: no per-turn countdown/pressure (thinky games). The match still has a
+    // generous hard-cap so an abandoned game can't stall the barrier forever.
+    this._noTurnTimer = !!opts.noTurnTimer;
     this.title = opts.title || '1v1';
 
     this.totalMiniRounds = 0;
@@ -115,6 +118,7 @@ export class PairingEngine extends BaseGame {
   _armTurnTimer(mi) {
     const m = this.matches[mi];
     if (!m || m.over || m.isBye || !m.engine) return;
+    if (this._noTurnTimer) { m.turnEndsAt = null; return; } // no per-turn countdown (hard-cap still guards)
     if (this._matchTimers[mi]) clearTimeout(this._matchTimers[mi]);
     m.turnEndsAt = Date.now() + this.matchTimerSec * 1000;
     this._matchTimers[mi] = setTimeout(() => {
