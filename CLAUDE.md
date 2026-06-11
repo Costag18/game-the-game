@@ -81,7 +81,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 7. Import and add to `GAME_COMPONENTS` in `client/src/App.jsx`
 8. Import preview and add to `GAME_PREVIEWS` in `client/src/screens/GameVote.jsx`
 
-## Mini-Games (93)
+## Mini-Games (83)
 
 | Game | Players | Type |
 |------|---------|------|
@@ -113,7 +113,6 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Telephone Pictionary | 3-8 | Lockstep write→draw→guess chains, private per-chain canvases, reveal + vote |
 | Othello | 2-8 | 1v1 board (Pairing Engine), 8×8 disc-flip/bracket, most discs wins |
 | Dots & Boxes | 2-8 | 1v1 board (Pairing Engine), claim 4th edge → extra turn, most boxes (5×5) |
-| Gomoku | 2-8 | 1v1 board (Pairing Engine), 15×15 five-in-a-row |
 | Hex | 2-8 | 1v1 board (Pairing Engine), 11×11 connect-your-edges, never draws |
 | Order & Chaos | 2-8 | 1v1 board (Pairing Engine), 6×6, Order wants 5-in-a-row, Chaos blocks |
 | Nim Heist | 2-8 | 1v1 (Pairing Engine), misère take-away — take the last gem and you lose |
@@ -130,11 +129,9 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Caption This | 3-8 | Caption AI-generated scenes (client Pollinations URL), vote funniest |
 | Awkward Award | 3-8 | Write an acceptance reason for a silly trophy pinned to a random nominee, vote |
 | Most Likely To | 3-8 | Secret-vote a player per prompt, votes received scored (vote-only) |
-| Vote Prophet | 3-8 | Vote your opinion + predict the group plurality, score the prediction |
 | Group Mind | 3-8 | Type to MATCH others (server normalize+bucket), score per match |
 | Mob Rule | 3-8 | Pick a side for the majority, twist rounds reward the minority |
 | Two Truths and a Lie | 3-8 | Rotating storyteller, guess the lie; catcher + fooler scoring |
-| Superlative Showdown | 3-8 | Privately rank the lobby, Borda consensus IS the placement |
 | Spyfall | 3-8 | Hidden spy among players sharing a location, vote + spy location guess |
 | Chameleon Clues | 3-8 | Hidden chameleon lacks the grid word, one-word clues + vote + guess |
 | Traitor's Vault | 4-8 | Co-op 5-stage crack with hidden traitors, sabotage counts + eject vote |
@@ -147,11 +144,8 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Domino Drift | 2-8 | Mexican-Train-lite dominoes, match pips, empty hand wins, pip-sum ranks the rest |
 | Bingo Brawl | 2-8 | Real-time 5×5 Bingo, server-called numbers, validated daubs, finish order ranks |
 | Twenty-Four | 2-8 | Make 24 from 4 numbers, safe server-side expression evaluator, speed scoring |
-| Target Locked | 2-8 | Countdown numbers — closest to target, whole-positive intermediates, server-validated |
 | Factor Frenzy | 2-8 | Tap every true divisor of the target, speed + streak, wrong taps penalised |
 | Going Once | 2-8 | Live ascending auction, server-validated bankrolls, going-once timer, most value wins |
-| Dutch Drop | 2-8 | Descending-price auction, first-to-buy by server arrival, hidden lot value, profit race |
-| Sealed Vault | 2-8 | Sealed-bid auction, private bids until reveal, highest pays, most loot wins |
 | Last Bid Standing | 3-8 | All-pay attrition, everyone in pays each tick, last standing takes the jackpot (reverse-elim) |
 | Token Tussle | 2-8 | Colonel Blotto — secretly split 20 tokens over 5 fronts, most-per-front wins it |
 | Whack-a-Pharaoh | 2-8 | Real-time whack-a-mole, server-scheduled pop-ups, live-occupant-validated taps |
@@ -164,11 +158,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 | Grid Lock | 2-8 | 15-puzzle slide race, server-validated slides, finish order + tiles-correct |
 | Nonogram Dash | 2-8 | Picross race, hidden bitmap (clues only sent), solve validated server-side |
 | Pair Hunt | 2-8 | SET — claim all-same/all-different trios from a public tableau, server-validated |
-| Crack the Vault | 2-8 | Numeric Mastermind race, hidden code, locked/loose feedback, crack order ranks |
 | Sudoku Sixer | 2-8 | 6×6 sudoku race, server-generated solution + givens, finish order + correct cells |
-| Flash Flood | 2-8 | Flashed-pattern memory race, growing grid, server-only pattern, rounds-banked ranking |
-| Sequence Sleuth | 2-8 | Guess the next term, fewer-terms-shown scores more, rule hidden server-side |
-| One-Line Wonder | 3-8 | Draw a word in a single server-enforced stroke, peer star-rating ranks |
 | Copy That | 2-8 | Flash-then-redraw from memory, server IoU similarity scoring (no voting) |
 | Caption Clash | 3-8 | Draw → caption a rival's doodle → vote funniest pair, both authors score |
 | Exquisite Corpse | 3-8 | Draw one server-clamped band of a shared monster, vote best band |
@@ -181,7 +171,7 @@ removePlayer(playerId)         // Override to auto-advance when waiting player l
 
 ## 1v1 Pairing Engine (Swiss layer)
 
-Inherently-1v1 games (Connect 4, Ultimate Tic-Tac-Toe, Othello, Dots & Boxes, Gomoku, Hex, Order & Chaos, Nim Heist, Pentago, Quoridor, Lights Out Duel, Liar's Market) can't natively produce a 1..N round ranking. `server/src/games/PairingEngine.js` solves this once: `class PairingEngine extends BaseGame` wraps N players in a Swiss mini-tournament (K=3 mini-rounds; odd count → one **bye** = free win), runs all pairings **simultaneously** as parallel 1v1 matches, re-pairs by record between mini-rounds, and `getResults()` ranks everyone by (wins → head-to-head → score differential).
+Inherently-1v1 games (Connect 4, Ultimate Tic-Tac-Toe, Othello, Dots & Boxes, Hex, Order & Chaos, Nim Heist, Pentago, Quoridor, Lights Out Duel, Liar's Market) can't natively produce a 1..N round ranking. `server/src/games/PairingEngine.js` solves this once: `class PairingEngine extends BaseGame` wraps N players in a Swiss mini-tournament (K=3 mini-rounds; odd count → one **bye** = free win), runs all pairings **simultaneously** as parallel 1v1 matches, re-pairs by record between mini-rounds, and `getResults()` ranks everyone by (wins → head-to-head → score differential).
 
 - **MatchEngine contract** (a plain object, NOT a BaseGame): `applyMove(pid, move)→bool`, `getView(pid)`, `isOver()`, `winner()`, `isDraw()`, optional `scoreDiff(pid)` (final tiebreak) and `autoMove()` (per-turn-timeout auto-play instead of forfeit). The match owns ONE board; it never touches ranking, byes, timers, the barrier, or leave handling.
 - **Thin wrapper** per game: `class Connect4 extends PairingEngine` just passes `matchFactory`, `miniRounds`, `matchTimerSec`, `matchHardCapSec`, `title`. Registered as a normal game; the PairingEngine itself is NOT registered and has no gameList entry.
@@ -583,7 +573,6 @@ The owner cares about:
 | Telephone Pictionary | Gochi Hand |
 | Othello | Cinzel |
 | Dots & Boxes | Fredoka |
-| Gomoku | Russo One |
 | Hex | Orbitron |
 | Order & Chaos | Audiowide |
 | Nim Heist | Wallpoet |
@@ -600,11 +589,9 @@ The owner cares about:
 | Caption This | Lilita One |
 | Awkward Award | Fredoka |
 | Most Likely To | Audiowide |
-| Vote Prophet | Black Ops One |
 | Group Mind | Quicksand |
 | Mob Rule | Permanent Marker |
 | Two Truths and a Lie | Special Elite |
-| Superlative Showdown | Bungee |
 | Spyfall | Special Elite |
 | Chameleon Clues | Creepster |
 | Traitor's Vault | Cinzel |
@@ -617,11 +604,8 @@ The owner cares about:
 | Domino Drift | Russo One |
 | Bingo Brawl | Luckiest Guy |
 | Twenty-Four | Orbitron |
-| Target Locked | Wallpoet |
 | Factor Frenzy | Russo One |
 | Going Once | Cinzel |
-| Dutch Drop | Bungee |
-| Sealed Vault | Playfair Display |
 | Last Bid Standing | Black Ops One |
 | Token Tussle | Orbitron |
 | Whack-a-Pharaoh | Luckiest Guy |
@@ -634,11 +618,7 @@ The owner cares about:
 | Grid Lock | Russo One |
 | Nonogram Dash | Orbitron |
 | Pair Hunt | Fredoka |
-| Crack the Vault | Wallpoet |
 | Sudoku Sixer | Cinzel |
-| Flash Flood | Bungee |
-| Sequence Sleuth | Orbitron |
-| One-Line Wonder | Gochi Hand |
 | Copy That | Lilita One |
 | Caption Clash | Bungee |
 | Exquisite Corpse | Permanent Marker |

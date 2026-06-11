@@ -38,7 +38,6 @@ import previewSkribbl from '../assets/gamepreviews/skribbl.png';
 import previewTelephone from '../assets/gamepreviews/telephonePictionary.png';
 import previewOthello from '../assets/gamepreviews/othello.png';
 import previewDotsAndBoxes from '../assets/gamepreviews/dotsAndBoxes.png';
-import previewGomoku from '../assets/gamepreviews/gomoku.png';
 import previewHex from '../assets/gamepreviews/hex.png';
 import previewOrderChaos from '../assets/gamepreviews/orderChaos.png';
 import previewNim from '../assets/gamepreviews/nim.png';
@@ -55,11 +54,9 @@ import previewQuiplashClash from '../assets/gamepreviews/quiplashClash.png';
 import previewCaptionThis from '../assets/gamepreviews/captionThis.png';
 import previewAwkwardAward from '../assets/gamepreviews/awkwardAward.png';
 import previewMostLikelyTo from '../assets/gamepreviews/mostLikelyTo.png';
-import previewVoteProphet from '../assets/gamepreviews/voteProphet.png';
 import previewGroupMind from '../assets/gamepreviews/groupMind.png';
 import previewMobRule from '../assets/gamepreviews/mobRule.png';
 import previewTwoTruths from '../assets/gamepreviews/twoTruths.png';
-import previewSuperlativeShowdown from '../assets/gamepreviews/superlativeShowdown.png';
 import previewSpyfall from '../assets/gamepreviews/spyfall.png';
 import previewChameleon from '../assets/gamepreviews/chameleon.png';
 import previewTraitorsVault from '../assets/gamepreviews/traitorsVault.png';
@@ -72,11 +69,8 @@ import previewYahtzee from '../assets/gamepreviews/yahtzee.png';
 import previewDominoDrift from '../assets/gamepreviews/dominoDrift.png';
 import previewBingoBrawl from '../assets/gamepreviews/bingoBrawl.png';
 import previewTwentyFour from '../assets/gamepreviews/twentyFour.png';
-import previewTargetLocked from '../assets/gamepreviews/targetLocked.png';
 import previewFactorFrenzy from '../assets/gamepreviews/factorFrenzy.png';
 import previewGoingOnce from '../assets/gamepreviews/goingOnce.png';
-import previewDutchDrop from '../assets/gamepreviews/dutchDrop.png';
-import previewSealedVault from '../assets/gamepreviews/sealedVault.png';
 import previewLastBidStanding from '../assets/gamepreviews/lastBidStanding.png';
 import previewTokenTussle from '../assets/gamepreviews/tokenTussle.png';
 import previewWhackAPharaoh from '../assets/gamepreviews/whackAPharaoh.png';
@@ -89,11 +83,7 @@ import previewEchoChamber from '../assets/gamepreviews/echoChamber.png';
 import previewGridLock from '../assets/gamepreviews/gridLock.png';
 import previewNonogramDash from '../assets/gamepreviews/nonogramDash.png';
 import previewPairHunt from '../assets/gamepreviews/pairHunt.png';
-import previewCrackTheVault from '../assets/gamepreviews/crackTheVault.png';
 import previewSudokuSixer from '../assets/gamepreviews/sudokuSixer.png';
-import previewFlashFlood from '../assets/gamepreviews/flashFlood.png';
-import previewSequenceSleuth from '../assets/gamepreviews/sequenceSleuth.png';
-import previewOneLineWonder from '../assets/gamepreviews/oneLineWonder.png';
 import previewCopyThat from '../assets/gamepreviews/copyThat.png';
 import previewCaptionClash from '../assets/gamepreviews/captionClash.png';
 import previewExquisiteCorpse from '../assets/gamepreviews/exquisiteCorpse.png';
@@ -133,7 +123,6 @@ const GAME_PREVIEWS = {
   telephonePictionary: previewTelephone,
   othello: previewOthello,
   dotsAndBoxes: previewDotsAndBoxes,
-  gomoku: previewGomoku,
   hex: previewHex,
   orderChaos: previewOrderChaos,
   nim: previewNim,
@@ -150,11 +139,9 @@ const GAME_PREVIEWS = {
   captionThis: previewCaptionThis,
   awkwardAward: previewAwkwardAward,
   mostLikelyTo: previewMostLikelyTo,
-  voteProphet: previewVoteProphet,
   groupMind: previewGroupMind,
   mobRule: previewMobRule,
   twoTruths: previewTwoTruths,
-  superlativeShowdown: previewSuperlativeShowdown,
   spyfall: previewSpyfall,
   chameleon: previewChameleon,
   traitorsVault: previewTraitorsVault,
@@ -167,11 +154,8 @@ const GAME_PREVIEWS = {
   dominoDrift: previewDominoDrift,
   bingoBrawl: previewBingoBrawl,
   twentyFour: previewTwentyFour,
-  targetLocked: previewTargetLocked,
   factorFrenzy: previewFactorFrenzy,
   goingOnce: previewGoingOnce,
-  dutchDrop: previewDutchDrop,
-  sealedVault: previewSealedVault,
   lastBidStanding: previewLastBidStanding,
   tokenTussle: previewTokenTussle,
   whackAPharaoh: previewWhackAPharaoh,
@@ -184,11 +168,7 @@ const GAME_PREVIEWS = {
   gridLock: previewGridLock,
   nonogramDash: previewNonogramDash,
   pairHunt: previewPairHunt,
-  crackTheVault: previewCrackTheVault,
   sudokuSixer: previewSudokuSixer,
-  flashFlood: previewFlashFlood,
-  sequenceSleuth: previewSequenceSleuth,
-  oneLineWonder: previewOneLineWonder,
   copyThat: previewCopyThat,
   captionClash: previewCaptionClash,
   exquisiteCorpse: previewExquisiteCorpse,

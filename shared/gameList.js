@@ -271,18 +271,6 @@ export const GAMES = {
       'When all 25 boxes are filled, the most boxes wins. Win matches across 3 mini-rounds to rank first.',
     ],
   },
-  gomoku: {
-    id: 'gomoku', name: 'Gomoku', minPlayers: 2, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Five stones in a row on a 15x15 board. 1v1 best-of-3 ladder.',
-    instructions: [
-      'You are paired 1v1 each mini-round (odd player count = one free-win bye).',
-      'Black moves first; players alternate placing one stone on an empty intersection.',
-      'Get five or more of your stones in an unbroken line — across, down, or diagonally — to win the board.',
-      'Block your rival\'s lines while building your own.',
-      'Win matches across 3 mini-rounds; the most wins ranks first.',
-    ],
-  },
   hex: {
     id: 'hex', name: 'Hex', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME,
@@ -475,18 +463,6 @@ export const GAMES = {
       'Highest total across 5 rounds ranks first; ties share a placement.',
     ],
   },
-  voteProphet: {
-    id: 'voteProphet', name: 'Vote Prophet', minPlayers: 3, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Vote your real opinion, then predict what the group will pick — predict right to score.',
-    instructions: [
-      'Each round shows an opinion prompt with two sides.',
-      'Lock in your real preference AND your prediction of the group\'s majority.',
-      'After the reveal, you score only if your prediction matched the actual plurality.',
-      'Everyone\'s choices stay private until the reveal.',
-      'Highest total across 5 rounds wins; ties share a placement.',
-    ],
-  },
   groupMind: {
     id: 'groupMind', name: 'Group Mind', minPlayers: 3, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME,
@@ -521,18 +497,6 @@ export const GAMES = {
       'Guessers score for catching the lie; the storyteller scores per player they fool.',
       'Which statement is the lie stays hidden until the reveal.',
       'Highest total after everyone has told their round wins; ties share a placement.',
-    ],
-  },
-  superlativeShowdown: {
-    id: 'superlativeShowdown', name: 'Superlative Showdown', minPlayers: 3, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Privately rank the whole lobby on a superlative — the group consensus is the score.',
-    instructions: [
-      'Each round shows a superlative like "Most likely to survive a zombie apocalypse".',
-      'Privately rank every player from most to least.',
-      'Rankings are private until the reveal, then aggregated (Borda) into a consensus order.',
-      'Your standing reflects how the whole group ranked you across all rounds.',
-      'Most consensus points after 4 rounds ranks first; ties share a placement.',
     ],
   },
   spyfall: {
@@ -679,18 +643,6 @@ export const GAMES = {
       'Highest total over 4 deals wins; ties share a placement.',
     ],
   },
-  targetLocked: {
-    id: 'targetLocked', name: 'Target Locked', minPlayers: 2, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Countdown numbers — combine six numbers to land as close to the target as you can.',
-    instructions: [
-      'Each round deals six source numbers and a random 3-digit target.',
-      'Build an expression (+ − × ÷ and parentheses) using each number at most once.',
-      'Every intermediate result must be a positive whole number.',
-      'Submit as often as you like — only your closest attempt counts.',
-      'Closer is worth more; highest total over 3 rounds wins.',
-    ],
-  },
   factorFrenzy: {
     id: 'factorFrenzy', name: 'Factor Frenzy', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME,
@@ -713,30 +665,6 @@ export const GAMES = {
       'A 6-second "going once" countdown resets on every raise.',
       'When it runs out, the high bidder pays their bid and wins the lot\'s value.',
       'Most total value after 6 lots wins; leftover cash breaks ties — cheap wins beat overpaying.',
-    ],
-  },
-  dutchDrop: {
-    id: 'dutchDrop', name: 'Dutch Drop', minPlayers: 2, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Descending auction — grab a mystery lot before the price drops too far, or a rival snaps it.',
-    instructions: [
-      'You start with 100 coins; six mystery lots are auctioned one at a time.',
-      'Each lot\'s price starts high and ticks DOWN every second.',
-      'Hit BUY to claim it at the current price — the first affordable buyer wins.',
-      'The hidden value is revealed only after it sells; profit = value − price.',
-      'Highest total profit after 6 lots wins; ties share a placement.',
-    ],
-  },
-  sealedVault: {
-    id: 'sealedVault', name: 'Sealed Vault', minPlayers: 2, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Sealed-bid auction — secretly bid on mystery lots; highest bidder pays and pockets the loot.',
-    instructions: [
-      'You start with 100 coins. Each of 5 rounds puts a mystery lot (worth a hidden 20–80) on the block.',
-      'Everyone secretly submits one sealed bid (up to your bankroll).',
-      'Bids resolve together; the highest bidder pays their bid and wins the lot\'s value.',
-      'You can never bid more than you hold, and bids stay hidden until the reveal.',
-      'Most total loot after 5 lots wins; leftover bankroll breaks ties.',
     ],
   },
   lastBidStanding: {
@@ -883,18 +811,6 @@ export const GAMES = {
       'Most valid sets wins; ties share a placement.',
     ],
   },
-  crackTheVault: {
-    id: 'crackTheVault', name: 'Crack the Vault', minPlayers: 2, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Numeric Mastermind race — crack the hidden 4-digit code from locked/loose feedback.',
-    instructions: [
-      'Everyone races to crack the same hidden 4-digit code.',
-      'Each guess returns how many digits are correct AND in place ("locked") and correct but misplaced ("loose").',
-      'Use the feedback to deduce the code.',
-      'First to get four locked cracks it and places 1st.',
-      'At the timer, non-crackers rank by best progress then fewest guesses.',
-    ],
-  },
   sudokuSixer: {
     id: 'sudokuSixer', name: 'Sudoku Sixer', minPlayers: 2, maxPlayers: 8,
     turnTimer: TIMERS.CARD_GAME,
@@ -905,42 +821,6 @@ export const GAMES = {
       'Each row, column, and 2x3 box must contain 1–6 exactly once.',
       'First to match the full solution places 1st.',
       'At the timer, unsolved players rank by correct cells.',
-    ],
-  },
-  flashFlood: {
-    id: 'flashFlood', name: 'Flash Flood', minPlayers: 2, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Pattern-memory race — reproduce the flashed grid; the grid grows each round.',
-    instructions: [
-      'Each round a pattern of cells lights up, then hides.',
-      'Tap exactly the cells that were lit (and no extras) to bank the round.',
-      'A wrong or incomplete recall eliminates you at that round.',
-      'The grid grows bigger every round.',
-      'Most rounds banked ranks first; ties share a placement.',
-    ],
-  },
-  sequenceSleuth: {
-    id: 'sequenceSleuth', name: 'Sequence Sleuth', minPlayers: 2, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Guess the next number — the fewer terms you need, the more you score.',
-    instructions: [
-      'A hidden number sequence reveals its terms one at a time.',
-      'Lock in your guess for the NEXT term whenever you\'re confident.',
-      'Guessing correctly with fewer terms shown scores more.',
-      'A wrong guess locks you out of that sequence.',
-      'Highest total across 5 sequences wins; ties share a placement.',
-    ],
-  },
-  oneLineWonder: {
-    id: 'oneLineWonder', name: 'One-Line Wonder', minPlayers: 3, maxPlayers: 8,
-    turnTimer: TIMERS.CARD_GAME,
-    description: 'Draw the secret word in a single unbroken line, then rate everyone else\'s masterpiece.',
-    instructions: [
-      'A secret word is revealed — everyone draws the SAME word.',
-      'You get ONE unbroken stroke: lift your pen and your drawing locks in.',
-      'Submit your one-line masterpiece before the timer runs out.',
-      'Then privately give every other drawing 1–5 stars (you can\'t rate your own).',
-      'Most stars received wins; ties share a placement.',
     ],
   },
   copyThat: {

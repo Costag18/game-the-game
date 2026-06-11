@@ -49,7 +49,6 @@ import SkribblGame from './games/Skribbl.jsx';
 import TelephonePictionaryGame from './games/TelephonePictionary.jsx';
 import OthelloGame from './games/Othello.jsx';
 import DotsAndBoxesGame from './games/DotsAndBoxes.jsx';
-import GomokuGame from './games/Gomoku.jsx';
 import HexGame from './games/Hex.jsx';
 import OrderAndChaosGame from './games/OrderAndChaos.jsx';
 import NimHeistGame from './games/NimHeist.jsx';
@@ -66,11 +65,9 @@ import QuiplashClashGame from './games/QuiplashClash.jsx';
 import CaptionThisGame from './games/CaptionThis.jsx';
 import AwkwardAwardGame from './games/AwkwardAward.jsx';
 import MostLikelyToGame from './games/MostLikelyTo.jsx';
-import VoteProphetGame from './games/VoteProphet.jsx';
 import GroupMindGame from './games/GroupMind.jsx';
 import MobRuleGame from './games/MobRule.jsx';
 import TwoTruthsGame from './games/TwoTruths.jsx';
-import SuperlativeShowdownGame from './games/SuperlativeShowdown.jsx';
 import SpyfallGame from './games/Spyfall.jsx';
 import ChameleonCluesGame from './games/ChameleonClues.jsx';
 import TraitorsVaultGame from './games/TraitorsVault.jsx';
@@ -83,11 +80,8 @@ import YahtzeeGame from './games/Yahtzee.jsx';
 import DominoDriftGame from './games/DominoDrift.jsx';
 import BingoBrawlGame from './games/BingoBrawl.jsx';
 import TwentyFourGame from './games/TwentyFour.jsx';
-import TargetLockedGame from './games/TargetLocked.jsx';
 import FactorFrenzyGame from './games/FactorFrenzy.jsx';
 import GoingOnceGame from './games/GoingOnce.jsx';
-import DutchDropGame from './games/DutchDrop.jsx';
-import SealedVaultGame from './games/SealedVault.jsx';
 import LastBidStandingGame from './games/LastBidStanding.jsx';
 import TokenTussleGame from './games/TokenTussle.jsx';
 import WhackAPharaohGame from './games/WhackAPharaoh.jsx';
@@ -100,11 +94,7 @@ import EchoChamberGame from './games/EchoChamber.jsx';
 import GridLockGame from './games/GridLock.jsx';
 import NonogramDashGame from './games/NonogramDash.jsx';
 import PairHuntGame from './games/PairHunt.jsx';
-import CrackTheVaultGame from './games/CrackTheVault.jsx';
 import SudokuSixerGame from './games/SudokuSixer.jsx';
-import FlashFloodGame from './games/FlashFlood.jsx';
-import SequenceSleuthGame from './games/SequenceSleuth.jsx';
-import OneLineWonderGame from './games/OneLineWonder.jsx';
 import CopyThatGame from './games/CopyThat.jsx';
 import CaptionClashGame from './games/CaptionClash.jsx';
 import ExquisiteCorpseGame from './games/ExquisiteCorpse.jsx';
@@ -147,7 +137,6 @@ const GAME_COMPONENTS = {
   telephonePictionary: TelephonePictionaryGame,
   othello: OthelloGame,
   dotsAndBoxes: DotsAndBoxesGame,
-  gomoku: GomokuGame,
   hex: HexGame,
   orderChaos: OrderAndChaosGame,
   nim: NimHeistGame,
@@ -164,11 +153,9 @@ const GAME_COMPONENTS = {
   captionThis: CaptionThisGame,
   awkwardAward: AwkwardAwardGame,
   mostLikelyTo: MostLikelyToGame,
-  voteProphet: VoteProphetGame,
   groupMind: GroupMindGame,
   mobRule: MobRuleGame,
   twoTruths: TwoTruthsGame,
-  superlativeShowdown: SuperlativeShowdownGame,
   spyfall: SpyfallGame,
   chameleon: ChameleonCluesGame,
   traitorsVault: TraitorsVaultGame,
@@ -181,11 +168,8 @@ const GAME_COMPONENTS = {
   dominoDrift: DominoDriftGame,
   bingoBrawl: BingoBrawlGame,
   twentyFour: TwentyFourGame,
-  targetLocked: TargetLockedGame,
   factorFrenzy: FactorFrenzyGame,
   goingOnce: GoingOnceGame,
-  dutchDrop: DutchDropGame,
-  sealedVault: SealedVaultGame,
   lastBidStanding: LastBidStandingGame,
   tokenTussle: TokenTussleGame,
   whackAPharaoh: WhackAPharaohGame,
@@ -198,11 +182,7 @@ const GAME_COMPONENTS = {
   gridLock: GridLockGame,
   nonogramDash: NonogramDashGame,
   pairHunt: PairHuntGame,
-  crackTheVault: CrackTheVaultGame,
   sudokuSixer: SudokuSixerGame,
-  flashFlood: FlashFloodGame,
-  sequenceSleuth: SequenceSleuthGame,
-  oneLineWonder: OneLineWonderGame,
   copyThat: CopyThatGame,
   captionClash: CaptionClashGame,
   exquisiteCorpse: ExquisiteCorpseGame,
