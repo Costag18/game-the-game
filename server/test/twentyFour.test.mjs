@@ -156,7 +156,7 @@ test('reveal timer auto-acks and advances to next deal / finished', () => {
   g.handleAction('b', { type: 'submit', expression: sol });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(6_000); // REVEAL_MS
+  advance(50_000); // REVEAL_MS
   assert(g.state === 'deal' || g.state === 'finished', `advanced (got ${g.state})`);
   assert(g.emitCount > before, 'broadcast on reveal timeout');
 });

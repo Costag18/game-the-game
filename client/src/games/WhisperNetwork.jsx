@@ -25,32 +25,62 @@ export default function WhisperNetworkGame({ gameState, onAction, nicknames, ava
   const [guessMap, setGuessMap] = useState({});      // accusation: otherId -> 'RED'|'BLUE'
   const prevPhase = useRef(null);
   const prevRound = useRef(null);
+  const autoSubmitted = useRef(false);
+  // keep the latest local input reachable from the countdown closure
+  const pickRef = useRef(null);
+  pickRef.current = pick;
+  const guessMapRef = useRef({});
+  guessMapRef.current = guessMap;
 
   const phase = gameState?.phase;
   const roundNumber = gameState?.roundNumber;
-  const secs = useCountdown(gameState?.deadline);
+  const deadline = gameState?.deadline;
+  const hasPushed = gameState?.hasPushed;
+  const hasGuessed = gameState?.hasGuessed;
+  const secs = useCountdown(deadline);
 
   useEffect(() => {
     if (phase !== prevPhase.current) {
       if (phase === 'reveal') { setIReady(false); playSound?.('voteCast'); }
-      if (phase === 'round') setPick(null);
-      if (phase === 'accusation') setGuessMap({});
+      if (phase === 'round') { setPick(null); autoSubmitted.current = false; }
+      if (phase === 'accusation') { setGuessMap({}); autoSubmitted.current = false; }
       if (phase === 'finished') playSound?.('roundWin');
       prevPhase.current = phase;
     }
     // new round -> reset the push picker
     if (phase === 'round' && roundNumber !== prevRound.current) {
       setPick(null);
+      autoSubmitted.current = false;
       prevRound.current = roundNumber;
     }
   }, [phase, roundNumber, playSound]);
+
+  // auto-submit the current push / accusations ~1s before the deadline so nothing is lost on timeout
+  useEffect(() => {
+    if (!deadline) return;
+    if (phase !== 'round' && phase !== 'accusation') return;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      if (rem > 1 || autoSubmitted.current) return;
+      if (phase === 'round' && !hasPushed) {
+        autoSubmitted.current = true;
+        if (pickRef.current !== null) onAction({ type: 'submitPush', push: pickRef.current });
+      } else if (phase === 'accusation' && !hasGuessed) {
+        autoSubmitted.current = true;
+        onAction({ type: 'submitGuesses', guesses: guessMapRef.current });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [deadline, phase, hasPushed, hasGuessed, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Tuning the network…</p></div>;
 
   const {
     myId, myFaction, players = [], scores = {}, totalRounds,
-    meter = 0, ready = [], hasPushed, myPush, pushedCount, playerCount,
-    hasGuessed, guessedCount, reveal,
+    meter = 0, ready = [], myPush, pushedCount, playerCount,
+    guessedCount, reveal,
   } = gameState;
 
   const others = players.filter((p) => p !== myId);

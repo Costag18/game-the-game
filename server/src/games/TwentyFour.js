@@ -2,7 +2,7 @@ import { BaseGame } from './BaseGame.js';
 
 const TOTAL_DEALS = 4;          // rounds
 const DEAL_MS = 45_000;         // window to crack each deal
-const REVEAL_MS = 6_000;        // reveal display before next deal
+const REVEAL_MS = 50_000;       // reveal ack window — long AFK safety net (Continue advances early)
 const BASE_POINTS = 1000;       // first valid 24 this deal
 const STEP_POINTS = 250;        // decay per earlier solver
 const MIN_POINTS = 200;         // floor for a valid (but slow) solve

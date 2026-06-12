@@ -8,12 +8,15 @@
   margin: 0 auto;
 }
 
-/* 6x6 grid; extra inner gaps after cols/rows 2 and 5 create the four-quadrant look */
+/* 6x6 grid; extra inner gaps after cols/rows 2 and 5 create the four-quadrant look.
+   width:min(92vw,420px) lets the board scale down on mobile portrait (cells shrink
+   below 44px via aspect-ratio) instead of overflowing the screen. */
 .grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 3px;
-  width: 100%;
+  width: min(92vw, 420px);
+  max-width: 100%;
   background: #3b2a52;
   padding: 10px;
   border-radius: 14px;
@@ -22,8 +25,6 @@
 
 .cell {
   aspect-ratio: 1;
-  min-width: 44px;
-  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;

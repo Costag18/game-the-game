@@ -68,6 +68,8 @@ export class SketchImpostor extends BaseGame {
     this.votes = {};
     this.accused = null;
     this.impostorWordGuess = null;
+    this._voteEndTime = null;   // epoch-ms deadline for the voting phase (powers client auto-submit)
+    this._guessEndTime = null;  // epoch-ms deadline for the impostorGuess phase
     this._revealTimer = null;
     this._turnTimer = null;
     this._voteTimer = null;
@@ -115,6 +117,7 @@ export class SketchImpostor extends BaseGame {
     this._clearTimers();
     this.votes = {};
     this.transition('vote'); // -> voting
+    this._voteEndTime = Date.now() + VOTE_MS;
     this._voteTimer = setTimeout(() => {
       if (this.state !== 'voting') return;
       this._resolveVote();
@@ -136,6 +139,7 @@ export class SketchImpostor extends BaseGame {
     const caught = this.accused === this.impostor && this.impostor != null;
     if (caught) {
       this.transition('guess'); // -> impostorGuess
+      this._guessEndTime = Date.now() + GUESS_MS;
       this._guessTimer = setTimeout(() => { if (this.state === 'impostorGuess') { this._finish(); this._emitChange(); } }, GUESS_MS);
     } else {
       this._finish();
@@ -225,6 +229,9 @@ export class SketchImpostor extends BaseGame {
       acknowledged: this.state === 'reveal' ? [...this.acknowledged] : [],
       myVote: this.votes[playerId] != null ? this.votes[playerId] : null,
       votedCount: Object.keys(this.votes).length,
+      // phase deadlines for the client countdown + timeout auto-submit
+      voteEndTime: this.state === 'voting' ? this._voteEndTime : null,
+      guessEndTime: this.state === 'impostorGuess' ? this._guessEndTime : null,
       // disclosure only at the end:
       impostorId: finished ? this.impostor : null,
       accused: finished ? this.accused : null,

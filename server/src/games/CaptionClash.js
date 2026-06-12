@@ -3,7 +3,7 @@ import { BaseGame } from './BaseGame.js';
 const DRAW_MS = 60_000;
 const CAPTION_MS = 45_000;
 const VOTE_MS = 40_000;
-const REVEAL_MS = 12_000;
+const REVEAL_MS = 50_000; // long no-countdown AFK safety net; players advance via Continue
 const VOTE_POINTS = 100; // awarded to BOTH the doodle author and the caption author per vote
 const MAX_CAPTION_LEN = 100;
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
@@ -122,6 +122,7 @@ export class CaptionClash extends BaseGame {
     this.votes = {};       // voterId -> pairId
     this.revealData = null;
     this.acknowledged = new Set();
+    this._phaseStart = 0; // ms timestamp of the current timed phase's entry (for client countdown)
     this._drawTimer = null;
     this._captionTimer = null;
     this._voteTimer = null;
@@ -140,6 +141,7 @@ export class CaptionClash extends BaseGame {
   // ---------- DRAW ----------
   onEnterDraw() {
     this.drawings = {};
+    this._phaseStart = Date.now();
     this._clearAllTimers();
     this._drawTimer = setTimeout(() => {
       if (this.state !== 'draw') return;
@@ -168,6 +170,7 @@ export class CaptionClash extends BaseGame {
       this.captionOf[captioner] = target;
     }
     this.captions = {};
+    this._phaseStart = Date.now();
     this._clearAllTimers();
     this._captionTimer = setTimeout(() => {
       if (this.state !== 'caption') return;
@@ -200,6 +203,7 @@ export class CaptionClash extends BaseGame {
     }
     this.pairs = shuffle(built).map((p, i) => ({ pairId: `pair_${i}`, ...p }));
     this.votes = {};
+    this._phaseStart = Date.now();
     this._clearAllTimers();
     this._voteTimer = setTimeout(() => {
       if (this.state !== 'vote') return;
@@ -354,6 +358,12 @@ export class CaptionClash extends BaseGame {
       myId: playerId,
       playerCount: this.players.length,
       scores: { ...this.scores },
+
+      // phase deadlines for client countdown + timeout auto-submit (reveal intentionally omitted:
+      // its long REVEAL_MS is a no-countdown AFK net — players advance via Continue)
+      drawEndTime: this.state === 'draw' ? this._phaseStart + DRAW_MS : null,
+      captionEndTime: this.state === 'caption' ? this._phaseStart + CAPTION_MS : null,
+      voteEndTime: this.state === 'vote' ? this._phaseStart + VOTE_MS : null,
 
       // DRAW — a player only ever sees their OWN strokes
       myDrawing: this.state === 'draw' ? (this.drawings[playerId] || []) : null,

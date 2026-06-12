@@ -152,7 +152,7 @@ for (const n of [2, 3, 4]) {
     const players = Array.from({ length: n }, (_, i) => String.fromCharCode(97 + i));
     const g = playFullGame(players);
     eq(g.state, 'reveal');
-    advance(12_000); // reveal auto-advance
+    advance(50_000); // reveal auto-advance
     eq(g.state, 'finished');
     const res = g.getResults();
     eq(res.length, n);
@@ -164,7 +164,7 @@ for (const n of [2, 3, 4]) {
 
 test('a tie shares a placement (everyone passes all 12 rounds → all 0 → all placement 1)', () => {
   const g = playFullGame(['a', 'b', 'c']);
-  advance(12_000);
+  advance(50_000);
   eq(g.state, 'finished');
   const res = g.getResults();
   eq(res.every((r) => r.placement === 1), true);
@@ -183,7 +183,7 @@ test('a constructed winner outranks others (highest total wins)', () => {
     }
     for (const p of ['b', 'c']) if (!g.acted[p]) g.handleAction(p, { type: 'pass' });
   }
-  advance(12_000);
+  advance(50_000);
   eq(g.state, 'finished');
   const res = g.getResults();
   eq(res[0].playerId, 'a');
@@ -216,7 +216,7 @@ test('collapse to one finishes; destroy clears timers', () => {
 
 test('opponent board contents are present (Qwixx boards are public) but no dice leak after game', () => {
   const g = playFullGame(['a', 'b']);
-  advance(12_000);
+  advance(50_000);
   eq(g.state, 'finished');
   const s = g.getStateForPlayer('a');
   eq(s.dice, null);

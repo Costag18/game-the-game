@@ -192,7 +192,7 @@ test('reveal timeout auto-acks and advances', () => {
   for (const p of ['a', 'b', 'c']) g.handleAction(p, { type: 'vote', entryId: g.gallery.find((e) => e.authorId !== p).entryId });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(15_000);
+  advance(50_000);
   assert(g.state === 'draw' || g.state === 'finished', `advanced (got ${g.state})`);
   assert(g.emitCount > before, 'broadcast on reveal timeout');
 });

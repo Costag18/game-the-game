@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './TakeSix.module.css';
 import PlayerName from '../components/PlayerName.jsx';
+import AckStatus from '../components/AckStatus.jsx';
 import { useSound } from '../context/SoundContext.jsx';
 
 function Card({ value, bullhead, onClick, selected, small }) {
@@ -28,7 +29,7 @@ export default function TakeSix({ gameState, onAction, nicknames, avatars }) {
   }, [phase]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Dealing…</p></div>;
-  const { round, totalRounds, rows = [], myHand = [], hasPicked, pickedCount, players = [], resolution, results } = gameState;
+  const { round, totalRounds, rows = [], myHand = [], hasPicked, pickedCount, players = [], resolution, results, acknowledged = [], myId } = gameState;
 
   function confirm() { if (sel == null || hasPicked) return; onAction({ type: 'playCard', card: sel }); playSound('cardDeal'); setSel(null); }
   function ack() { if (!iAcked) { setIAcked(true); onAction({ type: 'acknowledge' }); } }
@@ -71,6 +72,14 @@ export default function TakeSix({ gameState, onAction, nicknames, avatars }) {
             </div>
           ))}
           {!iAcked && <button className={styles.playBtn} onClick={ack}>Continue →</button>}
+          <AckStatus
+            players={players.map((p) => p.playerId)}
+            acknowledged={acknowledged}
+            me={myId}
+            iActed={iAcked}
+            nicknames={nicknames}
+            avatars={avatars}
+          />
         </div>
       )}
 

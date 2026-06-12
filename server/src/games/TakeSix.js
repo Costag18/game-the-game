@@ -6,8 +6,8 @@ const ROW_COUNT = 4;       // 4 face-up rows
 const ROW_LIMIT = 6;       // 6th card forces a take of the first 5
 const DECK_MAX = 104;      // cards numbered 1..104
 const PICK_MS = 30_000;    // per-round simultaneous pick window
-const REVEAL_MS = 9_000;   // reveal/resolve ack window before auto-advance
-const FINAL_MS = 12_000;   // final-board ack window
+const REVEAL_MS = 45_000;  // reveal/resolve AFK-safety net — players advance via Continue/ack
+const FINAL_MS = 45_000;   // final-board AFK-safety net — players advance via Continue/ack
 
 /**
  * Bullhead penalty for a card value (6 Nimmt! rules). If several apply, the

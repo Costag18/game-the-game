@@ -12,14 +12,18 @@ export default function ChameleonCluesGame({ gameState, onAction, nicknames, ava
   const [iReady, setIReady] = useState(false);
   const [remaining, setRemaining] = useState(null);
   const prevPhase = useRef(null);
+  const autoSubmitted = useRef(false);
+  const draftRef = useRef('');
+  draftRef.current = draft; // keep the latest typed clue reachable from the countdown closure
 
   const phase = gameState?.phase;
   const deadline = gameState?.deadline;
+  const hasSubmittedClue = gameState?.hasSubmittedClue;
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
     if (phase === 'reveal') { setIReady(false); playSound('roundStart'); }
-    if (phase === 'clues') { setDraft(''); }
+    if (phase === 'clues') { setDraft(''); autoSubmitted.current = false; }
     if (phase === 'voting') { setVotePick(null); playSound('voteCast'); }
     if (phase === 'chameleonGuess') { setCellPick(null); }
     if (phase === 'finished') { playSound('roundStart'); }
@@ -28,18 +32,27 @@ export default function ChameleonCluesGame({ gameState, onAction, nicknames, ava
 
   useEffect(() => {
     if (!deadline) { setRemaining(null); return; }
-    const tick = () => setRemaining(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setRemaining(rem);
+      // auto-submit the typed clue ~1s before the deadline so nothing is lost on timeout
+      if (phase === 'clues' && rem <= 1 && !autoSubmitted.current && !hasSubmittedClue) {
+        autoSubmitted.current = true;
+        const t = draftRef.current.trim();
+        if (t && !/\s/.test(t)) onAction({ type: 'submitClue', clue: t });
+      }
+    };
     tick();
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
-  }, [deadline]);
+  }, [deadline, phase, hasSubmittedClue, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Blending in…</p></div>;
 
   const {
     myId, theme, grid = [], players = [], scores = {}, playerCount,
     isChameleon, targetIndex, targetWord,
-    ready = [], myClue, hasSubmittedClue, cluesSubmitted,
+    ready = [], myClue, cluesSubmitted,
     clues, myVote, hasVoted, votedCount, hasGuessed,
     chameleonId, accused, chameleonGuessIndex, outcome,
   } = gameState;

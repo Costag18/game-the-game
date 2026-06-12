@@ -17,13 +17,18 @@ export default function ExquisiteCorpseGame({ gameState, onAction, nicknames, av
   const [strokes, setStrokes] = useState([]); // band-LOCAL coords (top of canvas = sliver origin)
   const [iSubmitted, setISubmitted] = useState(false);
   const [iAcked, setIAcked] = useState(false);
+  const [remaining, setRemaining] = useState(null);
   const prevPhase = useRef(null);
   const prevSubmitted = useRef(0);
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const myBand = gameState?.myBand;
   const sliverH = gameState?.sliverH ?? 40;
   const sliverAbove = gameState?.sliverAbove || null;
+  const hasSubmittedFlag = gameState?.hasSubmitted;
+  const drawEndTime = gameState?.drawEndTime;
+  const voteEndTime = gameState?.voteEndTime;
 
   // local->full coordinate offset: local y 0 == (yStart - sliverH) in full canvas
   const originY = myBand ? Math.max(0, myBand.yStart - (myBand.index === 0 ? 0 : sliverH)) : 0;
@@ -31,14 +36,45 @@ export default function ExquisiteCorpseGame({ gameState, onAction, nicknames, av
   const bandH = myBand ? myBand.yEnd - myBand.yStart : 0;
   const localH = bandH + topInset; // canvas logical height for my band view
 
+  // refs mirroring latest local input so the countdown closure can auto-submit it
+  const strokesRef = useRef([]);
+  const originYRef = useRef(0);
+  strokesRef.current = strokes;
+  originYRef.current = originY;
+
   // reset local strokes when a fresh draw phase starts
   useEffect(() => {
     if (phase !== prevPhase.current) {
       if (phase === 'draw') { setStrokes([]); setISubmitted(false); }
       if (phase === 'reveal') setIAcked(false);
+      autoSubmitted.current = false; // reset the timeout latch on every phase entry
       prevPhase.current = phase;
     }
   }, [phase]);
+
+  // countdown for the active timed phase; ~1s before the deadline auto-submit the SAME
+  // action the phase's button dispatches so nothing drawn is lost on timeout
+  const endTime = phase === 'draw' ? drawEndTime : phase === 'vote' ? voteEndTime : null;
+  useEffect(() => {
+    if (!endTime) { setRemaining(null); return; }
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      setRemaining(rem);
+      if (rem <= 1 && !autoSubmitted.current) {
+        autoSubmitted.current = true;
+        // only the DRAW phase holds local input (the strokes); replicate submitDrawing().
+        // VOTE has no draft worth auto-sending (server auto-votes non-voters), so skip it.
+        if (phase === 'draw' && !hasSubmittedFlag) {
+          const full = strokesRef.current.map((s) => shiftStroke(s, originYRef.current));
+          onAction({ type: 'submit', strokes: full });
+          setISubmitted(true);
+        }
+      }
+    };
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [endTime, phase, hasSubmittedFlag, onAction]);
 
   // little ping when another band lands
   const submittedCount = gameState?.submittedCount || 0;
@@ -94,6 +130,9 @@ export default function ExquisiteCorpseGame({ gameState, onAction, nicknames, av
     return (
       <div className={styles.arena}>
         <h1 className={styles.title}>Exquisite Corpse</h1>
+        {remaining != null && (
+          <span className={`${styles.timer} ${remaining <= 10 ? styles.timerLow : ''}`}>⏱ {remaining}s</span>
+        )}
         <p className={styles.prompt}>Together, draw <strong>{prompt}</strong></p>
         <p className={styles.bandTag}>
           You are band {myBand ? myBand.index + 1 : '?'} of {playerCount}.
@@ -129,6 +168,9 @@ export default function ExquisiteCorpseGame({ gameState, onAction, nicknames, av
     return (
       <div className={styles.arena}>
         <h1 className={styles.title}>Vote the Best Band</h1>
+        {remaining != null && (
+          <span className={`${styles.timer} ${remaining <= 10 ? styles.timerLow : ''}`}>⏱ {remaining}s</span>
+        )}
         <p className={styles.prompt}>The monster is assembled — but the pieces are hidden until the reveal!</p>
         <p className={styles.bandTag}>Pick the band you think is the best (you can't pick your own).</p>
         <div className={styles.voteGrid}>

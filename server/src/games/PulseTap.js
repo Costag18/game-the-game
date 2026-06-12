@@ -3,7 +3,7 @@ import { BaseGame } from './BaseGame.js';
 const TOTAL_ROUNDS = 3;
 const COUNTDOWN_MS = 2500;   // lead-in before the first beat each round
 const GRACE_MS = 900;        // grace after the last beat before the round ends
-const SUMMARY_MS = 4000;     // round-summary auto-advance
+const SUMMARY_MS = 45000;    // round-summary AFK-safety auto-advance (waits on Continue/ack; long net, no client countdown)
 const PERFECT_MS = 120;      // |offset| <= this -> Perfect
 const GOOD_MS = 280;         // |offset| <= this -> Good
 const PERFECT_PTS = 100;

@@ -19,6 +19,18 @@
 .roundLine { color: var(--text-secondary, #b8a88a); margin: 0; font-weight: 600; }
 .instruct { color: var(--text-primary, #f3e9d2); margin: 0; text-align: center; }
 
+.timer {
+  display: inline-block;
+  background: var(--bg-panel, #2a1518);
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  color: var(--gold, #d4a843);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.timerLow { color: #5fb0e8; border-color: #5fb0e8; }
+
 .hintBar {
   display: flex;
   align-items: center;

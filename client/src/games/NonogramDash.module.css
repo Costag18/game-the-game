@@ -43,6 +43,8 @@
   border: 2px solid #1f4d5e;
   user-select: none;
   touch-action: manipulation;
+  max-width: 100%;
+  overflow-x: auto;
 }
 .corner { background: transparent; }
 
@@ -115,3 +117,11 @@
   padding: 0.6rem 1.8rem; font-weight: 800; font-size: 1rem; cursor: pointer; min-height: 44px;
 }
 .primaryBtn:disabled { opacity: 0.45; cursor: default; }
+
+/* ---- mobile portrait: shrink cells + scroll so the 8-wide grid + clue strip never clips ---- */
+@media (max-width: 400px) {
+  .arena { padding: 0.6rem; }
+  .cell { min-width: 26px; min-height: 26px; }
+  .colClue { font-size: 0.62rem; }
+  .rowClue { font-size: 0.64rem; gap: 3px; padding-right: 3px; }
+}

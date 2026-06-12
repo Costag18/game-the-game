@@ -9,7 +9,7 @@
 .cellMarked { opacity: 1; }
 .cellLegal { outline: 3px solid var(--gold, #d4a843); cursor: pointer; animation: pulse 1s infinite; }
 @keyframes pulse { 0%,100% { outline-color: var(--gold, #d4a843); } 50% { outline-color: #fff; } }
-.actions { min-height: 2.2rem; }
+.actions { min-height: 2.2rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
 .acted { color: #5cd85c; font-weight: 700; margin: 0; }
 .passBtn { background: var(--bg-panel, #2a1518); color: var(--text-primary, #f3e9d2); border: 1px solid var(--gold-dim, #8a6d2f); border-radius: 8px; padding: 0.5rem 1.3rem; cursor: pointer; min-height: 44px; }
 .scoreboard { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; width: 100%; }

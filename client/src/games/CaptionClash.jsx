@@ -11,9 +11,25 @@ export default function CaptionClashGame({ gameState, onAction, nicknames, avata
   const [caption, setCaption] = useState('');
   const [pick, setPick] = useState(null);
   const [iAcked, setIAcked] = useState(false);
+  const [remaining, setRemaining] = useState(null);
   const prevPhase = useRef(null);
+  const autoSubmitted = useRef(false);
+
+  // refs mirroring the latest local input so the countdown closure can auto-submit it
+  const strokesRef = useRef([]);
+  const captionRef = useRef('');
+  const pickRef = useRef(null);
+  strokesRef.current = strokes;
+  captionRef.current = caption;
+  pickRef.current = pick;
 
   const phase = gameState?.phase;
+  const hasDrawnFlag = gameState?.hasDrawn;
+  const hasCaptionedFlag = gameState?.hasCaptioned;
+  const myVoteFlag = gameState?.myVote;
+  const drawEndTime = gameState?.drawEndTime;
+  const captionEndTime = gameState?.captionEndTime;
+  const voteEndTime = gameState?.voteEndTime;
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
@@ -21,8 +37,29 @@ export default function CaptionClashGame({ gameState, onAction, nicknames, avata
     if (phase === 'caption') setCaption('');
     if (phase === 'vote') { setPick(null); playSound('voteCast'); }
     if (phase === 'reveal') { setIAcked(false); playSound('roundWin'); }
+    autoSubmitted.current = false; // reset the timeout latch on every phase entry
     prevPhase.current = phase;
   }, [phase, playSound]);
+
+  // countdown for the active timed phase; ~1s before the deadline auto-submit the
+  // SAME action the phase's button dispatches so nothing typed/drawn is lost on timeout
+  const endTime = phase === 'draw' ? drawEndTime : phase === 'caption' ? captionEndTime : phase === 'vote' ? voteEndTime : null;
+  useEffect(() => {
+    if (!endTime) { setRemaining(null); return; }
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      setRemaining(rem);
+      if (rem <= 1 && !autoSubmitted.current) {
+        autoSubmitted.current = true;
+        if (phase === 'draw' && !hasDrawnFlag) onAction({ type: 'submit', strokes: strokesRef.current });
+        else if (phase === 'caption' && !hasCaptionedFlag) onAction({ type: 'caption', text: captionRef.current.trim() });
+        else if (phase === 'vote' && !myVoteFlag && pickRef.current) onAction({ type: 'vote', pairId: pickRef.current });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [endTime, phase, hasDrawnFlag, hasCaptionedFlag, myVoteFlag, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Sharpening pencils…</p></div>;
 
@@ -62,6 +99,10 @@ export default function CaptionClashGame({ gameState, onAction, nicknames, avata
   return (
     <div className={styles.arena}>
       <h1 className={styles.title}>CAPTION CLASH</h1>
+
+      {remaining != null && (phase === 'draw' || phase === 'caption' || phase === 'vote') && (
+        <span className={`${styles.timer} ${remaining <= 10 ? styles.timerLow : ''}`}>⏱ {remaining}s</span>
+      )}
 
       {/* ---------- DRAW ---------- */}
       {phase === 'draw' && (

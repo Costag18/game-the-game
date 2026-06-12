@@ -35,6 +35,14 @@
   font-size: clamp(1.4rem, 4.5vw, 2.1rem); font-weight: 700; color: #1a1a1a;
   text-transform: uppercase; letter-spacing: 1px;
 }
+.timer {
+  margin-top: 0.25rem;
+  font-family: 'Special Elite', 'Courier New', monospace; font-weight: 800;
+  font-size: 0.95rem; color: #6b5d44; letter-spacing: 1px;
+  background: rgba(0,0,0,0.08); border: 1px dashed #9a8f78; border-radius: 6px;
+  padding: 0.1rem 0.6rem; font-variant-numeric: tabular-nums;
+}
+.timerLow { color: #b33; border-color: #b33; }
 
 .hint { font-family: 'Special Elite', monospace; color: var(--text-secondary, #b8a88a); margin: 0.1rem 0; }
 .sub { color: var(--text-secondary, #b8a88a); margin: 0; }

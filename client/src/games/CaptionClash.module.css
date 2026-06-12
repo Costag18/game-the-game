@@ -45,6 +45,18 @@
 .subtle { color: var(--text-secondary, #b8a88a); font-size: 0.85rem; text-align: center; }
 .waitMsg { color: #5cd85c; font-weight: 700; text-align: center; }
 
+.timer {
+  display: inline-block;
+  background: var(--bg-panel, #2a1518);
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  color: var(--gold, #d4a843);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.timerLow { color: #ff5fa2; border-color: #ff5fa2; }
+
 .primaryBtn {
   background: #ff5fa2;
   color: #1a0e10;

@@ -6,7 +6,7 @@ const CANVAS_H = 600;
 const SLIVER_H = 40;            // how much of the band ABOVE you can see
 const DRAW_MS = 50_000;         // simultaneous draw phase
 const VOTE_MS = 30_000;         // vote-the-best-band phase
-const REVEAL_MS = 14_000;       // composite reveal / scoreboard ack
+const REVEAL_MS = 50_000;       // long no-countdown AFK safety net; players advance via Continue
 const MAX_POINTS = 400;         // per stroke
 const MAX_STROKES = 300;        // per band
 const VOTE_POINTS = 100;        // points per vote a band author receives
@@ -88,6 +88,7 @@ export class ExquisiteCorpse extends BaseGame {
     this.votes = {};              // voterPid -> bandAuthorPid
     this.acknowledged = new Set();
     this.voteTally = {};          // authorPid -> votes received
+    this._phaseStart = 0;         // ms timestamp of the current timed phase's entry (for client countdown)
     this._drawTimer = null;
     this._voteTimer = null;
     this._revealTimer = null;
@@ -119,6 +120,7 @@ export class ExquisiteCorpse extends BaseGame {
   // ---------- DRAW ----------
   onEnterDraw() {
     this.submitted = new Set();
+    this._phaseStart = Date.now();
     this._clearTimers();
     this._drawTimer = setTimeout(() => {
       if (this.state !== 'draw') return;
@@ -136,6 +138,7 @@ export class ExquisiteCorpse extends BaseGame {
 
   // ---------- VOTE ----------
   onEnterVote() {
+    this._phaseStart = Date.now();
     this._clearTimers();
     this._voteTimer = setTimeout(() => {
       if (this.state !== 'vote') return;
@@ -296,6 +299,10 @@ export class ExquisiteCorpse extends BaseGame {
       sliverH: SLIVER_H,
       playerCount: this.players.length,
       myId: playerId,
+      // phase deadlines for client countdown + timeout auto-submit (reveal intentionally omitted:
+      // its long REVEAL_MS is a no-countdown AFK net — players advance via Continue)
+      drawEndTime: this.state === 'draw' ? this._phaseStart + DRAW_MS : null,
+      voteEndTime: this.state === 'vote' ? this._phaseStart + VOTE_MS : null,
       // --- draw phase (private) ---
       myBand: band ? { index: band.index, yStart: band.yStart, yEnd: band.yEnd } : null,
       myStrokes: this.drawings[playerId] || [],

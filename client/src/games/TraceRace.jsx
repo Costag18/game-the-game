@@ -17,20 +17,46 @@ export default function TraceRaceGame({ gameState, onAction, nicknames, avatars 
   const { playSound } = useSound();
   const [myStrokes, setMyStrokes] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [remaining, setRemaining] = useState(null);
   const prevRound = useRef(null);
   const prevPhase = useRef(null);
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const round = gameState?.round;
+  const drawEndTime = gameState?.drawEndTime;
+  const hasSubmittedFlag = gameState?.hasSubmitted;
+
+  // ref mirroring the latest strokes so the countdown closure can auto-submit them
+  const myStrokesRef = useRef([]);
+  myStrokesRef.current = myStrokes;
 
   // reset local strokes whenever a new draw round begins
   useEffect(() => {
     if (round !== prevRound.current || (phase === 'drawing' && prevPhase.current !== 'drawing')) {
-      if (phase === 'drawing') { setMyStrokes([]); setSubmitted(false); }
+      if (phase === 'drawing') { setMyStrokes([]); setSubmitted(false); autoSubmitted.current = false; }
       prevRound.current = round;
     }
     prevPhase.current = phase;
   }, [round, phase]);
+
+  // countdown for the drawing phase; ~1s before the deadline auto-submit whatever's been
+  // traced (the SAME payload the Submit button sends) so nothing is lost on timeout
+  useEffect(() => {
+    if (phase !== 'drawing' || !drawEndTime) { setRemaining(null); return; }
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((drawEndTime - Date.now()) / 1000));
+      setRemaining(rem);
+      if (rem <= 1 && !autoSubmitted.current && !hasSubmittedFlag) {
+        autoSubmitted.current = true;
+        setSubmitted(true);
+        onAction({ type: 'submit', strokes: myStrokesRef.current.map((s) => ({ color: s.color, width: s.width, tool: 'pen', points: s.points })) });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [phase, drawEndTime, hasSubmittedFlag, onAction]);
 
   const guide = useMemo(() => guideStroke(gameState?.path), [gameState?.path]);
 
@@ -79,6 +105,9 @@ export default function TraceRaceGame({ gameState, onAction, nicknames, avatars 
 
       {phase === 'drawing' && (
         <>
+          {remaining != null && (
+            <span className={`${styles.timer} ${remaining <= 10 ? styles.timerLow : ''}`}>⏱ {remaining}s</span>
+          )}
           <p className={styles.instruct}>Trace the blue track as accurately as you can, then submit!</p>
           <div className={styles.hintBar}>
             <span className={styles.hintLabel}>Coverage</span>

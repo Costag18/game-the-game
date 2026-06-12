@@ -28,18 +28,39 @@ export default function TwentyFourGame({ gameState, onAction, nicknames, avatars
   const [iAcked, setIAcked] = useState(false);
   const prevPhase = useRef(null);
   const prevDeal = useRef(null);
+  const exprRef = useRef('');
+  const autoSubmitted = useRef(false);
+  exprRef.current = expr; // keep the latest expression reachable from the countdown closure
 
   const phase = gameState?.phase;
   const dealNumber = gameState?.dealNumber;
+  const deadline = gameState?.deadline;
+  const mySolved = gameState?.mySolved;
 
   useEffect(() => {
     if (phase !== prevPhase.current || dealNumber !== prevDeal.current) {
-      if (phase === 'deal') setExpr('');
+      if (phase === 'deal') { setExpr(''); autoSubmitted.current = false; }
       if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
       prevPhase.current = phase;
       prevDeal.current = dealNumber;
     }
   }, [phase, dealNumber, playSound]);
+
+  // auto-submit whatever's typed ~1s before the deadline so nothing is lost on timeout
+  useEffect(() => {
+    if (phase !== 'deal' || !deadline) return undefined;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      if (rem <= 1 && !autoSubmitted.current && !mySolved) {
+        autoSubmitted.current = true;
+        const t = exprRef.current.trim();
+        if (t) onAction({ type: 'submit', expression: t });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [phase, deadline, mySolved, onAction]);
 
   if (!gameState) {
     return <div className={styles.arena}><p className={styles.loading}>Dealing the numbers…</p></div>;
@@ -47,8 +68,8 @@ export default function TwentyFourGame({ gameState, onAction, nicknames, avatars
 
   const {
     totalDeals, target = 24, numbers = [], scores = {}, myId,
-    mySolved, myExpr, myGained, myReject, solvedCount, playerCount,
-    deadline, acknowledged = [], reveal,
+    myExpr, myGained, myReject, solvedCount, playerCount,
+    acknowledged = [], reveal,
   } = gameState;
 
   const allPlayers = Object.keys(scores);
@@ -72,7 +93,7 @@ export default function TwentyFourGame({ gameState, onAction, nicknames, avatars
       <div className={styles.head}>
         <h1 className={styles.title}>TWENTY&middot;FOUR</h1>
         <span className={styles.round}>Deal {dealNumber} / {totalDeals}</span>
-        {(phase === 'deal' || phase === 'reveal') && <Countdown deadline={deadline} />}
+        {phase === 'deal' && <Countdown deadline={deadline} />}
       </div>
 
       {phase !== 'finished' && (

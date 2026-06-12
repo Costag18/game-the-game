@@ -150,6 +150,7 @@ export class TraceRace extends BaseGame {
     this.submitted = new Set();
     this.roundScores = {};          // pid -> this round's score
     this.roundResults = null;       // detail for reveal
+    this._phaseStart = 0;           // ms timestamp of the current drawing phase's entry (for client countdown)
     this._drawTimer = null;
     this._revealTimer = null;
   }
@@ -171,6 +172,7 @@ export class TraceRace extends BaseGame {
     this.submitted = new Set();
     this.roundScores = {};
     this.roundResults = null;
+    this._phaseStart = Date.now();
     this._clearTimers();
     this._drawTimer = setTimeout(() => {
       if (this.state !== 'drawing') return;
@@ -275,6 +277,9 @@ export class TraceRace extends BaseGame {
       phase: this.state,
       round: this.roundIndex + 1,
       totalRounds: this.totalRounds,
+      // draw-phase deadline for client countdown + timeout auto-submit (reveal omitted:
+      // its short REVEAL_MS is an internal advance, not a visible countdown)
+      drawEndTime: this.state === 'drawing' ? this._phaseStart + DRAW_MS : null,
       // the target path is data the client renders (dexterity test) — visible during draw + reveal
       path: this.path,
       // a player sees ONLY their own submitted strokes; never anyone else's mid-game

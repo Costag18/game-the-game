@@ -30,6 +30,18 @@
 
 .status { margin: 0.3rem 0 0; font-size: 0.95rem; opacity: 0.9; }
 
+.timer {
+  display: inline-block;
+  background: var(--bg-panel, #2a1518);
+  border: 2px solid var(--gold-dim, #8a6d2f);
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  color: var(--gold, #d4a843);
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+.timerLow { color: #ff6b6b; border-color: #ff6b6b; }
+
 /* ---- draw band frame ---- */
 .bandFrame {
   position: relative;

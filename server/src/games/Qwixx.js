@@ -2,7 +2,7 @@ import { BaseGame } from './BaseGame.js';
 
 const TOTAL_ROUNDS = 12;
 const ROUND_MS = 25_000;       // per-round mark-or-pass window
-const REVEAL_MS = 12_000;      // final results auto-advance
+const REVEAL_MS = 50_000;      // final-results AFK-safety net — players advance via Continue/ack
 
 // Each colored row has 11 cells. Red/Yellow ascend 2..12; Green/Blue descend 12..2.
 const ASC = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -58,6 +58,7 @@ export class Qwixx extends BaseGame {
     this.acted = {};
     this.lastAction = {};   // pid -> 'mark' | 'pass' | null (for UI this round)
     this.history = [];      // [{ round, dice, offered }]
+    this.acknowledged = new Set(); // pids who pressed Continue on the final reveal
     this._roundTimer = null;
     this._revealTimer = null;
   }
@@ -96,13 +97,23 @@ export class Qwixx extends BaseGame {
   }
 
   onEnterReveal() {
+    this.acknowledged = new Set();
     this._clearTimers();
     this.deadline = Date.now() + REVEAL_MS;
     this._revealTimer = setTimeout(() => {
       if (this.state !== 'reveal') return;
+      for (const p of this.players) this.acknowledged.add(p);
       this.transition('finish');
       this._emitChange();
     }, REVEAL_MS);
+  }
+
+  _checkRevealComplete() {
+    if (this.state !== 'reveal') return;
+    if (this.players.every((p) => this.acknowledged.has(p))) {
+      this._clearTimers();
+      this.transition('finish');
+    }
   }
 
   onEnterFinished() { this._clearTimers(); }
@@ -128,6 +139,16 @@ export class Qwixx extends BaseGame {
 
   handleAction(playerId, action) {
     if (!this.players.includes(playerId)) return;
+    const aType = action && action.type;
+
+    if (this.state === 'reveal') {
+      if (aType === 'acknowledge') {
+        this.acknowledged.add(playerId);
+        this._checkRevealComplete();
+      }
+      return;
+    }
+
     if (this.state !== 'round') return;
     if (this.acted[playerId]) return;                      // one action per round
     const type = action && action.type;
@@ -176,6 +197,7 @@ export class Qwixx extends BaseGame {
     delete this.acted[playerId];
     delete this.lastAction[playerId];
     delete this.boards[playerId];
+    this.acknowledged.delete(playerId);
 
     if (this.players.length <= 1) {
       this._clearTimers();
@@ -184,6 +206,7 @@ export class Qwixx extends BaseGame {
       return;
     }
     if (this.state === 'round') this._maybeResolveRound();
+    else if (this.state === 'reveal') this._checkRevealComplete();
     this._emitChange();
   }
 
@@ -231,7 +254,10 @@ export class Qwixx extends BaseGame {
       // dice values are shown to everyone AS the announced roll (the sum is the offer)
       dice: this.state === 'round' ? [...this.dice] : null,
       offered: this.state === 'round' ? this.offered : null,
-      deadline: (this.state === 'round' || this.state === 'reveal') ? this.deadline : null,
+      // only the per-round window drives a visible countdown; the long reveal timer is a
+      // no-countdown AFK-safety net (players advance via Continue/ack)
+      deadline: this.state === 'round' ? this.deadline : null,
+      acknowledged: this.state === 'reveal' ? [...this.acknowledged] : [],
       rows: ROWS.map((r) => ({ color: r.color, dir: r.dir, cells: r.cells })),
       myBoard: this._publicBoard(playerId),
       myScore: this._totalScore(playerId),

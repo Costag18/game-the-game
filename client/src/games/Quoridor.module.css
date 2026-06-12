@@ -20,7 +20,8 @@
 
 .grid {
   display: grid;
-  width: 100%;
+  width: min(94vw, 100%, 460px);
+  max-width: 100%;
   aspect-ratio: 1;
   background: #5a3a1e;
   background: linear-gradient(135deg, #6b4423, #4a2f17);
@@ -95,3 +96,9 @@
   cursor: pointer;
 }
 .confirmBtn:disabled { opacity: 0.4; cursor: default; }
+
+/* Mobile portrait: keep the 9x9 interleaved grid fully on-screen, never clipped */
+@media (max-width: 480px) {
+  .boardWrap { max-width: 100%; }
+  .grid { width: min(94vw, 100%); padding: 6px; }
+}

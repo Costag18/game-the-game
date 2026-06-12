@@ -162,7 +162,7 @@ test('reveal timeout auto-acks and finishes + broadcasts', () => {
   for (const p of ['a', 'b', 'c']) g.handleAction(p, { type: 'vote', target: g.bandOrder.find((x) => x !== p) });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(14_000);
+  advance(50_000);
   eq(g.state, 'finished');
   assert(g.emitCount > before, 'broadcast on reveal timeout');
 });

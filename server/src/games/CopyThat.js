@@ -198,6 +198,7 @@ export class CopyThat extends BaseGame {
     this.roundScores = {};            // pid -> this-round score (current round)
     this.revealData = null;
     this.acknowledged = new Set();
+    this._redrawStart = null;         // epoch-ms when the redraw window opened (drives the client countdown)
     this._flashTimer = null;
     this._redrawTimer = null;
     this._revealTimer = null;
@@ -237,6 +238,7 @@ export class CopyThat extends BaseGame {
   // ---------- REDRAW ----------
   onEnterRedraw() {
     this._clearTimers();
+    this._redrawStart = Date.now(); // exposed as redrawEndTime so the client can show a countdown
     this._redrawTimer = setTimeout(() => {
       if (this.state !== 'redraw') return;
       for (const p of this.players) if (this.submissions[p] === undefined) this.submissions[p] = []; // auto-empty
@@ -248,6 +250,7 @@ export class CopyThat extends BaseGame {
   _toReveal() {
     if (this.state !== 'redraw') return;
     this._clearTimers();
+    this._redrawStart = null; // redraw window closed
     this.transition('reveal'); // -> onEnterReveal
   }
 
@@ -344,6 +347,8 @@ export class CopyThat extends BaseGame {
       // re-disclosed inside `reveal` once the round is scored.
       reference: inFlash ? this.reference : null,
       referenceName: inFlash ? this.reference?.name : null,
+      // Redraw deadline (epoch-ms) so the client can render a countdown + auto-submit on timeout.
+      redrawEndTime: (this.state === 'redraw' && this._redrawStart) ? this._redrawStart + REDRAW_MS : null,
       // Your own submission is the only drawing you can see before reveal.
       mySubmission: this.submissions[playerId] !== undefined ? this.submissions[playerId] : null,
       hasSubmitted: this.submissions[playerId] !== undefined,

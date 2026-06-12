@@ -24,6 +24,16 @@
   text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
 }
 .meta { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.timer {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 800;
+  color: #ffd166;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  padding: 0.05rem 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+.timerLow { color: #ff6b6b; }
 .loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
 
 .phaseBox {

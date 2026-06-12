@@ -136,7 +136,7 @@ test('round ends a grace after the last beat -> summary, then next round', () =>
   eq(g.state, 'summary');
   assert(g.emitCount > before, 'broadcast on round end');
   // summary auto-advance
-  advance(4000);
+  advance(45_000);
   eq(g.state, 'countdown');
   eq(g.round, 2);
 });
@@ -145,7 +145,7 @@ test('schedule tightens each round (faster interval)', () => {
   const g = newGame(['a', 'b']);
   const interval1 = g.schedule[1] - g.schedule[0];
   advance(2500); advanceToRoundEnd(g); // play round 1 out -> summary
-  advance(4000); // summary -> countdown round 2
+  advance(45_000); // summary -> countdown round 2
   eq(g.round, 2);
   const interval2 = g.schedule[1] - g.schedule[0];
   assert(interval2 < interval1, `round 2 tighter (${interval2} < ${interval1})`);
@@ -156,7 +156,7 @@ test('every timer path calls _emitChange (countdown, round-end, summary)', () =>
   let c0 = g.emitCount;
   advance(2500); assert(g.emitCount > c0, 'countdown emit'); c0 = g.emitCount;
   advanceToRoundEnd(g); assert(g.emitCount > c0, 'round-end emit'); c0 = g.emitCount;
-  advance(4000); assert(g.emitCount > c0, 'summary emit');
+  advance(45_000); assert(g.emitCount > c0, 'summary emit');
 });
 
 function playFullGame(players, taps /* fn(g, round) */) {

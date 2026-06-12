@@ -24,22 +24,42 @@ export default function TokenTussleGame({ gameState, onAction, nicknames, avatar
   const [alloc, setAlloc] = useState(() => new Array(FRONTS).fill(0));
   const [iAcked, setIAcked] = useState(false);
   const prevPhase = useRef(null);
+  const allocRef = useRef(alloc);
+  const autoSubmitted = useRef(false);
+  allocRef.current = alloc; // keep the latest allocation reachable from the countdown closure
 
   const phase = gameState?.phase;
   const hasSubmitted = gameState?.hasSubmitted;
+  const deadline = gameState?.deadline;
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'deploy') { setAlloc(new Array(FRONTS).fill(0)); }
+    if (phase === 'deploy') { setAlloc(new Array(FRONTS).fill(0)); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('coinCollect'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
+
+  // auto-deploy the player's CURRENT allocation ~1s before the deadline so their
+  // chosen split is committed (never discarded for the server's even-split default).
+  useEffect(() => {
+    if (phase !== 'deploy' || !deadline) return undefined;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      if (rem <= 1 && !autoSubmitted.current && !hasSubmitted) {
+        autoSubmitted.current = true;
+        onAction({ type: 'deploy', tokens: allocRef.current });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [phase, deadline, hasSubmitted, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Mustering forces…</p></div>;
 
   const {
     roundNumber, totalRounds, fronts = [], scores = {}, myId, tokensPerRound = 20,
-    submittedCount, playerCount, deadline, reveal, acknowledged = [],
+    submittedCount, playerCount, reveal, acknowledged = [],
   } = gameState;
 
   const used = alloc.reduce((a, b) => a + b, 0);

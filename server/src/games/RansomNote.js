@@ -9,7 +9,7 @@ const MAX_NOTE = 5;
 
 const WRITE_MS = 45_000;
 const VOTE_MS = 30_000;
-const REVEAL_MS = 12_000;
+const REVEAL_MS = 50_000; // long AFK-safety net — players advance via Continue/ack
 
 // Fixed server emoji pool. Players are dealt a random HAND of HAND_SIZE from this
 // and arrange MIN_NOTE..MAX_NOTE of them into a "ransom note" conveying the word.
@@ -70,6 +70,7 @@ export class RansomNote extends BaseGame {
     this.gallery = [];      // [{ entryId, authorId, emojis }]
     this.revealData = null;
     this.acknowledged = new Set();
+    this._drawStart = 0; // ms timestamp the current draw phase began (for client countdown)
     this._drawTimer = null;
     this._voteTimer = null;
     this._revealTimer = null;
@@ -97,6 +98,7 @@ export class RansomNote extends BaseGame {
     this.acknowledged = new Set();
     for (const p of this.players) this.hands[p] = shuffle(EMOJI_POOL).slice(0, HAND_SIZE);
     this._clearAllTimers();
+    this._drawStart = Date.now();
     this._drawTimer = setTimeout(() => {
       if (this.state !== 'draw') return;
       for (const p of this.players) {
@@ -279,6 +281,8 @@ export class RansomNote extends BaseGame {
       myId: playerId,
       minNote: MIN_NOTE,
       maxNote: MAX_NOTE,
+      // deadline for the compose phase — drives the client countdown + timeout auto-submit
+      drawEndTime: this.state === 'draw' ? this._drawStart + WRITE_MS : null,
       // hand + my own note are PRIVATE — never another player's
       myHand: this.state === 'draw' ? (this.hands[playerId] || []) : null,
       myNote: this.notes[playerId] != null ? this.notes[playerId] : null,

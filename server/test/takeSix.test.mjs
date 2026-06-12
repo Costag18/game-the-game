@@ -181,7 +181,7 @@ test('reveal auto-advances on timeout', () => {
   for (const p of ['a', 'b']) g.handleAction(p, { type: 'playCard', card: g.hands[p][0] });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(12_000);
+  advance(45_000);
   assert(g.state === 'choosing' || g.state === 'finished', `advanced (got ${g.state})`);
   assert(g.emitCount > before, 'broadcast on reveal timeout');
 });

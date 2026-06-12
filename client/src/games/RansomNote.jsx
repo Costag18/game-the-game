@@ -8,31 +8,54 @@ export default function RansomNoteGame({ gameState, onAction, nicknames, avatars
   const { playSound } = useSound();
   const [note, setNote] = useState([]); // array of {emoji, key} so duplicates from the hand are distinguishable
   const [iActed, setIActed] = useState(false);
+  const [remaining, setRemaining] = useState(null);
   const prevRound = useRef(null);
   const prevPhase = useRef(null);
+  const noteRef = useRef([]);
+  noteRef.current = note; // keep the latest composition reachable from the countdown closure
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const roundNumber = gameState?.roundNumber;
   const minNote = gameState?.minNote ?? 3;
   const maxNote = gameState?.maxNote ?? 5;
+  const drawEndTime = gameState?.drawEndTime;
 
   // Reset local composition on a new round or when the draw phase (re)starts.
   useEffect(() => {
     if (roundNumber !== prevRound.current) {
       setNote([]);
       setIActed(false);
+      autoSubmitted.current = false;
       prevRound.current = roundNumber;
     }
   }, [roundNumber]);
 
   useEffect(() => {
     if (phase !== prevPhase.current) {
-      if (phase === 'draw') { setNote([]); setIActed(false); }
+      if (phase === 'draw') { setNote([]); setIActed(false); autoSubmitted.current = false; }
       if (phase === 'vote') setIActed(false);
       if (phase === 'reveal') setIActed(false);
       prevPhase.current = phase;
     }
   }, [phase]);
+
+  // Countdown for the compose phase + timeout auto-submit (never discard a typed note).
+  useEffect(() => {
+    if (phase !== 'draw' || !drawEndTime) { setRemaining(null); return; }
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((drawEndTime - Date.now()) / 1000));
+      setRemaining(rem);
+      // ~1s before the server deadline, send whatever's composed (same action as the Send button)
+      if (rem <= 1 && !autoSubmitted.current && !gameState?.hasSubmitted) {
+        autoSubmitted.current = true;
+        onAction({ type: 'submit', emojis: noteRef.current.map((n) => n.emoji) });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [phase, drawEndTime, onAction, gameState?.hasSubmitted]);
 
   if (!gameState) {
     return <div className={styles.arena}><p className={styles.loading}>Dealing emoji…</p></div>;
@@ -90,6 +113,9 @@ export default function RansomNoteGame({ gameState, onAction, nicknames, avatars
           <div className={styles.wordCard}>
             <span className={styles.wordLabel}>Spell out without writing it:</span>
             <span className={styles.theWord}>{word}</span>
+            {remaining != null && (
+              <span className={`${styles.timer} ${remaining <= 10 ? styles.timerLow : ''}`}>{remaining}s</span>
+            )}
           </div>
 
           {hasSubmitted ? (

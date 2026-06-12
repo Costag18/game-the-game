@@ -1,6 +1,7 @@
 .arena { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; padding: 1rem; max-width: 600px; margin: 0 auto; }
 .title { font-family: 'Permanent Marker', cursive; font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--gold, #d4a843); margin: 0; }
 .loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }
+.countdown { color: var(--gold, #d4a843); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 .roleBox { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem; }
 .impostorTag { font-size: 1.4rem; font-weight: 800; color: #e85d5d; margin: 0; }
