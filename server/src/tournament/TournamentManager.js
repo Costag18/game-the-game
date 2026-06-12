@@ -25,6 +25,17 @@ export class TournamentManager {
     this.selectedGame = null;
   }
 
+  // Re-open voting for the SAME round (used by the unanimous skip-game vote): the
+  // abandoned game was never scored, so the round number is NOT consumed and nothing
+  // is added to roundHistory — players just pick a different game for this round.
+  restartRoundVoting() {
+    if (this.currentRound < 1) this.currentRound = 1; // a skip only happens once a round is live
+    this.phase = 'voting';
+    this.votes = {};
+    this.wagers = {};
+    this.selectedGame = null;
+  }
+
   submitVote(playerId, gameId) {
     this.votes[playerId] = gameId;
   }

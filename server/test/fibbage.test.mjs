@@ -34,9 +34,9 @@ test('rejects a fake equal to the truth or a duplicate; hides truth pre-reveal',
 
 test('all fakes submitted advances to voting; ballot hides author/kind', () => {
   const g = newGame(['a', 'b', 'c']);
-  g.handleAction('a', { type: 'submitFake', text: 'apple' });
-  g.handleAction('b', { type: 'submitFake', text: 'banana' });
-  g.handleAction('c', { type: 'submitFake', text: 'cherry' });
+  g.handleAction('a', { type: 'submitFake', text: 'fib-a' });
+  g.handleAction('b', { type: 'submitFake', text: 'fib-b' });
+  g.handleAction('c', { type: 'submitFake', text: 'fib-c' });
   eq(g.state, 'voting');
   const s = g.getStateForPlayer('a');
   eq(s.ballot.length, 4); // 3 fakes + truth
@@ -49,7 +49,7 @@ test('all fakes submitted advances to voting; ballot hides author/kind', () => {
 
 test('cannot vote for your own fib', () => {
   const g = newGame(['a', 'b', 'c']);
-  for (const [p, t] of [['a', 'apple'], ['b', 'banana'], ['c', 'cherry']]) g.handleAction(p, { type: 'submitFake', text: t });
+  for (const [p, t] of [['a', 'fib-a'], ['b', 'fib-b'], ['c', 'fib-c']]) g.handleAction(p, { type: 'submitFake', text: t });
   const mine = myFakeOpt(g, 'a');
   g.handleAction('a', { type: 'castVote', optionId: mine.optionId });
   eq(g.votes['a'], undefined);
@@ -57,7 +57,7 @@ test('cannot vote for your own fib', () => {
 
 test('scoring: found truth +1000 and +500 per fool; reveal discloses authors/voters', () => {
   const g = newGame(['a', 'b', 'c', 'd']);
-  for (const [p, t] of [['a', 'apple'], ['b', 'banana'], ['c', 'cherry'], ['d', 'date']]) g.handleAction(p, { type: 'submitFake', text: t });
+  for (const [p, t] of [['a', 'fib-a'], ['b', 'fib-b'], ['c', 'fib-c'], ['d', 'fib-d']]) g.handleAction(p, { type: 'submitFake', text: t });
   const truth = truthOptId(g);
   const aFake = myFakeOpt(g, 'a').optionId;
   // a finds truth; b, c, d all pick a's fake → a fooled 3
@@ -98,7 +98,7 @@ test('full 4-round game finishes; results rank all N with a tie sharing placemen
 
 test('write timeout injects house fakes and advances', () => {
   const g = newGame(['a', 'b', 'c']);
-  g.handleAction('a', { type: 'submitFake', text: 'apple' });
+  g.handleAction('a', { type: 'submitFake', text: 'fib-a' });
   advance(35_000);
   eq(g.state, 'voting');
   assert(g.fakes['b'] && g.fakes['c'], 'missing players got house fakes');
@@ -106,14 +106,14 @@ test('write timeout injects house fakes and advances', () => {
 
 test('vote timeout auto-votes everyone and advances to reveal', () => {
   const g = newGame(['a', 'b', 'c']);
-  for (const [p, t] of [['a', 'apple'], ['b', 'banana'], ['c', 'cherry']]) g.handleAction(p, { type: 'submitFake', text: t });
+  for (const [p, t] of [['a', 'fib-a'], ['b', 'fib-b'], ['c', 'fib-c']]) g.handleAction(p, { type: 'submitFake', text: t });
   advance(25_000);
   eq(g.state, 'reveal');
 });
 
 test('reveal timeout auto-acks and advances', () => {
   const g = newGame(['a', 'b', 'c']);
-  for (const [p, t] of [['a', 'apple'], ['b', 'banana'], ['c', 'cherry']]) g.handleAction(p, { type: 'submitFake', text: t });
+  for (const [p, t] of [['a', 'fib-a'], ['b', 'fib-b'], ['c', 'fib-c']]) g.handleAction(p, { type: 'submitFake', text: t });
   for (const p of ['a', 'b', 'c']) g.handleAction(p, { type: 'castVote', optionId: truthOptId(g) });
   eq(g.state, 'reveal');
   const before = g.emitCount;
@@ -124,8 +124,8 @@ test('reveal timeout auto-acks and advances', () => {
 
 test('leave during writing (last owing) advances to voting; orphan fake stays', () => {
   const g = newGame(['a', 'b', 'c']);
-  g.handleAction('a', { type: 'submitFake', text: 'apple' });
-  g.handleAction('b', { type: 'submitFake', text: 'banana' });
+  g.handleAction('a', { type: 'submitFake', text: 'fib-a' });
+  g.handleAction('b', { type: 'submitFake', text: 'fib-b' });
   g.removePlayer('c'); // c never submitted, was the last owed
   eq(g.state, 'voting');
   assert(!g.getResults().some((r) => r.playerId === 'c'), 'leaver not ranked');
@@ -133,7 +133,7 @@ test('leave during writing (last owing) advances to voting; orphan fake stays', 
 
 test('leave during voting keeps the orphan fake on the ballot', () => {
   const g = newGame(['a', 'b', 'c', 'd']);
-  for (const [p, t] of [['a', 'apple'], ['b', 'banana'], ['c', 'cherry'], ['d', 'date']]) g.handleAction(p, { type: 'submitFake', text: t });
+  for (const [p, t] of [['a', 'fib-a'], ['b', 'fib-b'], ['c', 'fib-c'], ['d', 'fib-d']]) g.handleAction(p, { type: 'submitFake', text: t });
   const cFake = myFakeOpt(g, 'c').optionId;
   g.handleAction('a', { type: 'castVote', optionId: cFake }); // a was fooled by c's fake
   g.removePlayer('c'); // c leaves mid-vote

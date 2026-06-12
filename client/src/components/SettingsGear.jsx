@@ -30,10 +30,15 @@ export default function SettingsGear({ screen }) {
       setSkipTotal(d?.total || 0);
       setIVotedSkip(voted.includes(socket.id));
     }
-    function onReturn() { setSkipVotedCount(0); setSkipTotal(0); setIVotedSkip(false); }
+    function onReset() { setSkipVotedCount(0); setSkipTotal(0); setIVotedSkip(false); }
     socket.on(EVENTS.SKIP_UPDATE, onSkipUpdate);
-    socket.on(EVENTS.RETURN_TO_LOBBY, onReturn);
-    return () => { socket.off(EVENTS.SKIP_UPDATE, onSkipUpdate); socket.off(EVENTS.RETURN_TO_LOBBY, onReturn); };
+    socket.on(EVENTS.RETURN_TO_LOBBY, onReset);
+    socket.on(EVENTS.ROUND_START, onReset); // a new round's vote (incl. after a skip) clears the tally
+    return () => {
+      socket.off(EVENTS.SKIP_UPDATE, onSkipUpdate);
+      socket.off(EVENTS.RETURN_TO_LOBBY, onReset);
+      socket.off(EVENTS.ROUND_START, onReset);
+    };
   }, [socket]);
 
   // reset my vote view whenever we leave the active-game screens (server clears votes per game)
@@ -176,16 +181,16 @@ export default function SettingsGear({ screen }) {
         ref={panelRef}
         className={`${styles.panel} ${open ? styles.panelOpen : ''}`}
       >
-        {/* Unanimous skip-to-lobby (only during an active game) */}
+        {/* Unanimous skip-THIS-game vote (only during an active game) */}
         {showSkip && (
           <div className={styles.section}>
             <span className={styles.label}>Skip game</span>
             <button
               className={`${styles.skipBtn} ${iVotedSkip ? styles.skipVoted : ''}`}
               onClick={toggleSkipVote}
-              title="Everyone must agree to return to the lobby"
+              title="Everyone must agree to skip this game and pick another"
             >
-              {iVotedSkip ? '✓ Voted to skip' : 'Vote to skip → Lobby'}
+              {iVotedSkip ? '✓ Voted to skip' : 'Vote to skip game'}
             </button>
             {skipTotal > 0 && (
               <span className={styles.skipCount}>

@@ -1115,9 +1115,10 @@ io.on(EVENTS.CONNECTION, (socket) => {
     advanceAfterResults(lobbyId, tm, lobby);
   });
 
-  // Unanimous "skip game → back to lobby". Each tournament player may toggle their
-  // vote; when EVERY current player has voted, the game/tournament is abandoned and
-  // everyone is returned to the lobby.
+  // Unanimous "skip THIS game". Each tournament player may toggle their vote; when
+  // EVERY current player has voted, the current game is abandoned (no scoring) and the
+  // tournament moves on — back to the game vote for this round — without resetting the
+  // whole tournament.
   socket.on(EVENTS.SKIP_VOTE, (data) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
@@ -1133,7 +1134,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     for (const v of [...tm.skipVotes]) if (!tm.players.includes(v)) tm.skipVotes.delete(v);
 
     if (tm.players.length > 0 && tm.players.every((p) => tm.skipVotes.has(p))) {
-      returnToLobby(lobbyId, tm, lobby);
+      skipCurrentGame(lobbyId, tm, lobby);
       return;
     }
     io.to(lobbyId).emit(EVENTS.SKIP_UPDATE, { voted: [...tm.skipVotes], total: tm.players.length });
@@ -1248,19 +1249,30 @@ function getTournamentState(tm) {
 // outstanding wager belonged to a player who just left) so a leave can never
 // strand the remaining players on the "Loading game…" screen.
 // Abandon the active game + tournament and send everyone back to the lobby.
-// Triggered by a UNANIMOUS skip vote (see SKIP_VOTE handler).
-function returnToLobby(lobbyId, tm, lobby) {
-  if (tm) {
-    if (tm.activeGame) { try { tm.activeGame.destroy?.(); } catch { /* ignore */ } tm.activeGame = null; }
-    if (tm._resultsTimer) { clearTimeout(tm._resultsTimer); tm._resultsTimer = null; }
+// Triggered by a UNANIMOUS skip vote (see SKIP_VOTE handler). Skips ONLY the current
+// game — the tournament keeps going. If a round was already scored (results screen),
+// advance normally; otherwise abandon the un-scored game and re-open the vote for THIS
+// round so players pick a different game (no score, the round number isn't consumed).
+function skipCurrentGame(lobbyId, tm, lobby) {
+  if (!tm) return;
+  tm.skipVotes = new Set();
+  io.to(lobbyId).emit(EVENTS.SKIP_UPDATE, { voted: [], total: 0 }); // reset everyone's skip tally
+
+  if (tm.phase === 'results') {
+    advanceAfterResults(lobbyId, tm, lobby); // round already counted — just move on
+    return;
   }
-  tournaments.delete(lobbyId);
-  if (lobby) {
-    lobbyManager.setStatus(lobbyId, 'waiting');
-    const updated = lobbyManager.getLobby(lobbyId);
-    if (updated) io.to(lobbyId).emit(EVENTS.LOBBY_STATE, updated);
-  }
-  io.to(lobbyId).emit(EVENTS.RETURN_TO_LOBBY, {});
+
+  if (tm.activeGame) { try { tm.activeGame.destroy?.(); } catch { /* ignore */ } tm.activeGame = null; }
+  if (tm._resultsTimer) { clearTimeout(tm._resultsTimer); tm._resultsTimer = null; }
+  tm.resultsAcknowledged = null;
+  tm.restartRoundVoting();
+  lobbyManager.setStatus(lobbyId, 'voting');
+  io.to(lobbyId).emit(EVENTS.TOURNAMENT_STATE, getTournamentState(tm));
+  io.to(lobbyId).emit(EVENTS.ROUND_START, {
+    round: tm.currentRound,
+    eligibleGames: shuffle(getEligibleGames(lobby.players.length)),
+  });
 }
 
 function startSelectedGame(lobbyId, tm, lobby) {

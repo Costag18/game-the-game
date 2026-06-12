@@ -515,13 +515,13 @@ The shared knowledge banks (MULTIPLE_CHOICE, QUANTITIES, NUMERIC_FACTS, EVENTS, 
 - Preset quick buttons for common values (5/10/15 rounds, 1000/2000/5000 points)
 - Server clamps values to safe ranges
 
-## Skip-to-Lobby Vote
+## Skip-Game Vote
 
-Any player can open the SettingsGear (during `gameVote`/`wagerPhase`/`playing`/`roundResults`) and "Vote to skip → Lobby". The vote is **unanimous-gated**: only when EVERY current tournament player has voted does the server abandon the active game + tournament and return everyone to the lobby (waiting room).
+Any player can open the SettingsGear (during `gameVote`/`wagerPhase`/`playing`/`roundResults`) and "Vote to skip game". The vote is **unanimous-gated**: only when EVERY current tournament player has voted does the server abandon the CURRENT game and move on — **the tournament keeps going** (it does NOT reset to the lobby). The skipped game is not scored and the round number is not consumed: players are returned to the **game vote for the same round** to pick a different game.
 
-- **Events:** `SKIP_VOTE` (client→server, `{vote:bool}` toggle), `SKIP_UPDATE` (server→room, `{voted:[ids], total}`), `RETURN_TO_LOBBY` (server→room) — in `shared/events.js`.
-- **Server (`index.js`):** votes tracked on `tm.skipVotes` (Set), reset per game in `startSelectedGame`. The `SKIP_VOTE` handler toggles the voter, prunes departed voters, and when `tm.players.every(p => skipVotes.has(p))` calls `returnToLobby()` — which `destroy()`s the active game, clears `tm._resultsTimer`, `tournaments.delete`s, sets lobby status `'waiting'`, and emits `LOBBY_STATE` + `RETURN_TO_LOBBY`. `handlePlayerLeave` prunes a departed player's vote so a gone player can't block the tally.
-- **Client:** `SettingsGear` (given a `screen` prop) shows the toggle + "X/Y voted · all must agree" only on active-game screens; `App.jsx` routes `RETURN_TO_LOBBY` → `waitingRoom`.
+- **Events:** `SKIP_VOTE` (client→server, `{vote:bool}` toggle), `SKIP_UPDATE` (server→room, `{voted:[ids], total}`) — in `shared/events.js`. (`RETURN_TO_LOBBY` still exists but is no longer emitted by skip — kept for back-compat; the client listeners are harmless.)
+- **Server (`index.js`):** votes tracked on `tm.skipVotes` (Set), reset per game in `startSelectedGame`. The `SKIP_VOTE` handler toggles the voter, prunes departed voters, and when `tm.players.every(p => skipVotes.has(p))` calls `skipCurrentGame()` — which: if `tm.phase === 'results'` (round already scored) just runs `advanceAfterResults` to move to the next round; otherwise `destroy()`s the active game, clears `tm._resultsTimer`, calls `tm.restartRoundVoting()` (re-opens voting for the SAME round — like `startNextRound` but WITHOUT incrementing `currentRound` or touching `roundHistory`), sets status `'voting'`, and emits `SKIP_UPDATE {voted:[],total:0}` (resets the tally) + `TOURNAMENT_STATE` + `ROUND_START`. `handlePlayerLeave` prunes a departed player's vote so a gone player can't block the tally.
+- **Client:** `SettingsGear` (given a `screen` prop) shows the toggle + "X/Y voted · all must agree" only on active-game screens, and resets its skip tally on `ROUND_START` (covers both the skip and a normal round advance). The `ROUND_START` the skip emits naturally routes the client to the game-vote screen.
 
 ## Conventions
 
