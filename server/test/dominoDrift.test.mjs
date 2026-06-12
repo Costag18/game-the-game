@@ -21,6 +21,11 @@ function rig(g, { hands, leftEnd, rightEnd, train, boneyard = [], turn }) {
   g.train = (train || [[leftEnd, rightEnd]]).map((t) => [...t]);
   g.boneyard = boneyard.map((t) => [...t]);
   g.consecutivePasses = 0;
+  // startGame() stamped lastEvent with the RANDOM seed tile; a rigged position
+  // must clear it so the deterministic snapshot can't carry a stale random tile
+  // (otherwise the substring leak check below false-positives ~7% of runs when
+  // the seed equals a scanned opponent tile like [0,4]/[2,2]).
+  g.lastEvent = null;
   g.setTurnPlayer(turn || g.players[0]);
   g._armTurnTimer();
 }
