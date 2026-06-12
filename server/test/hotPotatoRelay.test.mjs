@@ -1,9 +1,14 @@
-import { installClock, uninstallClock, advance, pendingTimers, test, assert, eq, report } from './helpers.mjs';
+import { installClock, uninstallClock, advance, fireNext, pendingTimers, test, assert, eq, report } from './helpers.mjs';
 import { HotPotatoRelay } from '../src/games/HotPotatoRelay.js';
 
 installClock();
 
-const FUSE_MAX_MS = 14000; // advancing past this guarantees the hidden fuse fired
+// NOTE: fire fuses with fireNext() (the single earliest pending timer), NOT a
+// blanket advance(). _explode re-arms a fresh RANDOM fuse on every pop, so one
+// big advance() can fire the re-armed fuse (or even the gameOver ack timer) in
+// the same window — eliminating an extra player or racing past gameOver. That
+// non-determinism is what made these tests flaky. During `live` the only pending
+// timer is the fuse, so fireNext() fires exactly one fuse, deterministically.
 
 function newGame(players) {
   const g = new HotPotatoRelay(players);
@@ -44,7 +49,7 @@ test('only the holder can pass; a non-holder pass is ignored', () => {
 test('the player HOLDING the token when the fuse fires is eliminated', () => {
   const g = newGame(['a', 'b', 'c']);
   const victim = g.holder;
-  advance(FUSE_MAX_MS + 1); // force the fuse
+  fireNext(); // fire EXACTLY the one armed fuse (a blanket advance can double-fire — see note up top)
   assert(!g.survivors.includes(victim), 'holder at fire time was eliminated');
   eq(g.survivors.length, 2);
   eq(g.lastBlast.eliminated, victim);
@@ -60,7 +65,7 @@ test('passing changes who explodes (server computes from holder at fire time)', 
   g.handleAction(first, { type: 'pass' }); // hand it off so `first` is safe
   const newHolder = g.holder;
   assert(newHolder !== first, 'token moved');
-  advance(FUSE_MAX_MS + 1);
+  fireNext(); // exactly one fuse — otherwise a short re-armed fuse can blow up `first` too
   assert(g.survivors.includes(first), 'the passer survived');
   assert(!g.survivors.includes(newHolder), 'the new holder blew up');
 });
@@ -68,11 +73,11 @@ test('passing changes who explodes (server computes from holder at fire time)', 
 test('every timer path calls _emitChange (spy the broadcast callback)', () => {
   const g = newGame(['a', 'b', 'c']);
   const before = g.emitCount;
-  advance(FUSE_MAX_MS + 1); // fuse fires -> _explode -> _emitChange
+  fireNext(); // fuse fires -> _explode -> _emitChange
   assert(g.emitCount > before, 'fuse fire broadcasts');
   // run it down to gameOver and assert the ack timer also broadcasts
   let guard = 0;
-  while (g.state === 'live' && guard++ < 10) advance(FUSE_MAX_MS + 1);
+  while (g.state === 'live' && guard++ < 10) fireNext(); // one pop per fuse; never races into the ack timer
   eq(g.state, 'gameOver');
   const beforeAck = g.emitCount;
   advance(11000); // ack auto-advance
@@ -82,7 +87,7 @@ test('every timer path calls _emitChange (spy the broadcast callback)', () => {
 
 test('ack from survivor advances gameOver -> finished', () => {
   const g = newGame(['a', 'b']);
-  advance(FUSE_MAX_MS + 1); // one pop leaves a single survivor -> gameOver
+  fireNext(); // one pop leaves a single survivor -> gameOver
   eq(g.state, 'gameOver');
   const winner = g.survivors[0];
   g.handleAction(winner, { type: 'acknowledge' });
@@ -105,7 +110,7 @@ for (const N of [2, 3, 4]) {
     let guard = 0;
     // Fire fuses one at a time (fireNext on the single pending fuse) so we don't
     // accidentally race past the gameOver ack timer in one big advance.
-    while (g.state === 'live' && guard++ < 50) advance(FUSE_MAX_MS + 1);
+    while (g.state === 'live' && guard++ < 50) fireNext();
     assert(g.state === 'gameOver' || g.state === 'finished', `reached end (got ${g.state})`);
     // ack the lone survivor (or it already auto-advanced)
     for (const p of g.survivors) g.handleAction(p, { type: 'acknowledge' });
@@ -131,7 +136,7 @@ test('co-eliminations (same-tick leaves) share a placement', () => {
   // make sure holder is still a survivor, then run the bomb to completion
   if (!g.survivors.includes(g.holder)) g.holder = g.survivors[0];
   let guard = 0;
-  while (g.state === 'live' && guard++ < 20) advance(FUSE_MAX_MS + 1);
+  while (g.state === 'live' && guard++ < 20) fireNext();
   for (const p of g.survivors) g.handleAction(p, { type: 'acknowledge' });
   eq(g.state, 'finished');
   const res = g.getResults();
@@ -150,7 +155,7 @@ test('removePlayer mid-play advances (no deadlock); holder hand-off', () => {
   eq(g.state, 'live');
   // game still completes
   let guard = 0;
-  while (g.state === 'live' && guard++ < 20) advance(FUSE_MAX_MS + 1);
+  while (g.state === 'live' && guard++ < 20) fireNext();
   eq(g.state, 'gameOver');
   for (const p of g.survivors) g.handleAction(p, { type: 'acknowledge' });
   eq(g.state, 'finished');
@@ -174,7 +179,7 @@ test('destroy() clears all timers', () => {
 
 test('a pass after the game is over is ignored', () => {
   const g = newGame(['a', 'b']);
-  advance(FUSE_MAX_MS + 1);
+  fireNext();
   eq(g.state, 'gameOver');
   const before = JSON.stringify(g.survivors);
   g.handleAction(g.survivors[0], { type: 'pass' });
