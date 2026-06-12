@@ -1,7 +1,7 @@
 import { BaseGame } from './BaseGame.js';
 
 const TOTAL_WINDOWS = 8;        // ~8 target windows in the 60s race
-const WINDOW_MS = 7_500;        // each window lasts ~7.5s (or until everyone clears the grid)
+const WINDOW_MS = 9_000;        // each window lasts ~9s (eased — divisor-hunting under time is hard) (or until everyone clears the grid)
 const REVEAL_MS = 2_500;        // brief reveal of which cells were divisors
 const GRID_SIZE = 12;           // candidate numbers per window
 const CORRECT_POINTS = 100;     // base for tapping a true divisor

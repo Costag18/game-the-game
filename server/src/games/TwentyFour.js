@@ -1,7 +1,8 @@
 import { BaseGame } from './BaseGame.js';
 
 const TOTAL_DEALS = 4;          // rounds
-const DEAL_MS = 45_000;         // window to crack each deal
+const DEAL_MS = 60_000;         // window to crack each deal (generous — these are hard)
+const HINT_DELAY_MS = 15_000;   // after this long into a deal, an unsolved player gets a first-step hint
 const REVEAL_MS = 50_000;       // reveal ack window — long AFK safety net (Continue advances early)
 const BASE_POINTS = 1000;       // first valid 24 this deal
 const STEP_POINTS = 250;        // decay per earlier solver
@@ -191,17 +192,76 @@ export function findSolution(numbers) {
   return null;
 }
 
-/** Generate a random solvable quad of integers 1..9 (retry until solvable). */
+// Like solveCards but ONLY follows combines whose intermediate value is a whole
+// number — i.e. solutions that never need fractions. These are the ones humans can
+// actually find; the fraction-only quads (e.g. 3,3,8,8) are what make 24 brutal.
+function solveCardsEasy(cards) {
+  if (cards.length === 1) return [cards[0]];
+  const results = [];
+  for (let i = 0; i < cards.length; i++) {
+    for (let j = 0; j < cards.length; j++) {
+      if (i === j) continue;
+      const rest = [];
+      for (let k = 0; k < cards.length; k++) if (k !== i && k !== j) rest.push(cards[k]);
+      const a = cards[i];
+      const b = cards[j];
+      for (const op of OPS) {
+        const v = applyOp(a.value, b.value, op);
+        if (v === null || !Number.isInteger(v)) continue; // no-fraction paths only
+        const combined = { value: v, expr: `(${a.expr}${op}${b.expr})` };
+        const sub = solveCardsEasy([combined, ...rest]);
+        for (const s of sub) results.push(s);
+      }
+    }
+  }
+  return results;
+}
+
+/** A solution string reachable WITHOUT fractions, or null if none exists. */
+export function findEasySolution(numbers) {
+  const cards = numbers.map((n) => ({ value: n, expr: String(n) }));
+  for (const r of solveCardsEasy(cards)) {
+    if (Math.abs(r.value - TARGET) <= EPS) {
+      let e = r.expr;
+      if (e.startsWith('(') && e.endsWith(')')) e = e.slice(1, -1);
+      return e;
+    }
+  }
+  return null;
+}
+
+const HINT_OPS = { '+': '+', '-': '−', '*': '×', '/': '÷' };
+/** Extract a friendly "first move" hint (the first two-number combine) from a solution. */
+export function firstStepHint(expr) {
+  if (typeof expr !== 'string') return null;
+  const m = expr.match(/(\d+)\s*([+\-*/])\s*(\d+)/);
+  if (!m) return null;
+  return `${m[1]} ${HINT_OPS[m[2]] || m[2]} ${m[3]}`;
+}
+
+/**
+ * Generate a quad of integers 1..9 that is solvable, PREFERRING ones with a
+ * no-fractions solution (much easier to find). Returns { numbers, solution, hint }.
+ */
 export function generateDeal() {
+  // First pass: insist on an easy (no-fraction) solution.
+  for (let attempt = 0; attempt < 3000; attempt++) {
+    const nums = [];
+    for (let k = 0; k < 4; k++) nums.push(1 + Math.floor(Math.random() * 9));
+    const easy = findEasySolution(nums);
+    if (easy) return { numbers: nums, solution: easy, hint: firstStepHint(easy) };
+  }
+  // Fallback: any solvable quad (vanishingly rare to reach here).
   for (let attempt = 0; attempt < 2000; attempt++) {
     const nums = [];
     for (let k = 0; k < 4; k++) nums.push(1 + Math.floor(Math.random() * 9));
     const sol = findSolution(nums);
-    if (sol) return { numbers: nums, solution: sol };
+    if (sol) return { numbers: nums, solution: sol, hint: firstStepHint(sol) };
   }
-  // Deterministic fallback known to make 24 (4*6=24 via 4,6,1,1 -> 4*6*1*1).
+  // Deterministic last resort (6,4,1,1 -> 6*4*1*1).
   const nums = [6, 4, 1, 1];
-  return { numbers: nums, solution: findSolution(nums) || '6*4*1*1' };
+  const sol = findEasySolution(nums) || findSolution(nums) || '6*4*1*1';
+  return { numbers: nums, solution: sol, hint: firstStepHint(sol) };
 }
 
 /* ============================================================================
@@ -399,6 +459,10 @@ export class TwentyFour extends BaseGame {
     const deal = this._deal;
     const mine = this.solves[playerId] || null;
     const revealing = this.state === 'reveal' || this.state === 'finished';
+    // After HINT_DELAY_MS into a deal, an unsolved player may see a first-step hint
+    // (e.g. "6 × 4") — never the full solution, which only appears in reveal.
+    const hintReady = this.state === 'deal' && !mine && this.deadline
+      && (this.deadline - Date.now()) <= (DEAL_MS - HINT_DELAY_MS);
     return {
       phase: this.state,
       myId: playerId,
@@ -414,6 +478,7 @@ export class TwentyFour extends BaseGame {
       myGained: mine ? mine.gained : 0,
       myRank: mine ? mine.rank : null,
       myReject: this.state === 'deal' ? (this.lastReject[playerId] || null) : null,
+      hint: hintReady && deal ? (deal.hint || null) : null,
       solvedCount: Object.keys(this.solves).length,
       playerCount: this.players.length,
       deadline: (this.state === 'deal' || this.state === 'reveal') ? this.deadline : null,

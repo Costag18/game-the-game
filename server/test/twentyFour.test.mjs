@@ -140,7 +140,7 @@ test('barrier advances to reveal when ALL players have solved', () => {
 test('deal timer fires reveal on timeout and broadcasts', () => {
   const g = newGame(['a', 'b']);
   const before = g.emitCount;
-  advance(45_000); // DEAL_MS
+  advance(60_000); // DEAL_MS
   eq(g.state, 'reveal');
   assert(g.emitCount > before, 'broadcast on deal timeout');
   // reveal exposes the example solution + numbers now
@@ -172,7 +172,7 @@ function playFullGame(players, solverFn) {
       const sol = g._deal.solution;
       for (const p of g.players) solverFn(g, p, sol);
       // anyone who didn't solve: time out the deal
-      if (g.state === 'deal') advance(45_000);
+      if (g.state === 'deal') advance(60_000);
     } else if (g.state === 'reveal') {
       for (const p of g.players) g.handleAction(p, { type: 'acknowledge' });
     }

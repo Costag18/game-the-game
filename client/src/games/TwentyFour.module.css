@@ -67,6 +67,12 @@
 }
 .primaryBtn:disabled { opacity: 0.4; cursor: default; }
 .reject { color: #ff8a8a; font-size: 0.95rem; text-align: center; margin: 0; max-width: 440px; }
+.hint {
+  color: #ffd27a; font-size: 0.95rem; text-align: center; margin: 0; max-width: 440px;
+  background: rgba(180,140,40,0.16); border: 1px solid rgba(255,200,90,0.4);
+  border-radius: 10px; padding: 0.4rem 0.8rem;
+}
+.hint strong { color: #ffe6a8; font-variant-numeric: tabular-nums; }
 .sub { color: var(--text-secondary, #b8a88a); margin: 0; font-size: 0.9rem; }
 .waitMsg { font-size: 1.2rem; color: #4fd1c5; font-weight: 700; margin: 0; text-align: center; }
 .loading { color: var(--text-secondary, #b8a88a); padding-top: 3rem; }

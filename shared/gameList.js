@@ -636,9 +636,10 @@ export const GAMES = {
     turnTimer: TIMERS.CARD_GAME,
     description: 'Race to make 24 from four numbers using + − × ÷ and parentheses.',
     instructions: [
-      'Each deal shows the same four numbers (1–9) — a way to make 24 always exists.',
+      'Each deal shows the same four numbers (1–9) — always solvable WITHOUT fractions.',
       'Build an expression using each number exactly once that equals 24.',
       'Tap the number/operator pad or type it, then submit — the server checks your math.',
+      'Stuck? A first-step hint appears after ~15 seconds. You have 60s per deal.',
       'Faster correct answers score more; wrong tries don\'t lock you out.',
       'Highest total over 4 deals wins; ties share a placement.',
     ],

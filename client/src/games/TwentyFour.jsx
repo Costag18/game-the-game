@@ -69,7 +69,7 @@ export default function TwentyFourGame({ gameState, onAction, nicknames, avatars
   const {
     totalDeals, target = 24, numbers = [], scores = {}, myId,
     myExpr, myGained, myReject, solvedCount, playerCount,
-    acknowledged = [], reveal,
+    acknowledged = [], reveal, hint,
   } = gameState;
 
   const allPlayers = Object.keys(scores);
@@ -143,6 +143,7 @@ export default function TwentyFourGame({ gameState, onAction, nicknames, avatars
             </div>
             <button className={styles.primaryBtn} onClick={submit} disabled={!expr.trim()}>Submit = {target}</button>
             {myReject && <p className={styles.reject}>{REJECT_MSG[myReject] || 'Not quite — try again.'}</p>}
+            {hint && <p className={styles.hint}>💡 Stuck? Try starting with <strong>{hint}</strong></p>}
             <p className={styles.sub}>Solved so far: {solvedCount}/{playerCount}</p>
           </div>
         )

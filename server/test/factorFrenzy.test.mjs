@@ -102,7 +102,7 @@ test('window resolves early once every player has tapped all 12 cells', () => {
 test('window timeout resolves to reveal and broadcasts', () => {
   const g = newGame(['a', 'b']);
   const before = g.emitCount;
-  advance(7_500);
+  advance(9_000);
   eq(g.state, 'reveal');
   assert(g.emitCount > before, 'broadcast on window timeout');
   // reveal timeout advances to next window (or finished)
@@ -115,7 +115,7 @@ test('reveal exposes isDivisor; isDivisor hidden in plain window state', () => {
   const sWindow = g.getStateForPlayer('a');
   eq(sWindow.grid.every((c) => c.isDivisor === null), true);
   eq(sWindow.reveal, null);
-  advance(7_500);
+  advance(9_000);
   const sReveal = g.getStateForPlayer('a');
   eq(sReveal.phase, 'reveal');
   eq(sReveal.grid.every((c) => typeof c.isDivisor === 'boolean'), true);
@@ -135,7 +135,7 @@ for (const N of [2, 3, 4]) {
             if (g.grid[i].isDivisor) g.handleAction(p, { type: 'tap', index: i });
           }
         }
-        advance(7_500); // close the window via timer (not everyone cleared every cell)
+        advance(9_000); // close the window via timer (not everyone cleared every cell)
       } else if (g.state === 'reveal') {
         for (const p of players) g.handleAction(p, { type: 'acknowledge' });
       }
@@ -160,7 +160,7 @@ test('equal scores share a placement (tie handling)', () => {
           if (g.grid[i].isDivisor) g.handleAction(p, { type: 'tap', index: i });
         }
       }
-      advance(7_500);
+      advance(9_000);
     } else if (g.state === 'reveal') {
       for (const p of g.players) g.handleAction(p, { type: 'acknowledge' });
     }
@@ -186,7 +186,7 @@ test('removePlayer mid-window does not deadlock: leaver pruned, barrier re-check
 
 test('removePlayer mid-reveal advances once remaining acks present', () => {
   const g = newGame(['a', 'b', 'c']);
-  advance(7_500); // -> reveal
+  advance(9_000); // -> reveal
   eq(g.state, 'reveal');
   g.handleAction('a', { type: 'acknowledge' });
   g.handleAction('b', { type: 'acknowledge' });
