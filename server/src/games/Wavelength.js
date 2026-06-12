@@ -63,6 +63,7 @@ export class Wavelength extends BaseGame {
     this._clueTimer = null;
     this._guessTimer = null;
     this._revealTimer = null;
+    this._clueStartTime = 0;
     this._guessStartTime = 0;
   }
 
@@ -98,6 +99,7 @@ export class Wavelength extends BaseGame {
     this.guesses = {};
     this.acknowledged = new Set();
     this._clearTimers();
+    this._clueStartTime = Date.now();
     this._clueTimer = setTimeout(() => {
       if (this.state !== 'clue') return;
       this.clueText = '(no clue)';
@@ -296,6 +298,8 @@ export class Wavelength extends BaseGame {
       totalPoints: { ...this.totalPoints },
       lastReveal: isReveal ? this.lastReveal : null,
       acknowledged: [...this.acknowledged],
+      clueEndTime: this.state === 'clue' && this._clueStartTime ? this._clueStartTime + CLUE_MS : null,
+      guessEndTime: this.state === 'guessing' && this._guessStartTime ? this._guessStartTime + GUESS_MS : null,
       myId: pid,
     };
   }

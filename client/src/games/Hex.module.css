@@ -1,4 +1,4 @@
-.boardWrap { display: flex; flex-direction: column; align-items: center; gap: 0.55rem; width: 100%; max-width: 460px; }
+.boardWrap { display: flex; flex-direction: column; align-items: center; gap: 0.55rem; width: 100%; max-width: 460px; --hex-shift: 0.62rem; }
 
 .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem 1rem; font-size: 0.78rem; color: var(--text-secondary, #d8cdb6); }
 .legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
@@ -58,4 +58,16 @@
 @media (max-width: 560px) {
   .cell { width: 1.2rem; height: 1.2rem; }
   .frame { padding: 10px; }
+}
+
+/* Mobile portrait (~380px): scale the whole 11x11 parallelogram off the viewport
+   so the right-shifted bottom rows never clip. Cell + row-shift shrink together
+   (shift stays ~0.4x cell so the hexes keep interlocking). The frame sizes to the
+   board content and is centered, so nothing overflows the screen edge. */
+@media (max-width: 520px) {
+  .boardWrap { --hex-shift: min(2vw, 0.62rem); max-width: 100%; }
+  .cell { width: min(5vw, 1.55rem); height: min(5vw, 1.55rem); }
+  .row { gap: 1px; }
+  .frame { width: max-content; max-width: 100%; padding: 9px; margin: 0 auto; overflow: visible; }
+  .rhombus { width: max-content; }
 }

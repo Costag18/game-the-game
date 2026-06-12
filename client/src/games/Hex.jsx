@@ -62,7 +62,7 @@ function Board({ myMatch, myId, onAction }) {
 
         <div className={styles.rhombus}>
           {Array.from({ length: size }, (_, r) => (
-            <div key={r} className={styles.row} style={{ marginLeft: `${r * 0.62}rem` }}>
+            <div key={r} className={styles.row} style={{ marginLeft: `calc(${r} * var(--hex-shift, 0.62rem))` }}>
               {Array.from({ length: size }, (_, c) => {
                 const val = board[r] ? board[r][c] : null;
                 const color = colorOf(val);

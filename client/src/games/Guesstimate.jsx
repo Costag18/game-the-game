@@ -23,13 +23,17 @@ export default function GuesstimateGame({ gameState, onAction, nicknames, avatar
   const [iAcked, setIAcked] = useState(false);
   const [secs, setSecs] = useState(0);
   const prevPhase = useRef(null);
+  const draftRef = useRef('');
+  draftRef.current = draft; // keep the latest typed guess reachable from the countdown closure
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const deadline = gameState?.deadline;
+  const hasSubmitted = gameState?.hasSubmitted;
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'question') setDraft('');
+    if (phase === 'question') { setDraft(''); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
@@ -37,17 +41,26 @@ export default function GuesstimateGame({ gameState, onAction, nicknames, avatar
   // countdown to the active deadline
   useEffect(() => {
     if (!deadline) { setSecs(0); return; }
-    const tick = () => setSecs(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setSecs(rem);
+      // auto-submit the typed guess ~1s before the deadline so nothing is lost on timeout
+      if (phase === 'question' && rem <= 1 && !autoSubmitted.current && !hasSubmitted) {
+        autoSubmitted.current = true;
+        const v = Number(draftRef.current);
+        if (Number.isFinite(v) && v > 0) onAction({ type: 'submitGuess', value: v });
+      }
+    };
     tick();
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
-  }, [deadline]);
+  }, [deadline, phase, hasSubmitted, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Crunching numbers…</p></div>;
 
   const {
     qNumber, total, prompt, unit, scores = {}, myId,
-    hasSubmitted, submittedCount, playerCount, reveal, acknowledged = [],
+    submittedCount, playerCount, reveal, acknowledged = [],
   } = gameState;
 
   const allPlayers = Object.keys(scores);

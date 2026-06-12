@@ -160,7 +160,9 @@ const SMALL_BLIND = 10;
 const BIG_BLIND = 20;
 const HANDS_PER_GAME = 5;
 
-const REVEAL_DELAY_MS = 4000;
+// Reveal/showdown holds on a Continue button (acknowledge) so players can read the
+// result; this is just the AFK-safety auto-advance so an idle player can't deadlock.
+const REVEAL_SAFETY_MS = 45000;
 
 const FSM = {
   initialState: 'waiting',
@@ -192,6 +194,7 @@ export class Poker extends BaseGame {
     this._roundComplete = false;
     this.handNumber = 0;           // current hand (1-based once started)
     this.handResults = [];         // store result of each hand for display
+    this.acknowledged = new Set(); // players who pressed Continue on the current reveal
   }
 
   // -------------------------------------------------------------------------
@@ -298,6 +301,14 @@ export class Poker extends BaseGame {
   // -------------------------------------------------------------------------
 
   handleAction(playerId, action) {
+    // Reveal/showdown: players press Continue to advance once everyone present acks.
+    if (this.state === 'reveal' && action?.type === 'acknowledge') {
+      if (!this.players.includes(playerId)) return;
+      this.acknowledged.add(playerId);
+      this._checkRevealComplete();
+      return;
+    }
+
     const validStates = ['preflop', 'flop', 'turn', 'river'];
     if (!validStates.includes(this.state)) return;
     if (playerId !== this.currentTurnPlayer) return;
@@ -584,16 +595,25 @@ export class Poker extends BaseGame {
     });
 
     this.lastHandWinner = winnerName;
+    this.acknowledged = new Set();
     this.transition('reveal');
     this._emitChange();
 
-    // Auto-advance after reveal delay
+    // Hold on Continue; AFK-safety auto-advance only.
     this._revealTimer = setTimeout(() => {
       if (this.state === 'reveal') {
         this._finishHandOrGame();
         this._emitChange();
       }
-    }, REVEAL_DELAY_MS);
+    }, REVEAL_SAFETY_MS);
+  }
+
+  _checkRevealComplete() {
+    if (this.state !== 'reveal') return;
+    if (this.players.length > 0 && this.players.every((p) => this.acknowledged.has(p))) {
+      this._finishHandOrGame();
+      this._emitChange();
+    }
   }
 
   _forceFinish() {
@@ -612,6 +632,7 @@ export class Poker extends BaseGame {
     });
 
     this.lastHandWinner = winner;
+    this.acknowledged = new Set();
     this.transition('reveal');
     this._emitChange();
 
@@ -620,7 +641,7 @@ export class Poker extends BaseGame {
         this._finishHandOrGame();
         this._emitChange();
       }
-    }, REVEAL_DELAY_MS);
+    }, REVEAL_SAFETY_MS);
   }
 
   _finishHandOrGame() {
@@ -652,6 +673,11 @@ export class Poker extends BaseGame {
     // derives its active set from this.players (_activePlayers/_nonFoldedPlayers),
     // pruning alone removes them from contention and turn rotation.
     super.removePlayer(playerId);
+
+    // On the reveal barrier, drop the leaver's ack and re-check so a departed
+    // player can't block the Continue tally.
+    this.acknowledged.delete(playerId);
+    if (this.state === 'reveal') { this._checkRevealComplete(); return; }
 
     const bettingStates = ['preflop', 'flop', 'turn', 'river'];
     if (!bettingStates.includes(this.state)) return;
@@ -731,6 +757,10 @@ export class Poker extends BaseGame {
           )
         : {},
       lastHandWinner: ['reveal', 'finished'].includes(this.state) ? this.lastHandWinner : null,
+      // Reveal Continue/acknowledge barrier
+      myId: playerId,
+      allPlayers: [...this.players],
+      acknowledged: this.state === 'reveal' ? [...this.acknowledged] : [],
     };
   }
 

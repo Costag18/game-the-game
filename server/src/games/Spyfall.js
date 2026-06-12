@@ -7,7 +7,9 @@ const POINTS_GROUP = 500;
 const REVEAL_MS = 30_000;     // role-card ack window
 const VOTING_MS = 90_000;     // discussion + secret vote window
 const SPY_GUESS_MS = 25_000;  // spy picks a location
-const FINISHED_REVEAL_MS = 15_000; // results auto-advance (orchestration also acks)
+const FINISHED_REVEAL_MS = 50_000; // results SAFETY hold — players advance via Continue
+                                   // (acknowledge); this long no-countdown timer only guards
+                                   // against an AFK player deadlocking the rich outcome reveal
 
 /**
  * Spyfall — hidden-role social deduction. One SPY hides among players who all
@@ -46,6 +48,7 @@ export class Spyfall extends BaseGame {
     this.locationOptions = SPYFALL_LOCATIONS.map((l) => l.location); // public
 
     this.ready = new Set();      // reveal acks
+    this.finishedAcks = new Set(); // finished-reveal Continue acks
     this.votes = {};             // voterId -> suspectId (secret until finished)
     this.deadline = null;        // epoch-ms for the active phase timer
 
@@ -170,6 +173,7 @@ export class Spyfall extends BaseGame {
   // ---------- FINISHED / SCORE ----------
   onEnterFinished() {
     this._clearTimers();
+    this.finishedAcks = new Set();
     // Guard against double-scoring if we somehow re-enter.
     if (this.outcome) { this.deadline = null; return; }
 
@@ -205,7 +209,9 @@ export class Spyfall extends BaseGame {
     this.deadline = Date.now() + FINISHED_REVEAL_MS;
     this._finishTimer = setTimeout(() => {
       this._clearTimers();
-      this._emitChange();
+      // safety: an AFK player can't deadlock the reveal — force the barrier closed
+      for (const p of this.players) this.finishedAcks.add(p);
+      this._emitChange(); // isComplete() now true → orchestration ends the round
     }, FINISHED_REVEAL_MS);
   }
 
@@ -229,6 +235,11 @@ export class Spyfall extends BaseGame {
       if (!this.locationOptions.includes(loc)) return;
       this.spyGuess = loc;
       this._resolve();
+    } else if (this.state === 'finished' && type === 'acknowledge') {
+      this.finishedAcks.add(playerId);
+      // when everyone present has hit Continue, isComplete() flips true and the
+      // orchestration ends the round — broadcast so that check runs
+      this._emitChange();
     }
   }
 
@@ -245,11 +256,17 @@ export class Spyfall extends BaseGame {
     const wasSpy = playerId === this.spyId;
     super.removePlayer(playerId); // prunes this.players + activePlayers rotation
     this.ready.delete(playerId);
+    this.finishedAcks.delete(playerId); // can't wait on a gone player's Continue
     delete this.votes[playerId];   // drop their pending obligation
     delete this.scores[playerId];  // stop scoring the leaver
     delete this.roles[playerId];
 
-    if (this.state === 'finished') { this._emitChange(); return; }
+    if (this.state === 'finished') {
+      // a leaver can't block the Continue barrier; if everyone left present has
+      // already acked, isComplete() flips true on this emit and the round ends
+      this._emitChange();
+      return;
+    }
 
     if (this.players.length <= 1) {
       this._clearTimers();
@@ -258,6 +275,8 @@ export class Spyfall extends BaseGame {
       if (wasSpy) this.spyCaught = true;
       this.state = 'finished';
       this.onEnterFinished();
+      // a sole survivor shouldn't have to read+ack — end immediately
+      for (const p of this.players) this.finishedAcks.add(p);
       this._emitChange();
       return;
     }
@@ -269,6 +288,7 @@ export class Spyfall extends BaseGame {
       this.spyId = null;
       this.state = 'finished';
       this.onEnterFinished();
+      for (const p of this.players) this.finishedAcks.add(p);
       this._emitChange();
       return;
     }
@@ -314,10 +334,17 @@ export class Spyfall extends BaseGame {
 
       // ---- FINISHED: full disclosure ----
       outcome: finished ? this.outcome : null,
+      finishedAcks: finished ? [...this.finishedAcks] : [],
+      iAcked: this.finishedAcks.has(playerId),
     };
   }
 
-  isComplete() { return this.state === 'finished'; }
+  // The round only ends once everyone present has hit Continue on the outcome
+  // reveal (or the FINISHED_REVEAL_MS safety timer force-closed the barrier).
+  isComplete() {
+    return this.state === 'finished'
+      && this.players.every((p) => this.finishedAcks.has(p));
+  }
 
   getResults() {
     // Rank all present players by points DESC; ties share a placement (dense over

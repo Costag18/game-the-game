@@ -10,25 +10,39 @@ export default function PriceIsWrongGame({ gameState, onAction, nicknames, avata
   const [iAcked, setIAcked] = useState(false);
   const [secs, setSecs] = useState(null);
   const prevPhase = useRef(null);
+  const draftRef = useRef('');
+  draftRef.current = draft; // keep the latest typed guess reachable from the countdown closure
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const deadline = gameState?.deadline;
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'guessing') setDraft('');
+    if (phase === 'guessing') { setDraft(''); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
 
-  // countdown to the active guess deadline
+  // countdown to the active guess deadline (+ auto-submit the typed guess on timeout)
   useEffect(() => {
     if (phase !== 'guessing' || !deadline) { setSecs(null); return; }
-    const tick = () => setSecs(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setSecs(rem);
+      // ~1s before the deadline, lock in whatever's typed so a timeout never discards it
+      if (rem <= 1 && !autoSubmitted.current && !gameState?.hasSubmitted) {
+        const n = Number(String(draftRef.current).trim());
+        if (Number.isFinite(n) && n >= 0 && String(draftRef.current).trim() !== '') {
+          autoSubmitted.current = true;
+          onAction({ type: 'submitGuess', guess: n });
+        }
+      }
+    };
     tick();
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
-  }, [phase, deadline]);
+  }, [phase, deadline, onAction, gameState?.hasSubmitted]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Loading the showcase…</p></div>;
 

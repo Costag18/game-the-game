@@ -101,6 +101,8 @@ export class Fibbage extends BaseGame {
     this._writeTimer = null;
     this._voteTimer = null;
     this._revealTimer = null;
+    this._writeStartTime = 0;
+    this._voteStartTime = 0;
   }
 
   setOnStateChange(cb) { this._onStateChange = cb; }
@@ -121,6 +123,7 @@ export class Fibbage extends BaseGame {
     this.revealData = null;
     this.acknowledged = new Set();
     this._clearAllTimers();
+    this._writeStartTime = Date.now();
     this._writeTimer = setTimeout(() => {
       if (this.state !== 'writing') return;
       const used = new Set(Object.values(this.fakes).map((f) => f.toLowerCase()));
@@ -158,6 +161,7 @@ export class Fibbage extends BaseGame {
     this.ballot = shuffle(opts).map((o, i) => ({ optionId: `opt_${i}`, ...o }));
     this.votes = {};
     this._clearAllTimers();
+    this._voteStartTime = Date.now();
     this._voteTimer = setTimeout(() => {
       if (this.state !== 'voting') return;
       for (const p of this.players) if (this.votes[p] === undefined) this._autoVote(p);
@@ -295,6 +299,8 @@ export class Fibbage extends BaseGame {
       votedCount: Object.keys(this.votes).length,
       acknowledged: this.state === 'reveal' ? [...this.acknowledged] : [],
       reveal: (this.state === 'reveal' || this.state === 'finished') ? this.revealData : null,
+      writeEndTime: this.state === 'writing' && this._writeStartTime ? this._writeStartTime + WRITE_MS : null,
+      voteEndTime: this.state === 'voting' && this._voteStartTime ? this._voteStartTime + VOTE_MS : null,
     };
   }
 

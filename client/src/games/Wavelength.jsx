@@ -14,18 +14,57 @@ export default function Wavelength({ gameState, onAction, nicknames, avatars }) 
   const [marker, setMarker] = useState(50);
   const [clue, setClue] = useState('');
   const [iAcked, setIAcked] = useState(false);
+  const [remaining, setRemaining] = useState(null);
   const prevPhase = useRef(null);
+  // keep latest typed clue / slider position reachable from the countdown closure
+  const clueRef = useRef('');
+  const markerRef = useRef(50);
+  clueRef.current = clue;
+  markerRef.current = marker;
+  const clueAutoSubmitted = useRef(false);
+  const guessAutoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
 
   useEffect(() => {
     if (phase !== prevPhase.current) {
       if (phase === 'reveal') setIAcked(false);
-      if (phase === 'guessing') setMarker(50);
-      if (phase === 'clue') setClue('');
+      if (phase === 'guessing') { setMarker(50); guessAutoSubmitted.current = false; }
+      if (phase === 'clue') { setClue(''); clueAutoSubmitted.current = false; }
       prevPhase.current = phase;
     }
   }, [phase]);
+
+  // Countdown + auto-submit the typed clue / current slider value ~1s before the
+  // server deadline, so a player's input isn't discarded (or replaced by "(no clue)" / 50).
+  const amPsychicNow = gameState?.amPsychic;
+  const clueTextNow = gameState?.clueText;
+  const hasGuessedNow = gameState?.myGuess != null;
+  const clueEndTimeNow = gameState?.clueEndTime;
+  const guessEndTimeNow = gameState?.guessEndTime;
+  useEffect(() => {
+    const clueActive = phase === 'clue' && amPsychicNow && !clueTextNow && clueEndTimeNow;
+    const guessActive = phase === 'guessing' && !amPsychicNow && !hasGuessedNow && guessEndTimeNow;
+    if (!clueActive && !guessActive) { setRemaining(null); return; }
+    const endTime = clueActive ? clueEndTimeNow : guessEndTimeNow;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      setRemaining(rem);
+      if (rem <= 1) {
+        if (clueActive && !clueAutoSubmitted.current) {
+          clueAutoSubmitted.current = true;
+          const c = clueRef.current.trim();
+          if (c && !/^\d{1,3}$/.test(c)) onAction({ type: 'submitClue', clue: c });
+        } else if (guessActive && !guessAutoSubmitted.current) {
+          guessAutoSubmitted.current = true;
+          onAction({ type: 'guess', value: markerRef.current });
+        }
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [phase, amPsychicNow, hasGuessedNow, clueTextNow, clueEndTimeNow, guessEndTimeNow, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Tuning in…</p></div>;
 
@@ -33,6 +72,7 @@ export default function Wavelength({ gameState, onAction, nicknames, avatars }) 
     roundsPerGame, subRound, psychicId, amPsychic, spectrum = {}, clueText,
     targetCenter, targetWidth, myGuess, guesses, guessedIds = [],
     totalPoints = {}, lastReveal, acknowledged = [], myId,
+    clueEndTime, guessEndTime,
   } = gameState;
 
   const reveal = phase === 'reveal' || phase === 'finished';
@@ -65,6 +105,9 @@ export default function Wavelength({ gameState, onAction, nicknames, avatars }) 
           Sub-round {subRound}/{roundsPerGame} · Psychic:{' '}
           <PlayerName playerId={psychicId} nicknames={nicknames} avatars={avatars} />
         </span>
+        {remaining != null && (
+          <span className={`${styles.timer} ${remaining <= 10 ? styles.timerLow : ''}`}>{remaining}s</span>
+        )}
       </div>
 
       {clueText && <p className={styles.clue}>“{clueText}”</p>}

@@ -104,7 +104,7 @@ test('reveal timer auto-acks and advances to next question', () => {
   for (const p of g.players) g.handleAction(p, { type: 'submitYear', year: 1900 });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(6_000);
+  advance(50_000);
   eq(g.state, 'guessing');
   eq(g.qIndex, 1);
   assert(g.emitCount > before, 'broadcast on reveal timeout');
@@ -129,7 +129,7 @@ function runFullGame(players) {
       let off = 0;
       for (const p of g.players) { g.handleAction(p, { type: 'submitYear', year: g.event.year + off }); off += 5; }
     } else if (g.state === 'reveal') {
-      advance(6_000);
+      advance(50_000);
     }
   }
   return g;
@@ -158,7 +158,7 @@ test('a tie shares a placement', () => {
       // everyone guesses exactly right -> all tie at 1000/round
       for (const p of g.players) g.handleAction(p, { type: 'submitYear', year: g.event.year });
     } else if (g.state === 'reveal') {
-      advance(6_000);
+      advance(50_000);
     }
   }
   eq(g.state, 'finished');

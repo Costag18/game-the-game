@@ -24,6 +24,11 @@ export default function DefinitionDuelGame({ gameState, onAction, nicknames, ava
   const [rejected, setRejected] = useState(false);
   const submittedAt = useRef(0);
   const prevPhase = useRef(null);
+  const draftRef = useRef('');
+  draftRef.current = draft; // latest typed definition, reachable from the timeout effect
+  const pickRef = useRef(null);
+  pickRef.current = pick;   // latest chosen ballot option, reachable from the timeout effect
+  const autoSubmitted = useRef(false); // one auto-submit per timed step
 
   const phase = gameState?.phase;
   const hasSubmitted = gameState?.hasSubmitted;
@@ -32,11 +37,24 @@ export default function DefinitionDuelGame({ gameState, onAction, nicknames, ava
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'writing') { setDraft(''); setRejected(false); setPick(null); submittedAt.current = 0; }
-    if (phase === 'voting') setPick(null);
+    if (phase === 'writing') { setDraft(''); setRejected(false); setPick(null); submittedAt.current = 0; autoSubmitted.current = false; }
+    if (phase === 'voting') { setPick(null); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
+
+  // timeout safety net: auto-submit whatever's entered ~1s before each step's deadline
+  // (writing → send typed definition; voting → send the chosen option) so it isn't discarded
+  useEffect(() => {
+    if (secondsLeft > 1 || autoSubmitted.current) return;
+    if (phase === 'writing' && !hasSubmitted) {
+      const t = draftRef.current.trim();
+      if (t) { autoSubmitted.current = true; submittedAt.current = Date.now(); onAction({ type: 'submitFake', text: t }); }
+    } else if (phase === 'voting' && !myVote && pickRef.current) {
+      autoSubmitted.current = true;
+      onAction({ type: 'castVote', optionId: pickRef.current });
+    }
+  }, [secondsLeft, phase, hasSubmitted, myVote, onAction]);
 
   // if a submit didn't register within ~1.6s, it was rejected (matches truth / dup)
   useEffect(() => {

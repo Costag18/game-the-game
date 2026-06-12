@@ -2,7 +2,9 @@ import { BaseGame } from './BaseGame.js';
 import { shuffledQuantities } from '../utils/triviaBank.js';
 
 const ANSWER_MS = 15_000;  // window to call HIGHER/LOWER each step
-const REVEAL_MS = 6_000;   // reveal hold before the next step / finish
+const REVEAL_MS = 45_000;  // reveal SAFETY hold — players advance via Continue (acknowledge);
+                           // this long no-countdown timer only guards against an AFK player
+                           // deadlocking the step, so reading the outcome is never rushed
 const MAX_STEPS = 20;      // cap the run length (the bank has hundreds of quantities —
                            // each game draws a fresh shuffled subset, so variety stays high
                            // while a single game stays a tight survival sprint, not a slog)

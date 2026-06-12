@@ -40,11 +40,13 @@ export default function SpyfallGame({ gameState, onAction, nicknames, avatars })
     myId, players = [], isSpy, location, myRole, locationOptions = [],
     ready = [], myVote, hasVoted, votedCount, playerCount,
     iAmGuessing, spyGuessSubmitted, outcome,
+    finishedAcks = [], iAcked = false,
   } = gameState;
 
   function ready_() { if (!iReady) { setIReady(true); onAction({ type: 'ready' }); playSound('click'); } }
   function confirmVote() { if (!pick || hasVoted) return; onAction({ type: 'castVote', suspectId: pick }); playSound('voteCast'); }
   function confirmGuess() { if (!locPick || spyGuessSubmitted) return; onAction({ type: 'guessLocation', location: locPick }); playSound('click'); }
+  function ackFinished() { if (!iAcked) { onAction({ type: 'acknowledge' }); playSound('click'); } }
 
   return (
     <div className={styles.arena}>
@@ -179,6 +181,11 @@ export default function SpyfallGame({ gameState, onAction, nicknames, avatars })
               </div>
             ))}
           </div>
+
+          {!iAcked
+            ? <button className={styles.primaryBtn} onClick={ackFinished}>Continue →</button>
+            : <p className={styles.sub}>Waiting for everyone…</p>}
+          <AckStatus players={players} acknowledged={finishedAcks} me={myId} iActed={iAcked} nicknames={nicknames} avatars={avatars} />
         </div>
       )}
     </div>

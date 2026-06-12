@@ -146,7 +146,13 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
   const [acknowledged, setAcknowledged] = useState(false);
   const [lastAckedRound, setLastAckedRound] = useState(0);
   const [wheelDone, setWheelDone] = useState(false);
+  const [betRemaining, setBetRemaining] = useState(null);
   const wheelTimerRef = useRef(null);
+  // keep the latest pending bets reachable from the countdown closure
+  const pendingBetsRef = useRef([]);
+  pendingBetsRef.current = pendingBets;
+  const autoSubmitted = useRef(false);
+  const betRoundRef = useRef(-1);
 
   if (!gameState) {
     return (
@@ -166,6 +172,7 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
     otherPlayers,
     phase,
     history,
+    betEndTime,
   } = gameState;
 
   const isFinished = phase === 'finished';
@@ -184,6 +191,35 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
   useEffect(() => {
     if (isBetting) setWheelDone(false);
   }, [isBetting]);
+
+  // reset the auto-submit guard at the start of each betting round
+  useEffect(() => {
+    if (isBetting && round !== betRoundRef.current) {
+      betRoundRef.current = round;
+      autoSubmitted.current = false;
+    }
+  }, [isBetting, round]);
+
+  // Betting-phase countdown — auto-submit accumulated bets ~1s before the server
+  // deadline so nothing typed is discarded (and an idle player can't hang the round).
+  useEffect(() => {
+    if (!isBetting || !betEndTime || myBetSubmitted) { setBetRemaining(null); return; }
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((betEndTime - Date.now()) / 1000));
+      setBetRemaining(rem);
+      if (rem <= 1 && !autoSubmitted.current) {
+        autoSubmitted.current = true;
+        // Only the same submit the button uses — empty bets are left for the
+        // server timer to treat as no-bet (the server rejects empty bet arrays).
+        if (pendingBetsRef.current.length > 0) {
+          onAction({ type: 'bet', bets: pendingBetsRef.current });
+        }
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [isBetting, betEndTime, myBetSubmitted, onAction]);
 
   // Reset acknowledged state when round advances
   if (round !== lastAckedRound && isBetting) {
@@ -293,7 +329,12 @@ export default function Roulette({ gameState, onAction, currentPlayerId, nicknam
       {/* Betting area */}
       {isBetting && !myBetSubmitted && myChips > 0 && (
         <section className={styles.bettingSection}>
-          <h2 className={styles.sectionTitle}>Place Your Bets</h2>
+          <h2 className={styles.sectionTitle}>
+            Place Your Bets
+            {betRemaining != null && (
+              <span className={`${styles.betTimer} ${betRemaining <= 10 ? styles.betTimerLow : ''}`}>{betRemaining}s</span>
+            )}
+          </h2>
 
           {/* Chip amount selector */}
           <div className={styles.chipSelector}>

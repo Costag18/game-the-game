@@ -12,6 +12,16 @@ export default function QuiplashClashGame({ gameState, onAction, nicknames, avat
   const [remaining, setRemaining] = useState(null);
   const prevPhase = useRef(null);
   const prevDuel = useRef(null);
+  // mirror the latest local input so the countdown closure can auto-submit on timeout
+  const draftsRef = useRef({});
+  draftsRef.current = drafts;
+  const pickRef = useRef(null);
+  pickRef.current = pick;
+  const writeAutoSubmitted = useRef(false);   // guards the one-shot write auto-submit
+  const voteAutoSubmitted = useRef(false);     // guards the per-duel vote auto-submit
+  // current game state reachable from the countdown closure (which only depends on deadline)
+  const stateRef = useRef(gameState);
+  stateRef.current = gameState;
 
   const phase = gameState?.phase;
   const deadline = gameState?.deadline;
@@ -19,7 +29,7 @@ export default function QuiplashClashGame({ gameState, onAction, nicknames, avat
 
   useEffect(() => {
     if (phase !== prevPhase.current) {
-      if (phase === 'writing') { setDrafts({}); }
+      if (phase === 'writing') { setDrafts({}); writeAutoSubmitted.current = false; }
       if (phase === 'voting') { setPick(null); playSound('roundStart'); }
       if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
       prevPhase.current = phase;
@@ -30,18 +40,42 @@ export default function QuiplashClashGame({ gameState, onAction, nicknames, avat
   useEffect(() => {
     if (phase === 'voting' && duelIndex !== prevDuel.current) {
       setPick(null);
+      voteAutoSubmitted.current = false; // fresh duel → allow one auto-submit again
       prevDuel.current = duelIndex;
     }
   }, [phase, duelIndex]);
 
-  // countdown to the active deadline
+  // countdown to the active deadline (also auto-submits typed/selected input on timeout)
   useEffect(() => {
     if (!deadline) { setRemaining(null); return; }
-    const tick = () => setRemaining(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setRemaining(rem);
+      // ~1s before the server deadline, send whatever's entered so nothing is discarded
+      if (rem <= 1) {
+        const gs = stateRef.current;
+        if (gs?.phase === 'writing' && !writeAutoSubmitted.current) {
+          writeAutoSubmitted.current = true;
+          // lock every owed prompt that has non-empty text typed
+          for (const mp of (gs.myPrompts || [])) {
+            if (mp.myAnswer != null) continue; // already locked
+            const t = (draftsRef.current[mp.duelId] || '').trim();
+            if (t) onAction({ type: 'submitAnswer', duelId: mp.duelId, text: t });
+          }
+        } else if (gs?.phase === 'voting' && !voteAutoSubmitted.current) {
+          const d = gs.duel;
+          // only voters with a current selection and no vote yet need auto-submitting
+          if (d && !d.iAmAuthor && !d.myVote && pickRef.current) {
+            voteAutoSubmitted.current = true;
+            onAction({ type: 'castVote', optionId: pickRef.current });
+          }
+        }
+      }
+    };
     tick();
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
-  }, [deadline]);
+  }, [deadline, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Warming up the wits…</p></div>;
 

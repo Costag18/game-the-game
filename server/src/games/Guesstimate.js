@@ -3,7 +3,7 @@ import { pickNumericFacts } from '../utils/triviaBank.js';
 
 const TOTAL_ROUNDS = 5;
 const ANSWER_MS = 30_000;     // time to submit a guess each round
-const REVEAL_MS = 6_000;      // reveal auto-advance
+const REVEAL_MS = 45_000;     // reveal auto-advance SAFETY net — players advance via Continue; this only guards an AFK table
 const MAX_POINTS = 1000;      // a perfect (exact) guess
 
 /**

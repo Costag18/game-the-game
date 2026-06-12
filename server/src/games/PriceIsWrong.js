@@ -3,7 +3,7 @@ import { pickNumericFacts } from '../utils/triviaBank.js';
 
 const TOTAL_ROUNDS = 5;
 const GUESS_MS = 25_000;       // window to lock a guess each round
-const REVEAL_MS = 6_000;       // reveal display before auto-advancing
+const REVEAL_MS = 50_000;      // reveal SAFETY auto-advance (no visible countdown) — Continue gates normally
 // Closest-without-going-over payout ladder (by rank among non-over guesses).
 const PAYOUTS = [1000, 700, 500];
 const PAYOUT_REST = 200;       // 4th-closest and beyond (still under) all get this

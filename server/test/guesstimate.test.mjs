@@ -99,7 +99,7 @@ test('reveal auto-advances to the next question / finished and broadcasts', () =
   g.handleAction('b', { type: 'submitGuess', value: 5 });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(6_000);
+  advance(45_000);
   assert(g.state === 'question' || g.state === 'finished', `advanced (got ${g.state})`);
   assert(g.emitCount > before, 'broadcast on reveal timeout');
 });

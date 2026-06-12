@@ -43,6 +43,9 @@ export default function TelephonePictionary({ gameState, onAction, nicknames, av
   const [draft, setDraft] = useState('');
   const stepKey = useRef(null);
   const prevReveal = useRef(-1);
+  const draftRef = useRef('');
+  draftRef.current = draft; // latest typed text, reachable from the countdown closure
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const stepIndex = gameState?.stepIndex;
@@ -51,7 +54,7 @@ export default function TelephonePictionary({ gameState, onAction, nicknames, av
   // reset the private canvas + draft on each new step
   useEffect(() => {
     const key = `${phase}:${stepIndex}:${myChainId}`;
-    if (key !== stepKey.current) { setStrokes([]); setDraft(''); stepKey.current = key; }
+    if (key !== stepKey.current) { setStrokes([]); setDraft(''); autoSubmitted.current = false; stepKey.current = key; }
   }, [phase, stepIndex, myChainId]);
 
   // private stroke echoes (author-only) for the draw step
@@ -70,6 +73,37 @@ export default function TelephonePictionary({ gameState, onAction, nicknames, av
     const idx = gameState?.reveal?.index;
     if (idx != null && idx !== prevReveal.current) { playSound('cardDeal'); prevReveal.current = idx; }
   }, [gameState?.reveal?.index, playSound]);
+
+  // auto-submit the current work ~1.5s before the deadline so a timeout never
+  // discards a player's typed phrase/guess or their drawing. Each timed step
+  // (writing / step-draw / step-write) is covered; resets per step via autoSubmitted.
+  const gsPhase = gameState?.phase;
+  const gsStepMode = gameState?.stepMode;
+  const gsDeadline = gameState?.deadline;
+  const gsSubmitted = gameState?.mySubmitted;
+  useEffect(() => {
+    const timed = gsPhase === 'writing' || gsPhase === 'step';
+    if (!timed || !gsDeadline) return;
+    const tick = () => {
+      if (autoSubmitted.current || gsSubmitted) return;
+      const rem = Math.max(0, Math.ceil((gsDeadline - Date.now()) / 1000));
+      if (rem > 1) return;
+      autoSubmitted.current = true;
+      if (gsPhase === 'writing') {
+        const t = String(draftRef.current).trim();
+        if (t) onAction({ type: 'submitPhrase', text: t });
+      } else if (gsStepMode === 'write') {
+        const t = String(draftRef.current).trim();
+        if (t) onAction({ type: 'submitWrite', text: t });
+      } else if (gsStepMode === 'draw') {
+        // submit whatever's on the private canvas (server snapshots it server-side)
+        onAction({ type: 'submitDraw' });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 300);
+    return () => clearInterval(id);
+  }, [gsPhase, gsStepMode, gsDeadline, gsSubmitted, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Setting up chains…</p></div>;
 

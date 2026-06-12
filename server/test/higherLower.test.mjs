@@ -162,7 +162,7 @@ test('collapse to one finishes; destroy clears timers', () => {
 
 // The engine's private timer constants, mirrored here for advancing the virtual clock.
 function ANSWER_TIMEOUT() { return 15_000; }
-function REVEAL_TIMEOUT() { return 6_000; }
+function REVEAL_TIMEOUT() { return 45_000; }
 
 uninstallClock();
 report('HigherLower');

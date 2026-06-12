@@ -21,18 +21,38 @@ export default function TimelineGame({ gameState, onAction, nicknames, avatars }
   const [year, setYear] = useState(1900);
   const [iAcked, setIAcked] = useState(false);
   const prevPhase = useRef(null);
+  const yearRef = useRef(1900);
+  yearRef.current = year; // keep the latest typed/slider year reachable from the countdown closure
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const locked = gameState?.locked;
   const deadline = gameState?.deadline;
-  const secs = useCountdown(deadline);
+  // only run a visible countdown during the guessing window; the reveal's long
+  // safety timer must NOT show a countdown.
+  const secs = useCountdown(phase === 'guessing' ? deadline : null);
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'guessing') setYear(1900);
+    if (phase === 'guessing') { setYear(1900); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
+
+  // auto-submit the current year ~1s before the deadline so a timeout never discards it
+  useEffect(() => {
+    if (phase !== 'guessing' || !deadline) return;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      if (rem <= 1 && !autoSubmitted.current && !gameState?.locked) {
+        autoSubmitted.current = true;
+        onAction({ type: 'submitYear', year: yearRef.current });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [phase, deadline, onAction, gameState?.locked]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Loading the timeline…</p></div>;
 

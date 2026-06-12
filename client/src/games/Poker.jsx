@@ -4,6 +4,7 @@ import { displayName } from '../utils/displayName.js';
 import { useScreenShake } from '../hooks/useScreenShake.js';
 import { useSound } from '../context/SoundContext.jsx';
 import PlayerName from '../components/PlayerName.jsx';
+import AckStatus from '../components/AckStatus.jsx';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -72,8 +73,10 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
   const shake = useScreenShake();
   const { playSound } = useSound();
   const [raiseAmount, setRaiseAmount] = useState('');
+  const [iAcked, setIAcked] = useState(false);
   const prevCommunityCount = useRef(0);
   const prevHoleCount = useRef(0);
+  const ackedHand = useRef(-1);
 
   if (!gameState) {
     return (
@@ -99,10 +102,30 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
     handNumber = 1,
     totalHands = 3,
     handResults = [],
+    myId,
+    allPlayers = [],
+    acknowledged = [],
   } = gameState;
 
-  const iAmFolded = folded && folded.includes(playerId);
+  const me = myId ?? playerId;
+
+  const iAmFolded = folded && folded.includes(me);
   const isActive = ['preflop', 'flop', 'turn', 'river'].includes(phase);
+
+  // Reset the local "acknowledged" flag whenever a new reveal/hand begins.
+  useEffect(() => {
+    if (phase === 'reveal' && ackedHand.current !== handNumber) {
+      setIAcked(false);
+      ackedHand.current = handNumber;
+    }
+    if (phase !== 'reveal') ackedHand.current = -1;
+  }, [phase, handNumber]);
+
+  function handleAck() {
+    if (iAcked) return;
+    setIAcked(true);
+    onAction({ type: 'acknowledge' });
+  }
 
   // Track card counts for deal animation
   const communityCount = (communityCards || []).length;
@@ -309,6 +332,23 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Reveal: hold on Continue so the showdown can be read */}
+        {isReveal && (
+          <div className={styles.continueArea}>
+            {!iAcked && (
+              <button className={styles.continueBtn} onClick={handleAck}>Continue →</button>
+            )}
+            <AckStatus
+              players={allPlayers}
+              acknowledged={acknowledged}
+              me={me}
+              iActed={iAcked}
+              nicknames={nicknames}
+              avatars={avatars}
+            />
           </div>
         )}
       </section>

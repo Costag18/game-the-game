@@ -40,3 +40,11 @@
 .xMark { color: #ff6b6b; }
 .oMark { color: #5fb0e8; }
 .dMark { color: var(--text-secondary, #777); }
+
+/* Mobile portrait (~380px): widen the grid so the 9x9 of inner cells stay
+   comfortably tappable (>=32px), and add bottom room so the board clears the
+   46px fixed StockTicker. */
+@media (max-width: 520px) {
+  .metaGrid { max-width: min(96vw, 420px); margin: 0 auto 50px; }
+  .cell { font-size: clamp(0.9rem, 4.5vw, 1.3rem); }
+}

@@ -3,7 +3,7 @@ import { pickEvents } from '../utils/triviaBank.js';
 
 const TOTAL_ROUNDS  = 6;
 const GUESS_MS      = 30_000;  // window to lock a year guess
-const REVEAL_MS     = 6_000;   // reveal auto-advance
+const REVEAL_MS     = 50_000;  // reveal SAFETY auto-advance (no visible countdown) — Continue gates normally
 const YEAR_MIN      = -4000;   // bank spans deep antiquity (the wheel ~3500 BC) to today —
 const YEAR_MAX      = 2100;    // the slider must REACH every event or exact guesses can't score
 const POINTS_PER_YR = 20;      // points lost per year of distance

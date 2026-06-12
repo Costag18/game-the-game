@@ -1,8 +1,10 @@
 import { BaseGame } from './BaseGame.js';
+import { TIMERS } from '../../../shared/constants.js';
 
 const RED_NUMBERS = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
 const TOTAL_ROUNDS = 5;
 const SPIN_ACK_TIMER_MS = 10000;
+const BET_TIMER_MS = TIMERS.ROULETTE * 1000; // 60s betting window before auto-spin
 
 export class Roulette extends BaseGame {
   constructor(players) {
@@ -23,10 +25,34 @@ export class Roulette extends BaseGame {
     this.history = [];     // array of { round, result, payouts }
     this.acknowledged = new Set();
     this._spinAckTimer = null;
+    this._betTimer = null;
+    this._betStartTime = 0;
   }
 
   setOnStateChange(cb) { this._onStateChange = cb; }
   _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
+
+  /**
+   * Arm the betting-phase timer. The spin only fires once every non-broke player
+   * submits, so without this a single idle player would hang the round forever.
+   * On expiry we spin with whatever bets came in (non-submitters = no bet).
+   */
+  _startBetTimer() {
+    if (this._betTimer) clearTimeout(this._betTimer);
+    this._betStartTime = Date.now();
+    this._betTimer = setTimeout(() => {
+      if (this.state !== 'betting') return;
+      // Treat anyone who never submitted as having placed no bet.
+      for (const p of this.players) {
+        if (!this.betSubmitted[p]) {
+          this.bets[p] = [];
+          this.betSubmitted[p] = true;
+        }
+      }
+      this._spin();
+      this._emitChange();
+    }, BET_TIMER_MS);
+  }
 
   /** Auto-advance the spinning/acknowledge phase if a player never clicks through. */
   _startSpinAckTimer() {
@@ -76,6 +102,10 @@ export class Roulette extends BaseGame {
     const allSubmitted = this.players.every((p) => this.betSubmitted[p]);
     if (allSubmitted) {
       this._spin();
+    } else if (this.state === 'betting') {
+      // Some players still need to bet — arm the betting-phase deadline so an
+      // idle player can't hang the round.
+      this._startBetTimer();
     }
   }
 
@@ -127,6 +157,7 @@ export class Roulette extends BaseGame {
   }
 
   _spin() {
+    if (this._betTimer) { clearTimeout(this._betTimer); this._betTimer = null; }
     this.transition('spin');
     this.spinResult = Math.floor(Math.random() * 37); // 0–36
     const result = this.spinResult;
@@ -233,6 +264,8 @@ export class Roulette extends BaseGame {
       otherPlayers,
       phase: this.state,
       history: this.history,
+      betEndTime: this.state === 'betting' && this._betStartTime
+        ? this._betStartTime + BET_TIMER_MS : null,
     };
   }
 
@@ -241,6 +274,7 @@ export class Roulette extends BaseGame {
     this.players = this.players.filter((p) => p !== playerId);
     if (this.players.length <= 1) {
       if (this._spinAckTimer) { clearTimeout(this._spinAckTimer); this._spinAckTimer = null; }
+      if (this._betTimer) { clearTimeout(this._betTimer); this._betTimer = null; }
       this.state = 'finished';
       return;
     }
@@ -264,6 +298,7 @@ export class Roulette extends BaseGame {
 
   destroy() {
     if (this._spinAckTimer) { clearTimeout(this._spinAckTimer); this._spinAckTimer = null; }
+    if (this._betTimer) { clearTimeout(this._betTimer); this._betTimer = null; }
   }
 
   getResults() {

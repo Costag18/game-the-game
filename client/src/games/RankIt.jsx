@@ -11,10 +11,13 @@ export default function RankItGame({ gameState, onAction, nicknames, avatars }) 
   const [iAcked, setIAcked] = useState(false);
   const [remaining, setRemaining] = useState(0);
   const prevPhase = useRef(null);
+  const orderRef = useRef([]);
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const locked = gameState?.locked;
   const items = gameState?.items;
+  orderRef.current = order; // keep the latest working order reachable from the countdown closure
 
   // (re)seed the local order whenever a new ranking round's items arrive
   useEffect(() => {
@@ -27,7 +30,7 @@ export default function RankItGame({ gameState, onAction, nicknames, avatars }) 
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'ranking') { setSelected(null); }
+    if (phase === 'ranking') { setSelected(null); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
@@ -36,11 +39,19 @@ export default function RankItGame({ gameState, onAction, nicknames, avatars }) 
   const deadline = gameState?.deadline;
   useEffect(() => {
     if (phase !== 'ranking' || !deadline) { setRemaining(0); return; }
-    const tick = () => setRemaining(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setRemaining(rem);
+      // auto-submit the current working order ~1s before the deadline so it isn't discarded
+      if (rem <= 1 && !autoSubmitted.current && !locked && orderRef.current.length) {
+        autoSubmitted.current = true;
+        onAction({ type: 'submitOrder', order: orderRef.current });
+      }
+    };
     tick();
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
-  }, [phase, deadline]);
+  }, [phase, deadline, locked, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Lining things up…</p></div>;
 

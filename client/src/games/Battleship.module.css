@@ -383,3 +383,43 @@
     width: 28px;
   }
 }
+
+/* Mobile portrait (~380px): keep tap targets >= 30px, prevent the 10x10 board
+   from overflowing the narrow viewport, and clear the 46px fixed StockTicker. */
+@media (max-width: 520px) {
+  .table {
+    padding: 1rem 0.4rem;
+    /* the two boards stack here — small buffer on top of the .gameMainArea
+       wrapper's 46px reserve so the lower board never butts the StockTicker */
+    padding-bottom: 24px;
+  }
+
+  /* 32px cells -> row = 22 (gutter) + 10*32 = 342px, fits a 380px viewport */
+  .cell {
+    width: 32px;
+    height: 32px;
+  }
+
+  .headerCell {
+    width: 32px;
+    height: 18px;
+  }
+
+  .cornerCell,
+  .rowHeader {
+    width: 22px;
+  }
+
+  .rowHeader {
+    height: 32px;
+  }
+
+  /* never let a board push the page sideways */
+  .gridContainer {
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: 1.35rem;
+  }
+}

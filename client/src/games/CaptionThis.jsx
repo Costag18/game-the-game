@@ -60,14 +60,44 @@ export default function CaptionThisGame({ gameState, onAction, nicknames, avatar
   const phase = gameState?.phase;
   const hasSubmitted = gameState?.hasSubmitted;
   const myVote = gameState?.myVote;
+  const activeDeadline = gameState?.deadline;
+
+  // mirror the latest local input + flags so the timeout closure can auto-submit it
+  const draftRef = useRef('');
+  draftRef.current = draft;
+  const pickRef = useRef(null);
+  pickRef.current = pick;
+  const autoSubmitted = useRef(false); // one-shot per timed input phase
+  const submittedFlag = hasSubmitted;
+  const votedFlag = myVote;
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'writing') setDraft('');
-    if (phase === 'voting') setPick(null);
+    if (phase === 'writing') { setDraft(''); autoSubmitted.current = false; }
+    if (phase === 'voting') { setPick(null); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
+
+  // On timeout, auto-submit whatever's entered (~1s before the server deadline) so
+  // a typed caption / selected vote isn't discarded in favour of a house substitute.
+  useEffect(() => {
+    if (!activeDeadline || (phase !== 'writing' && phase !== 'voting')) return undefined;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((activeDeadline - Date.now()) / 1000));
+      if (rem > 1 || autoSubmitted.current) return;
+      if (phase === 'writing' && !submittedFlag) {
+        const t = draftRef.current.trim();
+        if (t) { autoSubmitted.current = true; onAction({ type: 'submitCaption', text: t }); }
+      } else if (phase === 'voting' && !votedFlag && pickRef.current) {
+        autoSubmitted.current = true;
+        onAction({ type: 'castVote', optionId: pickRef.current });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [activeDeadline, phase, submittedFlag, votedFlag, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Loading the gallery…</p></div>;
 

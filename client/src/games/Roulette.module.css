@@ -179,6 +179,30 @@
   text-align: center;
 }
 
+.betTimer {
+  display: inline-block;
+  margin-left: 0.6rem;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: #f5e6c8;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(212, 168, 67, 0.5);
+  border-radius: 6px;
+  padding: 0.1rem 0.5rem;
+  vertical-align: middle;
+}
+
+.betTimerLow {
+  color: #ff5252;
+  border-color: rgba(255, 82, 82, 0.7);
+  animation: betTimerPulse 1s ease-in-out infinite;
+}
+
+@keyframes betTimerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
 /* Chip selector */
 .chipSelector {
   display: flex;

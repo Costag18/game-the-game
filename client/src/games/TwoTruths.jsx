@@ -12,28 +12,55 @@ export default function TwoTruthsGame({ gameState, onAction, nicknames, avatars 
   const [iAcked, setIAcked] = useState(false);
   const [remaining, setRemaining] = useState(null);
   const prevPhase = useRef(null);
+  const autoSubmitted = useRef(false);
+  // keep the latest local input reachable from the countdown closure
+  const draftsRef = useRef(['', '', '']);
+  draftsRef.current = drafts;
+  const lieIdxRef = useRef(null);
+  lieIdxRef.current = lieIdx;
+  const pickRef = useRef(null);
+  pickRef.current = pick;
 
   const phase = gameState?.phase;
   const deadline = gameState?.deadline;
   const hasSubmitted = gameState?.hasSubmitted;
   const myGuess = gameState?.myGuess;
+  const iAmStorytellerRaw = gameState?.iAmStoryteller;
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'writing') { setDrafts(['', '', '']); setLieIdx(null); playSound('roundStart'); }
-    if (phase === 'guessing') { setPick(null); playSound('voteCast'); }
+    if (phase === 'writing') { setDrafts(['', '', '']); setLieIdx(null); autoSubmitted.current = false; playSound('roundStart'); }
+    if (phase === 'guessing') { setPick(null); autoSubmitted.current = false; playSound('voteCast'); }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
 
-  // countdown to the active phase deadline
+  // countdown to the active phase deadline + auto-submit current input ~1s before
+  // the deadline so a typed/selected answer is never discarded on timeout.
   useEffect(() => {
     if (!deadline) { setRemaining(null); return; }
-    const tick = () => setRemaining(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setRemaining(rem);
+      if (rem <= 1 && !autoSubmitted.current) {
+        if (phase === 'writing' && iAmStorytellerRaw && !hasSubmitted) {
+          const texts = draftsRef.current.map((d) => d.trim());
+          if (texts.every((t) => t) && lieIdxRef.current != null) {
+            autoSubmitted.current = true;
+            onAction({ type: 'submitStatements', statements: texts, lieIndex: lieIdxRef.current });
+          }
+        } else if (phase === 'guessing' && !iAmStorytellerRaw && !myGuess) {
+          if (pickRef.current) {
+            autoSubmitted.current = true;
+            onAction({ type: 'guess', optionId: pickRef.current });
+          }
+        }
+      }
+    };
     tick();
-    const id = setInterval(tick, 250);
+    const id = setInterval(tick, 200);
     return () => clearInterval(id);
-  }, [deadline]);
+  }, [deadline, phase, iAmStorytellerRaw, hasSubmitted, myGuess, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Cooking up some lies…</p></div>;
 

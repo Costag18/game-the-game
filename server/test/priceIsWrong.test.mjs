@@ -47,6 +47,7 @@ test('guesses are private until reveal (no opponent guess leaks)', () => {
 
 test('closest-without-over scoring ladder + over scores 0', () => {
   const g = newGame(['a', 'b', 'c', 'd', 'e']);
+  g.fact = { ...g.fact, answer: 1000 }; // force a large answer so the ans-1/-2/-3 ladder stays positive
   const ans = g.fact.answer;
   // a closest under, b next, c third, d fourth (rest=200), e over (0)
   g.handleAction('a', { type: 'submitGuess', guess: ans });        // exact -> diff 0
@@ -86,7 +87,7 @@ test('reveal timer auto-acks and advances to next round / finished', () => {
   for (const p of g.players) g.handleAction(p, { type: 'submitGuess', guess: 1 });
   eq(g.state, 'reveal');
   const before = g.emitCount;
-  advance(6_000);
+  advance(50_000);
   assert(g.state === 'guessing' || g.state === 'finished', `advanced (got ${g.state})`);
   assert(g.emitCount > before, 'broadcast on reveal timeout');
 });

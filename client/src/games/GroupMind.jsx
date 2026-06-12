@@ -21,17 +21,36 @@ export default function GroupMindGame({ gameState, onAction, nicknames, avatars 
   const [draft, setDraft] = useState('');
   const [iAcked, setIAcked] = useState(false);
   const prevPhase = useRef(null);
+  const draftRef = useRef('');
+  draftRef.current = draft; // keep the latest draft reachable from the countdown closure
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const hasSubmitted = gameState?.hasSubmitted;
-  const secs = useCountdown(gameState?.deadline);
+  const deadline = gameState?.deadline;
+  const secs = useCountdown(deadline);
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'writing') setDraft('');
+    if (phase === 'writing') { setDraft(''); autoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
+
+  // auto-submit whatever's typed ~1s before the writing deadline so input isn't lost on timeout
+  useEffect(() => {
+    if (phase !== 'writing' || !deadline) return;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      if (rem <= 1 && !autoSubmitted.current && !hasSubmitted) {
+        const t = draftRef.current.trim();
+        if (t) { autoSubmitted.current = true; onAction({ type: 'submitAnswer', text: t }); }
+      }
+    };
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [phase, deadline, hasSubmitted, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Reading the room…</p></div>;
 

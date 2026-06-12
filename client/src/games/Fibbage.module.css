@@ -11,6 +11,17 @@
 .head { display: flex; align-items: baseline; gap: 0.8rem; }
 .title { font-family: 'Shrikhand', 'Fredoka', cursive; font-size: clamp(1.8rem, 5vw, 2.6rem); color: #ff5e7e; margin: 0; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
 .round { color: var(--text-secondary, #b8a88a); font-weight: 700; }
+.timer {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #ffd36b;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 211, 107, 0.5);
+  border-radius: 6px;
+  padding: 0.1rem 0.55rem;
+}
+.timerLow { color: #ff5252; border-color: rgba(255, 82, 82, 0.7); animation: fbTimerPulse 1s ease-in-out infinite; }
+@keyframes fbTimerPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 
 .prompt {
   font-size: clamp(1.1rem, 3vw, 1.5rem); line-height: 1.4; text-align: center;

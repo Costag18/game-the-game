@@ -10,8 +10,16 @@ export default function Fibbage({ gameState, onAction, nicknames, avatars }) {
   const [pick, setPick] = useState(null);
   const [iAcked, setIAcked] = useState(false);
   const [rejected, setRejected] = useState(false);
+  const [remaining, setRemaining] = useState(null);
   const submittedAt = useRef(0);
   const prevPhase = useRef(null);
+  // keep latest typed fib / selected vote reachable from the countdown closure
+  const draftRef = useRef('');
+  const pickRef = useRef(null);
+  draftRef.current = draft;
+  pickRef.current = pick;
+  const writeAutoSubmitted = useRef(false);
+  const voteAutoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
   const hasSubmitted = gameState?.hasSubmitted;
@@ -19,8 +27,8 @@ export default function Fibbage({ gameState, onAction, nicknames, avatars }) {
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
-    if (phase === 'writing') { setDraft(''); setRejected(false); submittedAt.current = 0; }
-    if (phase === 'voting') setPick(null);
+    if (phase === 'writing') { setDraft(''); setRejected(false); submittedAt.current = 0; writeAutoSubmitted.current = false; }
+    if (phase === 'voting') { setPick(null); voteAutoSubmitted.current = false; }
     if (phase === 'reveal') { setIAcked(false); playSound('voteCast'); }
     prevPhase.current = phase;
   }, [phase, playSound]);
@@ -32,6 +40,34 @@ export default function Fibbage({ gameState, onAction, nicknames, avatars }) {
     const id = setTimeout(() => { if (!hasSubmitted) setRejected(true); }, 1600);
     return () => clearTimeout(id);
   }, [hasSubmitted, draft]);
+
+  // Countdown + auto-submit the typed fib / selected vote ~1s before the server
+  // deadline so a player's input beats the house substitute (decoy fake / random vote).
+  const writeEndTime = gameState?.writeEndTime;
+  const voteEndTime = gameState?.voteEndTime;
+  useEffect(() => {
+    const writeActive = phase === 'writing' && !hasSubmitted && writeEndTime;
+    const voteActive = phase === 'voting' && !myVote && voteEndTime;
+    if (!writeActive && !voteActive) { setRemaining(null); return; }
+    const endTime = writeActive ? writeEndTime : voteEndTime;
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((endTime - Date.now()) / 1000));
+      setRemaining(rem);
+      if (rem <= 1) {
+        if (writeActive && !writeAutoSubmitted.current) {
+          writeAutoSubmitted.current = true;
+          const t = draftRef.current.trim();
+          if (t) { submittedAt.current = Date.now(); onAction({ type: 'submitFake', text: t }); }
+        } else if (voteActive && !voteAutoSubmitted.current) {
+          voteAutoSubmitted.current = true;
+          if (pickRef.current) onAction({ type: 'castVote', optionId: pickRef.current });
+        }
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [phase, hasSubmitted, myVote, writeEndTime, voteEndTime, onAction]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Thinking up lies…</p></div>;
 
@@ -62,6 +98,9 @@ export default function Fibbage({ gameState, onAction, nicknames, avatars }) {
       <div className={styles.head}>
         <h1 className={styles.title}>FIBBAGE</h1>
         <span className={styles.round}>Q{promptNumber} / {totalRounds}</span>
+        {remaining != null && (
+          <span className={`${styles.timer} ${remaining <= 10 ? styles.timerLow : ''}`}>{remaining}s</span>
+        )}
       </div>
 
       {phase !== 'finished' && <p className={styles.prompt}>{promptText.replace('____', '_____')}</p>}
