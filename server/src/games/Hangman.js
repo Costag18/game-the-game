@@ -64,6 +64,10 @@ export class Hangman extends BaseGame {
   }
 
   _endRound() {
+    // Guard against double-entry: a round can end via handleAction AND then again
+    // via removePlayer (all-eliminated) inside the 4s reveal window — without this,
+    // scores get added twice and a second reveal timer races the first.
+    if (this.showingWord) return;
     // Score: word guesser gets 3 pts, survivors get 2 pts minus wrongCount/3, eliminated get 0
     for (const p of this.players) {
       if (p === this.wordGuessWinner) {

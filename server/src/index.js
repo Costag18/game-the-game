@@ -999,9 +999,9 @@ io.on(EVENTS.CONNECTION, (socket) => {
     if (action === 'cross') {
       game.step++;
       if (game.step >= game.crashStep) {
-        // Hit! Lose wager
+        // Hit! Lose wager (clamp to 0 — negative scores break wager validation)
         game.alive = false;
-        tm.scores[socket.id] -= game.wager;
+        adjustScore(tm, socket.id, -game.wager);
         socket.emit(EVENTS.CHICKEN_RESULT, {
           phase: 'finished', step: game.step, multiplier: 0,
           wager: game.wager, net: -game.wager, alive: false,

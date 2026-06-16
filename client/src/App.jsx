@@ -215,13 +215,18 @@ function GameRouter() {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on(EVENTS.ROUND_START, () => { setScreen('gameVote'); playSound('roundStart'); });
-    socket.on(EVENTS.VOTE_RESULT, () => { setScreen('wagerPhase'); });
-    socket.on(EVENTS.WAGER_LOCKED, () => { setScreen('loadingGame'); playSound('wagerLock'); });
-    socket.on(EVENTS.GAME_STATE, () => setScreen((prev) => prev === 'loadingGame' ? 'playing' : prev));
-    socket.on(EVENTS.ROUND_RESULTS, () => setScreen('roundResults'));
-    socket.on(EVENTS.RETURN_TO_LOBBY, () => { setScreen('waitingRoom'); tournament.clearRoundResults(); });
-    socket.on(EVENTS.TOURNAMENT_END, (data) => {
+    // NAMED handlers removed by reference. This effect re-runs whenever playSound's
+    // identity changes (i.e. on every mute toggle); a bare socket.off(event) would
+    // then strip ALL listeners for that event on the shared socket — including
+    // useTournament's setGameState/setRoundResults/etc — and they would never be
+    // re-added (that effect's deps are [socket], unchanged), freezing the game.
+    const onRoundStart = () => { setScreen('gameVote'); playSound('roundStart'); };
+    const onVoteResult = () => { setScreen('wagerPhase'); };
+    const onWagerLocked = () => { setScreen('loadingGame'); playSound('wagerLock'); };
+    const onGameState = () => setScreen((prev) => prev === 'loadingGame' ? 'playing' : prev);
+    const onRoundResults = () => setScreen('roundResults');
+    const onReturnToLobby = () => { setScreen('waitingRoom'); tournament.clearRoundResults(); };
+    const onTournamentEnd = (data) => {
       setScreen('tournamentEnd');
       const winnerId = data?.winner?.playerId || data?.winner;
       if (winnerId === socket.id) {
@@ -231,22 +236,32 @@ function GameRouter() {
       } else {
         playSound('tournamentLoss');
       }
-    });
+    };
+    const onLobbyState = () => playSound('playerJoin');
+    const onEmote = () => playSound('emoteSend');
+    const onGif = () => playSound('gifSend');
+    socket.on(EVENTS.ROUND_START, onRoundStart);
+    socket.on(EVENTS.VOTE_RESULT, onVoteResult);
+    socket.on(EVENTS.WAGER_LOCKED, onWagerLocked);
+    socket.on(EVENTS.GAME_STATE, onGameState);
+    socket.on(EVENTS.ROUND_RESULTS, onRoundResults);
+    socket.on(EVENTS.RETURN_TO_LOBBY, onReturnToLobby);
+    socket.on(EVENTS.TOURNAMENT_END, onTournamentEnd);
     // Social sounds
-    socket.on(EVENTS.LOBBY_STATE, () => playSound('playerJoin'));
-    socket.on(EVENTS.EMOTE_BROADCAST, () => playSound('emoteSend'));
-    socket.on(EVENTS.GIF_BROADCAST, () => playSound('gifSend'));
+    socket.on(EVENTS.LOBBY_STATE, onLobbyState);
+    socket.on(EVENTS.EMOTE_BROADCAST, onEmote);
+    socket.on(EVENTS.GIF_BROADCAST, onGif);
     return () => {
-      socket.off(EVENTS.ROUND_START);
-      socket.off(EVENTS.VOTE_RESULT);
-      socket.off(EVENTS.WAGER_LOCKED);
-      socket.off(EVENTS.GAME_STATE);
-      socket.off(EVENTS.ROUND_RESULTS);
-      socket.off(EVENTS.RETURN_TO_LOBBY);
-      socket.off(EVENTS.TOURNAMENT_END);
-      socket.off(EVENTS.LOBBY_STATE);
-      socket.off(EVENTS.EMOTE_BROADCAST);
-      socket.off(EVENTS.GIF_BROADCAST);
+      socket.off(EVENTS.ROUND_START, onRoundStart);
+      socket.off(EVENTS.VOTE_RESULT, onVoteResult);
+      socket.off(EVENTS.WAGER_LOCKED, onWagerLocked);
+      socket.off(EVENTS.GAME_STATE, onGameState);
+      socket.off(EVENTS.ROUND_RESULTS, onRoundResults);
+      socket.off(EVENTS.RETURN_TO_LOBBY, onReturnToLobby);
+      socket.off(EVENTS.TOURNAMENT_END, onTournamentEnd);
+      socket.off(EVENTS.LOBBY_STATE, onLobbyState);
+      socket.off(EVENTS.EMOTE_BROADCAST, onEmote);
+      socket.off(EVENTS.GIF_BROADCAST, onGif);
     };
   }, [socket, playSound]);
 

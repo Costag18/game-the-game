@@ -775,8 +775,11 @@ export class Poker extends BaseGame {
       return { playerId: p, handResult, chips: this.chips[p] ?? 0, folded: this.folded.has(p) };
     });
 
-    // Sort: non-folded first by hand rank, then folded players
+    // Rank by chips accumulated across all hands — the round winner is the chip
+    // leader, not whoever was dealt the best cards in the final hand. Hand strength
+    // is only a tiebreak when two players finish with identical chip counts.
     evaluated.sort((a, b) => {
+      if (b.chips !== a.chips) return b.chips - a.chips;
       if (a.folded && !b.folded) return 1;
       if (!a.folded && b.folded) return -1;
       if (!a.folded && !b.folded) return compareHands(a.handResult, b.handResult);
@@ -787,11 +790,12 @@ export class Poker extends BaseGame {
     return evaluated.map((e, i) => {
       if (i > 0) {
         const prev = evaluated[i - 1];
-        // Tied only if both non-folded (or both folded) with identical hand comparison
+        // Tied only if equal chips AND the hand-strength tiebreak is also equal.
+        const sameChips = e.chips === prev.chips;
         const sameCategory = e.folded === prev.folded;
         const sameHand = !e.folded && !prev.folded && compareHands(e.handResult, prev.handResult) === 0;
         const bothFolded = e.folded && prev.folded;
-        if (!(sameCategory && (sameHand || bothFolded))) placement = i + 1;
+        if (!(sameChips && sameCategory && (sameHand || bothFolded))) placement = i + 1;
       }
       return {
         playerId: e.playerId,

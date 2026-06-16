@@ -17,19 +17,44 @@ export default function TakeSix({ gameState, onAction, nicknames, avatars }) {
   const { playSound } = useSound();
   const [sel, setSel] = useState(null);
   const [iAcked, setIAcked] = useState(false);
+  const [remaining, setRemaining] = useState(0);
   const prevPhase = useRef(null);
+  const selRef = useRef(null);
+  const autoSubmitted = useRef(false);
 
   const phase = gameState?.phase;
+  const hasPicked = gameState?.hasPicked;
+  const deadline = gameState?.deadline;
+  selRef.current = sel; // keep the latest selection reachable from the countdown closure
+
   useEffect(() => {
     if (phase !== prevPhase.current) {
-      if (phase === 'choosing') { setSel(null); }
+      if (phase === 'choosing') { setSel(null); autoSubmitted.current = false; }
       if (phase === 'reveal') setIAcked(false);
       prevPhase.current = phase;
     }
   }, [phase]);
 
+  // Countdown to the server pick deadline. Auto-submit the SELECTED card ~1s before
+  // it expires so a tapped-but-unconfirmed card isn't replaced by the server's
+  // random _autoPick (the "Timed-Input Must Auto-Submit" contract).
+  useEffect(() => {
+    if (phase !== 'choosing' || !deadline) { setRemaining(0); return; }
+    const tick = () => {
+      const rem = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setRemaining(rem);
+      if (rem <= 1 && !autoSubmitted.current && !hasPicked && selRef.current != null) {
+        autoSubmitted.current = true;
+        onAction({ type: 'playCard', card: selRef.current });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [phase, deadline, hasPicked, onAction]);
+
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Dealing…</p></div>;
-  const { round, totalRounds, rows = [], myHand = [], hasPicked, pickedCount, players = [], resolution, results, acknowledged = [], myId } = gameState;
+  const { round, totalRounds, rows = [], myHand = [], pickedCount, players = [], resolution, results, acknowledged = [], myId } = gameState;
 
   function confirm() { if (sel == null || hasPicked) return; onAction({ type: 'playCard', card: sel }); playSound('cardDeal'); setSel(null); }
   function ack() { if (!iAcked) { setIAcked(true); onAction({ type: 'acknowledge' }); } }
@@ -58,6 +83,7 @@ export default function TakeSix({ gameState, onAction, nicknames, avatars }) {
               {myHand.map((c) => <Card key={c.value} value={c.value} bullhead={c.bullhead} selected={sel === c.value} onClick={() => setSel(c.value)} />)}
             </div>
             <button className={styles.playBtn} onClick={confirm} disabled={sel == null}>Play {sel != null ? sel : ''}</button>
+            {remaining > 0 && <p className={styles.pickHint}>{remaining}s left{sel != null ? '' : ' · pick a card or one is chosen for you'}</p>}
           </>
         )
       )}

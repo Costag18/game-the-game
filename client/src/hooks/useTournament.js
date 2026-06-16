@@ -13,15 +13,19 @@ export function useTournament() {
 
   useEffect(() => {
     if (!socket) return;
+    // Use NAMED handlers and remove them by reference. A bare socket.off(event)
+    // removes ALL listeners for that event — including App.jsx's own handlers on
+    // the same shared socket — so every off() must pass its specific handler.
+    const onRoundStart = (data) => setEligibleGames(data.eligibleGames);
     socket.on(EVENTS.TOURNAMENT_STATE, setTournamentState);
-    socket.on(EVENTS.ROUND_START, (data) => setEligibleGames(data.eligibleGames));
+    socket.on(EVENTS.ROUND_START, onRoundStart);
     socket.on(EVENTS.VOTE_RESULT, setVoteResult);
     socket.on(EVENTS.ROUND_RESULTS, setRoundResults);
     socket.on(EVENTS.TOURNAMENT_END, setTournamentEnd);
     socket.on(EVENTS.GAME_STATE, setGameState);
     return () => {
       socket.off(EVENTS.TOURNAMENT_STATE, setTournamentState);
-      socket.off(EVENTS.ROUND_START);
+      socket.off(EVENTS.ROUND_START, onRoundStart);
       socket.off(EVENTS.VOTE_RESULT, setVoteResult);
       socket.off(EVENTS.ROUND_RESULTS, setRoundResults);
       socket.off(EVENTS.TOURNAMENT_END, setTournamentEnd);
