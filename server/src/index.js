@@ -14,6 +14,17 @@ import { createGame, isGameRegistered } from './games/registry.js';
 import { getEligibleGames } from '../../shared/gameList.js';
 import { pickRandomBodycamVideo } from '../../shared/policeVideos.js';
 
+// --- Process-level safety net ---
+// A malformed payload slipping past a handler guard must never crash the whole
+// server (an uncaught exception in a Socket.IO listener kills the process).
+// Log it loudly and keep serving.
+process.on('uncaughtException', (err) => {
+  console.error('[FATAL] Uncaught exception:', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[FATAL] Unhandled rejection:', reason);
+});
+
 // --- Police bodycam stream state per lobby ---
 // { videoId, time, updatedAt, paused }
 // time = last known playhead position (seconds)
@@ -47,9 +58,10 @@ function advanceBodycamForward(state) {
     // Cap history length to avoid unbounded growth
     if (state.history.length > 50) {
       state.history.shift();
-    } else {
-      state.historyIndex = state.history.length - 1;
     }
+    // Index must track the tip in BOTH branches — after the cap kicked in,
+    // a stale index made "prev" replay the wrong video.
+    state.historyIndex = state.history.length - 1;
     state.videoId = newId;
   }
   state.time = 0;
@@ -232,10 +244,12 @@ io.on(EVENTS.CONNECTION, (socket) => {
       if (typeof callback === 'function') callback({ error: 'Nickname is required' });
       return;
     }
-    socket.data.nickname = nickname.trim();
+    // Cap length — nicknames are embedded in every state broadcast
+    const trimmed = nickname.trim().slice(0, 24);
+    socket.data.nickname = trimmed;
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (lobbyId) {
-      lobbyManager.setNickname(socket.id, nickname.trim());
+      lobbyManager.setNickname(socket.id, trimmed);
       const lobby = lobbyManager.getLobby(lobbyId);
       io.to(lobbyId).emit(EVENTS.LOBBY_STATE, lobby);
     }
@@ -249,6 +263,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
 
   socket.on(EVENTS.CREATE_LOBBY, (options, callback) => {
     try {
+      if (!options || typeof options !== 'object') options = {};
       cleanupCasinoSession(socket.id);
       // Clamp custom win targets to safe ranges
       if (options.winCondition === 'fixedRounds') {
@@ -267,8 +282,12 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
-  socket.on(EVENTS.JOIN_LOBBY, ({ lobbyId, code }, callback) => {
+  socket.on(EVENTS.JOIN_LOBBY, (data, callback) => {
     try {
+      // Destructure inside the try — a null/non-object payload must not throw
+      // an uncaught TypeError in the listener (which would crash the process).
+      const { lobbyId, code } = data || {};
+      if (!lobbyId || typeof lobbyId !== 'string') throw new Error('Lobby id is required');
       cleanupCasinoSession(socket.id);
       const lobby = lobbyManager.joinLobby(lobbyId, socket.id, code);
       if (socket.data.nickname) {
@@ -346,11 +365,15 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (!lobbyId) return;
     const text = typeof data === 'string' ? data : data?.message;
-    if (!text || !text.trim()) return;
+    if (!text || typeof text !== 'string' || !text.trim()) return;
+    // Rate-limit: 500ms between chat messages per player (matches EMOTE_SEND)
+    const now = Date.now();
+    if (socket.data._lastChat && now - socket.data._lastChat < 500) return;
+    socket.data._lastChat = now;
     io.to(lobbyId).emit(EVENTS.CHAT_MESSAGE, {
       playerId: socket.id,
       nickname: socket.data.nickname || socket.id,
-      message: text.trim(),
+      message: text.trim().slice(0, 500),
       timestamp: Date.now(),
     });
   });
@@ -372,7 +395,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
-  // --- Emotesplosion (300s cooldown) ---
+  // --- Emotesplosion (60s cooldown) ---
   socket.on(EVENTS.EMOTESPLOSION_SEND, () => {
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     if (!lobbyId) return;
@@ -505,6 +528,18 @@ io.on(EVENTS.CONNECTION, (socket) => {
     if (!lobbyId) return;
 
     let imageUrl = data?.imageUrl;
+    // Client-supplied URLs must come from the Pexels proxy (like GIF_SEND
+    // whitelists Klipy) — never relay arbitrary strings/base64 blobs to the lobby.
+    if (imageUrl) {
+      if (typeof imageUrl !== 'string'
+        || !imageUrl.startsWith('https://images.pexels.com/')
+        || imageUrl.length > 2048) return;
+      // Rate-limit direct broadcasts: 5s per player (the generation path is
+      // already gated by the global Pollinations cooldown)
+      const now = Date.now();
+      if (socket.data._lastImageSend && now - socket.data._lastImageSend < 5000) return;
+      socket.data._lastImageSend = now;
+    }
     if (!imageUrl && data?.prompt) {
       // Check global Pollinations cooldown before generating
       const wait = getPollinationsWaitTime();
@@ -532,6 +567,19 @@ io.on(EVENTS.CONNECTION, (socket) => {
   // --- Avatar Set (prompt → server generates, or avatar URL → direct set) ---
   socket.on(EVENTS.SET_AVATAR, async (data, callback) => {
     let avatar = data?.avatar;
+    // Client-supplied avatars are either a Pexels photo URL or a previously
+    // generated data URI (from localStorage). Avatars are re-broadcast in every
+    // state payload, so cap size and validate origin.
+    if (avatar) {
+      const okUrl = typeof avatar === 'string'
+        && avatar.startsWith('https://images.pexels.com/') && avatar.length <= 2048;
+      const okDataUri = typeof avatar === 'string'
+        && avatar.startsWith('data:image/') && avatar.length <= 300000; // ~220KB image
+      if (!okUrl && !okDataUri) {
+        if (callback) callback({ error: 'Invalid avatar image' });
+        return;
+      }
+    }
     if (!avatar && data?.prompt) {
       const wait = getPollinationsWaitTime();
       if (wait > 0) {
@@ -698,14 +746,15 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
-  socket.on(EVENTS.COIN_FLIP, ({ amount, choice }) => {
+  socket.on(EVENTS.COIN_FLIP, (data) => {
+    const { amount, choice } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
     const score = tm.scores[socket.id] ?? 0;
-    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    if (!Number.isInteger(amount) || amount <= 0 || amount > Math.floor(score * 0.5)) return;
     if (choice !== 'heads' && choice !== 'tails') return;
 
     const result = Math.random() < 0.5 ? 'heads' : 'tails';
@@ -728,14 +777,15 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
   });
 
-  socket.on(EVENTS.SLOTS_SPIN, ({ amount }) => {
+  socket.on(EVENTS.SLOTS_SPIN, (data) => {
+    const { amount } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
     const score = tm.scores[socket.id] ?? 0;
-    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    if (!Number.isInteger(amount) || amount <= 0 || amount > Math.floor(score * 0.5)) return;
 
     const SYMBOLS = ['cherry', 'lemon', 'bar', 'seven', 'diamond', 'bell'];
     const reels = [
@@ -773,12 +823,13 @@ io.on(EVENTS.CONNECTION, (socket) => {
   });
 
   // --- Plinko ---
-  socket.on(EVENTS.PLINKO_DROP, ({ amount }) => {
+  socket.on(EVENTS.PLINKO_DROP, (data) => {
+    const { amount } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
-    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    if (!Number.isInteger(amount) || amount <= 0 || amount > Math.floor(score * 0.5)) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
     // Simulate ball bouncing through 8 rows of pegs (left/right each row)
@@ -809,12 +860,13 @@ io.on(EVENTS.CONNECTION, (socket) => {
   });
 
   // --- Wheel of Fortune ---
-  socket.on(EVENTS.WHEEL_SPIN, ({ amount }) => {
+  socket.on(EVENTS.WHEEL_SPIN, (data) => {
+    const { amount } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
-    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    if (!Number.isInteger(amount) || amount <= 0 || amount > Math.floor(score * 0.5)) return;
     const lobby = lobbyManager.getLobby(lobbyId);
 
     const WHEEL_SEGMENTS = [0, 0.5, 1, 0.5, 2, 0.5, 1, 0.5, 3, 0.5, 1, 0.5, 5, 0.5, 1, 0.5, 10, 0.5, 1, 0.5];
@@ -837,12 +889,13 @@ io.on(EVENTS.CONNECTION, (socket) => {
   });
 
   // --- Blackjack Lite ---
-  socket.on(EVENTS.BJ_LITE_START, ({ amount }) => {
+  socket.on(EVENTS.BJ_LITE_START, (data) => {
+    const { amount } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
-    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    if (!Number.isInteger(amount) || amount <= 0 || amount > Math.floor(score * 0.5)) return;
 
     // Deal cards (simple deck: 1-13, suit doesn't matter for BJ)
     function drawCard() { return Math.floor(Math.random() * 13) + 1; }
@@ -876,7 +929,8 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
-  socket.on(EVENTS.BJ_LITE_ACTION, ({ action }) => {
+  socket.on(EVENTS.BJ_LITE_ACTION, (data) => {
+    const { action } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
@@ -953,12 +1007,13 @@ io.on(EVENTS.CONNECTION, (socket) => {
   });
 
   // --- Chicken Cross ---
-  socket.on(EVENTS.CHICKEN_START, ({ amount }) => {
+  socket.on(EVENTS.CHICKEN_START, (data) => {
+    const { amount } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
     const score = tm.scores[socket.id] ?? 0;
-    if (!amount || amount <= 0 || amount > Math.floor(score * 0.5)) return;
+    if (!Number.isInteger(amount) || amount <= 0 || amount > Math.floor(score * 0.5)) return;
 
     // Start a chicken run — store state on tournament
     if (!tm._chickenGames) tm._chickenGames = {};
@@ -983,7 +1038,8 @@ io.on(EVENTS.CONNECTION, (socket) => {
     });
   });
 
-  socket.on(EVENTS.CHICKEN_ACTION, ({ action }) => {
+  socket.on(EVENTS.CHICKEN_ACTION, (data) => {
+    const { action } = data || {};
     const lobbyId = lobbyManager.getPlayerLobby(socket.id);
     const tm = tournaments.get(lobbyId);
     if (!tm || (tm.phase !== 'voting' && tm.phase !== 'wagering')) return;
@@ -1061,7 +1117,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     // Map this player to the casino "lobby" so gambling handlers can find it
     lobbyManager.playerToLobby.set(socket.id, casinoLobbyId);
     lobbyManager.lobbies.set(casinoLobbyId, {
-      id: casinoLobbyId, players: [socket.id], nicknames: {}, status: 'playing',
+      id: casinoLobbyId, players: [socket.id], nicknames: {}, avatars: {}, status: 'playing',
     });
     socket.join(casinoLobbyId);
     socket.emit(EVENTS.CASINO_STATE, { score: tm.scores[socket.id] });
@@ -1154,6 +1210,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     }
 
     const lobby = lobbyManager.getLobby(lobbyId);
+    if (!lobby) return; // lobby may have been deleted between action and broadcast
     const nicknames = lobby.nicknames || {};
     const avatars = lobby.avatars || {};
     for (const playerId of lobby.players) {
@@ -1217,7 +1274,7 @@ io.on(EVENTS.CONNECTION, (socket) => {
     const nickname = socket.data.nickname || 'Anonymous';
     if (!db) {
       console.warn('[Suggestion] No Firestore — suggestion lost:', text);
-      if (typeof callback === 'function') callback({ success: true });
+      if (typeof callback === 'function') callback({ error: 'Suggestions are unavailable right now — please try again later' });
       return;
     }
     try {

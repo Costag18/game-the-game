@@ -84,7 +84,9 @@ export class LobbyManager {
     const lobbyId = this.playerToLobby.get(playerId);
     if (!lobbyId) return;
     const lobby = this.lobbies.get(lobbyId);
-    if (lobby) lobby.avatars[playerId] = avatar;
+    if (!lobby) return;
+    if (!lobby.avatars) lobby.avatars = {}; // casino lobbies are created bare
+    lobby.avatars[playerId] = avatar;
   }
 
   setStatus(lobbyId, status) {
