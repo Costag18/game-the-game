@@ -1,7 +1,9 @@
 import { BaseGame } from './BaseGame.js';
 import { Deck } from '../utils/Deck.js';
+import { TIMERS } from '../../../shared/constants.js';
 
 const HANDS_PER_GAME = 5;
+const TURN_MS = TIMERS.CARD_GAME * 1000; // 30s
 
 export class Blackjack extends BaseGame {
   constructor(players) {
@@ -24,6 +26,8 @@ export class Blackjack extends BaseGame {
     this.wins = {}; // playerId -> win count across hands
     this.handResults = []; // history of each hand
     this.acknowledged = new Set();
+    this._turnTimer = null;
+    this._turnEndsAt = null;
   }
 
   setOnStateChange(cb) { this._onStateChange = cb; }
@@ -50,6 +54,24 @@ export class Blackjack extends BaseGame {
     for (const p of this.players) this.hands[p] = this.deck.dealMultiple(2);
     this.dealerHand = this.deck.dealMultiple(2);
     this.setTurnPlayer(this.players[0]);
+    this._startTurnTimer();
+  }
+
+  // A connected-but-idle player must never freeze the hand: auto-stand them
+  // when the turn clock runs out.
+  _startTurnTimer() {
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+    if (this.state !== 'playing') { this._turnEndsAt = null; return; }
+    this._turnEndsAt = Date.now() + TURN_MS;
+    this._turnTimer = setTimeout(() => {
+      if (this.state !== 'playing') return;
+      const pid = this.currentTurnPlayer;
+      if (pid && !this.stood.includes(pid) && !this.busted.includes(pid)) {
+        this.stood.push(pid);
+        this.advanceToNextPlayer();
+      }
+      this._emitChange();
+    }, TURN_MS);
   }
 
   handleAction(playerId, action) {
@@ -62,6 +84,8 @@ export class Blackjack extends BaseGame {
         if (this.calculateHandValue(this.hands[playerId]) > 21) {
           this.busted.push(playerId);
           this.advanceToNextPlayer();
+        } else {
+          this._startTurnTimer(); // fresh clock for the follow-up decision
         }
       } else if (action.type === 'stand') {
         this.stood.push(playerId);
@@ -100,6 +124,8 @@ export class Blackjack extends BaseGame {
       (p) => !this.busted.includes(p) && !this.stood.includes(p)
     );
     if (remaining.length === 0) {
+      if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+      this._turnEndsAt = null;
       this.transition('allDone');
       this.dealerPlay();
       this._recordHandResult();
@@ -111,6 +137,7 @@ export class Blackjack extends BaseGame {
       while (this.busted.includes(next) || this.stood.includes(next)) {
         next = this.nextTurn();
       }
+      this._startTurnTimer();
     }
   }
 
@@ -204,12 +231,14 @@ export class Blackjack extends BaseGame {
       } else if (!remaining.includes(this.currentTurnPlayer)) {
         // Turn landed on an already-stood/busted/absent player — pass it on.
         this.setTurnPlayer(remaining[0]);
+        this._startTurnTimer();
       }
     }
   }
 
   destroy() {
     if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
   }
 
   getStateForPlayer(playerId) {
@@ -228,6 +257,7 @@ export class Blackjack extends BaseGame {
         stood: this.stood.includes(p),
       })),
       isMyTurn: this.currentTurnPlayer === playerId && this.state === 'playing',
+      turnEndsAt: this.state === 'playing' ? this._turnEndsAt : null,
       busted: this.busted.includes(playerId),
       stood: this.stood.includes(playerId),
       phase: this.state,

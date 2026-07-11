@@ -69,7 +69,7 @@ export default function BuzzerRoyaleGame({ gameState, onAction, nicknames, avata
 
       {phase !== 'finished' && (
         <div className={styles.qCard}>
-          {(phase === 'question' || phase === 'reveal') && remaining > 0 && (
+          {phase === 'question' && remaining > 0 && (
             <span className={styles.timer}>{remaining}s</span>
           )}
           <p className={styles.question}>{question}</p>

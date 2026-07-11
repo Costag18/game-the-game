@@ -1,4 +1,8 @@
 import { BaseGame } from './BaseGame.js';
+import { TIMERS } from '../../../shared/constants.js';
+
+const CHOICE_MS = TIMERS.RPS * 1000;
+const CHOICE_OPTIONS = ['rock', 'paper', 'scissors'];
 
 const BEATS = {
   rock: 'scissors',
@@ -45,6 +49,32 @@ export class RockPaperScissors extends BaseGame {
     this.roundNumber += 1;
     this.choices = {};
     this.lastRoundResult = null;
+    this._startChoiceTimer();
+  }
+
+  // The choosing phase must not wait forever on an idle player: at the
+  // deadline, fill in a random throw for anyone who hasn't chosen and resolve.
+  _startChoiceTimer() {
+    if (this._choiceTimer) { clearTimeout(this._choiceTimer); this._choiceTimer = null; }
+    this._choiceEndsAt = Date.now() + CHOICE_MS;
+    this._choiceTimer = setTimeout(() => {
+      if (this.state !== 'round') return;
+      for (const p of this.players) {
+        if (this.choices[p] === undefined) {
+          this.choices[p] = CHOICE_OPTIONS[Math.floor(Math.random() * CHOICE_OPTIONS.length)];
+        }
+      }
+      this.transition('reveal');
+      this._resolveRound();
+      this.acknowledged = new Set();
+      this._startRevealTimer();
+      this._emitChange();
+    }, CHOICE_MS);
+  }
+
+  _clearChoiceTimer() {
+    if (this._choiceTimer) { clearTimeout(this._choiceTimer); this._choiceTimer = null; }
+    this._choiceEndsAt = null;
   }
 
   removePlayer(playerId) {
@@ -55,6 +85,7 @@ export class RockPaperScissors extends BaseGame {
 
     if (this.players.length <= 1) {
       if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+      this._clearChoiceTimer();
       if (this.state !== 'finished') this.state = 'finished';
       return;
     }
@@ -63,6 +94,7 @@ export class RockPaperScissors extends BaseGame {
     if (this.state === 'round') {
       const allChosen = this.players.every((p) => this.choices[p] !== undefined);
       if (allChosen) {
+        this._clearChoiceTimer();
         this.transition('reveal');
         this._resolveRound();
         this.acknowledged = new Set();
@@ -86,6 +118,7 @@ export class RockPaperScissors extends BaseGame {
 
       const allChosen = this.players.every((p) => this.choices[p] !== undefined);
       if (allChosen) {
+        this._clearChoiceTimer();
         this.transition('reveal');
         this._resolveRound();
         this.acknowledged = new Set();
@@ -124,6 +157,7 @@ export class RockPaperScissors extends BaseGame {
 
   destroy() {
     if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+    this._clearChoiceTimer();
   }
 
   _resolveRound() {
@@ -179,6 +213,7 @@ export class RockPaperScissors extends BaseGame {
       myId: playerId,
       myChoice: this.choices[playerId] ?? null,
       hasChosen: this.choices[playerId] !== undefined,
+      choiceEndsAt: this.state === 'round' ? this._choiceEndsAt : null,
       otherPlayers,
       lastRoundResult: isReveal ? this.lastRoundResult : null,
     };

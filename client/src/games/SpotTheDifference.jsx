@@ -124,6 +124,28 @@ export default function SpotTheDifference({ gameState, onAction, nicknames, avat
     }
   }, [gameState?.phase]);
 
+  // Local countdown timer
+  const isPlaying = gameState?.phase === 'playing';
+  const roundEndTime = gameState?.roundEndTime;
+  const [timeLeft, setTimeLeft] = useState(gameState?.roundDurationSec || 0);
+  const hasPinged = useRef(false);
+  useEffect(() => {
+    if (!isPlaying || !roundEndTime) { setTimeLeft(0); hasPinged.current = false; return; }
+    hasPinged.current = false;
+    function tick() {
+      const remaining = Math.max(0, Math.ceil((roundEndTime - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      // If timer hit 0 and server hasn't transitioned yet, send a ping to nudge it
+      if (remaining <= 0 && !hasPinged.current) {
+        hasPinged.current = true;
+        onAction({ type: 'ping' });
+      }
+    }
+    tick();
+    const interval = setInterval(tick, 500);
+    return () => clearInterval(interval);
+  }, [isPlaying, roundEndTime, onAction]);
+
   if (!gameState) {
     return (
       <div className={styles.table}>
@@ -144,35 +166,12 @@ export default function SpotTheDifference({ gameState, onAction, nicknames, avat
     myScore,
     myRoundScore,
     myWrongGuesses,
-    roundEndTime,
-    roundDurationSec,
     otherPlayers,
     missedDifferences,
   } = gameState;
 
   const isFinished = phase === 'finished';
-  const isPlaying = phase === 'playing';
   const isRoundEnd = phase === 'roundEnd';
-
-  // Local countdown timer
-  const [timeLeft, setTimeLeft] = useState(roundDurationSec || 0);
-  const hasPinged = useRef(false);
-  useEffect(() => {
-    if (!isPlaying || !roundEndTime) { setTimeLeft(0); hasPinged.current = false; return; }
-    hasPinged.current = false;
-    function tick() {
-      const remaining = Math.max(0, Math.ceil((roundEndTime - Date.now()) / 1000));
-      setTimeLeft(remaining);
-      // If timer hit 0 and server hasn't transitioned yet, send a ping to nudge it
-      if (remaining <= 0 && !hasPinged.current) {
-        hasPinged.current = true;
-        onAction({ type: 'ping' });
-      }
-    }
-    tick();
-    const interval = setInterval(tick, 500);
-    return () => clearInterval(interval);
-  }, [isPlaying, roundEndTime, onAction]);
 
   // Build found/missed sets
   const foundSet = new Set(foundDifferences.map((d) => d.index));

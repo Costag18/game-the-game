@@ -283,6 +283,13 @@
   min-height: 1.4em;
 }
 
+.turnTimer {
+  font-size: 0.85rem;
+  color: #d4a843;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
 /* ============================================================
    Action controls
    ============================================================ */

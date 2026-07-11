@@ -31,6 +31,20 @@ function MemoryCard({ card, position, isMyTurn, onFlip }) {
 }
 
 export default function MemoryMatch({ gameState, onAction, playerId, nicknames, avatars }) {
+  const timerRef = useRef(null);
+  const pendingFlipBackNow = gameState?.pendingFlipBack;
+  const myTurnNow = gameState?.isMyTurn;
+
+  // Auto-acknowledge after 2 seconds when cards are shown and it's my turn
+  useEffect(() => {
+    if (pendingFlipBackNow && myTurnNow) {
+      timerRef.current = setTimeout(() => {
+        onAction({ type: 'acknowledge' });
+      }, 2000);
+      return () => clearTimeout(timerRef.current);
+    }
+  }, [pendingFlipBackNow, myTurnNow, onAction]);
+
   if (!gameState) {
     return (
       <div className={styles.table}>
@@ -41,17 +55,6 @@ export default function MemoryMatch({ gameState, onAction, playerId, nicknames, 
 
   const { board, pairs, currentTurnPlayer, isMyTurn, phase, pendingFlipBack } = gameState;
   const isFinished = phase === 'finished';
-  const timerRef = useRef(null);
-
-  // Auto-acknowledge after 2 seconds when cards are shown and it's my turn
-  useEffect(() => {
-    if (pendingFlipBack && isMyTurn) {
-      timerRef.current = setTimeout(() => {
-        onAction({ type: 'acknowledge' });
-      }, 2000);
-      return () => clearTimeout(timerRef.current);
-    }
-  }, [pendingFlipBack, isMyTurn, onAction]);
 
   function handleFlip(position) {
     if (pendingFlipBack) return; // wait for auto-flip

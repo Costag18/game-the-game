@@ -74,9 +74,47 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
   const { playSound } = useSound();
   const [raiseAmount, setRaiseAmount] = useState('');
   const [iAcked, setIAcked] = useState(false);
+  const [showHands, setShowHands] = useState(false);
+  const [turnSecsLeft, setTurnSecsLeft] = useState(null);
   const prevCommunityCount = useRef(0);
   const prevHoleCount = useRef(0);
   const ackedHand = useRef(-1);
+
+  const phase = gameState?.phase;
+  const lastHandWinner = gameState?.lastHandWinner;
+  const handNumber = gameState?.handNumber ?? 1;
+  const turnEndsAt = gameState?.turnEndsAt;
+
+  // Reset the local "acknowledged" flag whenever a new reveal/hand begins.
+  useEffect(() => {
+    if (phase === 'reveal' && ackedHand.current !== handNumber) {
+      setIAcked(false);
+      ackedHand.current = handNumber;
+    }
+    if (phase !== 'reveal') ackedHand.current = -1;
+  }, [phase, handNumber]);
+
+  // Track card counts for deal animation
+  const communityCount = (gameState?.communityCards || []).length;
+  const holeCount = (gameState?.myHoleCards || []).length;
+  const communityAnimFrom = prevCommunityCount.current;
+  const holeAnimFrom = prevHoleCount.current;
+  useEffect(() => { prevCommunityCount.current = communityCount; }, [communityCount]);
+  useEffect(() => { prevHoleCount.current = holeCount; }, [holeCount]);
+
+  // Shake on showdown reveal
+  useEffect(() => {
+    if (phase === 'reveal' && lastHandWinner) shake('medium');
+  }, [phase, lastHandWinner]);
+
+  // Turn countdown
+  useEffect(() => {
+    if (!turnEndsAt) { setTurnSecsLeft(null); return; }
+    const tick = () => setTurnSecsLeft(Math.max(0, Math.ceil((turnEndsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [turnEndsAt]);
 
   if (!gameState) {
     return (
@@ -87,7 +125,6 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
   }
 
   const {
-    phase,
     myHoleCards,
     communityCards,
     pot,
@@ -98,8 +135,6 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
     folded,
     otherPlayers,
     revealedHands,
-    lastHandWinner,
-    handNumber = 1,
     totalHands = 3,
     handResults = [],
     myId,
@@ -112,33 +147,11 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
   const iAmFolded = folded && folded.includes(me);
   const isActive = ['preflop', 'flop', 'turn', 'river'].includes(phase);
 
-  // Reset the local "acknowledged" flag whenever a new reveal/hand begins.
-  useEffect(() => {
-    if (phase === 'reveal' && ackedHand.current !== handNumber) {
-      setIAcked(false);
-      ackedHand.current = handNumber;
-    }
-    if (phase !== 'reveal') ackedHand.current = -1;
-  }, [phase, handNumber]);
-
   function handleAck() {
     if (iAcked) return;
     setIAcked(true);
     onAction({ type: 'acknowledge' });
   }
-
-  // Track card counts for deal animation
-  const communityCount = (communityCards || []).length;
-  const holeCount = (myHoleCards || []).length;
-  const communityAnimFrom = prevCommunityCount.current;
-  const holeAnimFrom = prevHoleCount.current;
-  useEffect(() => { prevCommunityCount.current = communityCount; }, [communityCount]);
-  useEffect(() => { prevHoleCount.current = holeCount; }, [holeCount]);
-
-  // Shake on showdown reveal
-  useEffect(() => {
-    if (phase === 'reveal' && lastHandWinner) shake('medium');
-  }, [phase, lastHandWinner]);
   const isReveal = phase === 'reveal';
   const isFinished = phase === 'finished' || phase === 'showdown' || phase === 'reveal';
 
@@ -180,8 +193,6 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
     if (isMyTurn) return 'Your turn — choose an action.';
     return 'Waiting for other players...';
   }
-
-  const [showHands, setShowHands] = useState(false);
 
   return (
     <div className={styles.tableOuter}>
@@ -267,7 +278,10 @@ export default function Poker({ gameState, onAction, playerId, nicknames, avatar
           {myBet > 0 && <span className={styles.myBetLabel}>Bet: {myBet}</span>}
         </div>
 
-        <p className={styles.statusText}>{getStatusText()}</p>
+        <p className={styles.statusText}>
+          {getStatusText()}
+          {isActive && turnSecsLeft != null && <span className={styles.turnTimer}> ⏱ {turnSecsLeft}s</span>}
+        </p>
 
         {/* Actions */}
         {isMyTurn && !iAmFolded && isActive && (

@@ -11,7 +11,7 @@ function CellLabel({ x, y }) {
 }
 
 // --- Setup Grid: place ships ---
-function SetupGrid({ shipTypes, onConfirm }) {
+function SetupGrid({ shipTypes, onConfirm, setupEndTime }) {
   const [grid, setGrid] = useState(new Array(100).fill(null));
   const [ships, setShips] = useState([]);
   const [currentShipIdx, setCurrentShipIdx] = useState(0);
@@ -21,6 +21,24 @@ function SetupGrid({ shipTypes, onConfirm }) {
 
   const currentShip = shipTypes[currentShipIdx] || null;
   const allPlaced = ships.length === shipTypes.length;
+
+  // Auto-submit placed ships ~1s before the setup deadline so they aren't lost
+  const shipsRef = useRef(ships);
+  shipsRef.current = ships;
+  const autoSubmitted = useRef(false);
+  useEffect(() => {
+    if (!setupEndTime) return;
+    const tick = () => {
+      const rem = Math.ceil((setupEndTime - Date.now()) / 1000);
+      if (rem <= 1 && !autoSubmitted.current && shipsRef.current.length === shipTypes.length) {
+        autoSubmitted.current = true;
+        onConfirm(shipsRef.current.map((s) => ({ x: s.x, y: s.y, horizontal: s.horizontal })));
+      }
+    };
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [setupEndTime, shipTypes.length, onConfirm]);
 
   function getShipCells(x, y, size, horiz) {
     const cells = [];
@@ -213,22 +231,12 @@ function BattleGrid({ label, cells, sunkShips, onClick, clickable, fullReveal })
 
 export default function Battleship({ gameState, onAction, nicknames, avatars }) {
   const [timeLeft, setTimeLeft] = useState(0);
-
-  if (!gameState) {
-    return (
-      <div className={styles.table}>
-        <p className={styles.waiting}>Waiting for game to start...</p>
-      </div>
-    );
-  }
-
   const [selectedTarget, setSelectedTarget] = useState(null);
 
-  const {
-    phase, myGrid, myShips, opponents = [], myEliminated,
-    isMyTurn, currentTurnPlayer, setupReady,
-    setupEndTime, turnEndTime, shipTypes, eliminated = [],
-  } = gameState;
+  const phase = gameState?.phase;
+  const setupEndTime = gameState?.setupEndTime;
+  const turnEndTime = gameState?.turnEndTime;
+  const isMyTurn = gameState?.isMyTurn;
 
   const isSetup = phase === 'setup';
   const isPlaying = phase === 'playing';
@@ -255,6 +263,19 @@ export default function Battleship({ gameState, onAction, nicknames, avatars }) 
     }
     if (timeLeft > 0) hasPinged.current = false;
   }, [timeLeft, isPlaying, isMyTurn]);
+
+  if (!gameState) {
+    return (
+      <div className={styles.table}>
+        <p className={styles.waiting}>Waiting for game to start...</p>
+      </div>
+    );
+  }
+
+  const {
+    myGrid, myShips, opponents = [], myEliminated,
+    currentTurnPlayer, setupReady, shipTypes, eliminated = [],
+  } = gameState;
 
   function handleConfirmSetup(placements) {
     onAction({ type: 'placeShips', ships: placements });
@@ -314,7 +335,7 @@ export default function Battleship({ gameState, onAction, nicknames, avatars }) 
 
       {/* Setup Phase */}
       {isSetup && !setupReady?.me && shipTypes && (
-        <SetupGrid shipTypes={shipTypes} onConfirm={handleConfirmSetup} />
+        <SetupGrid shipTypes={shipTypes} onConfirm={handleConfirmSetup} setupEndTime={setupEndTime} />
       )}
 
       {isSetup && setupReady?.me && (

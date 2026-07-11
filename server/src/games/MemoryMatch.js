@@ -141,7 +141,7 @@ export class MemoryMatch extends BaseGame {
     }
     super.removePlayer(playerId); // prune roster + reassign turn
     if (this.state === 'playing') {
-      if (this.isComplete()) {
+      if (this.isComplete() || this.players.length <= 1) {
         this.transition('finish');
         this._clearTurnTimer();
       } else {
@@ -172,6 +172,7 @@ export class MemoryMatch extends BaseGame {
   }
 
   isComplete() {
+    if (this.state === 'finished') return true;
     return this.board.length > 0 && this.board.every((c) => c.matched);
   }
 

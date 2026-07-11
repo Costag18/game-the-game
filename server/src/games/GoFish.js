@@ -1,5 +1,8 @@
 import { BaseGame } from './BaseGame.js';
 import { Deck } from '../utils/Deck.js';
+import { TIMERS } from '../../../shared/constants.js';
+
+const TURN_MS = TIMERS.CARD_GAME * 1000; // 30s per ask
 
 export class GoFish extends BaseGame {
   constructor(players) {
@@ -15,6 +18,37 @@ export class GoFish extends BaseGame {
     this.hands = {};
     this.completedSets = {}; // playerId -> count of completed sets
     this.lastAction = null; // for client state reporting
+    this._turnTimer = null;
+    this._turnEndsAt = null;
+  }
+
+  setOnStateChange(cb) { this._onStateChange = cb; }
+  _emitChange() { if (typeof this._onStateChange === 'function') this._onStateChange(); }
+
+  // An idle player must never freeze the game: on timeout, ask a random valid
+  // (rank-from-hand, other-player) pair on their behalf.
+  _startTurnTimer() {
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+    if (this.state !== 'playing') { this._turnEndsAt = null; return; }
+    this._turnEndsAt = Date.now() + TURN_MS;
+    this._turnTimer = setTimeout(() => {
+      if (this.state !== 'playing') return;
+      const pid = this.currentTurnPlayer;
+      const hand = this.hands[pid] || [];
+      if (pid && hand.length > 0) {
+        const rank = hand[Math.floor(Math.random() * hand.length)].rank;
+        const others = this.players.filter((p) => p !== pid);
+        const withCards = others.filter((p) => (this.hands[p] || []).length > 0);
+        const pool = withCards.length > 0 ? withCards : others;
+        const target = pool[Math.floor(Math.random() * pool.length)];
+        if (target) this.handleAction(pid, { type: 'ask', targetPlayer: target, rank });
+        else this._advanceTurn();
+      } else {
+        this._advanceTurn();
+      }
+      if (this.state === 'playing') this._startTurnTimer();
+      this._emitChange();
+    }, TURN_MS);
   }
 
   startGame() {
@@ -38,6 +72,7 @@ export class GoFish extends BaseGame {
     this.setTurnPlayer(this.players[0]);
     this._autoDrawIfEmpty(this.players[0]);
     this._checkGameEnd();
+    this._startTurnTimer();
   }
 
   _autoDrawIfEmpty(playerId) {
@@ -112,59 +147,64 @@ export class GoFish extends BaseGame {
     if (this.state !== 'playing') return;
     if (playerId !== this.currentTurnPlayer) return;
 
-    if (action.type === 'ask') {
-      const { targetPlayer, rank } = action;
+    if (action.type === 'ask') this._handleAsk(playerId, action);
+    // Any processed turn (including a repeat turn after a transfer) gets a
+    // fresh clock; the timer self-clears once the game leaves 'playing'.
+    this._startTurnTimer();
+  }
 
-      // Validate: player must hold at least one card of that rank
-      const myHand = this.hands[playerId] || [];
-      const hasRank = myHand.some((c) => c.rank === rank);
-      if (!hasRank) return;
+  _handleAsk(playerId, action) {
+    const { targetPlayer, rank } = action;
 
-      // Validate target is a different valid player
-      if (!this.players.includes(targetPlayer) || targetPlayer === playerId) return;
+    // Validate: player must hold at least one card of that rank
+    const myHand = this.hands[playerId] || [];
+    const hasRank = myHand.some((c) => c.rank === rank);
+    if (!hasRank) return;
 
-      const targetHand = this.hands[targetPlayer] || [];
-      const matchingCards = targetHand.filter((c) => c.rank === rank);
+    // Validate target is a different valid player
+    if (!this.players.includes(targetPlayer) || targetPlayer === playerId) return;
 
-      if (matchingCards.length > 0) {
-        // Transfer all matching cards
-        this.hands[targetPlayer] = targetHand.filter((c) => c.rank !== rank);
-        this.hands[playerId] = [...myHand, ...matchingCards];
-        this._checkAndRemoveSets(playerId);
-        this.lastAction = { type: 'transfer', playerId, targetPlayer, rank, count: matchingCards.length };
-        this._autoDrawIfEmpty(playerId);
-        this._checkGameEnd();
-        // Go again only if player still has cards to ask with
-        if (this.state === 'playing' && (this.hands[playerId] || []).length === 0) {
-          this._advanceTurn();
-        }
-      } else {
-        // Go Fish
-        this.lastAction = { type: 'goFish', playerId, rank };
-        const drawn = this.deck.deal();
-        if (drawn) {
-          this.hands[playerId] = [...this.hands[playerId], drawn];
-          if (drawn.rank === rank) {
-            // Lucky draw — go again only if still have cards
-            this._checkAndRemoveSets(playerId);
-            this.lastAction = { type: 'luckyFish', playerId, rank };
-            this._checkGameEnd();
-            if (this.state === 'playing' && (this.hands[playerId] || []).length === 0) {
-              this._advanceTurn();
-            }
-          } else {
-            this._checkAndRemoveSets(playerId);
-            this._checkGameEnd();
-            if (this.state === 'playing') {
-              this._advanceTurn();
-            }
+    const targetHand = this.hands[targetPlayer] || [];
+    const matchingCards = targetHand.filter((c) => c.rank === rank);
+
+    if (matchingCards.length > 0) {
+      // Transfer all matching cards
+      this.hands[targetPlayer] = targetHand.filter((c) => c.rank !== rank);
+      this.hands[playerId] = [...myHand, ...matchingCards];
+      this._checkAndRemoveSets(playerId);
+      this.lastAction = { type: 'transfer', playerId, targetPlayer, rank, count: matchingCards.length };
+      this._autoDrawIfEmpty(playerId);
+      this._checkGameEnd();
+      // Go again only if player still has cards to ask with
+      if (this.state === 'playing' && (this.hands[playerId] || []).length === 0) {
+        this._advanceTurn();
+      }
+    } else {
+      // Go Fish
+      this.lastAction = { type: 'goFish', playerId, rank };
+      const drawn = this.deck.deal();
+      if (drawn) {
+        this.hands[playerId] = [...this.hands[playerId], drawn];
+        if (drawn.rank === rank) {
+          // Lucky draw — go again only if still have cards
+          this._checkAndRemoveSets(playerId);
+          this.lastAction = { type: 'luckyFish', playerId, rank };
+          this._checkGameEnd();
+          if (this.state === 'playing' && (this.hands[playerId] || []).length === 0) {
+            this._advanceTurn();
           }
         } else {
-          // Deck empty, no draw
+          this._checkAndRemoveSets(playerId);
           this._checkGameEnd();
           if (this.state === 'playing') {
             this._advanceTurn();
           }
+        }
+      } else {
+        // Deck empty, no draw
+        this._checkGameEnd();
+        if (this.state === 'playing') {
+          this._advanceTurn();
         }
       }
     }
@@ -218,6 +258,12 @@ export class GoFish extends BaseGame {
         this._checkGameEnd();
       }
     }
+    this._startTurnTimer();
+  }
+
+  destroy() {
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+    this._onStateChange = null;
   }
 
   getStateForPlayer(playerId) {
@@ -235,6 +281,7 @@ export class GoFish extends BaseGame {
       otherPlayers,
       currentTurnPlayer: this.currentTurnPlayer,
       isMyTurn: this.currentTurnPlayer === playerId && this.state === 'playing',
+      turnEndsAt: this.state === 'playing' ? this._turnEndsAt : null,
       deckRemaining: this.deck.remaining(),
       phase: this.state,
       lastAction: this.lastAction,

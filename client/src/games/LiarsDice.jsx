@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './LiarsDice.module.css';
 import { displayName } from '../utils/displayName.js';
 import PlayerName from '../components/PlayerName.jsx';
@@ -32,6 +32,16 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames, av
   const [bidFaceValue, setBidFaceValue] = useState(2);
   const [acked, setAcked] = useState(false);
   const [lastAckedPhase, setLastAckedPhase] = useState(null);
+  const [turnSecsLeft, setTurnSecsLeft] = useState(null);
+
+  const turnEndsAt = gameState?.turnEndsAt;
+  useEffect(() => {
+    if (!turnEndsAt) { setTurnSecsLeft(null); return; }
+    const tick = () => setTurnSecsLeft(Math.max(0, Math.ceil((turnEndsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [turnEndsAt]);
 
   if (!gameState) {
     return (
@@ -123,7 +133,10 @@ export default function LiarsDice({ gameState, onAction, playerId, nicknames, av
     <div className={styles.table}>
       <h1 className={styles.title}>Liar's Dice</h1>
 
-      <p className={styles.statusText}>{getStatusText()}</p>
+      <p className={styles.statusText}>
+        {getStatusText()}
+        {!isFinished && !isChallenging && turnSecsLeft != null && <span className={styles.turnTimer}> ⏱ {turnSecsLeft}s</span>}
+      </p>
 
       {/* Your dice */}
       {!eliminated && myDice && myDice.length > 0 && (

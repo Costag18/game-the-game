@@ -71,6 +71,7 @@ export class PressYourLuckPigs extends BaseGame {
 
   _armTurnTimer() {
     if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+    this._turnDeadline = Date.now() + TURN_MS;
     this._turnTimer = setTimeout(() => {
       if (this.state !== 'turn') return;
       this._bank(this.currentTurnPlayer); // auto-BANK on timeout
@@ -244,7 +245,7 @@ export class PressYourLuckPigs extends BaseGame {
       maxRounds: this.maxRounds,
       target: this.target,
       turnDeadline: (this.state === 'turn' && this._turnTimer)
-        ? Date.now() + TURN_MS
+        ? this._turnDeadline
         : null,
       scores: { ...this.scores },
       players: [...this.players],

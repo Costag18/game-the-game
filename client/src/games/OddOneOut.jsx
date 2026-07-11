@@ -19,9 +19,9 @@ export default function OddOneOutGame({ gameState, onAction, nicknames, avatars 
     prevPhase.current = phase;
   }, [phase, playSound]);
 
-  // countdown to the active deadline (question + reveal)
+  // countdown to the question deadline
   useEffect(() => {
-    if (!deadline) { setSecsLeft(null); return; }
+    if (phase !== 'question' || !deadline) { setSecsLeft(null); return; }
     const tick = () => setSecsLeft(Math.max(0, Math.ceil((deadline - Date.now()) / 1000)));
     tick();
     const id = setInterval(tick, 250);
@@ -58,8 +58,8 @@ export default function OddOneOutGame({ gameState, onAction, nicknames, avatars 
         </p>
       )}
 
-      {secsLeft != null && phase !== 'finished' && (
-        <div className={`${styles.timer} ${secsLeft <= 3 && phase === 'question' ? styles.timerLow : ''}`}>
+      {secsLeft != null && phase === 'question' && (
+        <div className={`${styles.timer} ${secsLeft <= 3 ? styles.timerLow : ''}`}>
           {secsLeft}s
         </div>
       )}

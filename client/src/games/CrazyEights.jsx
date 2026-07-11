@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './CrazyEights.module.css';
 import PlayerName from '../components/PlayerName.jsx';
 
@@ -89,6 +89,16 @@ function SuitPicker({ onPick }) {
 export default function CrazyEights({ gameState, onAction, nicknames, avatars }) {
   const [pickingSuit, setPickingSuit] = useState(false);
   const [pendingCardIndex, setPendingCardIndex] = useState(null);
+  const [turnSecsLeft, setTurnSecsLeft] = useState(null);
+
+  const turnEndsAt = gameState?.turnEndsAt;
+  useEffect(() => {
+    if (!turnEndsAt) { setTurnSecsLeft(null); return; }
+    const tick = () => setTurnSecsLeft(Math.max(0, Math.ceil((turnEndsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [turnEndsAt]);
 
   if (!gameState) {
     return (
@@ -192,7 +202,10 @@ export default function CrazyEights({ gameState, onAction, nicknames, avatars })
 
       {/* Player's hand */}
       <section className={styles.handSection}>
-        <p className={styles.statusText}>{getStatusText()}</p>
+        <p className={styles.statusText}>
+          {getStatusText()}
+          {!isFinished && turnSecsLeft != null && <span className={styles.turnTimer}> ⏱ {turnSecsLeft}s</span>}
+        </p>
         <div className={styles.handRow}>
           {(myHand || []).map((card, i) => (
             <PlayingCard

@@ -59,6 +59,12 @@
   font-weight: bold;
 }
 
+.turnTimer {
+  font-size: 0.85rem;
+  color: #d4a843;
+  white-space: nowrap;
+}
+
 /* Last action */
 .lastAction {
   background: rgba(212, 168, 67, 0.1);

@@ -1,5 +1,8 @@
 import { BaseGame } from './BaseGame.js';
 import { rollMultiple } from '../utils/Dice.js';
+import { TIMERS } from '../../../shared/constants.js';
+
+const TURN_MS = TIMERS.CARD_GAME * 1000; // 30s per bidding decision
 
 export class LiarsDice extends BaseGame {
   constructor(players) {
@@ -18,6 +21,8 @@ export class LiarsDice extends BaseGame {
     this.lastBidder = null;
     this.challengeResult = null; // { challenger, bidder, bid, actualCount, loser, allDice }
     this.challengeAcknowledged = new Set();
+    this._turnTimer = null;
+    this._turnEndsAt = null;
   }
 
   setOnStateChange(cb) { this._onStateChange = cb; }
@@ -33,6 +38,38 @@ export class LiarsDice extends BaseGame {
     }
     this.transition('start');
     this.setTurnPlayer(this.players[0]);
+    this._startTurnTimer();
+  }
+
+  // An idle bidder must never freeze the table. On timeout: make the minimal
+  // legal bid, or auto-challenge once the bid can no longer be raised sanely
+  // (quantity would exceed all dice in play).
+  _startTurnTimer() {
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+    if (this.state !== 'bidding') { this._turnEndsAt = null; return; }
+    this._turnEndsAt = Date.now() + TURN_MS;
+    this._turnTimer = setTimeout(() => {
+      if (this.state !== 'bidding') return;
+      const pid = this.currentTurnPlayer;
+      if (pid) {
+        if (!this.currentBid) {
+          this.handleAction(pid, { type: 'bid', quantity: 1, faceValue: 2 });
+        } else {
+          const { quantity: cq, faceValue: cf } = this.currentBid;
+          const next = cf < 6
+            ? { quantity: cq, faceValue: cf + 1 }
+            : { quantity: cq + 1, faceValue: 2 };
+          const totalDice = this.activePlayers
+            .reduce((n, p) => n + (this.dice[p] || []).length, 0);
+          if (next.quantity > totalDice) {
+            this.handleAction(pid, { type: 'challenge' });
+          } else {
+            this.handleAction(pid, { type: 'bid', ...next });
+          }
+        }
+      }
+      this._emitChange();
+    }, TURN_MS);
   }
 
   _rollAll() {
@@ -76,8 +113,11 @@ export class LiarsDice extends BaseGame {
         this.currentBid = { quantity, faceValue };
         this.lastBidder = playerId;
         this.nextTurn();
+        this._startTurnTimer();
       } else if (action.type === 'challenge') {
         if (!this.currentBid) return;
+        if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+        this._turnEndsAt = null;
         this.transition('challenge');
         this._resolveChallenge(playerId);
       }
@@ -167,6 +207,7 @@ export class LiarsDice extends BaseGame {
     this._rollAll();
     this.transition('reroll');
     this.setTurnPlayer(nextPlayer);
+    this._startTurnTimer();
   }
 
   removePlayer(playerId) {
@@ -176,17 +217,22 @@ export class LiarsDice extends BaseGame {
 
     if (this.activePlayers.length <= 1 && this.state !== 'finished') {
       if (this._challengeTimer) { clearTimeout(this._challengeTimer); this._challengeTimer = null; }
+      if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
       this.state = 'finished';
       return;
     }
     // If they were holding up the reveal acknowledgement, re-check now.
     if (this.state === 'challenging') {
       this._checkChallengeAckComplete();
+    } else if (this.state === 'bidding') {
+      // Turn may have been reassigned off the leaver — restart their clock.
+      this._startTurnTimer();
     }
   }
 
   destroy() {
     if (this._challengeTimer) { clearTimeout(this._challengeTimer); this._challengeTimer = null; }
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
   }
 
   getStateForPlayer(playerId) {
@@ -206,6 +252,7 @@ export class LiarsDice extends BaseGame {
       currentBid: this.currentBid,
       currentTurnPlayer: this.currentTurnPlayer,
       isMyTurn: this.currentTurnPlayer === playerId && this.state === 'bidding',
+      turnEndsAt: this.state === 'bidding' ? this._turnEndsAt : null,
       phase: this.state,
       eliminated: this.eliminated.includes(playerId),
       challengeResult: isChallenge ? this.challengeResult : null,

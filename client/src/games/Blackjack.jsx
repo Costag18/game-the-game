@@ -58,34 +58,17 @@ export default function Blackjack({ gameState, onAction, nicknames, avatars }) {
   const shake = useScreenShake();
   const { playSound } = useSound();
   const prevCardCount = useRef(0);
-
-  if (!gameState) {
-    return <div className={styles.table}><p className={styles.waiting}>Waiting for game to start...</p></div>;
-  }
-
-  const {
-    myHand,
-    myTotal,
-    dealerShowing,
-    dealerTotal,
-    otherPlayers,
-    isMyTurn,
-    busted,
-    stood,
-    phase,
-    handNumber = 1,
-    totalHands = 5,
-    wins = {},
-    handResults = [],
-  } = gameState;
-
-  const isFinished = phase === 'finished';
-  const isReveal = phase === 'reveal';
   const [acked, setAcked] = useState(false);
   const [lastAckedHand, setLastAckedHand] = useState(0);
+  const [turnSecsLeft, setTurnSecsLeft] = useState(null);
+
+  const phase = gameState?.phase;
+  const busted = gameState?.busted;
+  const myTotal = gameState?.myTotal;
+  const turnEndsAt = gameState?.turnEndsAt;
 
   // Track card count for deal animation
-  const cardCount = (myHand || []).length;
+  const cardCount = (gameState?.myHand || []).length;
   const animateFrom = prevCardCount.current;
   useEffect(() => { prevCardCount.current = cardCount; }, [cardCount]);
 
@@ -96,6 +79,35 @@ export default function Blackjack({ gameState, onAction, nicknames, avatars }) {
   useEffect(() => {
     if (myTotal === 21 && cardCount === 2 && phase === 'playing') { shake('heavy'); playSound('correct'); }
   }, [myTotal, cardCount, phase]);
+
+  // Turn countdown
+  useEffect(() => {
+    if (!turnEndsAt) { setTurnSecsLeft(null); return; }
+    const tick = () => setTurnSecsLeft(Math.max(0, Math.ceil((turnEndsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [turnEndsAt]);
+
+  if (!gameState) {
+    return <div className={styles.table}><p className={styles.waiting}>Waiting for game to start...</p></div>;
+  }
+
+  const {
+    myHand,
+    dealerShowing,
+    dealerTotal,
+    otherPlayers,
+    isMyTurn,
+    stood,
+    handNumber = 1,
+    totalHands = 5,
+    wins = {},
+    handResults = [],
+  } = gameState;
+
+  const isFinished = phase === 'finished';
+  const isReveal = phase === 'reveal';
 
   // Reset ack when hand advances
   if (handNumber !== lastAckedHand && phase === 'playing') {
@@ -191,7 +203,10 @@ export default function Blackjack({ gameState, onAction, nicknames, avatars }) {
       {/* Player's own hand */}
       <section className={styles.playerSection}>
         <Hand cards={myHand || []} label="Your Hand" total={myTotal} showHoleCard animateFrom={animateFrom} />
-        <p className={styles.statusText}>{getStatusText()}</p>
+        <p className={styles.statusText}>
+          {getStatusText()}
+          {phase === 'playing' && turnSecsLeft != null && <span className={styles.turnTimer}> ⏱ {turnSecsLeft}s</span>}
+        </p>
 
         {isMyTurn && !busted && !stood && (
           <div className={styles.actionButtons}>

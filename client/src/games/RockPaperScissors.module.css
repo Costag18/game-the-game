@@ -179,6 +179,13 @@
   min-height: 1.6em;
 }
 
+.turnTimer {
+  font-size: 0.95rem;
+  color: #d4a843;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
 .statusFinished {
   font-size: 1.5rem;
   color: #d4a843;

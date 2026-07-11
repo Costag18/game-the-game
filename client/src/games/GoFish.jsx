@@ -31,7 +31,21 @@ function CardMini({ rank, suit, dealIndex }) {
 export default function GoFish({ gameState, onAction, currentPlayerId, nicknames, avatars }) {
   const [selectedTarget, setSelectedTarget] = useState('');
   const [selectedRank, setSelectedRank] = useState('');
+  const [turnSecsLeft, setTurnSecsLeft] = useState(null);
   const prevHandCount = useRef(0);
+
+  const goFishHandCount = (gameState?.myHand || []).length;
+  const goFishAnimFrom = prevHandCount.current;
+  useEffect(() => { prevHandCount.current = goFishHandCount; }, [goFishHandCount]);
+
+  const turnEndsAt = gameState?.turnEndsAt;
+  useEffect(() => {
+    if (!turnEndsAt) { setTurnSecsLeft(null); return; }
+    const tick = () => setTurnSecsLeft(Math.max(0, Math.ceil((turnEndsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [turnEndsAt]);
 
   if (!gameState) {
     return (
@@ -53,10 +67,6 @@ export default function GoFish({ gameState, onAction, currentPlayerId, nicknames
   } = gameState;
 
   const isFinished = phase === 'finished';
-
-  const goFishHandCount = (myHand || []).length;
-  const goFishAnimFrom = prevHandCount.current;
-  useEffect(() => { prevHandCount.current = goFishHandCount; }, [goFishHandCount]);
 
   // Get unique ranks in my hand for the ask dropdown
   const myRanks = [...new Set((myHand || []).map((c) => c.rank))].sort((a, b) => a - b);
@@ -101,6 +111,7 @@ export default function GoFish({ gameState, onAction, currentPlayerId, nicknames
             Waiting for <PlayerName playerId={currentTurnPlayer} nicknames={nicknames} avatars={avatars} />...
           </span>
         )}
+        {!isFinished && turnSecsLeft != null && <span className={styles.turnTimer}>⏱ {turnSecsLeft}s</span>}
       </div>
 
       {/* Last action */}

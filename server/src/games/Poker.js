@@ -1,5 +1,6 @@
 import { BaseGame } from './BaseGame.js';
 import { Deck } from '../utils/Deck.js';
+import { TIMERS } from '../../../shared/constants.js';
 
 // ---------------------------------------------------------------------------
 // Hand evaluation helpers
@@ -164,6 +165,10 @@ const HANDS_PER_GAME = 5;
 // result; this is just the AFK-safety auto-advance so an idle player can't deadlock.
 const REVEAL_SAFETY_MS = 45000;
 
+// Per-decision clock during betting rounds — an idle player is auto-checked
+// (when free) or auto-folded so the hand can never stall on them.
+const TURN_MS = TIMERS.CARD_GAME * 1000;
+
 const FSM = {
   initialState: 'waiting',
   transitions: {
@@ -195,6 +200,28 @@ export class Poker extends BaseGame {
     this.handNumber = 0;           // current hand (1-based once started)
     this.handResults = [];         // store result of each hand for display
     this.acknowledged = new Set(); // players who pressed Continue on the current reveal
+    this._turnTimer = null;
+    this._turnEndsAt = null;
+  }
+
+  _bettingStates() { return ['preflop', 'flop', 'turn', 'river']; }
+
+  _startTurnTimer() {
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
+    if (!this._bettingStates().includes(this.state) || !this.currentTurnPlayer) {
+      this._turnEndsAt = null;
+      return;
+    }
+    this._turnEndsAt = Date.now() + TURN_MS;
+    this._turnTimer = setTimeout(() => {
+      if (!this._bettingStates().includes(this.state)) return;
+      const pid = this.currentTurnPlayer;
+      if (pid) {
+        const toCall = this.currentBet - (this.bets[pid] || 0);
+        this.handleAction(pid, { type: toCall <= 0 ? 'check' : 'fold' });
+      }
+      this._emitChange();
+    }, TURN_MS);
   }
 
   // -------------------------------------------------------------------------
@@ -287,6 +314,7 @@ export class Poker extends BaseGame {
       }
     }
     this.setTurnPlayer(activePlayers[firstActIdx]);
+    this._startTurnTimer();
   }
 
   _postBlind(playerId, amount) {
@@ -334,6 +362,7 @@ export class Poker extends BaseGame {
       } else {
         this._nextNonFoldedTurn(playerId);
       }
+      this._startTurnTimer();
       return;
     } else if (type === 'check') {
       // Only valid if currentBet equals what this player has already bet
@@ -394,6 +423,7 @@ export class Poker extends BaseGame {
     } else {
       this._nextActiveTurn();
     }
+    this._startTurnTimer();
   }
 
   _activePlayers() {
@@ -546,40 +576,46 @@ export class Poker extends BaseGame {
     const contenders = this._nonFoldedPlayers();
     let winnerName = null;
     let bestDesc = null;
+    let winners = [];
 
     if (contenders.length > 0) {
       let best = null;
-      let winner = null;
       for (const p of contenders) {
         const allCards = [...(this.holeCards[p] || []), ...this.communityCards];
         const result = evaluateHand(allCards);
         if (!best || compareHands(result, best) < 0) {
           best = result;
-          winner = p;
+          winners = [p];
+        } else if (compareHands(result, best) === 0) {
+          winners.push(p); // exact tie — the pot is chopped
         }
       }
-      if (winner) {
-        // Calculate max the winner can take from each player
-        const winnerInvested = this.totalInvested[winner] || 0;
-        let winnings = 0;
-        for (const p of this.players) {
-          const pInvested = this.totalInvested[p] || 0;
-          // Winner can only win up to what they put in from each player
-          winnings += Math.min(pInvested, winnerInvested);
-        }
-        // Return excess to other players who bet more than winner
-        for (const p of this.players) {
-          if (p === winner) continue;
-          const pInvested = this.totalInvested[p] || 0;
-          const excess = Math.max(0, pInvested - winnerInvested);
-          if (excess > 0) {
-            this.chips[p] += excess;
+      if (winners.length > 0) {
+        // Layered (side-pot-aware) distribution: each investment layer is
+        // split equally among the tied winners staked at that layer; layers
+        // above every winner's stake are refunded to their contributors.
+        const inv = {};
+        for (const p of this.players) inv[p] = this.totalInvested[p] || 0;
+        const levels = [...new Set(Object.values(inv).filter((v) => v > 0))].sort((a, b) => a - b);
+        let prev = 0;
+        for (const level of levels) {
+          const slice = level - prev;
+          const contributors = this.players.filter((p) => inv[p] >= level);
+          const layerPot = slice * contributors.length;
+          const eligible = winners.filter((w) => inv[w] >= level);
+          if (eligible.length > 0) {
+            const share = Math.floor(layerPot / eligible.length);
+            let rem = layerPot - share * eligible.length;
+            for (const w of eligible) this.chips[w] += share;
+            for (let i = 0; rem > 0; i++, rem--) this.chips[eligible[i % eligible.length]] += 1;
+          } else {
+            for (const p of contributors) this.chips[p] += slice;
           }
+          prev = level;
         }
-        this.chips[winner] += winnings;
         this.pot = 0;
-        winnerName = winner;
-        bestDesc = best?.description;
+        winnerName = winners[0];
+        bestDesc = winners.length > 1 ? `${best?.description} (split pot)` : best?.description;
       }
     }
 
@@ -587,6 +623,7 @@ export class Poker extends BaseGame {
     this.handResults.push({
       hand: this.handNumber,
       winner: winnerName,
+      winners,
       handDescription: bestDesc,
       holeCards: Object.fromEntries(
         this.players.map((p) => [p, this.holeCards[p] || []])
@@ -707,10 +744,12 @@ export class Poker extends BaseGame {
         this._nextNonFoldedTurn(playerId);
       }
     }
+    this._startTurnTimer();
   }
 
   destroy() {
     if (this._revealTimer) { clearTimeout(this._revealTimer); this._revealTimer = null; }
+    if (this._turnTimer) { clearTimeout(this._turnTimer); this._turnTimer = null; }
   }
 
   // -------------------------------------------------------------------------
@@ -729,6 +768,7 @@ export class Poker extends BaseGame {
       myChips: this.chips[playerId] ?? 0,
       myBet: this.bets[playerId] || 0,
       isMyTurn: this.currentTurnPlayer === playerId && ['preflop', 'flop', 'turn', 'river'].includes(this.state),
+      turnEndsAt: this._bettingStates().includes(this.state) ? this._turnEndsAt : null,
       currentTurnPlayer: this.currentTurnPlayer,
       folded: [...this.folded],
       handNumber: this.handNumber,

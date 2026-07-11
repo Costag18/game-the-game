@@ -224,6 +224,13 @@
   text-align: center;
 }
 
+.turnTimer {
+  font-size: 0.85rem;
+  color: #d4a843;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
 /* Suit picker overlay */
 .suitPickerOverlay {
   position: fixed;

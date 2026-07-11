@@ -21,18 +21,37 @@ export default function SpyfallGame({ gameState, onAction, nicknames, avatars })
   const [locPick, setLocPick] = useState(null); // location during spyGuess
   const [iReady, setIReady] = useState(false);
   const prevPhase = useRef(null);
+  const pickRef = useRef(null);
+  const locPickRef = useRef(null);
+  const autoSubmitted = useRef(false);
+  pickRef.current = pick;
+  locPickRef.current = locPick;
 
   const phase = gameState?.phase;
-  const secs = useCountdown(gameState?.deadline);
+  const isInputPhase = phase === 'voting' || phase === 'spyGuess';
+  const secs = useCountdown(isInputPhase ? gameState?.deadline : null);
 
   useEffect(() => {
     if (phase === prevPhase.current) return;
     if (phase === 'reveal') { setIReady(false); playSound('roundStart'); }
-    if (phase === 'voting') setPick(null);
-    if (phase === 'spyGuess') setLocPick(null);
+    if (phase === 'voting') { setPick(null); autoSubmitted.current = false; }
+    if (phase === 'spyGuess') { setLocPick(null); autoSubmitted.current = false; }
     if (phase === 'finished') playSound('voteCast');
     prevPhase.current = phase;
   }, [phase, playSound]);
+
+  // Auto-submit the current selection just before the deadline so it isn't lost
+  useEffect(() => {
+    if (secs == null || secs > 1 || autoSubmitted.current) return;
+    if (phase === 'voting' && pickRef.current && !gameState?.hasVoted) {
+      autoSubmitted.current = true;
+      onAction({ type: 'castVote', suspectId: pickRef.current });
+    }
+    if (phase === 'spyGuess' && gameState?.iAmGuessing && locPickRef.current && !gameState?.spyGuessSubmitted) {
+      autoSubmitted.current = true;
+      onAction({ type: 'guessLocation', location: locPickRef.current });
+    }
+  }, [secs, phase]);
 
   if (!gameState) return <div className={styles.arena}><p className={styles.loading}>Infiltrating…</p></div>;
 

@@ -199,6 +199,13 @@
   min-height: 1.5em;
 }
 
+.turnTimer {
+  font-size: 0.9rem;
+  color: #d4a843;
+  margin-left: 0.4rem;
+  white-space: nowrap;
+}
+
 /* Action buttons */
 .actionButtons {
   display: flex;

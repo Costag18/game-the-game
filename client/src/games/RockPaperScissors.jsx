@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './RockPaperScissors.module.css';
 import { displayName } from '../utils/displayName.js';
 import PlayerName from '../components/PlayerName.jsx';
@@ -9,6 +9,16 @@ const CHOICE_LABEL = { rock: 'Rock', paper: 'Paper', scissors: 'Scissors' };
 export default function RockPaperScissors({ gameState, onAction, nicknames, avatars }) {
   const [acked, setAcked] = useState(false);
   const [lastAckedRound, setLastAckedRound] = useState(0);
+  const [choiceSecsLeft, setChoiceSecsLeft] = useState(null);
+
+  const choiceEndsAt = gameState?.choiceEndsAt;
+  useEffect(() => {
+    if (!choiceEndsAt) { setChoiceSecsLeft(null); return; }
+    const tick = () => setChoiceSecsLeft(Math.max(0, Math.ceil((choiceEndsAt - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 500);
+    return () => clearInterval(id);
+  }, [choiceEndsAt]);
 
   if (!gameState) {
     return (
@@ -81,6 +91,7 @@ export default function RockPaperScissors({ gameState, onAction, nicknames, avat
 
       <p className={`${styles.statusText} ${isFinished ? styles.statusFinished : ''}`}>
         {getStatusText()}
+        {phase === 'round' && choiceSecsLeft != null && <span className={styles.turnTimer}> ⏱ {choiceSecsLeft}s</span>}
       </p>
 
       {phase === 'reveal' && !acked && (
